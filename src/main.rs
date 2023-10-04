@@ -6,6 +6,7 @@ use mysql::prelude::*;
 use std::env;
 
 fn main() {
+    println!("Hello, world!");
     // Load environment variables from .env file if present
     dotenv().ok();
 
