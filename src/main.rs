@@ -1,28 +1,33 @@
 pub mod routes;
 pub mod authentication;
 pub mod config;
-
+pub mod model;
+pub mod repository;
+pub mod error;
 
 use actix_cors::Cors;
 use actix_web::{http::header, App, HttpServer};
 use dotenv::dotenv;
 use routes::health_check::health_check;
 use sqlx::{mysql::MySqlPoolOptions, query, Row};
-use std::env;
 use tracing_actix_web::TracingLogger;
+
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenv().ok();
-    tracing_subscriber::fmt::init();
 
-    // Read the database URL from the environment variable
-    let database_url = env::var("DATABASE_URL_RUST").expect("DATABASE_URL not set");
+    dotenv().ok();
+
+    // Load the configuration struct with all the environment variables
+    let config = config::Config::init();
+
+    tracing_subscriber::fmt::init();
 
     tracing::info!("Connecting to database");
     let pool = match MySqlPoolOptions::new()
         .max_connections(10)
-        .connect(&database_url)
+        .connect(&config.database_url)
         .await
     {
         Ok(pool) => {
@@ -35,8 +40,7 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
-
-
+    // Test the connection to the database by running a show tables query
     match query("SHOW TABLES").fetch_all(&pool).await {
         Ok(rows) => {
             for row in &rows {
@@ -49,7 +53,6 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
-    let config = config::Config::init();
 
     tracing::info!("Starting Actix web server");
     HttpServer::new(move || {
@@ -65,6 +68,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(health_check)
             .app_data(config.clone())
+            .app_data(pool.clone())
             // .service(actix_files::Files::new("/api/images", &public_dir))
             // .configure(handler::config)
             .wrap(cors)

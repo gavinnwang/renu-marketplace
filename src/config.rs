@@ -8,6 +8,7 @@ pub struct Config {
     pub google_oauth_client_id: String,
     pub google_oauth_client_secret: String,
     pub google_oauth_redirect_url: String,
+    pub database_url: String,
 }
 
 impl Config {
@@ -23,6 +24,7 @@ impl Config {
             .expect("GOOGLE_OAUTH_CLIENT_SECRET must be set");
         let google_oauth_redirect_url = std::env::var("GOOGLE_OAUTH_REDIRECT_URL")
             .expect("GOOGLE_OAUTH_REDIRECT_URL must be set");
+        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
         Config {
             client_origin,
@@ -32,6 +34,7 @@ impl Config {
             google_oauth_client_id,
             google_oauth_client_secret,
             google_oauth_redirect_url,
+            database_url,
         }
     }
 }

@@ -20,6 +20,6 @@ model User {
   photo_url String
   verified  Boolean
   provider  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt @default(now())
 }
