@@ -1,4 +1,7 @@
 pub mod routes;
+pub mod authentication;
+pub mod config;
+
 
 use actix_cors::Cors;
 use actix_web::{http::header, App, HttpServer};
@@ -46,6 +49,8 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
+    let config = config::Config::init();
+
     tracing::info!("Starting Actix web server");
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -59,7 +64,7 @@ async fn main() -> std::io::Result<()> {
             .supports_credentials();
         App::new()
             .service(health_check)
-            // .app_data(app_data.clone())
+            .app_data(config.clone())
             // .service(actix_files::Files::new("/api/images", &public_dir))
             // .configure(handler::config)
             .wrap(cors)
