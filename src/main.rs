@@ -1,8 +1,11 @@
 extern crate dotenv;
 extern crate mysql;
 
+pub mod routes;
+
 use actix_cors::Cors;
 use actix_web::{http::header, App, HttpServer};
+use routes::health_check::health_check;
 use dotenv::dotenv;
 use sqlx::{mysql::MySqlPoolOptions, query, Row};
 use std::env;
@@ -47,6 +50,7 @@ async fn main() -> std::io::Result<()> {
             ])
             .supports_credentials();
         App::new()
+            .service(health_check)
             // .app_data(app_data.clone())
             // .service(actix_files::Files::new("/api/images", &public_dir))
             // .configure(handler::config)
