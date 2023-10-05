@@ -65,22 +65,20 @@ impl FromRequest for AuthenticationGuard {
             &Validation::new(Algorithm::HS256),
         );
 
-        // let token_sub = token.claims.sub;
-
-        let pool_option = req.app_data::<web::Data<DbPool>>();
-        if pool_option.is_none() {
-            return Box::pin(async move {
-                Err(ErrorUnauthorized(
-                    json!({"status": "fail", "message": "Internal Server error"}),
-                ))
-            });
-        }
-        let pool = pool_option.unwrap();
+        let pool = match req.app_data::<web::Data<DbPool>>() {
+            Some(pool) => pool.clone(),
+            None => {
+                return Box::pin(async {
+                    Err(ErrorUnauthorized(
+                        json!({"status": "fail", "message": "Internal Server error"}),
+                    ))
+                });
+            }
+        };
 
         match decode {
             Ok(decoded_token) => {
                 let user_id = decoded_token.claims.sub.clone();
-                let pool = pool.clone();
                 Box::pin(async move {
                     let user_result =
                         user_repository::fetch_user_by_id(pool.as_ref(), user_id.as_str()).await;
