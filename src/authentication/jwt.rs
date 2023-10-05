@@ -1,4 +1,4 @@
-use std::future::{ready, Ready};
+use std::{future::Future, pin::Pin};
 
 use actix_web::{
     dev::Payload,
@@ -9,7 +9,7 @@ use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::config::Config;
+use crate::{config::Config, model::db_model::DbPool, repository::user_repository};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {
@@ -24,9 +24,11 @@ pub struct AuthenticationGuard {
 
 impl FromRequest for AuthenticationGuard {
     type Error = ActixWebError;
-    type Future = Ready<Result<Self, Self::Error>>;
+    // type Future = Ready<Result<Self, Self::Error>>;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        
         let token = req
             .cookie("token")
             .map(|c| c.value().to_string())
@@ -36,43 +38,68 @@ impl FromRequest for AuthenticationGuard {
                     .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
             });
 
-        if token.is_none() {
-            return ready(Err(ErrorUnauthorized(
-                json!({"status": "fail", "message": "You are not logged in, please provide token"}),
-            )));
-        }
+        let token = match token {
+            Some(token) => token.clone(),
+            None => {
+                return Box::pin(async {
+                    Err(ErrorUnauthorized(
+                        json!({"status": "fail", "message": "You are not logged in. Please provide a token"}),
+                    ))
+                })
+            }
+        };
 
-        let config = req.app_data::<web::Data<Config>>().unwrap();
-
-        let jwt_secret = config.jwt_secret.to_owned();
-        let decode = decode::<TokenClaims>(
-            token.unwrap().as_str(),
+        let jwt_secret = match req.app_data::<web::Data<Config>>() {
+            Some(config) => config.jwt_secret.clone(),
+            None => {
+                return Box::pin(async {
+                    Err(ErrorUnauthorized(
+                        json!({"status": "fail", "message": "Internal Server errorr"}),
+                    ))
+                });
+            }
+        };
+                let decode = decode::<TokenClaims>(
+            token.as_str(),
             &DecodingKey::from_secret(jwt_secret.as_ref()),
             &Validation::new(Algorithm::HS256),
         );
 
+        // let token_sub = token.claims.sub;
+
+        let pool_option = req.app_data::<web::Data<DbPool>>();
+        if pool_option.is_none() {
+            return Box::pin(async move {
+                Err(ErrorUnauthorized(
+                    json!({"status": "fail", "message": "Internal Server error"}),
+                ))
+            });
+        }
+        let pool = pool_option.unwrap();
+
         match decode {
-            Ok(token) => {
-                // let vec = data.db.lock().unwrap();
-                // let user = vec
-                //     .iter()
-                //     .find(|user| user.id == Some(token.claims.sub.to_owned()));
+            Ok(decoded_token) => {
+                let user_id = decoded_token.claims.sub.clone();
+                let pool = pool.clone();
+                Box::pin(async move {
+                    let user_result =
+                        user_repository::fetch_user_by_id(pool.as_ref(), user_id.as_str()).await;
 
-                // if user.is_none() {
-                //     return ready(Err(ErrorUnauthorized(
-                //         json!({"status": "fail", "message": "User belonging to this token no logger exists"}),
-                //     )));
-                // }
+                    if user_result.is_err() {
+                        return Err(ErrorUnauthorized(
+                            json!({"status": "fail", "message": "User belonging to this token no longer exists"}),
+                        ));
+                    };
 
-                todo!("TODO");
-
-                ready(Ok(AuthenticationGuard {
-                    user_id: token.claims.sub,
-                }))
+                let user_id = decoded_token.claims.sub.clone();
+                    Ok(AuthenticationGuard { user_id: user_id })
+                })
             }
-            Err(_) => ready(Err(ErrorUnauthorized(
-                json!({"status": "fail", "message": "Invalid token or usre doesn't exists"}),
-            ))),
+            Err(_) => Box::pin(async {
+                Err(ErrorUnauthorized(
+                    json!({"status": "fail", "message": "Invalid token or user doesn't exist"}),
+                ))
+            }),
         }
     }
 }
