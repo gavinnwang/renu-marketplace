@@ -23,7 +23,6 @@ pub enum DbError {
     Other(sqlx::Error),
 }
 
-
 impl ResponseError for DbError {
     fn status_code(&self) -> actix_http::StatusCode {
         match self {
@@ -33,7 +32,7 @@ impl ResponseError for DbError {
             DbError::MySqlDatabaseError(e) => match e.code() {
                 Some("1062") => StatusCode::BAD_REQUEST,
                 _ => StatusCode::INTERNAL_SERVER_ERROR,
-            }
+            },
             DbError::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -56,4 +55,3 @@ impl From<sqlx::Error> for DbError {
         }
     }
 }
-

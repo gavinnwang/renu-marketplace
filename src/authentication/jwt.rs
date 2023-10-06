@@ -13,13 +13,13 @@ use crate::{config::Config, model::db_model::DbPool, repository::user_repository
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {
-    pub sub: String,
+    pub sub: i64,
     pub iat: usize,
     pub exp: usize,
 }
 
 pub struct AuthenticationGuard {
-    pub user_id: String,
+    pub user_id: i64,
 }
 
 impl FromRequest for AuthenticationGuard {
@@ -28,7 +28,6 @@ impl FromRequest for AuthenticationGuard {
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
-        
         let token = req
             .cookie("token")
             .map(|c| c.value().to_string())
@@ -59,7 +58,7 @@ impl FromRequest for AuthenticationGuard {
                 });
             }
         };
-                let decode = decode::<TokenClaims>(
+        let decode = decode::<TokenClaims>(
             token.as_str(),
             &DecodingKey::from_secret(jwt_secret.as_ref()),
             &Validation::new(Algorithm::HS256),
@@ -81,7 +80,7 @@ impl FromRequest for AuthenticationGuard {
                 let user_id = decoded_token.claims.sub.clone();
                 Box::pin(async move {
                     let user_result =
-                        user_repository::fetch_user_by_id(pool.as_ref(), user_id.as_str()).await;
+                        user_repository::fetch_user_by_id(pool.as_ref(), user_id).await;
 
                     if user_result.is_err() {
                         return Err(ErrorUnauthorized(
@@ -89,7 +88,7 @@ impl FromRequest for AuthenticationGuard {
                         ));
                     };
 
-                let user_id = decoded_token.claims.sub.clone();
+                    let user_id = decoded_token.claims.sub.clone();
                     Ok(AuthenticationGuard { user_id: user_id })
                 })
             }

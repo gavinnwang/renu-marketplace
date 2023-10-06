@@ -1,9 +1,9 @@
-pub mod routes;
 pub mod authentication;
 pub mod config;
+pub mod error;
 pub mod model;
 pub mod repository;
-pub mod error;
+pub mod routes;
 
 use actix_cors::Cors;
 use actix_web::{http::header, App, HttpServer};
@@ -12,11 +12,8 @@ use routes::health_check::health_check;
 use sqlx::{mysql::MySqlPoolOptions, query, Row};
 use tracing_actix_web::TracingLogger;
 
-
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
     dotenv().ok();
 
     // Load the configuration struct with all the environment variables
@@ -52,7 +49,6 @@ async fn main() -> std::io::Result<()> {
             tracing::error!("Failed to execute query: {}", e);
         }
     }
-
 
     tracing::info!("Starting Actix web server");
     HttpServer::new(move || {

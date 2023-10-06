@@ -5,11 +5,16 @@ use std::error::Error;
 
 use crate::config::Config;
 
-
 #[derive(Deserialize)]
 pub struct OAuthResponse {
     pub access_token: String,
     pub id_token: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct QueryCode {
+    pub code: String,
+    pub state: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -49,7 +54,6 @@ pub async fn request_token(
         Ok(oauth_response)
     } else {
         let message = "An error occurred while trying to retrieve access token.";
-        println!("{}", response.text().await?);
         Err(From::from(message))
     }
 }
