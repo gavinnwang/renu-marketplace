@@ -10,7 +10,7 @@ use crate::{
     repository::user_repository,
 };
 
-#[get("/sessions/oauth/google")]
+#[get("/callback")]
 async fn google_oauth_handler(
     query: web::Query<QueryCode>,
     config: web::Data<Config>,
@@ -103,7 +103,7 @@ async fn google_oauth_handler(
     response.finish()
 }
 
-#[get("/auth/logout")]
+#[get("/logout")]
 async fn logout_handler(_: AuthenticationGuard) -> impl Responder {
     let cookie = Cookie::build("token", "")
         .path("/")
