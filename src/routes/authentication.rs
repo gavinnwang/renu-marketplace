@@ -10,7 +10,7 @@ use crate::{
     repository::user_repository,
 };
 
-#[get("/auth/callback")]
+#[get("/sessions/oauth/google")]
 async fn google_oauth_handler(
     query: web::Query<QueryCode>,
     config: web::Data<Config>,
@@ -61,6 +61,7 @@ async fn google_oauth_handler(
             match user_id {
                 Err(message) => {
                     let message = message.to_string();
+                    tracing::error!("Failed to add user: {}", message);
                     return HttpResponse::BadGateway()
                         .json(serde_json::json!({"status": "fail", "message": message}));
                 }
@@ -69,7 +70,8 @@ async fn google_oauth_handler(
         }
         Ok(user) => user.id,
     };
-
+    
+    tracing::info!("User id authenticating: {}\n", user_id);
 
     let jwt_secret = config.jwt_secret.to_owned();
     let now = Utc::now();

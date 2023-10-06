@@ -9,7 +9,8 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
         .service(health_check_handler)
         .service(google_oauth_handler)
-        .service(logout_handler);
+        .service(logout_handler)
+        .service(web::scope("/users").service(super::user_handler::get_user_handler));
     
     conf.service(scope);
 }

@@ -9,6 +9,8 @@ pub struct Config {
     pub google_oauth_client_secret: String,
     pub google_oauth_redirect_url: String,
     pub database_url: String,
+    pub server_port: u16,
+    pub server_host: String,
 }
 
 impl Config {
@@ -25,6 +27,8 @@ impl Config {
         let google_oauth_redirect_url = std::env::var("GOOGLE_OAUTH_REDIRECT_URL")
             .expect("GOOGLE_OAUTH_REDIRECT_URL must be set");
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let server_port = std::env::var("SERVER_PORT").expect("SERVER_PORT must be set");
+        let server_host = std::env::var("SERVER_HOST").expect("SERVER_HOST must be set");
 
         Config {
             client_origin,
@@ -35,6 +39,8 @@ impl Config {
             google_oauth_client_secret,
             google_oauth_redirect_url,
             database_url,
+            server_port: server_port.parse::<u16>().unwrap(),
+            server_host,
         }
     }
 }

@@ -50,6 +50,8 @@ async fn main() -> std::io::Result<()> {
     }
 
     tracing::info!("Starting Actix web server");
+    let server_host = config.server_host.clone();
+    let server_port = config.server_port.clone();
     HttpServer::new(move || {
         let cors = Cors::default()
             .allowed_origin("http://localhost:3000")
@@ -67,7 +69,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(TracingLogger::default())
             .configure(routes::handler::handlers)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((server_host, server_port))?
     .run()
     .await
 }
