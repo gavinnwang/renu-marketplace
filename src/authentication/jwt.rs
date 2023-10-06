@@ -38,7 +38,7 @@ impl FromRequest for AuthenticationGuard {
             });
 
         let token = match token {
-            Some(token) => token.clone(),
+            Some(token) => token,
             None => {
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
@@ -51,13 +51,15 @@ impl FromRequest for AuthenticationGuard {
         let jwt_secret = match req.app_data::<web::Data<Config>>() {
             Some(config) => config.jwt_secret.clone(),
             None => {
+                tracing::error!("Internal Server error: JWT secret not found");
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Internal Server errorr"}),
+                        json!({"status": "fail", "message": "Internal Server error: JWT secret not found"}),
                     ))
                 });
             }
         };
+        
         let decode = decode::<TokenClaims>(
             token.as_str(),
             &DecodingKey::from_secret(jwt_secret.as_ref()),
@@ -67,9 +69,10 @@ impl FromRequest for AuthenticationGuard {
         let pool = match req.app_data::<web::Data<DbPool>>() {
             Some(pool) => pool.clone(),
             None => {
+                tracing::error!("Internal Server error: Database connection failed");
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Internal Server error"}),
+                        json!({"status": "fail", "message": "Internal Server error: Database connection failed"}),
                     ))
                 });
             }

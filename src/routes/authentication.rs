@@ -4,13 +4,13 @@ use chrono::{Utc, Duration};
 use jsonwebtoken::{encode, Header, EncodingKey};
 
 use crate::{
-    authentication::{google_oauth::{get_google_user, request_token, QueryCode}, jwt::TokenClaims},
+    authentication::{google_oauth::{get_google_user, request_token, QueryCode}, jwt::{TokenClaims, AuthenticationGuard}},
     config::Config,
     model::{db_model::DbPool, user_model::NewUser},
     repository::user_repository,
 };
 
-#[get("/sessions/oauth/google")]
+#[get("/auth/callback")]
 async fn google_oauth_handler(
     query: web::Query<QueryCode>,
     config: web::Data<Config>,
@@ -99,4 +99,17 @@ async fn google_oauth_handler(
     response.append_header((LOCATION, format!("{}{}", frontend_origin, state)));
     response.cookie(cookie);
     response.finish()
+}
+
+#[get("/auth/logout")]
+async fn logout_handler(_: AuthenticationGuard) -> impl Responder {
+    let cookie = Cookie::build("token", "")
+        .path("/")
+        .max_age(ActixWebDuration::new(-1, 0))
+        .http_only(true)
+        .finish();
+
+    HttpResponse::Ok()
+        .cookie(cookie)
+        .json(serde_json::json!({"status": "success"}))
 }

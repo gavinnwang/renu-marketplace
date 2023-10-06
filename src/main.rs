@@ -6,9 +6,8 @@ pub mod repository;
 pub mod routes;
 
 use actix_cors::Cors;
-use actix_web::{http::header, App, HttpServer};
+use actix_web::{http::header, App, HttpServer, web::Data};
 use dotenv::dotenv;
-use routes::health_check::health_check;
 use sqlx::{mysql::MySqlPoolOptions, query, Row};
 use tracing_actix_web::TracingLogger;
 
@@ -62,13 +61,11 @@ async fn main() -> std::io::Result<()> {
             ])
             .supports_credentials();
         App::new()
-            .service(health_check)
-            .app_data(config.clone())
-            .app_data(pool.clone())
-            // .service(actix_files::Files::new("/api/images", &public_dir))
-            // .configure(handler::config)
+            .app_data(Data::new(config.clone()))
+            .app_data(Data::new(pool.clone()))
             .wrap(cors)
             .wrap(TracingLogger::default())
+            .configure(routes::handler::handlers)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
