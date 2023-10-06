@@ -44,10 +44,9 @@ impl From<sqlx::Error> for DbError {
             sqlx::Error::RowNotFound => DbError::NotFound,
             sqlx::Error::Io(_) => DbError::ConnectionError,
             sqlx::Error::Database(e) => {
-                // Check if PostgreSQL error
-                let pg_error = e.try_downcast::<MySqlDatabaseError>();
-                match pg_error {
-                    Ok(pg_error) => DbError::MySqlDatabaseError(pg_error),
+                let mysql_error = e.try_downcast::<MySqlDatabaseError>();
+                match mysql_error {
+                    Ok(mysql_error) => DbError::MySqlDatabaseError(mysql_error),
                     Err(e) => DbError::Other(sqlx::Error::Database(e)),
                 }
             }
