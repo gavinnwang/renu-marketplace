@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT id, name FROM User WHERE email = ?",
+  "query": "SELECT id, name, email FROM User WHERE email = ?",
   "describe": {
     "columns": [
       {
@@ -22,6 +22,16 @@
           "char_set": 255,
           "max_size": 764
         }
+      },
+      {
+        "ordinal": 2,
+        "name": "email",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 764
+        }
       }
     ],
     "parameters": {
@@ -29,8 +39,9 @@
     },
     "nullable": [
       false,
+      false,
       false
     ]
   },
-  "hash": "0e27b19425eb28cf7c35b7d48d8032af379381b9d7b073f757c1ccdddfd90cc3"
+  "hash": "58ae4ae56d759a071a7b89b1f389d1edb1a978c8b1b2c9dd9f43e0890f402343"
 }
