@@ -2,7 +2,7 @@ use actix_web::web;
 
 use super::auth_handler::google_oauth_handler;
 use super::auth_handler::logout_handler;
-use super::health_check::health_check_handler;
+use super::health_handler::health_check_handler;
 
 pub fn handlers(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
