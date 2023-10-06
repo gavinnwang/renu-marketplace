@@ -1,10 +1,16 @@
 use actix_http::header::LOCATION;
-use actix_web::{get, web, HttpResponse, Responder, cookie::{time::Duration as ActixWebDuration, Cookie},};
-use chrono::{Utc, Duration};
-use jsonwebtoken::{encode, Header, EncodingKey};
+use actix_web::{
+    cookie::{time::Duration as ActixWebDuration, Cookie},
+    get, web, HttpResponse, Responder,
+};
+use chrono::{Duration, Utc};
+use jsonwebtoken::{encode, EncodingKey, Header};
 
 use crate::{
-    authentication::{google_oauth::{get_google_user, request_token, QueryCode}, jwt::{TokenClaims, AuthenticationGuard}},
+    authentication::{
+        google_oauth::{get_google_user, request_token, QueryCode},
+        jwt::{AuthenticationGuard, TokenClaims},
+    },
     config::Config,
     model::{db_model::DbPool, user_model::NewUser},
     repository::user_repository,
@@ -46,6 +52,18 @@ async fn google_oauth_handler(
             Ok(google_user) => google_user,
         };
 
+    // if email doesn't end in northwestern.edu redirect to 404 page
+
+    if !google_user.email.ends_with("northwestern.edu") {
+        tracing::warn!(
+            "API: User email is not northwestern edu email: {}\n",
+            google_user.email
+        );
+        let frontend_origin = config.client_origin.to_owned();
+        let mut response = HttpResponse::Found();
+        return response.append_header((LOCATION, format!("{}{}", frontend_origin, "/failed_sign_in"))).json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
+    }
+
     let user = user_repository::fetch_user_by_email(pool.as_ref(), &google_user.email).await;
 
     let user_id = match user {
@@ -70,7 +88,7 @@ async fn google_oauth_handler(
         }
         Ok(user) => user.id,
     };
-    
+
     tracing::info!("User id authenticating: {}\n", user_id);
 
     let jwt_secret = config.jwt_secret.to_owned();
