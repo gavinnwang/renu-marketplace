@@ -9,6 +9,19 @@ import { Slot, SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { SessionProvider } from "../providers/ctx";
+import {
+  Poppins_300Light,
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+} from "@expo-google-fonts/poppins";
+import {
+  Manrope_300Light,
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+} from "@expo-google-fonts/manrope";
+import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
 // import * as SecureStore from "expo-secure-store";
 
 export {
@@ -69,6 +82,15 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Poppins_300Light,
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Manrope_300Light,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    SecularOne_400Regular,
     ...FontAwesome.font,
   });
 

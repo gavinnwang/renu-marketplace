@@ -14,8 +14,7 @@ export default function Index() {
             className={theme.dark ? "text-white" : "text-black"}
             onPress={() => {
               signOut();
-            }}
-          >
+            }}>
             Sign Out
           </Text>
           <Text>
@@ -24,14 +23,14 @@ export default function Index() {
             User token: {session.token}
           </Text>
           <Link href="/welcome">GO TO APP</Link>
+          <Link href="/home">Home</Link>
         </View>
       ) : (
         <View>
           <Text
             onPress={() => {
               void signIn("/");
-            }}
-          >
+            }}>
             Sign In
           </Text>
           <Link href="/welcome">GO TO APP</Link>

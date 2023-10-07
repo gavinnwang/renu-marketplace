@@ -9,8 +9,7 @@ export default function SignIn() {
       <Text
         onPress={() => {
           void signIn("/");
-        }}
-      >
+        }}>
         Sign In
       </Text>
     </View>
