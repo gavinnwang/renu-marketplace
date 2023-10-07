@@ -35,7 +35,6 @@ export default function Index() {
             Sign In
           </Text>
           <Link href="/welcome">GO TO APP</Link>
-
         </View>
       )}
     </View>

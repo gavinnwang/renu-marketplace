@@ -7,9 +7,7 @@ export default function Index() {
   return (
     <View className="flex flex-1 justify-center items-center bg-gray-50">
       <Text>hello you signed in. your name is {session!.name} </Text>
-      <Link href="/one">
-      go to app now
-      </Link>
+      <Link href="/one">go to app now</Link>
     </View>
   );
 }

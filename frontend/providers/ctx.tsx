@@ -17,7 +17,7 @@ type AuthContextType = {
   session: Session | null;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setSession : React.Dispatch<React.SetStateAction<Session | null>>
+  setSession: React.Dispatch<React.SetStateAction<Session | null>>;
   loadedFromStorage: boolean;
   setLoadedFromStorage: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -93,7 +93,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         setIsLoading,
         setSession,
         loadedFromStorage,
-        setLoadedFromStorage
+        setLoadedFromStorage,
       }}
     >
       {children}
