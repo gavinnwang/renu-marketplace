@@ -23,7 +23,7 @@ export default function Index() {
             User token: {session.token}
           </Text>
           <Link href="/welcome">GO TO APP</Link>
-          <Link href="/home">Home</Link>
+          <Link href="/home/mens">Home</Link>
         </View>
       ) : (
         <View>

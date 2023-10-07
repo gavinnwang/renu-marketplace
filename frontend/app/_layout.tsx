@@ -144,8 +144,8 @@ function RootLayoutNav() {
         </View> */}
 
         <>
-          <SafeAreaView style={{ flex: 0, backgroundColor: "#F6F6F^" }} />
-          <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F^" }}>
+          <SafeAreaView style={{ flex: 0, backgroundColor: "#F6F6F6" }} />
+          <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F6" }}>
             <Slot />
           </SafeAreaView>
         </>

@@ -20,13 +20,13 @@ model User {
   updated_at        DateTime @default(now()) @updatedAt
   items             Item[]
   transaction_count Int      @default(0)
-
 }
 
 model Item {
-  id    Int    @id @default(autoincrement())
-  name  String
-  price Float
+  id       Int    @id @default(autoincrement())
+  name     String
+  price    Float
+  imageUrl String
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
