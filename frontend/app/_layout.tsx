@@ -7,7 +7,7 @@ import {
 import { useFonts } from "expo-font";
 import { Slot, SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
-import { useColorScheme } from "react-native";
+import { SafeAreaView, View, useColorScheme } from "react-native";
 import { SessionProvider } from "../providers/ctx";
 import {
   Poppins_300Light,
@@ -131,7 +131,27 @@ function RootLayoutNav() {
   // }
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Slot />
+      <>
+        {/* <SafeAreaView style={{ flex: 0, backgroundColor: "#F6F6F6" }} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F6" }}> */}
+        {/* <SafeAreaView edges={[]}> */}
+
+        {/* </SafeAreaView> */}
+        {/* <View style={{ flex: 1, backgroundColor: "#F6F6F6" }}>
+          <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F6" }}>
+            <Slot />
+          </SafeAreaView>
+        </View> */}
+
+        <>
+          <SafeAreaView style={{ flex: 0, backgroundColor: "#F6F6F^" }} />
+          <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F^" }}>
+            <Slot />
+          </SafeAreaView>
+        </>
+
+        {/* </SafeAreaView> */}
+      </>
     </ThemeProvider>
   );
 }

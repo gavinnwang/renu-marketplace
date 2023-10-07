@@ -7,7 +7,7 @@ export default function Index() {
   const { signOut, session, signIn } = useSession();
   const theme = useTheme();
   return (
-    <View className="flex h-full w-full justify-center items-center bg-purple-50 ">
+    <View className="flex h-full w-full justify-center items-center">
       {session ? (
         <View>
           <Text
