@@ -9,7 +9,8 @@ export default function Index() {
   return (
     <View className="flex h-full w-full justify-center items-center bg-red-500 ">
       {session ? (
-        <Text
+        <View>
+          <Text
         className={theme.dark ? 'text-white' : 'text-black'}
           onPress={() => {
             signOut();
@@ -17,11 +18,16 @@ export default function Index() {
         >
           Sign Out
         </Text>
+        <Text>
+          session: {session}
+        </Text>
+        </View>
+
       ) : (
         <View>
           <Text
             onPress={() => {
-              void signIn("/");
+              void signIn("/"); 
             }}
           >
             Sign In
