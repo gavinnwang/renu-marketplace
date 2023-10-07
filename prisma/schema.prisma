@@ -12,20 +12,22 @@ generator client {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  name       String
-  email      String   @unique
-  role       String   @default("user")
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
-  items      Item[]
+  id                Int      @id @default(autoincrement())
+  name              String
+  email             String   @unique
+  role              String   @default("user")
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+  items             Item[]
+  transaction_count Int      @default(0)
+
 }
 
 model Item {
-  id         Int      @id @default(autoincrement())
-  name       String
-  price      Float
-  
+  id    Int    @id @default(autoincrement())
+  name  String
+  price Float
+
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
   user       User     @relation(fields: [user_id], references: [id])

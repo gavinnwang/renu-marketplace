@@ -1,0 +1,6 @@
+/frontend
+/target
+/prisma
+/node_modules
+/.expo
+/.sqlx
