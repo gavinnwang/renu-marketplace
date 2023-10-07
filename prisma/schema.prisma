@@ -16,8 +16,8 @@ model User {
   name              String
   email             String   @unique
   role              String   @default("user")
-  created_at        DateTime @default(now())
-  updated_at        DateTime @default(now()) @updatedAt
+  created_at        DateTime @db.Timestamp()
+  updated_at        DateTime  @db.Timestamp()
   items             Item[]
   transaction_count Int      @default(0)
 }
@@ -29,8 +29,8 @@ model Item {
   original_price Float?
   image_url      String
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  created_at DateTime @db.Timestamp()
+  updated_at DateTime  @db.Timestamp()
   user       User     @relation(fields: [user_id], references: [id])
   user_id    Int
 
