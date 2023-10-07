@@ -53,7 +53,7 @@ function RootLayoutNav() {
   return (
     <SessionProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Slot></Slot>
+        <Slot/>
       </ThemeProvider>
     </SessionProvider>
   );

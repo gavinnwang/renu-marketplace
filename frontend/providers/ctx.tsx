@@ -1,7 +1,10 @@
 import React from "react";
+import * as WebBrowser from 'expo-web-browser';
+import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
+
 
 type AuthContextType = {
-  signIn: () => void;
+  signIn: (from: string) => Promise<void>;
   signOut: () => void;
   session: string | null;
   isLoading: boolean;
@@ -24,13 +27,16 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const signIn = () => { 
+  const signIn = async (from : string) => { 
     console.log("sign in");
+    const link = getGoogleUrl(from);
+    await WebBrowser.openBrowserAsync(link);
     setSession("xxx");
   }
 
   const signOut = () => {
     console.log("sign out");
+    
     setSession(null);
   }
 

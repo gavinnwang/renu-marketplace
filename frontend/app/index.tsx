@@ -1,20 +1,16 @@
-import { Text, View } from 'react-native';
+import { Text, View } from "react-native";
 import { useSession } from "../providers/ctx";
+import { Link } from "expo-router";
+import { useTheme } from "@react-navigation/native";
 
 export default function Index() {
   const { signOut, session, signIn } = useSession();
+  const theme = useTheme();
   return (
-    <View
-    className='flex flex-1 justify-center items-center bg-red-500 text-blue-300i'
-    //   style={{
-    //     flex: 1,
-    //     justifyContent: "center",
-    //     alignItems: "center",
-    //     backgroundColor: "red",
-    //   }}
-    >
+    <View className="flex h-full w-full justify-center items-center bg-red-500 ">
       {session ? (
         <Text
+        className={theme.dark ? 'text-white' : 'text-black'}
           onPress={() => {
             signOut();
           }}
@@ -22,14 +18,16 @@ export default function Index() {
           Sign Out
         </Text>
       ) : (
-        <Text
-          onPress={() => {
-            signIn();
-          }}
-        >
-          Sign In
-          wefoiwejfoi
-        </Text>
+        <View>
+          <Text
+            onPress={() => {
+              void signIn("/");
+            }}
+          >
+            Sign In
+          </Text>
+          <Link href="/one">app</Link>
+        </View>
       )}
     </View>
   );

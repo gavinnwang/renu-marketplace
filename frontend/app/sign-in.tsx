@@ -9,8 +9,8 @@ export default function SignIn() {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text
         onPress={() => {
-          signIn();
-          router.replace('/');
+          void signIn("/");
+        //   router.replace('/');
         }}>
         Sign In
       </Text>
