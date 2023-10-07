@@ -89,7 +89,7 @@ async fn google_oauth_handler(
         Ok(user) => user.id,
     };
 
-    tracing::info!("User id authenticating: {}\n", user_id);
+    tracing::info!("API: User id authenticating: {}\n", user_id);
 
     let jwt_secret = config.jwt_secret.to_owned();
     let now = Utc::now();
@@ -108,7 +108,7 @@ async fn google_oauth_handler(
     )
     .unwrap();
 
-    let cookie = Cookie::build("token", token)
+    let cookie = Cookie::build("token", token.clone())
         .path("/")
         .max_age(ActixWebDuration::new(60 * config.jwt_max_age, 0))
         .http_only(true)
@@ -122,7 +122,8 @@ async fn google_oauth_handler(
 }
 
 #[get("/logout")]
-async fn logout_handler(_: AuthenticationGuard) -> impl Responder {
+async fn logout_handler(auth_gaurd: AuthenticationGuard) -> impl Responder {
+    tracing::info!("API: User with id {} logging out\n", auth_gaurd.user_id);
     let cookie = Cookie::build("token", "")
         .path("/")
         .max_age(ActixWebDuration::new(-1, 0))
