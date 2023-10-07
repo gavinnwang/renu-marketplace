@@ -2,8 +2,6 @@ import { Link, Stack, useLocalSearchParams } from "expo-router";
 import { Text, TextInput, View } from "react-native";
 import { LogoWithText } from "../../../components/Logo";
 import { Item } from "@prisma/client";
-import { useMemo } from "react";
-import { ItemListing } from "../../../components/ItemListing";
 import { ItemListingGrid } from "../../../components/ItemListingGrid";
 
 const SECTIONS = [
