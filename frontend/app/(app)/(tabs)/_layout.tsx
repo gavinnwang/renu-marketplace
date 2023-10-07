@@ -15,7 +15,7 @@ export default function TabsLayout() {
     screenOptions={
         {
             tabBarStyle: {
-                backgroundColor: "#F6F6F6",
+                backgroundColor: "#f9f9f9",
             }
         }
     }>

@@ -113,7 +113,7 @@ export default function HomePage() {
   return (
     <>
       {/* <Stack.Screen options={{ title: "hello!" }} /> */}
-      <View className="bg-[#F6F6F6]">
+      <View className="bg-[#f9f9f9]">
         <View className="mx-[10px] ">
           <View className="flex flex-row items-center">
             <LogoWithText className="flex-grow" />
