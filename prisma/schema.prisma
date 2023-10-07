@@ -22,9 +22,10 @@ model User {
 }
 
 model Item {
-  id    Int    @id @default(autoincrement())
-  name  String
-  price Float
+  id         Int      @id @default(autoincrement())
+  name       String
+  price      Float
+  
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
   user       User     @relation(fields: [user_id], references: [id])
