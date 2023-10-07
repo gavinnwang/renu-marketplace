@@ -1,4 +1,4 @@
-import { Redirect, Slot } from "expo-router";
+import { Redirect, Slot, Tabs } from "expo-router";
 import { Text } from "react-native";
 import { useSession } from "../../providers/ctx";
 
@@ -24,5 +24,5 @@ export default function AppLayout() {
   }
 
   // This layout can be deferred because it's not the root layout.
-  return <Slot />;
+  return <Slot/>
 }

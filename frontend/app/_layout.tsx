@@ -131,26 +131,11 @@ function RootLayoutNav() {
   // }
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <>
-        {/* <SafeAreaView style={{ flex: 0, backgroundColor: "#F6F6F6" }} />
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F6" }}> */}
-        {/* <SafeAreaView edges={[]}> */}
-
-        {/* </SafeAreaView> */}
-        {/* <View style={{ flex: 1, backgroundColor: "#F6F6F6" }}>
-          <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F6" }}>
-            <Slot />
-          </SafeAreaView>
-        </View> */}
-
-        <>
+      <>  
           <SafeAreaView style={{ flex: 0, backgroundColor: "#F6F6F6" }} />
-          <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F6" }}>
-            <Slot />
-          </SafeAreaView>
-        </>
-
-        {/* </SafeAreaView> */}
+          {/* <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6F6" }}> */}
+          <Slot />
+          {/* </SafeAreaView> */}
       </>
     </ThemeProvider>
   );

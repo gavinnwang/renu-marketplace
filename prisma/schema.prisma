@@ -17,7 +17,7 @@ model User {
   email             String   @unique
   role              String   @default("user")
   created_at        DateTime @db.Timestamp()
-  updated_at        DateTime  @db.Timestamp()
+  updated_at        DateTime @updatedAt @db.Timestamp()
   items             Item[]
   transaction_count Int      @default(0)
 }
@@ -30,7 +30,7 @@ model Item {
   image_url      String
 
   created_at DateTime @db.Timestamp()
-  updated_at DateTime  @db.Timestamp()
+  updated_at DateTime @updatedAt @db.Timestamp()
   user       User     @relation(fields: [user_id], references: [id])
   user_id    Int
 

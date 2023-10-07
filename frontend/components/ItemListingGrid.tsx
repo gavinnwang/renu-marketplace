@@ -16,7 +16,7 @@ export function ItemListingGrid(props: { items: Item[] }) {
       {chunkedItems.map(itemPair => (
         <View
           key={itemPair[0].id}
-          className="flex flex-row justify-between mb-6">
+          className="flex flex-row justify-between mb-6 ">
           {itemPair.map(item => (
             <ItemListing key={item.id} item={item} />
           ))}

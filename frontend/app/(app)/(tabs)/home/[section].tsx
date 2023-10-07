@@ -1,8 +1,8 @@
 import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { Text, TextInput, View } from "react-native";
-import { LogoWithText } from "../../../components/Logo";
+import { ScrollView, Text, TextInput, View } from "react-native";
+import { LogoWithText } from "../../../../components/Logo";
 import { Item } from "@prisma/client";
-import { ItemListingGrid } from "../../../components/ItemListingGrid";
+import { ItemListingGrid } from "../../../../components/ItemListingGrid";
 
 const SECTIONS = [
   { display: "Men's", value: "mens" },
@@ -25,7 +25,7 @@ const items: Item[] = [
   },
   {
     created_at: new Date(),
-    id: 0,
+    id: 55,
     image_url: "https://picsum.photos/seed/696/3000/2000",
     name: "item name",
     price: 123.456,
@@ -35,7 +35,7 @@ const items: Item[] = [
   },
   {
     created_at: new Date(),
-    id: 0,
+    id: 5,
     image_url: "https://picsum.photos/seed/696/3000/2000",
     name: "item name",
     price: 123.456,
@@ -45,7 +45,7 @@ const items: Item[] = [
   },
   {
     created_at: new Date(),
-    id: 0,
+    id: 7,
     image_url: "https://picsum.photos/seed/696/3000/2000",
     name: "item name",
     price: 123.456,
@@ -55,7 +55,7 @@ const items: Item[] = [
   },
   {
     created_at: new Date(),
-    id: 0,
+    id: 222,
     image_url: "https://picsum.photos/seed/696/3000/2000",
     name: "item name",
     price: 123.456,
@@ -65,7 +65,7 @@ const items: Item[] = [
   },
   {
     created_at: new Date(),
-    id: 0,
+    id: 11,
     image_url: "https://picsum.photos/seed/696/3000/2000",
     name: "item name",
     price: 123.456,
@@ -75,7 +75,7 @@ const items: Item[] = [
   },
   {
     created_at: new Date(),
-    id: 0,
+    id: 2,
     image_url: "https://picsum.photos/seed/696/3000/2000",
     name: "item name",
     price: 123.456,
@@ -85,7 +85,7 @@ const items: Item[] = [
   },
   {
     created_at: new Date(),
-    id: 0,
+    id: 33,
     image_url: "https://picsum.photos/seed/696/3000/2000",
     name: "item name",
     price: 123.456,
@@ -95,7 +95,7 @@ const items: Item[] = [
   },
   {
     created_at: new Date(),
-    id: 0,
+    id: 3,
     image_url: "https://picsum.photos/seed/696/3000/2000",
     name: "item name",
     price: 123.456,
@@ -109,13 +109,12 @@ export default function HomePage() {
   const param = useLocalSearchParams();
 
   const selectedSection = param.section;
-  console.log("EEEEEEEEEE", selectedSection);
 
   return (
     <>
-      <Stack.Screen options={{ title: "hello!" }} />
-      <View className="">
-        <View className="mx-[10px]">
+      {/* <Stack.Screen options={{ title: "hello!" }} /> */}
+      <View className="bg-[#F6F6F6]">
+        <View className="mx-[10px] ">
           <View className="flex flex-row items-center">
             <LogoWithText className="flex-grow" />
             <View className="flex justify-center items-center bg-[#F0F0F0] rounded-md flex-grow-[2] ml-1">
@@ -123,8 +122,8 @@ export default function HomePage() {
             </View>
           </View>
 
-          <View className="border-y border-[#EEEEEE] flex flex-row mt-3 justify-between py-1">
-            {SECTIONS.map(section => {
+          <View className="border-y border-[#EEEEEE] flex flex-row mt-3 justify-between py-2">
+            {SECTIONS.map((section) => {
               return (
                 <Link key={section.value} href={`/home/${section.value}`}>
                   <Text
@@ -132,16 +131,19 @@ export default function HomePage() {
                       section.value === selectedSection
                         ? "text-[#4E2A84] underline underline-offset-8"
                         : "text-[#949494]"
-                    }`}>
+                    }`}
+                  >
                     {section.display}
                   </Text>
                 </Link>
               );
             })}
           </View>
-          <Text className="font-Poppins_500Medium text-xl mt-4">Browse</Text>
         </View>
-        <ItemListingGrid items={items} />
+        <ScrollView>
+          <Text className="font-Poppins_500Medium text-xl m-2">Browse</Text>
+          <ItemListingGrid items={items} />
+        </ScrollView>
       </View>
     </>
   );
