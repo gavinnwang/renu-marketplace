@@ -59,9 +59,9 @@ async fn google_oauth_handler(
             "API: User email is not northwestern edu email: {}\n",
             google_user.email
         );
-        let frontend_origin = config.client_origin.to_owned();
+
         let mut response = HttpResponse::Found();
-        return response.append_header((LOCATION, format!("{}{}", frontend_origin, "/failed_sign_in"))).json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
+        return response.append_header((LOCATION, format!("{}{}", state, "/failed_sign_in"))).json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
     }
 
     let user = user_repository::fetch_user_by_email(pool.as_ref(), &google_user.email).await;
@@ -114,9 +114,8 @@ async fn google_oauth_handler(
     //     .http_only(true)
     //     .finish();
 
-    let frontend_origin = config.client_origin.to_owned();
     let mut response = HttpResponse::Found();
-    let redirect_url = format!("{}{}?email={}&name={}&token={}", frontend_origin, state, google_user.email, google_user.name, token);
+    let redirect_url = format!("{}?email={}&name={}&token={}", state, google_user.email, google_user.name, token);
     tracing::info!("API: Redirecting to {}\n", redirect_url);
     response.append_header((LOCATION,redirect_url ));
     // response.cookie(cookie);

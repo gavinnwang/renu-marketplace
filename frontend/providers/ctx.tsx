@@ -54,9 +54,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [loadedFromStorage, setLoadedFromStorage] = React.useState(false);
 
   const signIn = async (from: string) => {
-    const link = getGoogleUrl(from);
-    const callbackUrl = Linking.createURL("App");
+    const callbackUrl = Linking.createURL("App") + from;
     console.log("callbackUrl", callbackUrl);
+    const link = getGoogleUrl(callbackUrl);
+
     const result: WebBrowser.WebBrowserAuthSessionResult =
       await WebBrowser.openAuthSessionAsync(link, callbackUrl);
     console.log(result);
