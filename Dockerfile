@@ -5,6 +5,6 @@ COPY . .
 
 RUN cargo install --path .
 
-RUN cargo build --release
+RUN cargo build --release   
 
 CMD ["./target/release/marketplace"]
