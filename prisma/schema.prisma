@@ -23,10 +23,11 @@ model User {
 }
 
 model Item {
-  id       Int    @id @default(autoincrement())
-  name     String
-  price    Float
-  imageUrl String
+  id             Int    @id @default(autoincrement())
+  name           String
+  price          Float
+  original_price Float?
+  image_url      String
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
