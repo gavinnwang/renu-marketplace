@@ -3,6 +3,7 @@ import * as WebBrowser from "expo-web-browser";
 import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
 import * as Linking from "expo-linking";
 import "react-native-url-polyfill/auto";
+import * as SecureStore from "expo-secure-store";
 
 type Session = {
   token: string;
@@ -15,10 +16,26 @@ type AuthContextType = {
   signOut: () => void;
   session: Session | null;
   isLoading: boolean;
-  setIsLoading: (isLoading: boolean) => void;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setSession : React.Dispatch<React.SetStateAction<Session | null>>
+  loadedFromStorage: boolean;
+  setLoadedFromStorage: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+
+async function save(key: string, value: string) {
+  await SecureStore.setItemAsync(key, value);
+}
+
+// async function getValueFor(key: string) {
+//   let result = await SecureStore.getItemAsync(key);
+//   if (result) {
+//     alert("Here's your value \n" + result);
+//   } else {
+//     alert("No values stored under that key.");
+//   }
+// }
 
 export function useSession() {
   const value = React.useContext(AuthContext);
@@ -33,6 +50,7 @@ export function useSession() {
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [loadedFromStorage, setLoadedFromStorage] = React.useState(false);
 
   const signIn = async (from: string) => {
     const link = getGoogleUrl(from);
@@ -52,8 +70,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           email: email,
           name: name,
         });
+        await save("token", token);
+        await save("email", email);
+        await save("name", name);
       } else {
-        console.error("Missing token, email or name")
+        console.error("Missing token, email or name");
       }
     }
   };
@@ -70,6 +91,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         session,
         isLoading,
         setIsLoading,
+        setSession,
+        loadedFromStorage,
+        setLoadedFromStorage
       }}
     >
       {children}

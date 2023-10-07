@@ -71,8 +71,8 @@ async fn google_oauth_handler(
             let user_id = user_repository::add_user(
                 pool.as_ref(),
                 &NewUser {
-                    name: google_user.name,
-                    email: google_user.email,
+                    name: google_user.name.clone(),
+                    email: google_user.email.clone(),
                 },
             )
             .await;
@@ -108,16 +108,18 @@ async fn google_oauth_handler(
     )
     .unwrap();
 
-    let cookie = Cookie::build("token", token.clone())
-        .path("/")
-        .max_age(ActixWebDuration::new(60 * config.jwt_max_age, 0))
-        .http_only(true)
-        .finish();
+    // let cookie = Cookie::build("token", token.clone())
+    //     .path("/")
+    //     .max_age(ActixWebDuration::new(60 * config.jwt_max_age, 0))
+    //     .http_only(true)
+    //     .finish();
 
     let frontend_origin = config.client_origin.to_owned();
     let mut response = HttpResponse::Found();
-    response.append_header((LOCATION, format!("{}{}", frontend_origin, state)));
-    response.cookie(cookie);
+    let redirect_url = format!("{}{}?email={}&name={}&token={}", frontend_origin, state, google_user.email, google_user.name, token);
+    tracing::info!("API: Redirecting to {}\n", redirect_url);
+    response.append_header((LOCATION,redirect_url ));
+    // response.cookie(cookie);
     response.finish()
 }
 
