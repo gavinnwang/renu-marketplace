@@ -5,4 +5,6 @@ COPY . .
 
 RUN cargo build --release   
 
+RUN cargo sqlx prepare
+
 CMD ["./target/release/marketplace"]

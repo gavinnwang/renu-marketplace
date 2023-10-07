@@ -33,8 +33,8 @@ jobs:
         key: ${{ secrets.DROPLET_SSH_KEY }}
         passphrase: ${{ secrets.DROPLET_PASSPdoHRASE }}
         script: |
-          docker pull wry0313/marketplace:latest
           docker stop marketplace-container || true
           docker rm marketplace-container || true
+          docker pull wry0313/marketplace:latest
           docker run --name marketplace-container -p 8080:8080 wry0313/marketplace:latest
         
