@@ -11,7 +11,14 @@ function TabBarIcon(props: {
 
 export default function TabsLayout() {
   return (
-    <Tabs>
+    <Tabs 
+    screenOptions={
+        {
+            tabBarStyle: {
+                backgroundColor: "#F6F6F6",
+            }
+        }
+    }>
       <Tabs.Screen
         name="home/[section]"
         options={{
