@@ -24,7 +24,7 @@ jobs:
         context: .
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/marketplace:latest
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         build-args: DATABASE_URL=${{ secrets.DATABASE_URL }} 
 
     - name: Deploy to DigitalOcean Droplet
