@@ -27,12 +27,12 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="listings"
+        name="list/[tab]"
         options={{
-          title: "Listings",
+          title: "List",
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          href: "listings",
+          href: "list/Listings",
         }}
       />
     </Tabs>
