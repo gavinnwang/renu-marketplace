@@ -59,7 +59,7 @@ impl FromRequest for AuthenticationGuard {
                 });
             }
         };
-        
+
         let decode = decode::<TokenClaims>(
             token.as_str(),
             &DecodingKey::from_secret(jwt_secret.as_ref()),
@@ -91,7 +91,7 @@ impl FromRequest for AuthenticationGuard {
                         ));
                     };
 
-                    let user_id = decoded_token.claims.sub.clone();
+                    let user_id = decoded_token.claims.sub;
                     Ok(AuthenticationGuard { user_id: user_id })
                 })
             }
