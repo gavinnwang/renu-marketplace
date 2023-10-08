@@ -8,7 +8,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "cargo prisma"
+  output = "src/prisma.rs"
 }
 
 model User {
@@ -16,11 +17,13 @@ model User {
   name              String
   email             String   @unique
   role              String   @default("user")
-  created_at        DateTime @db.Timestamp()
-  updated_at        DateTime @updatedAt @db.Timestamp()
+  created_at        DateTime @db.Timestamp(0) @default(now())
+  updated_at        DateTime @updatedAt @db.Timestamp(0)
   items             Item[]
   transaction_count Int      @default(0)
 }
+
+
 
 model Item {
   id             Int    @id @default(autoincrement())
@@ -29,8 +32,8 @@ model Item {
   original_price Float?
   image_url      String
 
-  created_at DateTime @db.Timestamp()
-  updated_at DateTime @updatedAt @db.Timestamp()
+  created_at DateTime @db.Timestamp(0)  @default(now())
+  updated_at DateTime @updatedAt @db.Timestamp(0)
   user       User     @relation(fields: [user_id], references: [id])
   user_id    Int
 

@@ -1,5 +1,5 @@
+
 use serde::{Deserialize, Serialize};
-use sqlx::types::chrono;
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 pub struct Item {
@@ -8,8 +8,8 @@ pub struct Item {
     pub price: f64,
     pub original_price: Option<f64>,
     pub image_url: String,
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    pub updated_at: chrono::DateTime<chrono::Utc>,
+    pub created_at: std::time::SystemTime,
+    pub updated_at: std::time::SystemTime,
     pub user_id: i64,
 }
 

@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT id, name, price, original_price, image_url, user_id FROM Item WHERE id = ?",
+  "query": "SELECT id, name, price, original_price, image_url, user_id, created_at, updated_at FROM Item",
   "describe": {
     "columns": [
       {
@@ -62,10 +62,30 @@
           "char_set": 63,
           "max_size": 11
         }
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": {
+          "type": "Timestamp",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 23
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "updated_at",
+        "type_info": {
+          "type": "Timestamp",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 23
+        }
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 0
     },
     "nullable": [
       false,
@@ -73,8 +93,10 @@
       false,
       true,
       false,
+      false,
+      false,
       false
     ]
   },
-  "hash": "0e6713cd8712b6108959b06ce370ff785745549516e12d07b8daaefe1493b24c"
+  "hash": "a4666ed549c91740d9b3e479cf3d93e659cadea5ec39e12934ebd5be27db4791"
 }

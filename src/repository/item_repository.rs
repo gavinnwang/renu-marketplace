@@ -15,10 +15,10 @@ pub struct PartialItem {
 
 pub async fn fetch_all_items(
     conn: impl Executor<'_, Database = MySql>,
-) -> Result<Vec<PartialItem>, DbError> {
+) -> Result<Vec<Item>, DbError> { 
     sqlx::query_as!(
-        PartialItem,
-        r#"SELECT id, name, price, original_price, image_url, user_id FROM Item"#
+        Item,
+        r#"SELECT id, name, price, original_price, image_url, user_id, created_at, updated_at FROM Item"#
     )
     .fetch_all(conn)
     .await
@@ -28,10 +28,10 @@ pub async fn fetch_all_items(
 pub async fn fetch_item_by_id(
     id: i64,
     conn: impl Executor<'_, Database = MySql>,
-) -> Result<PartialItem, DbError> {
+) -> Result<Item, DbError> {
     sqlx::query_as!(
-        PartialItem,
-        r#"SELECT id, name, price, original_price, image_url, user_id FROM Item WHERE id = ?"#,
+        Item,
+        r#"SELECT id, name, price, original_price, image_url, user_id, created_at, updated_at FROM Item WHERE id = ?"#,
         id
     )
     .fetch_one(conn)
