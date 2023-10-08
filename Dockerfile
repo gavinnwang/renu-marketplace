@@ -5,7 +5,7 @@ COPY . .
 
 RUN cargo install sqlx-cli --no-default-features --features mysql
 
-RUN cargo sqlx prepare
+RUN cargo sqlx prepare --database-url $DATABASE_URL
 
 RUN cargo build --release   
 
