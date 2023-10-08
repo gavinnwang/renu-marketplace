@@ -11,30 +11,28 @@ function TabBarIcon(props: {
 
 export default function TabsLayout() {
   return (
-    <Tabs 
-    screenOptions={
-        {
-            tabBarStyle: {
-                backgroundColor: "#f9f9f9",
-            }
-        }
-    }>
+    <Tabs
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: "#f9f9f9",
+        },
+      }}>
       <Tabs.Screen
         name="home/[section]"
         options={{
           title: "Home",
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          href: "home/mens"
+          href: "home/mens",
         }}
       />
-         <Tabs.Screen
+      <Tabs.Screen
         name="listings"
         options={{
           title: "Listings",
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          href: "listings"
+          href: "listings",
         }}
       />
     </Tabs>

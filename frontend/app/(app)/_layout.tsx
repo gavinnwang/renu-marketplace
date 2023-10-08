@@ -1,6 +1,9 @@
 import { Redirect, Slot, Tabs } from "expo-router";
 import { Text } from "react-native";
 import { useSession } from "../../providers/ctx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function AppLayout() {
   const { isLoading, session } = useSession();
@@ -24,5 +27,9 @@ export default function AppLayout() {
   }
 
   // This layout can be deferred because it's not the root layout.
-  return <Slot/>
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Slot />
+    </QueryClientProvider>
+  );
 }
