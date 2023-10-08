@@ -5,7 +5,7 @@ COPY . .
 
 ARG DATABASE_URL
 
-RUN cargo install sqlx-cli --no-default-features --features mysql
+RUN cargo install sqlx-cli --no-default-features --features rustls,mysql
 
 RUN cargo sqlx prepare --database-url $DATABASE_URL
 
