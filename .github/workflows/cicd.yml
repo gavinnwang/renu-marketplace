@@ -26,6 +26,7 @@ jobs:
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/marketplace:latest
         platforms: linux/amd64
         build-args: DATABASE_URL=${{ secrets.DATABASE_URL }} 
+        
 
     - name: Deploy to DigitalOcean Droplet
       uses: appleboy/ssh-action@master
@@ -35,8 +36,20 @@ jobs:
         key: ${{ secrets.DROPLET_SSH_KEY }}
         passphrase: ${{ secrets.DROPLET_PASSPHRASE }}
         script: |
+          docker system prune -f -a || true
           docker stop marketplace-container || true
           docker rm marketplace-container || true
-          docker pull --platform=linux/amd64/v3 wry0313/marketplace:latest
-          docker run --name marketplace-container -p 8080:8080 wry0313/marketplace:latest
-        
+          docker pull wry0313/marketplace:latest
+          docker run --name marketplace-container
+            -p 8080:8080 \
+            -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            -e DATABASE_URL_PRISMA=${{ secrets.DATABASE_URL_PRISMA }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e TOKEN_EXPIRED_IN=${{ secrets.TOKEN_EXPIRED_IN }} \
+            -e TOKEN_MAXAGE=${{ secrets.TOKEN_MAXAGE }} \
+            -e GOOGLE_OAUTH_CLIENT_ID=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }} \
+            -e GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }} \
+            -e GOOGLE_OAUTH_REDIRECT_URL=${{ secrets.GOOGLE_OAUTH_REDIRECT_URL }} \
+            -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
+            -e SERVER_HOST=${{ secrets.SERVER_HOST }} \
+            wry0313/marketplace:latest 
