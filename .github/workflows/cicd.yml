@@ -27,7 +27,6 @@ jobs:
         platforms: linux/amd64
         build-args: DATABASE_URL=${{ secrets.DATABASE_URL }} 
         
-
     - name: Deploy to DigitalOcean Droplet
       uses: appleboy/ssh-action@master
       with:
