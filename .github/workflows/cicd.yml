@@ -32,7 +32,7 @@ jobs:
         host: ${{ secrets.DROPLET_HOST }}
         username: ${{ secrets.DROPLET_USERNAME }}
         key: ${{ secrets.DROPLET_SSH_KEY }}
-        passphrase: ${{ secrets.DROPLET_PASSPdoHRASE }}
+        passphrase: ${{ secrets.DROPLET_PASSPHRASE }}
         script: |
           docker stop marketplace-container || true
           docker rm marketplace-container || true
