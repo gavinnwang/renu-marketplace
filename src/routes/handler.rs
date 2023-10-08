@@ -13,7 +13,11 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
                 .service(logout_handler),
         )
         .service(web::scope("/users").service(super::user_handler::get_user_handler))
-        .service(web::scope("/items").service(super::item_handler::get_items_handler));
+        .service(
+            web::scope("/items")
+                .service(super::item_handler::get_items_handler)
+                .service(super::item_handler::get_item_by_id_handler),
+        );
 
     conf.service(scope);
 }
