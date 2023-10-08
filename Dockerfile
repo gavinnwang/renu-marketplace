@@ -1,29 +1,28 @@
-FROM rust:latest
+# Use an official Rust runtime as a parent image
+FROM rust:latest as builder
 
-# Set the Rust toolchain to the stable version
-RUN rustup default stable
+# Set the current working directory
+WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install -y gcc-x86-64-linux-gnu
-
-RUN rustup target add x86_64-unknown-linux-gnu
-
-ENV TARGET_CC=x86_64-unknown-linux-gnu-gcc
+# Copy the local package dependencies to the container
+COPY Cargo.toml Cargo.lock ./
 
 
 
-
-WORKDIR /src
+# Copy the source code to the container
 COPY . .
 
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
+RUN cargo install sqlx-cli --no-default-features --features mysql,rustls
+RUN cargo sqlx prepare
+# Build dependencies
+RUN cargo build --release
+RUN rm src/*.rs
 
+# Start a new stage to reduce final image size
+FROM debian:buster-slim
 
-RUN cargo install sqlx-cli --no-default-features --features rustls,mysql
+# Copy the binary from builder to this new stage
+COPY --from=builder /usr/src/app/target/release/marketplace /usr/local/bin/
 
-RUN cargo sqlx prepare --database-url $DATABASE_URL
-
-RUN cargo build --release --target x86_64-unknown-linux-gnu
-
-CMD ["./target/release/marketplace"]
-
+# Set the command to run your application
+CMD ["marketplace"]
