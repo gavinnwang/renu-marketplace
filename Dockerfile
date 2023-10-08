@@ -29,7 +29,7 @@ ENV SQLX_OFFLINE true
 RUN cargo chef cook --release --target x86_64-unknown-linux-musl --recipe-path recipe.json
 COPY . .
 
-RUN cargo build --release --target x86_64-unknown-linux-musl --bin app
+RUN cargo build --release --target x86_64-unknown-linux-musl --bin marketplace
 
 # We do not need the Rust toolchain to run the binary!
 FROM alpine AS runtime
