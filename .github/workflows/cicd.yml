@@ -40,10 +40,9 @@ jobs:
           docker stop marketplace-container || true
           docker rm marketplace-container || true
           docker pull wry0313/marketplace:latest
-          docker run --name marketplace-container
+          docker run --name marketplace-container \
             -p 8080:8080 \
             -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-            -e DATABASE_URL_PRISMA=${{ secrets.DATABASE_URL_PRISMA }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e TOKEN_EXPIRED_IN=${{ secrets.TOKEN_EXPIRED_IN }} \
             -e TOKEN_MAXAGE=${{ secrets.TOKEN_MAXAGE }} \
@@ -53,3 +52,22 @@ jobs:
             -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
             -e SERVER_HOST=${{ secrets.SERVER_HOST }} \
             wry0313/marketplace:latest 
+
+
+  #           docker stop marketplace-container || true
+  #           docker system prune -f -a || true
+  #           docker stop marketplace-container || true
+  #           docker rm marketplace-container || true
+  #           docker pull wry0313/marketplace:latest
+  #           docker run --name marketplace-container \
+  # -p 8080:8080 \
+  # -e DATABASE_URL='mysql://voj9lrmiyvpvi1daye0y:pscale_pw_RNMyiTxfDZPRBKVkNcldCRuJrt9FodJlLtB5Dlt4Djl@aws.connect.psdb.cloud/marketplace' \
+  # -e JWT_SECRET=go_max_rua \
+  # -e TOKEN_EXPIRED_IN=60m \
+  # -e TOKEN_MAXAGE=60 \
+  # -e GOOGLE_OAUTH_CLIENT_ID=479411838275-kpsk3vagvubv429vnhu85hsviahv8ed7.apps.googleusercontent.com \
+  # -e GOOGLE_OAUTH_CLIENT_SECRET=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 \
+  # -e GOOGLE_OAUTH_REDIRECT_URL=http://localhost:8080/api/auth/callback \
+  # -e SERVER_PORT=8080 \
+  # -e SERVER_HOST=0.0.0.0 \
+  # wry0313/marketplace:latest
