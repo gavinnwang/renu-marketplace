@@ -14,7 +14,13 @@ jsonwebtoken = "8.2.0" # create and parses JWT
 reqwest = { version = "0.11.14", features = ["json"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.91"
-sqlx = { version = "0.7", features = ["runtime-tokio", "tls-native-tls", "mysql", "time"] }
+sqlx = { version = "0.7", features = [
+    "mysql",
+    "chrono",
+    "runtime-tokio",
+    "tls-native-tls",
+    "time",
+] }
 tracing-actix-web = "0.7.7"
 tracing = "0.1.37"
 tracing-subscriber = "0.3.17"

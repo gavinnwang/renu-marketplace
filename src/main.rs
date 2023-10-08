@@ -6,7 +6,7 @@ pub mod repository;
 pub mod routes;
 
 use actix_cors::Cors;
-use actix_web::{http::header, App, HttpServer, web::Data};
+use actix_web::{http::header, web::Data, App, HttpServer};
 use dotenv::dotenv;
 use sqlx::{mysql::MySqlPoolOptions, query, Row};
 use tracing_actix_web::TracingLogger;
@@ -51,7 +51,8 @@ async fn main() -> std::io::Result<()> {
 
     tracing::info!("Starting Actix web server");
     let server_host = config.server_host.clone();
-    let server_port = config.server_port.clone();
+    let server_port = config.server_port;
+
     HttpServer::new(move || {
         let cors = Cors::default()
             .allowed_origin("http://localhost:3000")
