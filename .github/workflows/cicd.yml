@@ -41,7 +41,7 @@ jobs:
           docker rm marketplace-container || true
           docker pull wry0313/marketplace:latest
           docker run -d --name marketplace-container \
-            -p 80:80 \
+            -p 8080:8080 \
             -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e TOKEN_EXPIRED_IN=${{ secrets.TOKEN_EXPIRED_IN }} \
