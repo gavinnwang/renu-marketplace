@@ -4,6 +4,8 @@ WORKDIR /src
 COPY . .
 
 ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 
 RUN cargo install sqlx-cli --no-default-features --features rustls,mysql
 

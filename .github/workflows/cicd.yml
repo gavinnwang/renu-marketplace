@@ -24,7 +24,8 @@ jobs:
         context: .
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/marketplace:latest
-        build-args: --platform linux/amd64/v3 DATABASE_URL=${{ secrets.DATABASE_URL }} 
+        platform: linux/amd64/v3
+        build-args: DATABASE_URL=${{ secrets.DATABASE_URL }} 
 
     - name: Deploy to DigitalOcean Droplet
       uses: appleboy/ssh-action@master
