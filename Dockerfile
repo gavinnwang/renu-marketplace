@@ -7,13 +7,14 @@ WORKDIR /usr/src/app
 # Copy the local package dependencies to the container
 COPY Cargo.toml Cargo.lock ./
 
-
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 
 # Copy the source code to the container
 COPY . .
 
 RUN cargo install sqlx-cli --no-default-features --features mysql,rustls
-RUN cargo sqlx prepare
+RUN cargo sqlx prepare --database $DATABASE_URL --driver mysql
 # Build dependencies
 RUN cargo build --release
 RUN rm src/*.rs
