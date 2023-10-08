@@ -1,36 +1,10 @@
-# Use an official Rust runtime as a parent image
-FROM rust:latest as builder
+FROM --platform=linux/amd64 rust:1.73
 
-# Set the current working directory
-WORKDIR /usr/src/app
-
-# Copy the local package dependencies to the container
-COPY Cargo.toml Cargo.lock ./
-
+WORKDIR /src
+COPY . .
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
-
-# Copy the source code to the container
-COPY . .
-
-RUN cargo install sqlx-cli --no-default-features --features mysql,rustls
+RUN cargo install sqlx-cli --no-default-features --features rustls,mysql
 RUN cargo sqlx prepare --database-url $DATABASE_URL
-# Build dependencies
-RUN cargo build --release
-RUN rm src/*.rs
-
-# RUN apt-get update && apt install -y openssl
-
-# Start a new stage to reduce final image size
-FROM debian:bullseye-slim
-
-RUN apt-get update && apt install -y openssl
-
-RUN useradd -ms /bin/bash app
-
-
-# Copy the binary from builder to this new stage
-COPY --from=builder /usr/src/app/target/release/marketplace /usr/local/bin/
-# Set the command to run your application
-CMD ["marketplace"]
-    
+RUN cargo build --release   
+CMD ["./target/release/marketplace"]
