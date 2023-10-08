@@ -24,7 +24,7 @@ jobs:
         context: .
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/marketplace:latest
-        build-args: DATABASE_URL=${{ secrets.DATABASE_URL }}
+        build-args: DATABASE_URL=${{ secrets.DATABASE_URL }} --platform linux/amd64/v3
 
     - name: Deploy to DigitalOcean Droplet
       uses: appleboy/ssh-action@master
@@ -36,6 +36,6 @@ jobs:
         script: |
           docker stop marketplace-container || true
           docker rm marketplace-container || true
-          docker pull wry0313/marketplace:latest
+          docker pull --platform=linux/amd64/v3 wry0313/marketplace:latest
           docker run --name marketplace-container -p 8080:8080 wry0313/marketplace:latest
         
