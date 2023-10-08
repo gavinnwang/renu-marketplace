@@ -24,3 +24,17 @@ pub async fn fetch_all_items(
     .await
     .map_err(Into::into)
 }
+
+pub async fn fetch_item_by_id(
+    id: i64,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<PartialItem, DbError> {
+    sqlx::query_as!(
+        PartialItem,
+        r#"SELECT id, name, price, original_price, image_url, user_id FROM Item WHERE id = ?"#,
+        id
+    )
+    .fetch_one(conn)
+    .await
+    .map_err(Into::into)
+}
