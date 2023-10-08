@@ -12,7 +12,6 @@ FROM chef AS planner
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
-ENV SQLX_OFFLINE true
 # ARG DATABASE_URL
 # ENV DATABASE_URL=$DATABASE_URL
 # RUN cargo install sqlx-cli --no-default-features --features rustls,mysql
@@ -22,6 +21,7 @@ ENV SQLX_OFFLINE true
 FROM chef AS builder 
 COPY --from=planner /app/recipe.json recipe.json
 # Build dependencies - this is the caching Docker layer!
+ENV SQLX_OFFLINE true
 RUN cargo chef cook --release --recipe-path recipe.json
 # Build application
 COPY . .
