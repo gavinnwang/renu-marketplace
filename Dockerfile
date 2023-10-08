@@ -11,6 +11,6 @@ RUN cargo install sqlx-cli --no-default-features --features rustls,mysql
 
 RUN cargo sqlx prepare --database-url $DATABASE_URL
 
-RUN cargo build --release   
+RUN cargo run 
 
-CMD ["./target/release/marketplace"]
+# CMD ["./target/release/marketplace"]
