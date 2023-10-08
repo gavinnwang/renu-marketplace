@@ -14,7 +14,7 @@ ENV DATABASE_URL=$DATABASE_URL
 COPY . .
 
 RUN cargo install sqlx-cli --no-default-features --features mysql,rustls
-RUN cargo sqlx prepare --database $DATABASE_URL --driver mysql
+RUN cargo sqlx prepare --database-url $DATABASE_URL --driver mysql
 # Build dependencies
 RUN cargo build --release
 RUN rm src/*.rs
