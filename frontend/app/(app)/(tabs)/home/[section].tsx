@@ -31,7 +31,7 @@ export default function HomePage() {
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/items/`).then(x =>
         x.json(),
       ) as Promise<ApiResponse<Item[]>>,
-    queryKey: ["all_items"],
+    queryKey: ["item"],
   });
 
   return (
