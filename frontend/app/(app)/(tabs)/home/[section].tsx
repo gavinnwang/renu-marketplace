@@ -13,99 +13,6 @@ const SECTIONS = [
   { display: "Electronics", value: "electronics" },
 ];
 
-// const items: Item[] = [
-//   {
-//     created_at: new Date(),
-//     id: 0,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-//   {
-//     created_at: new Date(),
-//     id: 55,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-//   {
-//     created_at: new Date(),
-//     id: 5,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-//   {
-//     created_at: new Date(),
-//     id: 7,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-//   {
-//     created_at: new Date(),
-//     id: 222,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-//   {
-//     created_at: new Date(),
-//     id: 11,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-//   {
-//     created_at: new Date(),
-//     id: 2,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-//   {
-//     created_at: new Date(),
-//     id: 33,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-//   {
-//     created_at: new Date(),
-//     id: 3,
-//     image_url: "https://picsum.photos/seed/696/3000/2000",
-//     name: "item name",
-//     price: 123.456,
-//     updated_at: new Date(),
-//     user_id: 0,
-//     original_price: 100,
-//   },
-// ];
-
 interface ApiResponse<T> {
   data: T;
   status: "success" | "failure";
@@ -124,9 +31,8 @@ export default function HomePage() {
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/items/`).then(x =>
         x.json(),
       ) as Promise<ApiResponse<Item[]>>,
+    queryKey: ["all_items"],
   });
-
-  console.log({ items });
 
   return (
     <>
