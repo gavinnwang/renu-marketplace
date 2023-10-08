@@ -3,3 +3,6 @@
 /prisma
 /node_modules
 /.expo
+package-lock.json
+package.json
+prettierrc
