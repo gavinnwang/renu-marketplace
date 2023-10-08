@@ -32,7 +32,7 @@ export default function TabsLayout() {
           title: "List",
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          href: "list/Listings",
+          href: "list/0",
         }}
       />
     </Tabs>
