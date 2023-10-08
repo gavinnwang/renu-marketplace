@@ -24,6 +24,6 @@ FROM debian:buster-slim
 
 # Copy the binary from builder to this new stage
 COPY --from=builder /usr/src/app/target/release/marketplace /usr/local/bin/
-
+RUN apt-get update && apt install -y openssl
 # Set the command to run your application
 CMD ["marketplace"]
