@@ -1,38 +1,34 @@
 import { Link, useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 
-const TABS = [
-  { display: "Listings", value: "0" },
-  { display: "Sold", value: "1" },
-];
+const TABS = ["Listings", "Sold"];
 
 export default function ListingPage() {
   const param = useLocalSearchParams();
   const selectedTab = param.tab;
   const selectedTabInt = parseInt(selectedTab as string);
-  const tabDisplay = TABS[selectedTabInt].display;
+  const tabDisplay = TABS[selectedTabInt];
 
   return (
     <View className="bg-[#F9F9F9] h-full">
       <Text className="ml-2.5 mt-6 font-Poppins_600SemiBold text-xl text-[#181818] ">
-        {tabDisplay}      </Text>
-      <View className="flex flex-row mt-5 w-screen justify-center items-center">
-        {TABS.map((tab) => {
+        {tabDisplay}{" "}
+      </Text>
+      <View className="flex flex-row  w-screen justify-center items-center border-b border-b-[#D7D7D7]">
+        {TABS.map((tab, index) => {
           return (
-            <Link
-              key={tab.value}
-              href={`/list/${tab.value}`}
-              className="mx-auto border-"
-            >
-              <Text
-                className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-[120%]  ${
-                  tab.value === selectedTab
-                    ? "text-[#181818] underline underline-offset-8"
-                    : "text-[#949494]"
-                }`}
-              >
-                {tab.display}
-              </Text>
+            <Link key={tab} href={`/list/${index}`} className="mx-auto">
+              <View className="">
+                <Text
+                  className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
+                    index === selectedTabInt
+                      ? "text-[#181818] border-b borde-lime-900"
+                      : "text-[#949494]"
+                  }`}
+                >
+                  {tab}
+                </Text>
+              </View>
             </Link>
           );
         })}
