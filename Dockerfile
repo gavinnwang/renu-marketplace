@@ -12,10 +12,11 @@ FROM chef AS planner
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
-RUN cargo install sqlx-cli --no-default-features --features rustls,mysql
-RUN cargo sqlx prepare --database-url $DATABASE_URL
+ENV SQLX_OFFLINE true
+# ARG DATABASE_URL
+# ENV DATABASE_URL=$DATABASE_URL
+# RUN cargo install sqlx-cli --no-default-features --features rustls,mysql
+# RUN cargo sqlx prepare --database-url $DATABASE_URL
 # RUN cargo build --release   
 
 FROM chef AS builder 
@@ -30,4 +31,5 @@ RUN cargo build --release
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 COPY --from=builder /app/target/release/marketplace /usr/local/bin
+ENV sqlx=off
 ENTRYPOINT ["/usr/local/bin/app"]
