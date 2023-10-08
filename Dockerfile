@@ -19,11 +19,12 @@ RUN cargo sqlx prepare --database-url $DATABASE_URL
 RUN cargo build --release
 RUN rm src/*.rs
 
+# RUN apt-get update && apt install -y openssl
+
 # Start a new stage to reduce final image size
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 # Copy the binary from builder to this new stage
 COPY --from=builder /usr/src/app/target/release/marketplace /usr/local/bin/
-RUN apt-get update && apt install -y openssl
 # Set the command to run your application
 CMD ["marketplace"]
