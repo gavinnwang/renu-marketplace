@@ -24,7 +24,13 @@ RUN rm src/*.rs
 # Start a new stage to reduce final image size
 FROM debian:bullseye-slim
 
+RUN apt-get update && apt install -y openssl
+
+RUN useradd -ms /bin/bash app
+
+
 # Copy the binary from builder to this new stage
 COPY --from=builder /usr/src/app/target/release/marketplace /usr/local/bin/
 # Set the command to run your application
 CMD ["marketplace"]
+    
