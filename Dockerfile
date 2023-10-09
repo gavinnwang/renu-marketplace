@@ -37,5 +37,6 @@ RUN addgroup -S myuser && adduser -S myuser -G myuser
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/marketplace /usr/local/bin/
 # RUN apt-get update && apt install -y openssl
 # RUN apt-get install -y libssl-dev
+EXPOSE 8080
 ENV sqlx=off
 ENTRYPOINT ["/usr/local/bin/marketplace"]
