@@ -5,7 +5,7 @@ use super::auth_handler::logout_handler;
 use super::health_handler::health_check_handler;
 
 pub fn handlers(conf: &mut web::ServiceConfig) {
-    let scope = web::scope("/api")
+    let scope = web::scope("/")
         .service(health_check_handler)
         .service(
             web::scope("/auth")

@@ -28,7 +28,7 @@ export default function HomePage() {
     isError: isErrorItems,
   } = useQuery({
     queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/items/`).then(x =>
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/`).then(x =>
         x.json(),
       ) as Promise<ApiResponse<Item[]>>,
     queryKey: ["item"],
