@@ -1,8 +1,7 @@
 name: Quick deploy
 
-on: 
-  push:
-    branches: [ never ]
+on: [workflow_dispatch]
+
 jobs:
 
   build:
