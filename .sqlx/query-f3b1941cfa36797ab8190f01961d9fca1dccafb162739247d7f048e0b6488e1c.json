@@ -68,9 +68,9 @@
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
-          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "flags": "NOT_NULL | BINARY | TIMESTAMP",
           "char_set": 63,
-          "max_size": 23
+          "max_size": 19
         }
       },
       {
@@ -80,7 +80,7 @@
           "type": "Timestamp",
           "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
           "char_set": 63,
-          "max_size": 23
+          "max_size": 19
         }
       }
     ],
