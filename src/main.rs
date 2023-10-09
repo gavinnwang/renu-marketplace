@@ -53,6 +53,8 @@ async fn main() -> std::io::Result<()> {
     let server_host = config.server_host.clone();
     let server_port = config.server_port;
 
+    tracing::info!("Server listening on {}:{}", server_host, server_port);
+
     HttpServer::new(move || {
         let cors = Cors::default()
             .allowed_origin("http://localhost:3000")
