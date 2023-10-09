@@ -38,3 +38,7 @@ next-env.d.ts
 # Added by cargo
 
 /target
+
+
+secrets
+
