@@ -1,15 +1,14 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL_PRISMA")
-  relationMode = "prisma"
+generator client {
+  provider = "prisma-client-js"
 }
 
-generator client {
-  provider = "cargo prisma"
-  output = "src/prisma.rs"
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL_PRISMA")
+  relationMode = "prisma"
 }
 
 model User {
@@ -17,25 +16,22 @@ model User {
   name              String
   email             String   @unique
   role              String   @default("user")
-  created_at        DateTime @db.Timestamp(0) @default(now())
+  created_at        DateTime @default(now()) @db.Timestamp(0)
   updated_at        DateTime @updatedAt @db.Timestamp(0)
   items             Item[]
   transaction_count Int      @default(0)
 }
 
-
-
 model Item {
-  id             Int    @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   name           String
   price          Float
   original_price Float?
   image_url      String
-
-  created_at DateTime @db.Timestamp(0)  @default(now())
-  updated_at DateTime @updatedAt @db.Timestamp(0)
-  user       User     @relation(fields: [user_id], references: [id])
-  user_id    Int
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+  updated_at     DateTime @updatedAt @db.Timestamp(0)
+  user           User     @relation(fields: [user_id], references: [id])
+  user_id        Int
 
   @@index([user_id], name: "user_id")
 }

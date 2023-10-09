@@ -28,8 +28,8 @@ export default function HomePage() {
     isError: isErrorItems,
   } = useQuery({
     queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/`).then(x =>
-        x.json(),
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/`).then((x) =>
+        x.json()
       ) as Promise<ApiResponse<Item[]>>,
     queryKey: ["item"],
   });
@@ -45,22 +45,29 @@ export default function HomePage() {
             </View>
           </View>
 
-          <View className="border-y border-[#EEEEEE] flex flex-row mt-3 justify-between py-2">
-            {SECTIONS.map(section => {
-              return (
-                <Link key={section.value} href={`/home/${section.value}`}>
-                  <Text
-                    className={`font-Poppins_400Regular text-sm  ${
-                      section.value === selectedSection
-                        ? "text-[#4E2A84] underline underline-offset-8"
-                        : "text-[#949494]"
-                    }`}>
-                    {section.display}
-                  </Text>
-                </Link>
-              );
-            })}
-          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View className="border-y border-[#EEEEEE] flex flex-row mt-3 justify-between h-[40px] items-center">
+              {SECTIONS.map((section) => {
+                return (
+                  <Link
+                    key={section.value}
+                    href={`/home/${section.value}`}
+                    className="px-3"
+                  >
+                    <Text
+                      className={`font-Poppins_400Regular text-sm   ${
+                        section.value === selectedSection
+                          ? "text-[#4E2A84] underline underline-offset-8 "
+                          : "text-[#949494]"
+                      }`}
+                    >
+                      {section.display}
+                    </Text>
+                  </Link>
+                );
+              })}
+            </View>
+          </ScrollView>
         </View>
         <ScrollView>
           <Text className="font-Poppins_500Medium text-xl m-2">Browse</Text>
