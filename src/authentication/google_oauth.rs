@@ -33,19 +33,16 @@ pub async fn request_token(
     authorization_code: &str,
     env: &web::Data<Config>,
 ) -> Result<OAuthResponse, Box<dyn Error>> {
-    let redirect_url = env.google_oauth_redirect_url.to_owned();
-    let client_secret = env.google_oauth_client_secret.to_owned();
-    let client_id = env.google_oauth_client_id.to_owned();
 
     let root_url = "https://oauth2.googleapis.com/token";
     let client = Client::new();
 
     let params = [
         ("grant_type", "authorization_code"),
-        ("redirect_uri", redirect_url.as_str()),
-        ("client_id", client_id.as_str()),
+        ("redirect_uri", env.google_oauth_redirect_url.as_str()),
+        ("client_id", env.google_oauth_client_id.as_str()),
         ("code", authorization_code),
-        ("client_secret", client_secret.as_str()),
+        ("client_secret", env.google_oauth_client_secret.as_str()),
     ];
     let response = client.post(root_url).form(&params).send().await?;
 
@@ -53,6 +50,7 @@ pub async fn request_token(
         let oauth_response = response.json::<OAuthResponse>().await?;
         Ok(oauth_response)
     } else {
+        tracing::error!("Error requesting token: {:?}", response);
         let message = "An error occurred while trying to retrieve access token.";
         Err(From::from(message))
     }
