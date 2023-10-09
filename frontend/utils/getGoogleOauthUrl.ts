@@ -16,7 +16,5 @@ export const getGoogleUrl = (from: string) => {
 
   const qs = new URLSearchParams(options);
 
-  const r =  `${rootUrl}?${qs.toString()}`;
-  console.log(r)
-  return r
+  return `${rootUrl}?${qs.toString()}`;
 };
