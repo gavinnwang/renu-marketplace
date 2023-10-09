@@ -50,7 +50,7 @@ pub async fn request_token(
         let oauth_response = response.json::<OAuthResponse>().await?;
         Ok(oauth_response)
     } else {
-        tracing::error!("Error requesting token: {:?}", response);
+        tracing::error!("Error requesting token: {:?}", response.text().await?);
         let message = "An error occurred while trying to retrieve access token.";
         Err(From::from(message))
     }
