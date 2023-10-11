@@ -11,7 +11,7 @@ export default function ListingPage() {
 
   return (
     <View className="bg-bgLight h-full">
-      <Text className="ml-2.5 mt-6 font-Poppins_600SemiBold text-xl text-black ">
+      <Text className="ml-2.5 mt-6 font-Poppins_600SemiBold text-xl text-blackPrimary ">
         {tabDisplay}{" "}
       </Text>
       <View className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight">
@@ -22,8 +22,8 @@ export default function ListingPage() {
                 <Text
                   className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
                     index === selectedTabInt
-                      ? "text-black border-b borde-lime-900"
-                      : "text-gray"
+                      ? "text-blackPrimary border-b borde-lime-900"
+                      : "text-grayPrimary"
                   }`}
                 >
                   {tab}

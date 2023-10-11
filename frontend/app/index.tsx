@@ -15,7 +15,7 @@ export default function Index() {
       {session ? (
         <View>
           <Text
-            className={theme.dark ? "text-white" : "text-black"}
+            className={theme.dark ? "text-white" : "text-blackPrimary"}
             onPress={() => {
               signOut();
             }}>

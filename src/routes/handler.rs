@@ -6,7 +6,8 @@ use super::health_handler::health_check_handler;
 
 pub fn handlers(conf: &mut web::ServiceConfig) {
     conf.service(health_check_handler);
-
+    conf.service(super::health_handler::index_handler);
+    
     conf.service(
         web::scope("/auth")
             .service(google_oauth_handler)

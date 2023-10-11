@@ -67,8 +67,8 @@ export default function HomePage() {
                 <Text
                   className={`font-Poppins_400Regular ${
                     section.value === selectedSection
-                      ? "text-purple"
-                      : "text-gray"
+                      ? "text-purplePrimary"
+                      : "text-blackPrimary"
                   }`}
                 >
                   {section.display}

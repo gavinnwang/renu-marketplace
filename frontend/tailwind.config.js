@@ -15,11 +15,11 @@ module.exports = {
         SecularOne_400Regular: "SecularOne_400Regular",
       },
       colors: () => ({
-        black: "#181818",
+        blackPrimary: "#181818",
         grayLight: "#EEE",
-        purple: "#4E2A84",
+        purplePrimary: "#4E2A84",
         bgLight: "#F9F9F9",
-        bgLightSecondary: "#B5B5B5"
+        grayPrimary: "#B5B5B5"
       }),
     },
   },

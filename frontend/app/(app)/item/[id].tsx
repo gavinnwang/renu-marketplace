@@ -55,7 +55,7 @@ export default function ItemPage() {
           <Text className="font-Manrope_600SemiBold text-sm">
             {item.data.name}
           </Text>
-          <Pressable className="bg-purple mx-16 p-2 rounded-lg mt-6">
+          <Pressable className="bg-purplePrimary mx-16 p-2 rounded-lg mt-6">
             <Text className="text-white text-center text-lg">Purchase</Text>
           </Pressable>
         </>
