@@ -1,9 +1,11 @@
-import { Link, Stack, router, useLocalSearchParams } from "expo-router";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { LogoWithText } from "../../../../components/Logo";
+import { router, useLocalSearchParams } from "expo-router";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { Item } from "@prisma/client";
 import { ItemListingGrid } from "../../../../components/ItemListingGrid";
 import { useQuery } from "@tanstack/react-query";
+import { RefreshControl } from "react-native-gesture-handler";
+import { useState } from "react";
+import { ApiResponse } from "../../../../types/api";
 
 const SECTIONS = [
   { display: "Men's", value: "mens" },
@@ -13,10 +15,6 @@ const SECTIONS = [
   { display: "Electronics", value: "electronics" },
 ];
 
-interface ApiResponse<T> {
-  data: T;
-  status: "success" | "failure";
-}
 
 export default function HomePage() {
   const param = useLocalSearchParams();
@@ -26,6 +24,7 @@ export default function HomePage() {
     data: items,
     isLoading: isLoadingItems,
     isError: isErrorItems,
+    refetch: refetchItems,
   } = useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/`).then((x) =>
@@ -33,24 +32,18 @@ export default function HomePage() {
       ) as Promise<ApiResponse<Item[]>>,
     queryKey: ["item"],
   });
+  const [refreshing, _] = useState(false);
 
   return (
     <>
       <View className="bg-bgLight h-full">
-        <View className="flex flex-row items-center mx-[10px]">
-          <LogoWithText className="flex-grow" />
-          <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow-[2] ml-[10px]">
-            <TextInput placeholder="Search here" className="p-2 w-full" />
-          </View>
-        </View>
-
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             alignItems: "center",
           }}
-          className="border-y border-grayLight flex flex-row mt-3  max-h-[42px]"
+          className="border-y border-grayLight flex flex-row  min-h-[42px] max-h-[42px]"
         >
           {SECTIONS.map((section) => {
             return (
@@ -77,7 +70,11 @@ export default function HomePage() {
             );
           })}
         </ScrollView>
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
+          }
+        >
           <Text className="font-Poppins_500Medium text-xl m-2">Browse</Text>
           {isLoadingItems ? (
             <Text>...</Text>
