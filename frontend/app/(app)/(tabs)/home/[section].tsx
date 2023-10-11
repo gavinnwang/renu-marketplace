@@ -48,9 +48,9 @@ export default function HomePage() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
-            alignItems: "flex-start",
+            alignItems: "center",
           }}
-          className="border-y border-grayLight flex flex-row mt-3 pt-2 max-h-[42px]"
+          className="border-y border-grayLight flex flex-row mt-3  max-h-[42px]"
         >
           {SECTIONS.map((section) => {
             return (

@@ -22,7 +22,7 @@ export default function ListingPage() {
                 <Text
                   className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
                     index === selectedTabInt
-                      ? "text-blackPrimary border-b borde-lime-900"
+                      ? "text-blackPrimary border-b border-grayPrimary"
                       : "text-grayPrimary"
                   }`}
                 >
