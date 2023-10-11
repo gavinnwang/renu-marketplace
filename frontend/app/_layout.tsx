@@ -131,13 +131,8 @@ function RootLayoutNav() {
   // }
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <>
-        <SafeAreaView style={{ flex: 0, backgroundColor: "#f9f9f9" }} />
-        {/* <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f9f9" }}> */}
+        <SafeAreaView className="bg-bgLight" />
         <Slot />
-
-        {/* </SafeAreaView> */}
-      </>
     </ThemeProvider>
   );
 }

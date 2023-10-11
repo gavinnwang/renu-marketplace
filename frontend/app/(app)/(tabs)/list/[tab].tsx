@@ -10,11 +10,11 @@ export default function ListingPage() {
   const tabDisplay = TABS[selectedTabInt];
 
   return (
-    <View className="bg-[#F9F9F9] h-full">
-      <Text className="ml-2.5 mt-6 font-Poppins_600SemiBold text-xl text-[#181818] ">
+    <View className="bg-bgLight h-full">
+      <Text className="ml-2.5 mt-6 font-Poppins_600SemiBold text-xl text-black ">
         {tabDisplay}{" "}
       </Text>
-      <View className="flex flex-row  w-screen justify-center items-center border-b border-b-[#D7D7D7]">
+      <View className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight">
         {TABS.map((tab, index) => {
           return (
             <Link key={tab} href={`/list/${index}`} className="mx-auto">
@@ -22,8 +22,8 @@ export default function ListingPage() {
                 <Text
                   className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
                     index === selectedTabInt
-                      ? "text-[#181818] border-b borde-lime-900"
-                      : "text-[#949494]"
+                      ? "text-black border-b borde-lime-900"
+                      : "text-gray"
                   }`}
                 >
                   {tab}
