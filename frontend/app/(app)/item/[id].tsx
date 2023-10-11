@@ -42,7 +42,7 @@ export default function ItemPage() {
   });
 
   return (
-    <View>
+    <View className="h-full bg-bgLight">
       <View className="flex flex-row" >
         <Pressable onPress = {router.back}>
           <LeftIcon/>
@@ -55,7 +55,7 @@ export default function ItemPage() {
           <Text className="font-Manrope_600SemiBold text-sm">
             {item.data.name}
           </Text>
-          <Pressable className="bg-[#4E2A84] mx-16 p-2 rounded-lg mt-6">
+          <Pressable className="bg-purple mx-16 p-2 rounded-lg mt-6">
             <Text className="text-white text-center text-lg">Purchase</Text>
           </Pressable>
         </>

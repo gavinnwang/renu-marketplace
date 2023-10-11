@@ -25,16 +25,16 @@ export function ItemListing(props: { item: Item }) {
         />
         <View className="mx-1">
           <View className="flex flex-row items-center">
-            <Text className="color-[#4E2A84] font-Manrope_600SemiBold text-base mr-1">
+            <Text className="color-purple font-Manrope_600SemiBold text-base mr-1">
               ${props.item.price.toFixed(2)}
             </Text>
             {props.item.original_price != null ? (
-              <Text className="font-Manrope_500Medium text-sm text-[#181818] line-through">
+              <Text className="font-Manrope_500Medium text-sm text-black line-through">
                 ${props.item.original_price}
               </Text>
             ) : null}
           </View>
-          <Text className="font-Manrope_500Medium text-sm text-[#252525]z">
+          <Text className="font-Manrope_500Medium text-sm text-black]">
             {props.item.name}
           </Text>
         </View>

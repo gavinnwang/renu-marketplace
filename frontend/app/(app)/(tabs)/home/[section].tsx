@@ -36,11 +36,10 @@ export default function HomePage() {
 
   return (
     <>
-      <View className="bg-[#f9f9f9] h-full">
-        {/* <View className="mx-[10px] "> */}
+      <View className="bg-bgLight h-full">
         <View className="flex flex-row items-center mx-[10px]">
           <LogoWithText className="flex-grow" />
-          <View className="flex justify-center items-center bg-[#F0F0F0] rounded-md flex-grow-[2] ml-[10px]">
+          <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow-[2] ml-[10px]">
             <TextInput placeholder="Search here" className="p-2 w-full" />
           </View>
         </View>
@@ -48,7 +47,10 @@ export default function HomePage() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          className="border-y border-[#EEEEEE] flex flex-row mt-3 pt-2 max-h-[45px]"
+          contentContainerStyle={{
+            alignItems: "flex-start",
+          }}
+          className="border-y border-grayLight flex flex-row mt-3 pt-2 max-h-[42px]"
         >
           {SECTIONS.map((section) => {
             return (
@@ -65,8 +67,8 @@ export default function HomePage() {
                 <Text
                   className={`font-Poppins_400Regular ${
                     section.value === selectedSection
-                      ? "text-[#4E2A84] underline underline-offset-8 "
-                      : "text-[#949494]"
+                      ? "text-purple"
+                      : "text-gray"
                   }`}
                 >
                   {section.display}

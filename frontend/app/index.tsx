@@ -11,7 +11,7 @@ export default function Index() {
     router.replace("/home/mens");
   }
   return (
-    <View className="flex h-full w-full pt-4 items-center bg-[#F9F9F9]">
+    <View className="flex h-full w-full pt-4 items-center bg-bgLight">
       {session ? (
         <View>
           <Text
@@ -34,7 +34,7 @@ export default function Index() {
           <LogoWithText />
           {/* <Text className</View>="text-3xl text-center">Renu</Text> */}
           <Pressable
-            className="bg-[#EEEEEE] p-3 rounded-md px-8 mt-4"
+            className="bg-grayLight p-3 rounded-md px-8 mt-4"
             onPress={() => signIn("/welcome")}>
             <Text className="text-xl">Sign In</Text>
           </Pressable>

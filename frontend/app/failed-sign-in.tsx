@@ -3,7 +3,7 @@ import { SafeAreaView, Text, View } from "react-native";
 
 export default function FailedSignIn() {
   return (
-    <View className="bg-[#F9F9F9] h-full">
+    <View className="bg-bgLight h-full">
       <Text className="text-red-500 text-xl text-center">
         Failed to sign in
       </Text>
