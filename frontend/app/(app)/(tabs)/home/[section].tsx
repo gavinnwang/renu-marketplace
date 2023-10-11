@@ -7,7 +7,8 @@ import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";
 import { ApiResponse } from "../../../../types/api";
 
-const SECTIONS = [
+export const SECTIONS = [
+  { display: "All", value: "all" },
   { display: "Men's", value: "mens" },
   { display: "Women's", value: "womens" },
   { display: "Life/Tools", value: "lifetools" },
@@ -40,10 +41,8 @@ export default function HomePage() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            alignItems: "center",
-          }}
-          className="border-y border-grayLight flex flex-row  min-h-[42px] max-h-[42px]"
+
+          className="border-y border-grayLight flex flex-row  min-h-[42px] max-h-[42px] "
         >
           {SECTIONS.map((section) => {
             return (
@@ -55,13 +54,14 @@ export default function HomePage() {
                   }
                   void router.replace(`/home/${section.value}`);
                 }}
-                className="px-3"
+                
+                className="px-3 h-full justify-center"
               >
                 <Text
-                  className={`font-Poppins_400Regular ${
+                  className={`font-Poppins_500Medium ${
                     section.value === selectedSection
                       ? "text-purplePrimary"
-                      : "text-blackPrimary"
+                      : "text-gray-400"
                   }`}
                 >
                   {section.display}
@@ -69,8 +69,11 @@ export default function HomePage() {
               </Pressable>
             );
           })}
-        </ScrollView>
+        </ScrollView
+
+        >
         <ScrollView
+        showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
           }

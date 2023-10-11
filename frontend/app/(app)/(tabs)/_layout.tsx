@@ -2,6 +2,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 import Colors from "../../../constants/Colors";
+import { SECTIONS } from "./home/[section]";
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -24,7 +25,7 @@ export default function TabsLayout() {
           title: "Home",
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          href: "home/mens",
+          href: `home/${SECTIONS[0].value}}`,
         }}
       />
       <Tabs.Screen
