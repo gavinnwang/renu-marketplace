@@ -1,5 +1,5 @@
-import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { Link, Stack, router, useLocalSearchParams } from "expo-router";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { LogoWithText } from "../../../../components/Logo";
 import { Item } from "@prisma/client";
 import { ItemListingGrid } from "../../../../components/ItemListingGrid";
@@ -37,38 +37,44 @@ export default function HomePage() {
   return (
     <>
       <View className="bg-[#f9f9f9] h-full">
-        <View className="mx-[10px] ">
-          <View className="flex flex-row items-center">
-            <LogoWithText className="flex-grow" />
-            <View className="flex justify-center items-center bg-[#F0F0F0] rounded-md flex-grow-[2] ml-1">
-              <TextInput placeholder="Search here" className="p-2 w-full" />
-            </View>
+        {/* <View className="mx-[10px] "> */}
+        <View className="flex flex-row items-center mx-[10px]">
+          <LogoWithText className="flex-grow" />
+          <View className="flex justify-center items-center bg-[#F0F0F0] rounded-md flex-grow-[2] ml-[10px]">
+            <TextInput placeholder="Search here" className="p-2 w-full" />
           </View>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="border-y border-[#EEEEEE] flex flex-row mt-3 justify-between h-[40px] items-center">
-              {SECTIONS.map((section) => {
-                return (
-                  <Link
-                    key={section.value}
-                    href={`/home/${section.value}`}
-                    className="px-3"
-                  >
-                    <Text
-                      className={`font-Poppins_400Regular text-sm   ${
-                        section.value === selectedSection
-                          ? "text-[#4E2A84] underline underline-offset-8 "
-                          : "text-[#949494]"
-                      }`}
-                    >
-                      {section.display}
-                    </Text>
-                  </Link>
-                );
-              })}
-            </View>
-          </ScrollView>
         </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="border-y border-[#EEEEEE] flex flex-row mt-3 pt-2 max-h-[45px]"
+        >
+          {SECTIONS.map((section) => {
+            return (
+              <Pressable
+                key={section.value}
+                onPress={() => {
+                  if (section.value === selectedSection) {
+                    return;
+                  }
+                  void router.replace(`/home/${section.value}`);
+                }}
+                className="px-3"
+              >
+                <Text
+                  className={`font-Poppins_400Regular ${
+                    section.value === selectedSection
+                      ? "text-[#4E2A84] underline underline-offset-8 "
+                      : "text-[#949494]"
+                  }`}
+                >
+                  {section.display}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
         <ScrollView>
           <Text className="font-Poppins_500Medium text-xl m-2">Browse</Text>
           {isLoadingItems ? (

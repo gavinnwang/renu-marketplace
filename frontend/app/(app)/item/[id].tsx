@@ -11,7 +11,8 @@ const LeftIcon = () => (
     height="33"
     viewBox="0 0 25 33"
     fill="none"
-    onPress={router.back}>
+    
+    >
     <Path
       d="M14.5833 9.625L9.375 16.5L14.5833 23.375"
       stroke="#958F91"
@@ -42,8 +43,11 @@ export default function ItemPage() {
 
   return (
     <View>
-      <View className="flex flex-row">
-        <LeftIcon />
+      <View className="flex flex-row" >
+        <Pressable onPress = {router.back}>
+          <LeftIcon/>
+        </Pressable>
+
       </View>
       {item != null ? (
         <>
@@ -51,7 +55,6 @@ export default function ItemPage() {
           <Text className="font-Manrope_600SemiBold text-sm">
             {item.data.name}
           </Text>
-          {/*///className="bg-[#4E2A84]"*/}
           <Pressable className="bg-[#4E2A84] mx-16 p-2 rounded-lg mt-6">
             <Text className="text-white text-center text-lg">Purchase</Text>
           </Pressable>
