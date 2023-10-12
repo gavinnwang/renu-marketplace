@@ -4,7 +4,7 @@ import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
 import * as Linking from "expo-linking";
 import "react-native-url-polyfill/auto";
 import * as SecureStore from "expo-secure-store";
-import { Link, Redirect, router } from "expo-router";
+import { router } from "expo-router";
 
 type Session = {
   token: string;
