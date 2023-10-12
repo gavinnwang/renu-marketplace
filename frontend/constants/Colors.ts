@@ -1,10 +1,13 @@
 const backgroundLight = "#F9F9F9";
-export const black = "#181818";
-export const gray = "#949494";
-export const northwesternPurple = "#4E2A84";
+const blackPrimary = "#181818";
+const grayPrimary = "#949494";
+const northwesternPurple = "#4E2A84";
 export default {
+  blackPrimary,
+  grayPrimary,
+  northwesternPurple,
   light: {
-    text: black,
+    text: blackPrimary,
     background: backgroundLight,
     tabIconDefault: "#ccc",
     tabIconSelected: backgroundLight,
