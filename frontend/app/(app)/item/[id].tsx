@@ -35,7 +35,6 @@ export default function ItemPage() {
     enabled: !!itemId,
   });
 
-  console.log("item", item);
 
   return (
     <View className="h-full bg-bgLight">
@@ -44,9 +43,9 @@ export default function ItemPage() {
           <LeftIcon />
         </Pressable>
       </View>
-      {item != null ? (
+      {item ? (
         <>
-          <Image percentageWidth={1} url={item.data.image_url} />
+          <Image percentageHeight={1} percentageWidth={1} url={item.data.image_url} />
           <Text className="font-Manrope_600SemiBold text-sm">
             {item.data.name}
           </Text>
@@ -56,8 +55,7 @@ export default function ItemPage() {
         </>
       ) : (
         <>
-          <Text>Hi</Text>
-          <Text>Id: {itemId}</Text>
+          <Text>Item could not be loaded.</Text>
         </>
       )}
     </View>

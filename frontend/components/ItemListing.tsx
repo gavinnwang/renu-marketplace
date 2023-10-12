@@ -3,19 +3,18 @@ import {
   Image,
   View,
   Text,
-  type DimensionValue,
-  SafeAreaView,
 } from "react-native";
 import { Item } from "@prisma/client";
 import { Link } from "expo-router";
 
 const dimensions = Dimensions.get("window");
-const imagePercentage = 0.49;
+const imagePercentage = 0.495;
 const imageWidth = (dimensions.width * imagePercentage);
+console.log("imageWidth", imageWidth.toPrecision(3));
 
 export function ItemListing(props: { item: Item }) {
   return (
-    <Link href={`/item/${props.item.id}`} className={`flex flex-col max-w-[${imageWidth.toPrecision(3)}px]`}>
+    <Link href={`/item/${props.item.id}`} className={`flex flex-col max-w-[${(imageWidth - 10).toPrecision(3)}px] px-1 pb-3`}>
       <View className="flex flex-col">
         <Image
           source={{ uri: props.item.image_url }}
