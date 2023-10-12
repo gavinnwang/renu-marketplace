@@ -3,13 +3,17 @@ import { useSession } from "../providers/ctx";
 import { Link, router } from "expo-router";
 import { useTheme } from "@react-navigation/native";
 import { LogoWithText } from "../components/Logo";
+import { useEffect } from "react";
+import { SECTIONS } from "./(app)/(tabs)/home/[section]";
 
 export default function Index() {
   const { signOut, session, signIn } = useSession();
   const theme = useTheme();
-  if (session) {
-    router.replace("/home/mens");
-  }
+  useEffect(() => {
+    if (session) {
+      router.replace(`/home/${SECTIONS[0].value}`);
+    }
+  }, [session]);
   return (
     <View className="flex h-full w-full pt-4 items-center bg-bgLight">
       {session ? (
@@ -18,7 +22,8 @@ export default function Index() {
             className={theme.dark ? "text-white" : "text-blackPrimary"}
             onPress={() => {
               signOut();
-            }}>
+            }}
+          >
             Sign Out
           </Text>
           <Text>
@@ -35,7 +40,8 @@ export default function Index() {
           {/* <Text className</View>="text-3xl text-center">Renu</Text> */}
           <Pressable
             className="bg-grayLight p-3 rounded-md px-8 mt-4"
-            onPress={() => signIn("/welcome")}>
+            onPress={() => signIn("/welcome")}
+          >
             <Text className="text-xl">Sign In</Text>
           </Pressable>
           {/* <Text

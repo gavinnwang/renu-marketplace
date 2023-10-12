@@ -34,11 +34,6 @@ export default function AppLayout() {
     <QueryClientProvider client={queryClient}>
 
       <View className="flex flex-row items-center px-2.5 bg-bgLight pb-2.5">
-        <Text>
-        {
-          param.screen.includes("item") ? "Item" : "Home"
-        }
-        </Text>
         <LogoWithText className="flex-grow" />
         <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
           <TextInput placeholder="Search here" className="p-2 w-full" />
