@@ -1,11 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { Item } from "@prisma/client";
 import { ItemListingGrid } from "../../../../components/ItemListingGrid";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";
 import { ApiResponse } from "../../../../types/api";
+import { ItemListing } from "../../../../components/ItemListing";
 
 export const SECTIONS = [
   { display: "All", value: "all" },
@@ -15,7 +16,6 @@ export const SECTIONS = [
   { display: "Furniture", value: "furniture" },
   { display: "Electronics", value: "electronics" },
 ];
-
 
 export default function HomePage() {
   const param = useLocalSearchParams();
@@ -33,6 +33,7 @@ export default function HomePage() {
       ) as Promise<ApiResponse<Item[]>>,
     queryKey: ["item"],
   });
+
   const [refreshing, _] = useState(false);
 
   return (
@@ -41,7 +42,6 @@ export default function HomePage() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-
           className="border-y border-grayLight flex flex-row  min-h-[42px] max-h-[42px] "
         >
           {SECTIONS.map((section) => {
@@ -54,7 +54,6 @@ export default function HomePage() {
                   }
                   void router.replace(`/home/${section.value}`);
                 }}
-                
                 className="px-3 h-full justify-center"
               >
                 <Text
@@ -69,24 +68,30 @@ export default function HomePage() {
               </Pressable>
             );
           })}
-        </ScrollView
-
-        >
-        <ScrollView
-        showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
-          }
-        >
-          <Text className="font-Poppins_500Medium text-xl m-2">Browse</Text>
-          {isLoadingItems ? (
-            <Text>...</Text>
-          ) : isErrorItems ? (
-            <Text className="text-red-500">Something went wrong</Text>
-          ) : (
-            <ItemListingGrid items={items.data} />
-          )}
         </ScrollView>
+
+        {/* <Text className="font-Poppins_500Medium text-xl p-2 bg-red-200">
+          Browse
+        </Text> */}
+        {isLoadingItems ? (
+          <Text>...</Text>
+        ) : isErrorItems ? (
+          <Text className="text-red-500">Something went wrong</Text>
+        ) : (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={refetchItems}
+              />
+            }
+            data={items.data}
+            numColumns={2}
+            columnWrapperStyle={{ justifyContent: "space-between" }}
+            renderItem={ItemListing}
+          />
+        )}
       </View>
     </>
   );
