@@ -1,9 +1,10 @@
 import { Link, useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 
+
 const TABS = ["Listings", "Sold"];
 
-export default function ListingPage() {
+export default function ListScreen() {
   const param = useLocalSearchParams();
   const selectedTab = param.tab;
   const selectedTabInt = parseInt(selectedTab as string);
@@ -12,7 +13,7 @@ export default function ListingPage() {
   return (
     <View className="bg-bgLight h-full">
       <Text className="ml-2.5 mt-6 font-Poppins_600SemiBold text-xl text-blackPrimary ">
-        {tabDisplay}{" "}
+        {tabDisplay}
       </Text>
       <View className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight">
         {TABS.map((tab, index) => {
@@ -36,3 +37,4 @@ export default function ListingPage() {
     </View>
   );
 }
+
