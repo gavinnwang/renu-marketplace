@@ -77,7 +77,7 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
-    const {setSession} = useSession();
+  const { setSession } = useSession();
 
   async function getToken() {
     const session = await SecureStore.getItemAsync("session");
@@ -91,10 +91,8 @@ function RootLayoutNav() {
     getToken();
   }, []);
 
-
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <SafeAreaView className="bg-bgLight" />
       <Slot />
     </ThemeProvider>
   );

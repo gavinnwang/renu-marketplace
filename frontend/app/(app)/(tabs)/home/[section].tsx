@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import {
   FlatList,
   Pressable,
+  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -43,69 +44,66 @@ export default function HomePage() {
 
   const [refreshing, _] = useState(false);
 
+  const HEADER_HEIGHT = 40;
+
   return (
-    <>
-      <View className="flex flex-row items-center px-2.5 bg-bgLight pb-2.5">
+    <View className="bg-bgLight h-full">
+      <View className="flex flex-row items-center px-2.5 pb-2.5 h-[40px]">
         <LogoWithText className="flex-grow" />
         <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
           <TextInput placeholder="Search here" className="p-2 w-full" />
         </View>
       </View>
-      <View className="bg-bgLight h-full">
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="border-y border-grayLight flex flex-row  min-h-[42px] max-h-[42px] "
-        >
-          {SECTIONS.map((section) => {
-            return (
-              <Pressable
-                key={section.value}
-                onPress={() => {
-                  if (section.value === selectedSection) {
-                    return;
-                  }
-                  void router.replace(`/home/${section.value}`);
-                }}
-                className="px-3 h-full justify-center"
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="border-y border-grayLight flex flex-row  min-h-[42px] max-h-[42px] "
+      >
+        {SECTIONS.map((section) => {
+          return (
+            <Pressable
+              key={section.value}
+              onPress={() => {
+                if (section.value === selectedSection) {
+                  return;
+                }
+                void router.replace(`/home/${section.value}`);
+              }}
+              className="px-3 h-full justify-center"
+            >
+              <Text
+                className={`font-Poppins_500Medium ${
+                  section.value === selectedSection
+                    ? "text-purplePrimary"
+                    : "text-gray-400"
+                }`}
               >
-                <Text
-                  className={`font-Poppins_500Medium ${
-                    section.value === selectedSection
-                      ? "text-purplePrimary"
-                      : "text-gray-400"
-                  }`}
-                >
-                  {section.display}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+                {section.display}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
 
-        {/* <Text className="font-Poppins_500Medium text-xl p-2 bg-red-200">
+      {/* <Text className="font-Poppins_500Medium text-xl p-2 bg-red-200">
           Browse
         </Text> */}
-        {isLoadingItems ? (
-          <Text>...</Text>
-        ) : isErrorItems ? (
-          <Text className="text-red-500">Something went wrong</Text>
-        ) : (
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={refetchItems}
-              />
-            }
-            data={items.data}
-            numColumns={2}
-            columnWrapperStyle={{ justifyContent: "space-between" }}
-            renderItem={ItemListing}
-          />
-        )}
-      </View>
-    </>
+      {isLoadingItems ? (
+        <Text>...</Text>
+      ) : isErrorItems ? (
+        <Text className="text-red-500">Something went wrong</Text>
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
+          }
+          data={items.data}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+          renderItem={ItemListing}
+        />
+      )}
+    </View>
   );
 }

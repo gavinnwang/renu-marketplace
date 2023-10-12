@@ -1,5 +1,5 @@
 import { Redirect, Stack, useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 import { useSession } from "../../providers/ctx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -25,14 +25,12 @@ export default function AppLayout() {
     // in the headless Node process that the pages are rendered in.
     return <Redirect href="/" />;
   }
-  
+
   const param = useLocalSearchParams();
-  console.log("param", param)
+
   // This layout can be deferred because it's not the root layout.
   return (
     <QueryClientProvider client={queryClient}>
-
-  
 
       <Stack
         screenOptions={{
