@@ -1,11 +1,19 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { Item } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";
 import { ApiResponse } from "../../../../types/api";
 import { ItemListing } from "../../../../components/ItemListing";
+import { LogoWithText } from "../../../../components/Logo";
 
 export const SECTIONS = [
   { display: "All", value: "all" },
@@ -37,6 +45,12 @@ export default function HomePage() {
 
   return (
     <>
+      <View className="flex flex-row items-center px-2.5 bg-bgLight pb-2.5">
+        <LogoWithText className="flex-grow" />
+        <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
+          <TextInput placeholder="Search here" className="p-2 w-full" />
+        </View>
+      </View>
       <View className="bg-bgLight h-full">
         <ScrollView
           horizontal
