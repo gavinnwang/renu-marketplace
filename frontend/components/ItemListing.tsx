@@ -14,7 +14,7 @@ console.log("imageWidth", imageWidth.toPrecision(3));
 
 export function ItemListing(props: { item: Item }) {
   return (
-    <Link href={`/item/${props.item.id}`} className={`flex flex-col max-w-[${(imageWidth - 10).toPrecision(3)}px] px-1 pb-3`}>
+    <Link href={`/item/${props.item.id}`} className={`flex flex-col max-w-[${(imageWidth - 10).toPrecision(3)} px-[3px] pb-3`}>
       <View className="flex flex-col">
         <Image
           source={{ uri: props.item.image_url }}
@@ -24,16 +24,16 @@ export function ItemListing(props: { item: Item }) {
             height: (imageWidth * 4) / 3,
           }}
         />
-        <View className="mx-1">
+        <View className="mx-1 h-[66px]">
           <View className="flex flex-row items-center">
             <Text className="text-purplePrimary font-Manrope_600SemiBold text-base mr-1">
               ${props.item.price.toFixed(2)}
             </Text>
-            {props.item.original_price != null ? (
+            {/* {props.item.original_price != null ? (
               <Text className="font-Manrope_500Medium text-sm text-blackPrimary line-through">
                 ${props.item.original_price}
               </Text>
-            ) : null}
+            ) : null} */}
           </View>
           <Text className={`font-Manrope_500Medium text-sm text-blackPrimary line-clamp-2 `}>
             {props.item.name}
