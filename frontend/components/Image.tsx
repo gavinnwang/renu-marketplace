@@ -4,15 +4,15 @@ import {
   type DimensionValue,
 } from "react-native";
 
-export function Image(props: { url: string; percentageWidth: number }) {
+export function Image({url, percentageWidth, percentageHeight = 4/3}: { url: string; percentageWidth: number; percentageHeight?: number  }) {
   const dimensions = Dimensions.get("window");
   return (
     <NativeImage
-      source={{ uri: props.url }}
+      source={{ uri: url }}
       className="object-cover"
       style={{
-        width: (dimensions.width * props.percentageWidth) as DimensionValue,
-        height: (dimensions.width * props.percentageWidth * 4) / 3,
+        width: (dimensions.width * percentageWidth) as DimensionValue,
+        height: (dimensions.width * percentageWidth ) * percentageHeight as DimensionValue,
       }}
     />
   );

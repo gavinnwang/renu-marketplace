@@ -8,7 +8,7 @@ import { useFonts } from "expo-font";
 import { Slot, SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { SafeAreaView, View, useColorScheme } from "react-native";
-import { SessionProvider } from "../providers/ctx";
+import { SessionProvider, useSession } from "../providers/ctx";
 import {
   Poppins_300Light,
   Poppins_400Regular,
@@ -22,7 +22,7 @@ import {
   Manrope_600SemiBold,
 } from "@expo-google-fonts/manrope";
 import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
-// import * as SecureStore from "expo-secure-store";
+import * as SecureStore from "expo-secure-store";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -118,21 +118,26 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  // const { session, setSession, loadedFromStorage, setLoadedFromStorage } = useSession();
 
-  // if(!loadedFromStorage && !session) {
-  //   const s = getInitialSession();
-  //   console.log("loaded session:", s)
-  //   if (s) {
-  //     setSession(s);
-  //   }
-  //   setLoadedFromStorage(true);
-  //   console.log("loaded from storage:")
-  // }
+    const {setSession} = useSession();
+
+  async function getToken() {
+    const session = await SecureStore.getItemAsync("session");
+    console.log("session", session);
+    if (session) {
+      setSession(JSON.parse(session));
+    }
+  }
+
+  useEffect(() => {
+    getToken();
+  }, []);
+
+
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <SafeAreaView className="bg-bgLight" />
-        <Slot />
+      <SafeAreaView className="bg-bgLight" />
+      <Slot />
     </ThemeProvider>
   );
 }

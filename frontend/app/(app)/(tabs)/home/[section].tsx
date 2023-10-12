@@ -1,7 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { Item } from "@prisma/client";
-import { ItemListingGrid } from "../../../../components/ItemListingGrid";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";

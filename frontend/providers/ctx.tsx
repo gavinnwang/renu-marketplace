@@ -67,14 +67,13 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const email = params.get("email");
       const name = params.get("name");
       if (token && email && name) {
-        setSession({
+        const s = {
           token: token,
           email: email,
           name: name,
-        });
-        await save("token", token);
-        await save("email", email);
-        await save("name", name);
+        };
+        setSession(s);
+        void save("session", JSON.stringify(s));
       } else {
         router.replace("/failed-sign-in");
       }
@@ -96,7 +95,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         setSession,
         loadedFromStorage,
         setLoadedFromStorage,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

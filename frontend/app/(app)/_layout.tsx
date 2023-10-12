@@ -1,4 +1,4 @@
-import { Redirect, Stack } from "expo-router";
+import { Redirect, Stack, useLocalSearchParams } from "expo-router";
 import { Text, TextInput, View } from "react-native";
 import { useSession } from "../../providers/ctx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -27,13 +27,18 @@ export default function AppLayout() {
     return <Redirect href="/" />;
   }
   
-
-
+  const param = useLocalSearchParams();
+  console.log("param", param)
   // This layout can be deferred because it's not the root layout.
   return (
     <QueryClientProvider client={queryClient}>
 
       <View className="flex flex-row items-center px-2.5 bg-bgLight pb-2.5">
+        <Text>
+        {
+          param.screen.includes("item") ? "Item" : "Home"
+        }
+        </Text>
         <LogoWithText className="flex-grow" />
         <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
           <TextInput placeholder="Search here" className="p-2 w-full" />
