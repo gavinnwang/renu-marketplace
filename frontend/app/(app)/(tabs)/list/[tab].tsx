@@ -1,5 +1,5 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 
 
 const TABS = ["Listings", "Sold"];
@@ -11,6 +11,7 @@ export default function ListScreen() {
   const tabDisplay = TABS[selectedTabInt];
 
   return (
+
     <View className="bg-bgLight h-full">
       <Text className="ml-2.5 mt-6 font-Poppins_600SemiBold text-xl text-blackPrimary ">
         {tabDisplay}

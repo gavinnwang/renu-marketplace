@@ -3,6 +3,7 @@ import React from "react";
 import Colors from "../../../constants/Colors";
 import { SECTIONS } from "./home/[section]";
 import Svg, { Path } from "react-native-svg";
+import { SafeAreaView } from "react-native";
 
 // function TabBarIcon(props: {
 //   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -13,50 +14,53 @@ import Svg, { Path } from "react-native-svg";
 
 export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarStyle: {
-          backgroundColor: Colors.light.background,
-        },
-        tabBarActiveTintColor: Colors.blackPrimary,
-      }}
-    >
-      <Tabs.Screen
-        name="home/[section]"
-        options={{
-          title: "Home",
-          headerShown: false,
-          tabBarIcon: ({ color }) => <HomeIcon color={color} />,
-          href: `home/${SECTIONS[0].value}}`,
+    <>
+      <SafeAreaView className="bg-bgLight"></SafeAreaView>
+      <Tabs
+        screenOptions={{
+          tabBarStyle: {
+            backgroundColor: Colors.light.background,
+          },
+          tabBarActiveTintColor: Colors.blackPrimary,
         }}
-      />
-      <Tabs.Screen
-        name="message"
-        options={{
-          title: "Message",
-          headerShown: false,
-          tabBarIcon: ({ color }) => <MessageIcon color={color} />,
-          href: `message`,
-        }}
-      />
-      <Tabs.Screen
-        name="list/[tab]"
-        options={{
-          title: "List",
-          headerShown: false,
-          tabBarIcon: ({ color }) => <ListIcon color={color} />,
-          href: "list/0",
-        }}
-      />
-      <Tabs.Screen
-        name="account"
-        options={{
-          title: "ME",
-          headerShown: false,
-          tabBarIcon: ({ color }) => <AccountIcon color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="home/[section]"
+          options={{
+            title: "Home",
+            headerShown: false,
+            tabBarIcon: ({ color }) => <HomeIcon color={color} />,
+            href: `home/${SECTIONS[0].value}}`,
+          }}
+        />
+        <Tabs.Screen
+          name="message"
+          options={{
+            title: "Message",
+            headerShown: false,
+            tabBarIcon: ({ color }) => <MessageIcon color={color} />,
+            href: "message",
+          }}
+        />
+        <Tabs.Screen
+          name="list/[tab]"
+          options={{
+            title: "List",
+            headerShown: false,
+            tabBarIcon: ({ color }) => <ListIcon color={color} />,
+            href: "list/0",
+          }}
+        />
+        <Tabs.Screen
+          name="account"
+          options={{
+            title: "Me",
+            headerShown: false,
+            tabBarIcon: ({ color }) => <AccountIcon color={color} />,
+          }}
+        />
+      </Tabs>
+    </>
   );
 }
 

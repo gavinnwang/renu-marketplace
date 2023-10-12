@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { View, Text, Button, Pressable } from "react-native";
+import { View, Text, Button, Pressable, SafeAreaView } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Image } from "../../../components/Image";
 import { useQuery } from "@tanstack/react-query";
@@ -37,7 +37,7 @@ export default function ItemPage() {
 
 
   return (
-    <View className="h-full bg-bgLight">
+    <SafeAreaView className="h-full bg-bgLight">
       <View className="flex flex-row">
         <Pressable onPress={router.back}>
           <LeftIcon />
@@ -58,6 +58,6 @@ export default function ItemPage() {
           <Text>Item could not be loaded.</Text>
         </>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
