@@ -29,48 +29,6 @@ export {
   ErrorBoundary,
 } from "expo-router";
 
-// type Session = {
-//   token: string;
-//   email: string;
-//   name: string;
-// };
-
-// const getInitialSession = () => {
-//   let token;
-//   SecureStore.getItemAsync("token").then((t) => {
-//     token = t;
-//   });
-//   let email;
-//   SecureStore.getItemAsync("email").then((e) => {
-//     email = e;
-//   });
-//   let name;
-//   SecureStore.getItemAsync("name").then((n) => {
-//     name = n;
-//   });
-//   if (token && email && name) {
-//     return {
-//       token: token as string,
-//       email: email as string,
-//       name: name as string,
-//     } as Session;
-//   }
-//   return undefined;
-// };
-
-// async function save(key: string, value: string) {
-//   await SecureStore.setItemAsync(key, value);
-// }
-
-// async function getValueFor(key: string) {
-//   let result = await SecureStore.getItemAsync(key);
-//   if (result) {
-//     alert("🔐 Here's your value 🔐 \n" + result);
-//   } else {
-//     alert("No values stored under that key.");
-//   }
-// }
-
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
