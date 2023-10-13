@@ -1,18 +1,24 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { View, Text, Button, Pressable, SafeAreaView } from "react-native";
+import { Text, Pressable, SafeAreaView } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Image } from "../../../components/Image";
 import { useQuery } from "@tanstack/react-query";
 import { Item } from "@prisma/client";
+import Colors from "../../../constants/Colors";
 
-const LeftIcon = () => (
-  <Svg width="25" height="33" viewBox="0 0 25 33" fill="none">
+const CloseIcon = () => (
+  <Svg
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke={Colors.grayPrimary}
+    className="w-6 h-6"
+  >
     <Path
-      d="M14.5833 9.625L9.375 16.5L14.5833 23.375"
-      stroke="#958F91"
-      stroke-width="1.7"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.7}
+      d="M6 18L18 6M6 6l12 12"
     />
   </Svg>
 );
@@ -35,17 +41,19 @@ export default function ItemPage() {
     enabled: !!itemId,
   });
 
-
   return (
     <SafeAreaView className="h-full bg-bgLight">
-      <View className="flex flex-row">
-        <Pressable onPress={router.back}>
-          <LeftIcon />
-        </Pressable>
-      </View>
+      <Pressable onPress={router.back} className="p-3">
+        <CloseIcon />
+      </Pressable>
+
       {item ? (
         <>
-          <Image percentageHeight={1} percentageWidth={1} url={item.data.image_url} />
+          <Image
+            percentageHeight={1}
+            percentageWidth={1}
+            url={item.data.image_url}
+          />
           <Text className="font-Manrope_600SemiBold text-sm">
             {item.data.name}
           </Text>
