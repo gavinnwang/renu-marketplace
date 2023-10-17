@@ -2,8 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import {
   FlatList,
   Pressable,
-  SafeAreaView,
-  ScrollView,
+  ScrollView,   
   Text,
   TextInput,
   View,
