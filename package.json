@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@prisma/client": "^5.4.1"
+    "@prisma/client": "^5.4.1",
+    "dayjs": "^1.11.10"
   },
   "devDependencies": {
     "prisma": "^5.4.2"

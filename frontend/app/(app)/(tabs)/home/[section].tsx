@@ -100,7 +100,7 @@ export default function HomePage() {
           }
           data={items.data}
           numColumns={2}
-          columnWrapperStyle={{ justifyContent: "space-between" }}
+          columnWrapperStyle={{ justifyContent: "space-evenly", marginTop: 12 }}
           renderItem={ItemListing}
         />
       )}
