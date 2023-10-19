@@ -1,16 +1,9 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import Colors from "../../../constants/Colors";
-import { SECTIONS } from "./home/[section]";
+
 import Svg, { Path } from "react-native-svg";
 import { SafeAreaView } from "react-native";
-
-// function TabBarIcon(props: {
-//   name: React.ComponentProps<typeof FontAwesome>["name"];
-//   color: string;
-// }) {
-//   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-// }
 
 export default function TabsLayout() {
   return (
@@ -30,7 +23,7 @@ export default function TabsLayout() {
             title: "Home",
             headerShown: false,
             tabBarIcon: ({ color }) => <HomeIcon color={color} />,
-            href: `home/${SECTIONS[0].value}}`,
+            href: "home/all",
           }}
         />
         <Tabs.Screen

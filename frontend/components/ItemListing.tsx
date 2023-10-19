@@ -11,34 +11,27 @@ const imageWidth = (dimensions.width - horizontalGapPx * 3) / 2;
 
 export function ItemListing(props: { item: any }) {
   return (
-    <Link href={`/item/${props.item.id}`} className="flex flex-col bg-white ">
+    <Link href={`/item/${props.item.id}`} className="flex flex-col">
       <View className="flex flex-col">
         <Image
           source={{ uri: props.item.image_url }}
-          className="object-cover"
+          className="object-cover rounded-t-sm"
           style={{
             width: imageWidth,
             maxWidth: imageWidth,
             height: (imageWidth * 4) / 3,
           }}
         />
-        <View className="mx-1 h-[66px]">
-          <View className="flex flex-row items-center">
+        <View className="h-fit py-2 px-2.5 bg-white rounded-b-sm flex flex-col gap-y-0.5">
+          <Text className={`font-Manrope_500Medium text-sm text-grayPrimary `}>
+            {props.item.name.substring(0, 10)}
+          </Text>
+          <Text className={`font-Manrope_500Medium text-sm text-grayPrimary `}>
+            {dayjs(props.item.created_at.secs_since_epoch * 1000).fromNow()}
+          </Text>
             <Text className="text-purplePrimary font-Manrope_600SemiBold text-base mr-1">
               ${props.item.price.toFixed(2)}
             </Text>
-            {/* {props.item.original_price != null ? (
-              <Text className="font-Manrope_500Medium text-sm text-blackPrimary line-through">
-                ${props.item.original_price}
-              </Text>
-            ) : null} */}
-          </View>
-          <Text className={`font-Manrope_500Medium text-sm text-blackPrimary `}>
-            {props.item.name.substring(0, 10)}
-          </Text>
-          <Text className={`font-Manrope_500Medium text-sm text-blackPrimary `}>
-            {dayjs(props.item.created_at.secs_since_epoch * 1000).fromNow()}
-          </Text>
         </View>
       </View>
     </Link>

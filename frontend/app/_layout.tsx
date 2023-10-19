@@ -81,7 +81,6 @@ function RootLayoutNav() {
 
   async function getToken() {
     const session = await SecureStore.getItemAsync("session");
-    console.log("session", session);
     if (session) {
       setSession(JSON.parse(session));
     }
