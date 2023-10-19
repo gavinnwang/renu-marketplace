@@ -96,7 +96,7 @@ export default function HomePage() {
         className="bg-[#ECECEC]"
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
+            <RefreshControl className="z-50 bg-red-400" refreshing={refreshing} onRefresh={refetchItems} />
           }
           data={items.data}
           numColumns={2}

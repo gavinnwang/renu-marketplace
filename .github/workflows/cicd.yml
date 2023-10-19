@@ -4,12 +4,12 @@ on:
   push:
     branches:
       - main
-    paths: 
-      - 'src/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - '.github/workflows/**'
-      - 'Dockerfile'
+    # paths: 
+    #   - 'src/**'
+    #   - 'Cargo.toml'
+    #   - 'Cargo.lock'
+    #   - '.github/workflows/**'
+    #   - 'Dockerfile'
 
 jobs:
   build-push-and-deploy:
@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3 
 
     - name: Login to DockerHub
       uses: docker/login-action@v3
