@@ -15,23 +15,23 @@ export function ItemListing(props: { item: any }) {
       <View className="flex flex-col">
         <Image
           source={{ uri: props.item.image_url }}
-          className="object-cover rounded-t-sm"
+          className="object-cover rounded-t"
           style={{
             width: imageWidth,
             maxWidth: imageWidth,
             height: (imageWidth * 4) / 3,
           }}
         />
-        <View className="h-fit py-2 px-2.5 bg-white rounded-b-sm flex flex-col gap-y-0.5">
-          <Text className={`font-Manrope_500Medium text-sm text-grayPrimary `}>
+        <View className="h-fit py-2.5 px-2.5 bg-white rounded-b flex flex-col ">
+          <Text className="text-purplePrimary font-Manrope_600SemiBold text-base">
+            ${props.item.price.toFixed(2)}
+          </Text>
+          <Text className={`font-Manrope_500Medium text-sm  `}>
             {props.item.name.substring(0, 10)}
           </Text>
-          <Text className={`font-Manrope_500Medium text-sm text-grayPrimary `}>
+          <Text className={`font-Manrope_500Medium text-xs `}>
             {dayjs(props.item.created_at.secs_since_epoch * 1000).fromNow()}
           </Text>
-            <Text className="text-purplePrimary font-Manrope_600SemiBold text-base mr-1">
-              ${props.item.price.toFixed(2)}
-            </Text>
         </View>
       </View>
     </Link>
