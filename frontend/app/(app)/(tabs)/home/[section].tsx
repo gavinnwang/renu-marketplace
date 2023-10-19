@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import {
   FlatList,
   Pressable,
-  ScrollView,   
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -90,10 +90,10 @@ export default function HomePage() {
       {isLoadingItems ? (
         <Text>...</Text>
       ) : isErrorItems ? (
-        <Text className="text-red-500">Something went wrong</Text>
+        <Text>Something went wrong</Text>
       ) : (
         <FlatList
-        className="bg-[#ECECEC]"
+          className="bg-[#ECECEC]"
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
