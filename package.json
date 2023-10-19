@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@expo-google-fonts/poppins": "^0.2.3",
     "@prisma/client": "^5.4.1",
     "dayjs": "^1.11.10"
   },

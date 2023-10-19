@@ -1,10 +1,11 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { Text, Pressable, SafeAreaView } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import { Text, Pressable, SafeAreaView, View } from "react-native";
+import Svg, { Path, SvgAst } from "react-native-svg";
 import { Image } from "../../../components/Image";
 import { useQuery } from "@tanstack/react-query";
 import { Item } from "@prisma/client";
 import Colors from "../../../constants/Colors";
+import { ApiResponse } from "../../../types/api";
 
 const CloseIcon = () => (
   <Svg
@@ -22,11 +23,6 @@ const CloseIcon = () => (
     />
   </Svg>
 );
-
-interface ApiResponse<T> {
-  data: T;
-  status: "success" | "failure";
-}
 
 export default function ItemPage() {
   const param = useLocalSearchParams();
@@ -54,18 +50,42 @@ export default function ItemPage() {
             percentageWidth={1}
             url={item.data.image_url}
           />
-          <Text className="font-Manrope_600SemiBold text-sm">
-            {item.data.name}
-          </Text>
-          <Pressable className="bg-purplePrimary mx-16 p-2 rounded-lg mt-6">
-            <Text className="text-white text-center text-lg">Purchase</Text>
-          </Pressable>
+          <View className="w-full flex flex-col p-3 py-3">
+            <Text className="text-sm font-Manrope_600SemiBold">
+              {item.data.name}
+            </Text>
+            <Text className="text-2xl text-purplePrimary">
+              ${item.data.price}
+            </Text>
+          </View>
+          <View className="h-2 bg-grayLight" />
+          <View className="p-2 flex flex-col gap-y-2">
+            <View className="flex flex-row gap-x-0.5">
+              <DescriptionIcon />
+              <Text className="text-sm">Description</Text>
+            </View>
+
+            <View>
+              <Text className="font-Manrope_300Light text-sm pl-2">
+                {item.data.description || "No description provided."} 
+              </Text>
+            </View>
+          </View>
         </>
       ) : (
         <>
-          <Text>Item could not be loaded.</Text>
+          <Text>Loading</Text>
         </>
       )}
     </SafeAreaView>
   );
 }
+
+const DescriptionIcon = () => (
+  <Svg width="20" height="20" viewBox="0 0 16 16" fill="none">
+    <Path
+      d="M5.2551 5.786C5.25373 5.81829 5.25898 5.85053 5.27053 5.88072C5.28208 5.91091 5.29968 5.93841 5.32225 5.96155C5.34482 5.98468 5.37189 6.00296 5.40179 6.01524C5.43168 6.02753 5.46378 6.03357 5.4961 6.033H6.3211C6.4591 6.033 6.5691 5.92 6.5871 5.783C6.6771 5.127 7.1271 4.649 7.9291 4.649C8.6151 4.649 9.2431 4.992 9.2431 5.817C9.2431 6.452 8.8691 6.744 8.2781 7.188C7.6051 7.677 7.0721 8.248 7.1101 9.175L7.1131 9.392C7.11415 9.45761 7.14095 9.52017 7.18772 9.5662C7.23449 9.61222 7.29748 9.63801 7.3631 9.638H8.1741C8.2404 9.638 8.30399 9.61166 8.35087 9.56478C8.39776 9.51789 8.4241 9.4543 8.4241 9.388V9.283C8.4241 8.565 8.6971 8.356 9.4341 7.797C10.0431 7.334 10.6781 6.82 10.6781 5.741C10.6781 4.23 9.4021 3.5 8.0051 3.5C6.7381 3.5 5.3501 4.09 5.2551 5.786ZM6.8121 11.549C6.8121 12.082 7.2371 12.476 7.8221 12.476C8.4311 12.476 8.8501 12.082 8.8501 11.549C8.8501 10.997 8.4301 10.609 7.8211 10.609C7.2371 10.609 6.8121 10.997 6.8121 11.549Z"
+      fill="black"
+    />
+  </Svg>
+);
