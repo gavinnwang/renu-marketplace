@@ -2,7 +2,14 @@ name: Rust CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+    paths: 
+      - 'src/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/**'
+      - 'Dockerfile'
 
 jobs:
   build-push-and-deploy:
