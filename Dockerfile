@@ -11,7 +11,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM chef AS builder 
 COPY --from=planner /app/recipe.json recipe.json
 
-ENV SQLX_OFFLINE=true
+ENV SQLX_OFFLINE=false
 # ARG DATABASE_URL
 # ENV DATABASE_URL=$DATABASE_URL
 
@@ -25,6 +25,6 @@ RUN addgroup -S myuser && adduser -S myuser -G myuser
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/marketplace /usr/local/bin/
 
 EXPOSE 8080
-ENV sqlx=off
+# ENV sqlx=off
 
 ENTRYPOINT ["/usr/local/bin/marketplace"]
