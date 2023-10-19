@@ -11,9 +11,9 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM chef AS builder 
 COPY --from=planner /app/recipe.json recipe.json
 
-ENV SQLX_OFFLINE true
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
+ENV SQLX_OFFLINE=true
+# ARG DATABASE_URL
+# ENV DATABASE_URL=$DATABASE_URL
 
 RUN cargo chef cook --release --target x86_64-unknown-linux-musl --recipe-path recipe.json
 COPY . .
