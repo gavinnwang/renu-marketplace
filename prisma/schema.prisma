@@ -15,11 +15,16 @@ model User {
   id                Int      @id @default(autoincrement())
   name              String
   email             String   @unique
-  role              String   @default("user")
+  role              Role     @default(USER)
   created_at        DateTime @default(now()) @db.Timestamp(0)
   updated_at        DateTime @default(now()) @updatedAt @db.Timestamp(0)
   items             Item[]
   transaction_count Int      @default(0)
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model Item {
@@ -27,6 +32,7 @@ model Item {
   name        String
   price       Float
   image_url   String
+  category    Category @default(GENERAL)
   created_at  DateTime @default(now()) @db.Timestamp(0)
   updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(0)
   description String?
@@ -34,4 +40,16 @@ model Item {
   user_id     Int
 
   @@index([user_id], name: "user_id")
+}
+
+enum Category {
+  MENS
+  WOMENS
+  HOME
+  FURNITURE
+  ELECTRONICS
+  BIKES
+  TICKETS
+  GENERAL
+  FREE
 }

@@ -25,6 +25,21 @@ pub async fn fetch_all_items(
     .map_err(Into::into)
 }
 
+pub async fn fetch_items_by_category(
+    category: &str,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<Vec<Item>, DbError> {
+    sqlx::query_as!(
+        Item,
+        r#"SELECT id, name, price, image_url, user_id, created_at, updated_at FROM Item WHERE category = ?"#,
+        category
+    )
+    .fetch_all(conn)
+    .await
+    .map_err(Into::into)
+}
+
+
 pub async fn fetch_item_by_id(
     id: i64,
     conn: impl Executor<'_, Database = MySql>,

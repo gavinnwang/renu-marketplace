@@ -11,7 +11,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM chef AS builder 
 COPY --from=planner /app/recipe.json recipe.json
 
-ENV SQLX_OFFLINE=false
+ENV SQLX_OFFLINE=true
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
