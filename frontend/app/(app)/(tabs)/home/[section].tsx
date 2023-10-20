@@ -32,6 +32,7 @@ export default function HomePage() {
   const param = useLocalSearchParams();
   const selectedSection = param.section;
 
+  const fetchUrlPath = selectedSection == "all" ? "/items/" : `/items/category/${selectedSection}`;
   const {
     data: items,
     isLoading: isLoadingItems,
@@ -39,10 +40,10 @@ export default function HomePage() {
     refetch: refetchItems,
   } = useQuery({
     queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/`).then((x) =>
+      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + fetchUrlPath).then((x) =>
         x.json()
       ) as Promise<ApiResponse<Item[]>>,
-    queryKey: ["item"],
+    queryKey: ["item", selectedSection],
   });
 
   const [refreshing, _] = useState(false);
@@ -58,7 +59,7 @@ export default function HomePage() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        className="border-y border-grayLight flex flex-row  min-h-[42px] max-h-[42px] "
+        className="border-y border-grayLight flex flex-row  min-h-[45px] max-h-[42px] "
       >
         {SECTIONS.map((section) => {
           return (
