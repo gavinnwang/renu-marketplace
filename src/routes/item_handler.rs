@@ -35,3 +35,24 @@ async fn get_item_by_id_handler(path: web::Path<i64>, pool: web::Data<DbPool>) -
         }
     }
 }
+
+#[get("/category/{category}")]
+async fn get_items_by_category_handler(
+    path: web::Path<String>,
+    pool: web::Data<DbPool>,
+) -> impl Responder {
+    let category = path.into_inner();
+    let items = item_repository::fetch_items_by_category(&category, pool.as_ref()).await;
+
+    match items {
+        Ok(items) => {
+            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
+        }
+        Err(err) => {
+            tracing::error!("{}", format!("API: Failed to fetch items with category {category}"));
+            tracing::error!("{}", err);
+            HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+        }
+    }
+}

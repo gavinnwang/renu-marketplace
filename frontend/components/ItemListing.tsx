@@ -24,10 +24,10 @@ export function ItemListing(props: { item: any }) {
         />
         <View className="h-fit py-2.5 px-2.5 bg-white rounded-b flex flex-col ">
           <Text className="text-purplePrimary font-Manrope_600SemiBold text-base">
-            ${props.item.price.toFixed(2)}
+            ${props.item.price < 10 ? props.item.price.toFixed(2) : props.item.price}
           </Text>
           <Text className={`font-Manrope_500Medium text-sm  `}>
-            {props.item.name.substring(0, 10)}
+            {props.item.name}
           </Text>
           <Text className={`font-Manrope_500Medium text-xs `}>
             {dayjs(props.item.created_at.secs_since_epoch * 1000).fromNow()}

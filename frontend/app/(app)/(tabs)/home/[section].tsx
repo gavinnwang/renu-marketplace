@@ -17,11 +17,15 @@ import { LogoWithText } from "../../../../components/Logo";
 
 export const SECTIONS = [
   { display: "All", value: "all" },
-  { display: "Men's", value: "mens" },
   { display: "Women's", value: "womens" },
-  { display: "Life/Tools", value: "lifetools" },
+  { display: "Men's", value: "mens" },
+  { display: "Home & Tools", value: "home" },
   { display: "Furniture", value: "furniture" },
   { display: "Electronics", value: "electronics" },
+  { display: "Bikes & Scooters", value: "bikes" },
+  { display: "Tickets", value: "tickets" },
+  { display: "General", value: "general" },
+  { display: "Free", value: "free" },
 ];
 
 export default function HomePage() {
@@ -42,8 +46,6 @@ export default function HomePage() {
   });
 
   const [refreshing, _] = useState(false);
-
-  const HEADER_HEIGHT = 40;
 
   return (
     <View className="bg-bgLight h-full">
