@@ -10,6 +10,7 @@ on:
       - 'Cargo.lock'
       - '.github/workflows/**'
       - 'Dockerfile'
+      - '.sqlx/**'
 
 jobs:
   build-push-and-deploy:
