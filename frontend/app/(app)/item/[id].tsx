@@ -7,7 +7,6 @@ import Colors from "../../../constants/Colors";
 import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
 import { useSession } from "../../../providers/ctx";
-import Stars from "../../../components/Stars";
 
 const CloseIcon = () => (
   <Svg
@@ -97,7 +96,6 @@ export default function ItemPage() {
                 <Text className="font-Manrope_400Regular text-sm text-blackPrimary">
                   {session ? session.name : "Loading User"}
                 </Text>
-                <Stars rating={4.5} />
 
               </View>
             </View>
