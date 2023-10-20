@@ -4,6 +4,7 @@ import { Pressable, FlatList, Text, View } from "react-native";
 import { useSession } from "../../../providers/ctx";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
+import Stars from "../../../components/Stars";
 
 export default function AccountScreen() {
   const { signOut } = useSession();
@@ -48,25 +49,27 @@ export default function AccountScreen() {
             uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=2787&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           }}
           style={{
-            borderColor: Colors.whitePrimary
+            borderColor: Colors.whitePrimary,
           }}
           className="w-[74px] h-[74px] rounded-full -mt-10 border "
         />
       </View>
 
       <View className="flex-row -mt-4 items-end justify-bottom justify-between px-2 pb-2">
-        <View className="flex-col w-[120px]">
-          
-          <Text className=" font-Manrope_400Regular text-sm">420 Reviews</Text>
-          <Text className=" font-Manrope_400Regular text-sm">
-            444 Transactions
+        <View className="flex-col w-[100px] ">
+          <Text className="font-Manrope_400Regular text-sm"> <Text className="font-Manrope_600SemiBold">43</Text> Followers</Text>
+          <Text className="font-Manrope_400Regular text-sm">
+           <Text className="font-Manrope_600SemiBold">
+            8</Text>  Sales Done
           </Text>
         </View>
 
-        <Text className=" text-base font-Poppins_500Medium text-center max-w-[160px]">Gavin Wang</Text>
+        <Text className=" text-base font-Poppins_500Medium text-center max-w-[160px]">
+          Gavin Wang
+        </Text>
 
-        <View className="flex flex-col w-[120px]">
-          <Text className="font-Manrope_400Regular text-sm text-center">4.3 Followers</Text>
+        <View className="flex flex-col w-[100px] gap-y-0.5">
+
           <Pressable className="font-Manrope_400Regular bg-purplePrimary p-2">
             <Text className="text-white text-center font-Manrope_600SemiBold">
               Edit
@@ -74,6 +77,8 @@ export default function AccountScreen() {
           </Pressable>
         </View>
       </View>
+
+      <View className="w-full h-2 bg-grayLight mt-2" />
 
       <FlatList
         data={likedItemsData}
