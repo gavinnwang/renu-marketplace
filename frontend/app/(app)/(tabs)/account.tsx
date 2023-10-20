@@ -1,8 +1,9 @@
 import React from "react";
-import { Pressable, FlatList, Image, Text, View, Button } from "react-native";
+import { Pressable, FlatList, Text, View } from "react-native";
 
 import { useSession } from "../../../providers/ctx";
 import Colors from "../../../constants/Colors";
+import { Image } from "expo-image";
 
 export default function AccountScreen() {
   const { signOut } = useSession();
@@ -53,18 +54,19 @@ export default function AccountScreen() {
         />
       </View>
 
-      <View className="flex-row justify-between px-2 pb-2">
-        <View className="flex-col">
+      <View className="flex-row -mt-4 items-end justify-bottom justify-between px-2 pb-2">
+        <View className="flex-col w-[120px]">
+          
           <Text className=" font-Manrope_400Regular text-sm">420 Reviews</Text>
           <Text className=" font-Manrope_400Regular text-sm">
             444 Transactions
           </Text>
         </View>
 
-        <Text className=" text-xl">Gavin MacBang</Text>
+        <Text className=" text-base font-Poppins_500Medium text-center max-w-[160px]">Gavin Wang</Text>
 
-        <View className="flex flex-col">
-          <Text className="font-Manrope_400Regular text-sm">4.3 Followers</Text>
+        <View className="flex flex-col w-[120px]">
+          <Text className="font-Manrope_400Regular text-sm text-center">4.3 Followers</Text>
           <Pressable className="font-Manrope_400Regular bg-purplePrimary p-2">
             <Text className="text-white text-center font-Manrope_600SemiBold">
               Edit
