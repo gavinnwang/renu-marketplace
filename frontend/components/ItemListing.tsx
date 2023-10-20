@@ -11,7 +11,7 @@ const imageWidth = (dimensions.width - horizontalGapPx * 3) / 2;
 
 export function ItemListing(props: { item: any }) {
   return (
-    <Link href={`/item/${props.item.id}`} className="flex flex-col">
+    <Link href={`/item/${props.item.id}`} className="flex flex-col px-[5px]">
       <View className="flex flex-col">
         <Image
           source={{ uri: props.item.image_url }}
