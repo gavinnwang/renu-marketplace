@@ -1,11 +1,13 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { Text, Pressable, SafeAreaView, View } from "react-native";
-import Svg, { Path, SvgAst } from "react-native-svg";
-import { Image } from "../../../components/Image";
+import { Text, Pressable, SafeAreaView, View, Dimensions } from "react-native";
+import Svg, { Path } from "react-native-svg";
 import { useQuery } from "@tanstack/react-query";
 import { Item } from "@prisma/client";
 import Colors from "../../../constants/Colors";
 import { ApiResponse } from "../../../types/api";
+import { Image } from "expo-image";
+import { useSession } from "../../../providers/ctx";
+import Stars from "../../../components/Stars";
 
 const CloseIcon = () => (
   <Svg
@@ -28,6 +30,8 @@ export default function ItemPage() {
   const param = useLocalSearchParams();
   const itemId = param.id;
 
+  const { session } = useSession();
+
   const { data: item } = useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
@@ -46,9 +50,13 @@ export default function ItemPage() {
       {item ? (
         <>
           <Image
-            percentageHeight={1}
-            percentageWidth={1}
-            url={item.data.image_url}
+            style={{
+              height: Dimensions.get("window").width,
+              width: "100%",
+            }}
+            source={{
+              uri: item.data.image_url,
+            }}
           />
           <View className="w-full flex flex-col p-3 py-3">
             <Text className="text-sm font-Manrope_600SemiBold">
@@ -67,8 +75,31 @@ export default function ItemPage() {
 
             <View>
               <Text className="font-Manrope_300Light text-sm pl-2">
-                {item.data.description || "No description provided."} 
+                {item.data.description || "No description provided."}
               </Text>
+            </View>
+          </View>
+          <View className="h-2 bg-grayLight" />
+
+          <View className="p-3">
+            <Text className="font-Poppins_600SemiBold text-base">Seller</Text>
+            <View className="flex flex-row">
+              <Image
+                source={{
+                  uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=2787&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                }}
+                style={{
+                  borderColor: Colors.whitePrimary,
+                }}
+                className="w-[53px] h-[53px] rounded-full  border "
+              />
+              <View className="flex flex-col gap-y-1 ml-2">
+                <Text className="font-Manrope_400Regular text-sm text-blackPrimary">
+                  {session ? session.name : "Loading User"}
+                </Text>
+                <Stars rating={4.5} />
+
+              </View>
             </View>
           </View>
         </>
@@ -89,3 +120,5 @@ const DescriptionIcon = () => (
     />
   </Svg>
 );
+
+
