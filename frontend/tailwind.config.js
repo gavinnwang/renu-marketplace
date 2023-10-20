@@ -16,7 +16,7 @@ module.exports = {
       },
       colors: () => ({
         blackPrimary: "#181818",
-        grayLight: "#EEE",
+        grayLight: "#EEEEEE",
         grayMedium: "#ECECEC",
         purplePrimary: "#4E2A84",
         bgLight: "#F9F9F9",
