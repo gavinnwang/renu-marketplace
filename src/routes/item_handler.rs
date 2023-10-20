@@ -12,7 +12,7 @@ async fn get_items_handler(pool: web::Data<DbPool>) -> impl Responder {
             HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
         }
         Err(_) => {
-            tracing::error!("API: Failed to fetch_all_items");
+            tracing::error!("API: Failed to fetch_all_items\n");
             HttpResponse::InternalServerError()
                 .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
         }
@@ -26,9 +26,10 @@ async fn get_item_by_id_handler(path: web::Path<i64>, pool: web::Data<DbPool>) -
 
     match item {
         Ok(item) => HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": item})),
-        Err(e) => {
-            tracing::error!("{}", format!("API: Failed to fetch item with id {item_id}"));
-            match e {
+        Err(err) => {
+            tracing::error!("{}\n", format!("API: Failed to fetch item with id {item_id}"));
+            tracing::error!("Error message: {}\n", err);
+            match err {
             crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item with id {item_id}" )})),
             _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
         }
@@ -49,8 +50,8 @@ async fn get_items_by_category_handler(
             HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
         }
         Err(err) => {
-            tracing::error!("{}", format!("API: Failed to fetch items with category {category}"));
-            tracing::error!("{}", err);
+            tracing::error!("{}\n", format!("API: Failed to fetch items with category {category}"));
+            tracing::error!("Error message: {}\n", err);
             HttpResponse::InternalServerError()
                 .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
         }
