@@ -32,7 +32,8 @@ export default function HomePage() {
   const param = useLocalSearchParams();
   const selectedSection = param.section;
 
-  const fetchUrlPath = selectedSection == "all" ? "/items/" : `/items/category/${selectedSection}`;
+  const fetchUrlPath =
+    selectedSection == "all" ? "/items/" : `/items/category/${selectedSection}`;
   const {
     data: items,
     isLoading: isLoadingItems,
@@ -86,27 +87,36 @@ export default function HomePage() {
           );
         })}
       </ScrollView>
-
-      {/* <Text className="font-Poppins_500Medium text-xl p-2 bg-red-200">
-          Browse
-        </Text> */}
-      {isLoadingItems ? (
-        <Text>...</Text>
-      ) : isErrorItems ? (
-        <Text>Something went wrong</Text>
-      ) : (
-        <FlatList
-          className="bg-[#ECECEC]"
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
-          }
-          data={items.data}
-          numColumns={2}
-          columnWrapperStyle={{ justifyContent: "space-evenly", marginTop: 12 }}
-          renderItem={ItemListing}
-        />
-      )}
+      <View className="bg-grayMedium h-full">
+        {isLoadingItems ? (
+          <Text>...</Text>
+        ) : isErrorItems ? (
+          <Text>Something went wrong</Text>
+        ) : items.data.length === 0 ? (
+          <Text>No items</Text>
+        ) : (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={()=>{
+                  refetchItems()
+                }}
+              />
+            }
+            data={items.data}
+            numColumns={2}
+            columnWrapperStyle={{
+              justifyContent: "flex-start",
+              marginTop: 12,
+              paddingHorizontal: 10,
+            }}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={ItemListing}
+          />
+        )}
+      </View>
     </View>
   );
 }
