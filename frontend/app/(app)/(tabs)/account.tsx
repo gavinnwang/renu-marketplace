@@ -4,7 +4,6 @@ import { Pressable, FlatList, Text, View } from "react-native";
 import { useSession } from "../../../providers/ctx";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
-import Stars from "../../../components/Stars";
 
 export default function AccountScreen() {
   const { signOut } = useSession();

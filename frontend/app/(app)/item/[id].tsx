@@ -8,6 +8,7 @@ import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
 import { useSession } from "../../../providers/ctx";
 
+
 const CloseIcon = () => (
   <Svg
     fill="none"
@@ -78,6 +79,7 @@ export default function ItemPage() {
               </Text>
             </View>
           </View>
+
           <View className="h-2 bg-grayLight" />
 
           <View className="p-3">
