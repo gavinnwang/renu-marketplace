@@ -36,24 +36,24 @@ pub struct RawItem {
 pub fn convert_raw_into_items(raw_items: Vec<RawItem>) -> Vec<Item> {
     raw_items
         .into_iter()
-        .map(|raw_item| {
-            let item_images: Vec<String> = match raw_item.item_images {
-                Some(item_images) => item_images.split(",").map(|s| s.to_string()).collect(),
-                None => Vec::new(),
-            };
-
-            Item {
-                id: raw_item.id,
-                name: raw_item.name,
-                price: raw_item.price,
-                item_images,
-                category: raw_item.category,
-                user_id: raw_item.user_id,
-                created_at: raw_item.created_at.into(),
-                updated_at: raw_item.updated_at.into(),
-            }
-        })
+        .map(|raw_item| convert_raw_into_item(raw_item))
         .collect()
+}
+
+pub fn convert_raw_into_item(raw_item: RawItem) -> Item {
+    Item {
+        id: raw_item.id,
+        name: raw_item.name,
+        price: raw_item.price,
+        item_images: match raw_item.item_images {
+            Some(item_images) => item_images.split(",").map(|s| s.to_string()).collect(),
+            None => Vec::new(),
+        },
+        category: raw_item.category,
+        user_id: raw_item.user_id,
+        created_at: raw_item.created_at.into(),
+        updated_at: raw_item.updated_at.into(),
+    }
 }
 
 pub async fn fetch_all_items(
@@ -112,20 +112,34 @@ pub async fn fetch_items_by_category(
     Ok(items)
 }
 
-// pub async fn fetch_item_by_id(
-//     id: i64,
-//     conn: impl Executor<'_, Database = MySql>,
-// ) -> Result<Item, DbError> {
-//     let item = sqlx::query_as!(
-//         Item,
-//         r#"SELECT id, name, price, image_url, user_id, created_at, updated_at FROM Item WHERE id = ?"#,
-//         id
-//     )
-//     .fetch_one(conn)
-//     .await?;
+pub async fn fetch_item_by_id(
+    id: i64,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<Item, DbError> {
+    let raw_item = sqlx::query_as!(
+        RawItem,
+        r#"
+        SELECT
+            Item.id, 
+            Item.name, 
+            Item.price, 
+            Item.user_id, 
+            Item.category,
+            Item.created_at, 
+            Item.updated_at,
+            GROUP_CONCAT(ItemImage.url) AS item_images
+        FROM Item
+        INNER JOIN ItemImage ON Item.id = ItemImage.item_id && Item.id = ?
+        GROUP BY Item.id
+        "#,
+        id
+    )
+    .fetch_one(conn)
+    .await?;
 
-//     Ok(item)
-// }
+    let item = convert_raw_into_item(raw_item);
+    Ok(item)
+}
 
 // pub async fn fetch_item_with_seller_by_id(
 //     id: i64,
@@ -143,19 +157,4 @@ pub async fn fetch_items_by_category(
 //     .await?;
 
 //     Ok(item)
-// }
-
-// pub async fn fetch_items_by_user_id(
-//     user_id: i64,
-//     conn: impl Executor<'_, Database = MySql>,
-// ) -> Result<Vec<Item>, DbError> {
-//     let items = sqlx::query_as!(
-//         Item,
-//         r#"SELECT id, name, price, image_url, user_id, created_at, updated_at FROM Item WHERE user_id = ?"#,
-//         user_id
-//     )
-//     .fetch_all(conn)
-//     .await?;
-
-//     Ok(items)
 // }
