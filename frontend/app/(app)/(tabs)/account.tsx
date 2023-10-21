@@ -1,12 +1,40 @@
-import React from "react";
-import { Pressable, FlatList, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Pressable, FlatList, Text, View, ScrollView } from "react-native";
 
 import { useSession } from "../../../providers/ctx";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
+import { useLocalSearchParams } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { ApiResponse } from "../../../types/api";
+import { ItemWithImage } from "../../../types/types";
+import { ItemListing } from "../../../components/ItemListing";
+import { RefreshControl } from "react-native-gesture-handler";
 
 export default function AccountScreen() {
   const { signOut } = useSession();
+
+
+  const param = useLocalSearchParams();
+  const selectedSection = param.section;
+
+  const fetchUrlPath =
+    selectedSection == "all" ? "/items/" : `/items/category/${selectedSection}`;
+  const {
+    data: items,
+    isLoading: isLoadingItems,
+    isError: isErrorItems,
+    refetch: refetchItems,
+  } = useQuery({
+    queryFn: async () =>
+      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + fetchUrlPath).then((x) =>
+        x.json()
+      ) as Promise<ApiResponse<ItemWithImage[]>>,
+    queryKey: ["item", selectedSection],
+  });
+
+  const [refreshing, _] = useState(false);
+
 
   const likedItemsData = [
     {
@@ -79,29 +107,42 @@ export default function AccountScreen() {
 
       <View className="w-full h-2 bg-grayLight mt-2" />
 
-      <FlatList
-        data={likedItemsData}
-        numColumns={2}
-        renderItem={({ item }) => (
-          <View className="m-2 bg-white p-4">
-            <Image source={{ uri: item.image }} className="w-full h-40" />
-            <Text className="font-family: Poppins; text-lg mt-2">
-              {item.price}{" "}
-              <Text className="font-Manrope_400Regular text-sm text-gray-500 line-through">
-                {item.originalPrice}
-              </Text>
-            </Text>
-            <Text className="font-Manrope_400Regular text-sm">
-              {item.title}
-            </Text>
-            <Text className="font-Manrope_400Regular text-sm">{item.size}</Text>
-            <Text className="font-Manrope_400Regular text-sm">
-              {item.color}
-            </Text>
-          </View>
+      
+      <Text className="ml-2.5 mt-6 mb-6 font-Poppins_600SemiBold text-xl" >Saved Items</Text>
+
+        <View className="bg-grayMedium h-full ">
+        {isLoadingItems ? (
+          <Text>...</Text>
+        ) : isErrorItems ? (
+          <Text>Something went wrong</Text>
+        ) : items.data.length === 0 ? (
+          <Text>No items</Text>
+        ) : (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => {
+                  refetchItems();
+                }}
+              />
+            }
+            data={items.data}
+            numColumns={2}
+            columnWrapperStyle={{
+              justifyContent: "flex-start",
+              marginTop: 12,
+              paddingHorizontal: 10,
+            }}
+            contentContainerStyle={{
+              paddingBottom: 92,
+            }}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={ItemListing}
+          />
         )}
-        keyExtractor={(item) => item.id}
-      />
+      </View>
 
       <Pressable onPress={signOut} className="bg-blue-500 p-4 mt-4">
         <Text className="font-family: Poppins; text-center text-white">
@@ -109,5 +150,6 @@ export default function AccountScreen() {
         </Text>
       </Pressable>
     </View>
+
   );
 }
