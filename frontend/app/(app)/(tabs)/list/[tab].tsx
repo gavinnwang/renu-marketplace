@@ -13,7 +13,7 @@ export default function ListScreen() {
   return (
 
     <View className="bg-bgLight h-full">
-      <Text className="ml-2.5 mt-6 font-Poppins_600SemiBold text-xl text-blackPrimary ">
+      <Text className="ml-2.5 mt-4 font-Poppins_600SemiBold text-xl text-blackPrimary ">
         {tabDisplay}
       </Text>
       <View className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight">
