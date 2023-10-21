@@ -7,6 +7,9 @@ import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
 import { useSession } from "../../../providers/ctx";
 import { ItemWithImage } from "../../../types/types";
+import { FlatList } from "react-native-gesture-handler";
+import PaginationDots from "../../../components/PaginationDots";
+import { useRef, useState } from "react";
 
 const CloseIcon = () => (
   <Svg
@@ -40,6 +43,11 @@ export default function ItemPage() {
     enabled: !!itemId,
   });
 
+  const [index, setIndex] = useState(0);
+  const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+    setIndex(viewableItems[0].index);
+  }).current;
+
   return (
     <SafeAreaView className="h-full bg-bgLight">
       <Pressable onPress={router.back} className="p-3">
@@ -48,15 +56,36 @@ export default function ItemPage() {
 
       {item ? (
         <>
-          <Image
-            style={{
-              height: Dimensions.get("window").width,
-              width: "100%",
-            }}
-            source={{
-              uri: item.data.item_images[0],
+          <FlatList
+            data={item.data.item_images}
+            renderItem={({ item }) => (
+              <Image
+                style={{
+                  height: "100%",
+                  width: Dimensions.get("window").width,
+                }}
+                source={{
+                  uri: item,
+                }}
+              />
+            )}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            pagingEnabled
+            snapToAlignment="center"
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={{
+              itemVisiblePercentThreshold: 50,
             }}
           />
+          <View className="relative">
+            {item.data.item_images.length > 1 && (
+              <PaginationDots
+                data={item.data.item_images}
+                currentIndex={index}
+              />
+            )}
+          </View>
           <View className="w-full flex flex-col p-3 py-3">
             <Text className="text-sm font-Manrope_600SemiBold">
               {item.data.name}
