@@ -2,12 +2,11 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Text, Pressable, SafeAreaView, View, Dimensions } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useQuery } from "@tanstack/react-query";
-import { Item } from "@prisma/client";
 import Colors from "../../../constants/Colors";
 import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
 import { useSession } from "../../../providers/ctx";
-
+import { ItemWithImage } from "../../../types/types";
 
 const CloseIcon = () => (
   <Svg
@@ -36,7 +35,7 @@ export default function ItemPage() {
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
         (x) => x.json()
-      ) as Promise<ApiResponse<Item>>,
+      ) as Promise<ApiResponse<ItemWithImage>>,
     queryKey: ["item", itemId],
     enabled: !!itemId,
   });
@@ -55,7 +54,7 @@ export default function ItemPage() {
               width: "100%",
             }}
             source={{
-              uri: item.data.image_url,
+              uri: item.data.item_images[0],
             }}
           />
           <View className="w-full flex flex-col p-3 py-3">
@@ -98,7 +97,6 @@ export default function ItemPage() {
                 <Text className="font-Manrope_400Regular text-sm text-blackPrimary">
                   {session ? session.name : "Loading User"}
                 </Text>
-
               </View>
             </View>
           </View>
@@ -120,5 +118,3 @@ const DescriptionIcon = () => (
     />
   </Svg>
 );
-
-

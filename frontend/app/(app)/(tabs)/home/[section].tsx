@@ -14,6 +14,7 @@ import { useState } from "react";
 import { ApiResponse } from "../../../../types/api";
 import { ItemListing } from "../../../../components/ItemListing";
 import { LogoWithText } from "../../../../components/Logo";
+import { ItemWithImage } from "../../../../types/types";
 
 export const SECTIONS = [
   { display: "All", value: "all" },
@@ -43,7 +44,7 @@ export default function HomePage() {
     queryFn: async () =>
       fetch(process.env.EXPO_PUBLIC_BACKEND_URL + fetchUrlPath).then((x) =>
         x.json()
-      ) as Promise<ApiResponse<Item[]>>,
+      ) as Promise<ApiResponse<ItemWithImage[]>>,
     queryKey: ["item", selectedSection],
   });
 
@@ -87,7 +88,7 @@ export default function HomePage() {
           );
         })}
       </ScrollView>
-      <View className="bg-grayMedium h-full">
+      <View className="bg-grayMedium h-full ">
         {isLoadingItems ? (
           <Text>...</Text>
         ) : isErrorItems ? (
@@ -100,8 +101,8 @@ export default function HomePage() {
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
-                onRefresh={()=>{
-                  refetchItems()
+                onRefresh={() => {
+                  refetchItems();
                 }}
               />
             }
@@ -111,6 +112,9 @@ export default function HomePage() {
               justifyContent: "flex-start",
               marginTop: 12,
               paddingHorizontal: 10,
+            }}
+            contentContainerStyle={{
+              paddingBottom: 92,
             }}
             keyExtractor={(item) => item.id.toString()}
             renderItem={ItemListing}

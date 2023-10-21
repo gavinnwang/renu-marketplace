@@ -4,18 +4,19 @@ import { Link } from "expo-router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Image } from "expo-image";
+import { ItemWithImage } from "../types/types";
 dayjs.extend(relativeTime);
 
 const dimensions = Dimensions.get("window");
 const horizontalGapPx = 10;
 const imageWidth = (dimensions.width - horizontalGapPx * 3) / 2;
 
-export function ItemListing(props: { item: any }) {
+export function ItemListing(props: { item: ItemWithImage }) {
   return (
     <Link href={`/item/${props.item.id}`} className="flex flex-col px-[5px]">
       <View className="flex flex-col">
         <Image
-          source={{ uri: props.item.image_url }}
+          source={{ uri: props.item.item_images[0] }}
           className="object-cover rounded-t"
           style={{
             width: imageWidth,
@@ -34,7 +35,7 @@ export function ItemListing(props: { item: any }) {
             {props.item.name}
           </Text>
           <Text className={`font-Manrope_500Medium text-xs `}>
-            {dayjs(props.item.created_at.secs_since_epoch * 1000).fromNow()}
+            {dayjs(props.item.created_at).fromNow()}
           </Text>
         </View>
       </View>
