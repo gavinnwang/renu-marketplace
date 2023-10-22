@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { TabView } from "react-native-tab-view";
 import { useQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";

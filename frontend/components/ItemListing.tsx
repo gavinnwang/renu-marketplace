@@ -24,18 +24,32 @@ export function ItemListing(props: { item: ItemWithImage }) {
             height: (imageWidth * 4) / 3,
           }}
         />
-        <View className="h-fit py-2.5 px-2.5 bg-white rounded-b flex flex-col ">
-          <Text className="text-purplePrimary font-Manrope_600SemiBold text-base">
-            $
-            {props.item.price < 10
-              ? props.item.price.toFixed(2)
-              : props.item.price}
-          </Text>
+        {/* <FlatList
+          data={props.item.item_images}
+          renderItem={({ item }) => (
+            <Image
+              style={{
+                height: imageWidth,
+                width: imageWidth,
+                maxWidth: imageWidth,
+              }}
+              source={{
+                uri: item,
+              }}
+            />
+          )}
+          horizontal
+          pagingEnabled
+        /> */}
+        <View className="h-fit py-2.5 px-2.5 bg-white rounded-b flex flex-col">
           <Text className={`font-Manrope_500Medium text-sm  `}>
             {props.item.name}
           </Text>
-          <Text className={`font-Manrope_500Medium text-xs `}>
+          <Text className="font-Manrope_500Medium text-xs">
             {dayjs(props.item.created_at).fromNow()}
+          </Text>
+          <Text className="text-purplePrimary font-Manrope_600SemiBold text-xl">
+            ${props.item.price}
           </Text>
         </View>
       </View>
