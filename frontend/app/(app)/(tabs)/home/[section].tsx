@@ -95,7 +95,7 @@ export default function HomePage() {
           </Text>
         ) : items.data.length === 0 ? (
           <Text className="mx-auto my-[60%] font-Poppins_600SemiBold text-lg">
-            No item right now... Upload one!
+            No item right now... List one!
           </Text>
         ) : (
           <FlatList
@@ -197,12 +197,12 @@ const Tabs = ({
       Animated.parallel([
         Animated.timing(animatedValueX, {
           toValue: measures[idx].x,
-          duration: 150,
+          duration: 100,
           useNativeDriver: true,
         }),
         Animated.timing(animatedWidth, {
           toValue: measures[idx].width,
-          duration: 150,
+          duration: 110,
           useNativeDriver: true,
         }),
       ]).start();
@@ -241,20 +241,21 @@ const Tabs = ({
 const Indicator = ({
   animatedValueX,
   animatedWidth,
-  measures
+  measures,
 }: {
   animatedValueX: Animated.Value;
   animatedWidth: Animated.Value;
   measures: Measure[];
-  
 }) => {
   const scaleX = animatedWidth.interpolate({
-    inputRange: [0,  Math.max(...measures.map(item => item.width)) / 3],
-    outputRange: [0, 1]
+    inputRange: [0, Math.max(...measures.map((item) => item.width)) / 3],
+    outputRange: [0, 1],
   });
   const translateX = animatedValueX.interpolate({
-    inputRange: measures.map(item => item.x),
-    outputRange: measures.map(item => item.x + item.width / 2 - measures[0].width / 2)
+    inputRange: measures.map((item) => item.x),
+    outputRange: measures.map(
+      (item) => item.x + item.width / 2 - measures[0].width / 2
+    ),
   });
 
   return (
@@ -265,7 +266,7 @@ const Indicator = ({
         width: measures[0].width,
 
         backgroundColor: Colors.northwesternPurple,
-        transform: [{translateX},{ scaleX }],
+        transform: [{ translateX }, { scaleX }],
         bottom: -4,
       }}
     ></Animated.View>
