@@ -9,7 +9,7 @@ use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::{config::Config, model::db_model::DbPool, repository::user_repository, error};
+use crate::{config::Config, model::db_model::DbPool, repository::user_repository};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {

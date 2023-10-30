@@ -23,17 +23,14 @@ export default function AccountScreen() {
     queryFn: async () =>
       fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/users/me", {
         headers: {
-          authorization: `${session?.token}`,
-        }
-      }).then((x) =>
-        x.json()
-      ) as Promise<ApiResponse<User>>,
+          authorization: `Bearer ${session?.token}`,
+        },
+      }).then((x) => x.json()) as Promise<ApiResponse<User>>,
     queryKey: ["me"],
     enabled: !!session,
     onSuccess: (data) => {
-      console.log(data)
       setUser(data.data);
-    }
+    },
   });
 
   const {
@@ -65,7 +62,9 @@ export default function AccountScreen() {
           <View className="bg-blackPrimary w-full h-[80px]"></View>
           <Image
             source={{
-              uri: user?.profile_image || "../../../assets/images/placeholder-profile.webp",
+              uri:
+                user?.profile_image ||
+                "../../../assets/images/placeholder-profile.webp",
             }}
             style={{
               borderColor: Colors.whitePrimary,
@@ -82,18 +81,25 @@ export default function AccountScreen() {
 
             <View className="flex-row">
               <Text className="font-Manrope_400Regular text-sm mr-3">
-                <Text className="font-Manrope_600SemiBold">{user?.active_listing_count}</Text> Active Listings
+                <Text className="font-Manrope_600SemiBold">
+                  {user?.active_listing_count}
+                </Text>{" "}
+                Active Listings
               </Text>
               <Text className="font-Manrope_400Regular text-sm">
-                <Text className="font-Manrope_600SemiBold">{user?.sales_done_count}</Text> Sales Done
+                <Text className="font-Manrope_600SemiBold">
+                  {user?.sales_done_count}
+                </Text>{" "}
+                Sales Done
               </Text>
             </View>
           </View>
 
           <View className="flex flex-col w-[100px] gap-y-0.5">
-            <Pressable 
-            onPress={signOut}
-            className="font-Manrope_400Regular bg-purplePrimary p-2">
+            <Pressable
+              onPress={signOut}
+              className="font-Manrope_400Regular bg-purplePrimary p-2"
+            >
               <Text className="text-white text-center font-Manrope_600SemiBold">
                 Edit
               </Text>
@@ -147,12 +153,7 @@ export default function AccountScreen() {
 }
 
 const DownArrowIcon = () => (
-  <Svg
-    width="22"
-    height="22"
-    viewBox="0 0 22 22"
-    fill="none"
-  >
+  <Svg width="22" height="22" viewBox="0 0 22 22" fill="none">
     <Path
       d="M4.12774 7.32321L11 14.0222L17.8722 7.32321C17.995 7.20328 18.1598 7.13614 18.3315 7.13614C18.5031 7.13614 18.668 7.20328 18.7907 7.32321C18.8502 7.38146 18.8974 7.45099 18.9297 7.52773C18.9619 7.60446 18.9785 7.68686 18.9785 7.77009C18.9785 7.85332 18.9619 7.93572 18.9297 8.01245C18.8974 8.08918 18.8502 8.15871 18.7907 8.21696L11.4799 15.345C11.3515 15.4701 11.1793 15.5401 11 15.5401C10.8207 15.5401 10.6485 15.4701 10.5201 15.345L3.20924 8.21834C3.14936 8.16004 3.10178 8.09035 3.06928 8.01336C3.03679 7.93637 3.02005 7.85365 3.02005 7.77009C3.02005 7.68652 3.03679 7.60381 3.06928 7.52682C3.10178 7.44983 3.14936 7.38013 3.20924 7.32184C3.33202 7.20191 3.49685 7.13477 3.66849 7.13477C3.84012 7.13477 4.00495 7.20191 4.12774 7.32184V7.32321Z"
       fill="black"
