@@ -1,15 +1,7 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Executor, MySql};
 
-use crate::{error::DbError, model::user_model::NewUser};
+use crate::{error::DbError, model::user_model::{NewUser, PartialUser}};
 // use chrono::{DateTime, Local};
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct PartialUser {
-    pub id: i64,
-    pub name: String,
-    pub email: String,
-}
 
 pub async fn fetch_user_by_id(
     conn: impl Executor<'_, Database = MySql>,
@@ -17,7 +9,7 @@ pub async fn fetch_user_by_id(
 ) -> Result<PartialUser, DbError> {
     let user = sqlx::query_as!(
         PartialUser,
-        r#"SELECT id, name, email FROM User WHERE id = ?"#,
+        r#"SELECT id, name, email, profile_image, active_listing_count, sales_done_count FROM User WHERE id = ?"#,
         id
     )
     .fetch_one(conn)
@@ -32,7 +24,7 @@ pub async fn fetch_user_by_email(
 ) -> Result<PartialUser, DbError> {
     let user = sqlx::query_as!(
         PartialUser,
-        r#"SELECT id, name, email FROM User WHERE email = ?"#,
+        r#"SELECT id, name, email, profile_image, active_listing_count, sales_done_count FROM User WHERE email = ?"#,
         email
     )
     .fetch_one(conn)
@@ -49,11 +41,6 @@ pub async fn add_user(
         "User repository: Adding user with name {}\n",
         &new_user.name
     );
-
-    // let dt = Local::now();
-    // let naive_utc = dt.naive_utc();
-    // let offset = dt.offset().clone();
-    // let dt_new = DateTime::<Local>::from_naive_utc_and_offset(naive_utc, offset);
 
     let id = sqlx::query!(
         r#"INSERT INTO User (name, email) VALUES (?, ?)"#,

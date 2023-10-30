@@ -37,6 +37,24 @@ async fn get_item_by_id_handler(path: web::Path<i64>, pool: web::Data<DbPool>) -
     }
 }
 
+#[get("/{id}/seller")]
+async fn get_item_with_seller_info_by_id_handler(path: web::Path<i64>, pool: web::Data<DbPool>) -> impl Responder {
+    let item_id = path.into_inner();
+    let item = item_repository::fetch_item_with_seller_info_by_id(item_id, pool.as_ref()).await;
+
+    match item {
+        Ok(item) => HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": item})),
+        Err(err) => {
+            tracing::error!("{}\n", format!("API: Failed to fetch item with seller info with id {item_id}"));
+            tracing::error!("Error message: {}\n", err);
+            match err {
+            crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item with id {item_id} or seller" )})),
+            _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+        }
+        }
+    }
+}
+
 #[get("/category/{category}")]
 async fn get_items_by_category_handler(
     path: web::Path<String>,
@@ -57,3 +75,4 @@ async fn get_items_by_category_handler(
         }
     }
 }
+
