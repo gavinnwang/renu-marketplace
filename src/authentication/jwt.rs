@@ -9,7 +9,7 @@ use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::{config::Config, model::db_model::DbPool, repository::user_repository};
+use crate::{config::Config, model::db_model::DbPool, repository::user_repository, error};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {
@@ -34,9 +34,9 @@ impl FromRequest for AuthenticationGuard {
             .or_else(|| {
                 req.headers()
                     .get(http::header::AUTHORIZATION)
-                    .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
+                    .map(|h| h.to_str().unwrap().to_string())
             });
-
+        
         let token = match token {
             Some(token) => token,
             None => {

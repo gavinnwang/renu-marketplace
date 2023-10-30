@@ -197,12 +197,12 @@ const Tabs = ({
       Animated.parallel([
         Animated.timing(animatedValueX, {
           toValue: measures[idx].x,
-          duration: 100,
+          duration: 150,
           useNativeDriver: true,
         }),
         Animated.timing(animatedWidth, {
           toValue: measures[idx].width,
-          duration: 110,
+          duration: 150,
           useNativeDriver: true,
         }),
       ]).start();

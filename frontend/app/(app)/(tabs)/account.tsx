@@ -9,9 +9,32 @@ import { ItemWithImage } from "../../../types/types";
 import { ItemListing } from "../../../components/ItemListing";
 import { RefreshControl } from "react-native-gesture-handler";
 import Svg, { Path } from "react-native-svg";
+import { User } from "@prisma/client";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+
+  const {
+    data: userData,
+    isLoading: isLoadingUser,
+    isError: isErrorUser,
+  } = useQuery({
+    queryFn: async () =>
+      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/users/me", {
+        headers: {
+          authorization: `${session?.token}`,
+        }
+      }).then((x) =>
+        x.json()
+      ) as Promise<ApiResponse<User>>,
+    queryKey: ["me"],
+    enabled: !!session,
+    onSuccess: (data) => {
+      console.log(data)
+      setUser(data.data);
+    }
+  });
 
   const {
     data: items,
@@ -24,6 +47,7 @@ export default function AccountScreen() {
         x.json()
       ) as Promise<ApiResponse<ItemWithImage[]>>,
     queryKey: ["item"],
+    enabled: !!session,
   });
 
   const [refreshing, _] = useState(false);
@@ -38,36 +62,38 @@ export default function AccountScreen() {
       </View>
       <ScrollView>
         <View className="flex items-start">
-          <View className=" bg-purpleSecondary w-full h-[120px]"></View>
+          <View className="bg-blackPrimary w-full h-[80px]"></View>
           <Image
             source={{
-              uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=2787&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+              uri: user?.profile_image || "../../../assets/images/placeholder-profile.webp",
             }}
             style={{
               borderColor: Colors.whitePrimary,
             }}
-            className="w-[74px] h-[74px] rounded-full -mt-10 border ml-2.5 "
+            className="w-[74px] h-[74px] rounded-full -mt-10 border ml-2.5 bg-blackPrimary"
           />
         </View>
 
         <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
           <View className="flex-col w-[200px] ">
-            <Text className=" text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px]">
-              {session?.name}
+            <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px]">
+              {user?.name}
             </Text>
 
             <View className="flex-row">
               <Text className="font-Manrope_400Regular text-sm mr-3">
-                <Text className="font-Manrope_600SemiBold">43</Text> Followers
+                <Text className="font-Manrope_600SemiBold">{user?.active_listing_count}</Text> Active Listings
               </Text>
               <Text className="font-Manrope_400Regular text-sm">
-                <Text className="font-Manrope_600SemiBold">8</Text> Sales Done
+                <Text className="font-Manrope_600SemiBold">{user?.sales_done_count}</Text> Sales Done
               </Text>
             </View>
           </View>
 
           <View className="flex flex-col w-[100px] gap-y-0.5">
-            <Pressable className="font-Manrope_400Regular bg-purplePrimary p-2">
+            <Pressable 
+            onPress={signOut}
+            className="font-Manrope_400Regular bg-purplePrimary p-2">
               <Text className="text-white text-center font-Manrope_600SemiBold">
                 Edit
               </Text>

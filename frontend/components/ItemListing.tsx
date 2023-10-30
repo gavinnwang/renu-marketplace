@@ -17,7 +17,6 @@ export function ItemListing(props: { item: ItemWithImage }) {
       <View className="flex flex-col">
         <Image
           source={{ uri: props.item.item_images[0] }}
-
           className="object-cover rounded-t"
           style={{
             width: imageWidth,
