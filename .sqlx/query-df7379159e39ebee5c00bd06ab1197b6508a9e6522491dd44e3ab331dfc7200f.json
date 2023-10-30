@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.created_at, \n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id && Item.id = ?\n        GROUP BY Item.id\n        ",
+  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.created_at, \n            Item.updated_at,\n            User.name AS seller_name,\n            User.profile_image as seller_image_url,\n            User.sales_done_count,\n            User.active_listing_count,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = ?\n        INNER JOIN User ON Item.user_id = User.id\n        GROUP BY Item.id,\n        User.id\n        ",
   "describe": {
     "columns": [
       {
@@ -75,6 +75,46 @@
       },
       {
         "ordinal": 7,
+        "name": "seller_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "seller_image_url",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "sales_done_count",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "active_listing_count",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 11,
         "name": "item_images",
         "type_info": {
           "type": "Blob",
@@ -95,8 +135,12 @@
       false,
       false,
       false,
+      false,
+      true,
+      false,
+      false,
       true
     ]
   },
-  "hash": "e7fd9ff437daf8cc7fb2a4218a4f079810b730023ca77342949f71c1cd36cb5b"
+  "hash": "df7379159e39ebee5c00bd06ab1197b6508a9e6522491dd44e3ab331dfc7200f"
 }
