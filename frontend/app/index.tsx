@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, SafeAreaView, Text, View } from "react-native";
 import { useSession } from "../providers/ctx";
 import { router } from "expo-router";
 import { LogoWithText } from "../components/Logo";
@@ -13,7 +13,7 @@ export default function Index() {
     }
   }, [session]);
   return (
-    <View className="flex h-full w-full pt-4 items-center bg-bgLight">
+    <SafeAreaView className="flex h-full w-full pt-4 items-center bg-bgLight">
       <View>
         <LogoWithText />
         <Pressable
@@ -23,6 +23,6 @@ export default function Index() {
           <Text className="text-xl">Sign In</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

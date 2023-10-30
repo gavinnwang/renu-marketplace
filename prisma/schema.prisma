@@ -21,8 +21,6 @@ model User {
   updated_at           DateTime    @default(now()) @updatedAt @db.Timestamp(0)
   items                Item[]
   saved_items          SavedItem[]
-  sales_done_count     Int         @default(0)
-  active_listing_count Int         @default(0)
 }
 
 model SavedItem {
