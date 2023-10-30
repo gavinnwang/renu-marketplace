@@ -197,13 +197,13 @@ const Tabs = ({
       Animated.parallel([
         Animated.timing(animatedValueX, {
           toValue: measures[idx].x,
-          duration: 200,
-          useNativeDriver: false,
+          duration: 150,
+          useNativeDriver: true,
         }),
         Animated.timing(animatedWidth, {
           toValue: measures[idx].width,
-          duration: 200,
-          useNativeDriver: false,
+          duration: 150,
+          useNativeDriver: true,
         }),
       ]).start();
     }
@@ -231,6 +231,7 @@ const Tabs = ({
         <Indicator
           animatedValueX={animatedValueX}
           animatedWidth={animatedWidth}
+          measures={measures}
         />
       )}
     </ScrollView>
@@ -240,18 +241,31 @@ const Tabs = ({
 const Indicator = ({
   animatedValueX,
   animatedWidth,
+  measures
 }: {
   animatedValueX: Animated.Value;
   animatedWidth: Animated.Value;
+  measures: Measure[];
+  
 }) => {
+  const scaleX = animatedWidth.interpolate({
+    inputRange: [0,  Math.max(...measures.map(item => item.width)) / 3],
+    outputRange: [0, 1]
+  });
+  const translateX = animatedValueX.interpolate({
+    inputRange: measures.map(item => item.x),
+    outputRange: measures.map(item => item.x + item.width / 2 - measures[0].width / 2)
+  });
+
   return (
     <Animated.View
       style={{
         position: "absolute",
         height: 2,
-        width: animatedWidth,
-        left: animatedValueX, // Use the animated value for left position
+        width: measures[0].width,
+
         backgroundColor: Colors.northwesternPurple,
+        transform: [{translateX},{ scaleX }],
         bottom: -4,
       }}
     ></Animated.View>
