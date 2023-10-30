@@ -46,7 +46,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (from: string) => {
     const callbackUrl = Linking.createURL("App") + from;
-    console.log("callbackUrl", callbackUrl);
     const link = getGoogleUrl(callbackUrl);
 
     const result: WebBrowser.WebBrowserAuthSessionResult =
