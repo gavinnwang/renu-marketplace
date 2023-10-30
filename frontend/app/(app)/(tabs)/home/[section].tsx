@@ -58,7 +58,6 @@ export default function HomePage() {
   const param = useLocalSearchParams();
   const selectedSection = param.section as string;
 
-
   const fetchUrlPath =
     selectedSection == "all" ? "/items/" : `/items/category/${selectedSection}`;
   const {
@@ -85,15 +84,19 @@ export default function HomePage() {
         </View>
       </View>
 
-      <Tabs data={data} selectedSection={selectedSection}  />
+      <Tabs data={data} selectedSection={selectedSection} />
 
       <View className="bg-grayMedium h-full ">
         {isLoadingItems ? (
-          <Text>...</Text>
+          <></>
         ) : isErrorItems ? (
-          <Text>Something went wrong</Text>
+          <Text className="mx-auto my-[60%] font-Poppins_600SemiBold text-lg">
+            Something went wrong. Please refresh.
+          </Text>
         ) : items.data.length === 0 ? (
-          <Text>No items</Text>
+          <Text className="mx-auto my-[60%] font-Poppins_600SemiBold text-lg">
+            No item right now... Upload one!
+          </Text>
         ) : (
           <FlatList
             showsVerticalScrollIndicator={false}
@@ -194,20 +197,18 @@ const Tabs = ({
       Animated.parallel([
         Animated.timing(animatedValueX, {
           toValue: measures[idx].x,
-          duration: 180,
+          duration: 200,
           useNativeDriver: false,
         }),
         Animated.timing(animatedWidth, {
           toValue: measures[idx].width,
-          duration: 150,
+          duration: 200,
           useNativeDriver: false,
         }),
       ]).start();
     }
   }, [selectedSection, measures]);
 
-
-  console.log(measures);
   return (
     <ScrollView
       ref={containerRef}
@@ -228,8 +229,6 @@ const Tabs = ({
 
       {measures.length > 0 && (
         <Indicator
-          measures={measures}
-          selectedSection={selectedSection}
           animatedValueX={animatedValueX}
           animatedWidth={animatedWidth}
         />
@@ -239,24 +238,17 @@ const Tabs = ({
 };
 
 const Indicator = ({
-  measures,
-  selectedSection,
   animatedValueX,
   animatedWidth,
 }: {
-  measures: Measure[];
-  selectedSection: string;
   animatedValueX: Animated.Value;
   animatedWidth: Animated.Value;
 }) => {
-  // const idx = SECTIONS.findIndex((x) => x.value === selectedSection);
-  // const width = measures[idx] ? measures[idx].width : 0;
-
   return (
     <Animated.View
       style={{
         position: "absolute",
-        height: 3,
+        height: 2,
         width: animatedWidth,
         left: animatedValueX, // Use the animated value for left position
         backgroundColor: Colors.northwesternPurple,
