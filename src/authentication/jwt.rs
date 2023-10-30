@@ -34,7 +34,7 @@ impl FromRequest for AuthenticationGuard {
             .or_else(|| {
                 req.headers()
                     .get(http::header::AUTHORIZATION)
-                    .map(|h| h.to_str().unwrap().to_string())
+                    .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
             });
         
         let token = match token {
