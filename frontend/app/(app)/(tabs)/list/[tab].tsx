@@ -1,5 +1,5 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { SafeAreaView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 
 const TABS = ["Listings", "Sold"];
