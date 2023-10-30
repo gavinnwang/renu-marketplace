@@ -1,0 +1,80 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT id, name, email, profile_image, active_listing_count, sales_done_count FROM User WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "email",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "profile_image",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "active_listing_count",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "sales_done_count",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "ac0d74fc676dcaf26b1b9de04fb57549ecf8f9918c1ffe15218fca22aae35d08"
+}
