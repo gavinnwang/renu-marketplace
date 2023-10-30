@@ -19,6 +19,7 @@ module.exports = {
         grayLight: "#EEEEEE",
         grayMedium: "#ECECEC",
         purplePrimary: "#4E2A84",
+        purpleSecondary: "#2A0D41",
         bgLight: "#F9F9F9",
         grayPrimary: "#B5B5B5"
       }),
