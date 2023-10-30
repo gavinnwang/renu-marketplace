@@ -11,10 +11,15 @@ import { RefreshControl } from "react-native-gesture-handler";
 import Svg, { Path } from "react-native-svg";
 import { User } from "@prisma/client";
 
+type UserWithCount = User & {
+  active_listing_count: number;
+  sales_done_count: number;
+};
+
 export default function AccountScreen() {
   const { signOut, session } = useSession();
-  const [user, setUser] = useState<User | null>(null);
-
+  const [user, setUser] = useState<UserWithCount | null>(null);
+  console.log(session);
   const {
     data: userData,
     isLoading: isLoadingUser,
@@ -25,10 +30,11 @@ export default function AccountScreen() {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
-      }).then((x) => x.json()) as Promise<ApiResponse<User>>,
+      }).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
     queryKey: ["me"],
-    enabled: !!session,
+    enabled: !!session && !!session.token,
     onSuccess: (data) => {
+      console.log(data);
       setUser(data.data);
     },
   });
@@ -74,8 +80,8 @@ export default function AccountScreen() {
         </View>
 
         <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
-          <View className="flex-col w-[200px] ">
-            <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px]">
+          <View className="flex-col w-[200px]">
+            <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px]">
               {user?.name}
             </Text>
 
