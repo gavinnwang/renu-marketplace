@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT id, name, email, profile_image, active_listing_count, sales_done_count FROM User WHERE email = ?",
+  "query": "SELECT \n        u.id, \n        u.name, \n        u.email, \n        u.profile_image,\n        CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,\n        CAST(COALESCE(SUM(CASE WHEN i.status = 'SOLD' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count\n        FROM \n            User u\n        INNER JOIN \n            Item i ON u.id = i.user_id\n        WHERE \n            u.email = ?\n        GROUP BY \n            u.id;",
   "describe": {
     "columns": [
       {
@@ -47,20 +47,20 @@
         "ordinal": 4,
         "name": "active_listing_count",
         "type_info": {
-          "type": "Long",
-          "flags": "NOT_NULL | NUM",
+          "type": "LongLong",
+          "flags": "NOT_NULL | BINARY | NUM",
           "char_set": 63,
-          "max_size": 11
+          "max_size": 21
         }
       },
       {
         "ordinal": 5,
         "name": "sales_done_count",
         "type_info": {
-          "type": "Long",
-          "flags": "NOT_NULL | NUM",
+          "type": "LongLong",
+          "flags": "NOT_NULL | BINARY | NUM",
           "char_set": 63,
-          "max_size": 11
+          "max_size": 21
         }
       }
     ],
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "71edaae17e24a4195b943f31633b83f10571ee52cfd1eb9874b92c5886e81aa4"
+  "hash": "29e2ea0876a66964ecf84cf0e6be0861e52073a781e42c2bc9f9328640fcf212"
 }

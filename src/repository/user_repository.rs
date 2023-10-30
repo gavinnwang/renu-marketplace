@@ -1,6 +1,9 @@
 use sqlx::{Executor, MySql};
 
-use crate::{error::DbError, model::user_model::{NewUser, PartialUser}};
+use crate::{
+    error::DbError,
+    model::user_model::{NewUser, PartialUser},
+};
 // use chrono::{DateTime, Local};
 
 pub async fn fetch_user_by_id(
@@ -9,7 +12,21 @@ pub async fn fetch_user_by_id(
 ) -> Result<PartialUser, DbError> {
     let user = sqlx::query_as!(
         PartialUser,
-        r#"SELECT id, name, email, profile_image, active_listing_count, sales_done_count FROM User WHERE id = ?"#,
+        r#"SELECT 
+        u.id, 
+        u.name, 
+        u.email, 
+        u.profile_image,
+        CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
+        CAST(COALESCE(SUM(CASE WHEN i.status = 'SOLD' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
+        FROM 
+            User u
+        INNER JOIN 
+            Item i ON u.id = i.user_id
+        WHERE 
+            u.id = ?
+        GROUP BY 
+            u.id;"#,
         id
     )
     .fetch_one(conn)
@@ -24,7 +41,21 @@ pub async fn fetch_user_by_email(
 ) -> Result<PartialUser, DbError> {
     let user = sqlx::query_as!(
         PartialUser,
-        r#"SELECT id, name, email, profile_image, active_listing_count, sales_done_count FROM User WHERE email = ?"#,
+        r#"SELECT 
+        u.id, 
+        u.name, 
+        u.email, 
+        u.profile_image,
+        CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
+        CAST(COALESCE(SUM(CASE WHEN i.status = 'SOLD' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
+        FROM 
+            User u
+        INNER JOIN 
+            Item i ON u.id = i.user_id
+        WHERE 
+            u.email = ?
+        GROUP BY 
+            u.id;"#,     
         email
     )
     .fetch_one(conn)
