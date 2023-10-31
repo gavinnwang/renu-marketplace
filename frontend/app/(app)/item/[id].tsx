@@ -6,7 +6,7 @@ import Colors from "../../../constants/Colors";
 import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
 import { useSession } from "../../../providers/ctx";
-import { ItemWithImage } from "../../../types/types";
+import { ItemWithImage, UserWithCount } from "../../../types/types";
 import { FlatList } from "react-native-gesture-handler";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
@@ -36,12 +36,32 @@ export default function ItemPage() {
 
   const { data: item } = useQuery({
     queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
-        (x) => x.json()
-      ) as Promise<ApiResponse<ItemWithImage>>,
+      fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`
+      ).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage>>,
     queryKey: ["item", itemId],
     enabled: !!itemId,
   });
+
+  const [seller, setSeller] = useState<UserWithCount>();
+
+  useQuery({
+    queryFn: async () =>
+      fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.data.user_id}`
+      ).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
+    queryKey: ["user", item?.data.user_id],
+    enabled: !!item && item.status === "success",
+    onSuccess(data) {
+      if (data.status === "success") {
+        setSeller(data.data);
+      } else {
+        console.error("cannot find seller");
+      }
+    },
+  });
+
+  console.log("seller: ", seller);
 
   const [index, setIndex] = useState(0);
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
@@ -115,16 +135,16 @@ export default function ItemPage() {
             <View className="flex flex-row">
               <Image
                 source={{
-                  uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=2787&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                  uri: seller?.name,
                 }}
                 style={{
                   borderColor: Colors.whitePrimary,
                 }}
-                className="w-[53px] h-[53px] rounded-full  border "
+                className="w-[53px] h-[53px] rounded-full  border bg-blackPrimary"
               />
               <View className="flex flex-col gap-y-1 ml-2">
                 <Text className="font-Manrope_400Regular text-sm text-blackPrimary">
-                  {session ? session.name : "Loading User"}
+                  {seller?.name ?? "loading..."}
                 </Text>
               </View>
             </View>

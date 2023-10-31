@@ -1,3 +1,7 @@
-import type { Item } from "@prisma/client";
+import type { Item, User } from "@prisma/client";
 
+export type UserWithCount = User & {
+  active_listing_count: number;
+  sales_done_count: number;
+};
 export type ItemWithImage = Item & { item_images: string[] };
