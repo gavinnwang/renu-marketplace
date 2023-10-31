@@ -9,7 +9,7 @@ use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::{config::Config, model::db_model::DbPool, repository::user_repository};
+use crate::config::Config;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {
@@ -66,33 +66,33 @@ impl FromRequest for AuthenticationGuard {
             &Validation::new(Algorithm::HS256),
         );
 
-        let pool = match req.app_data::<web::Data<DbPool>>() {
-            Some(pool) => pool.clone(),
-            None => {
-                tracing::error!("Internal Server error: Database connection failed");
-                return Box::pin(async {
-                    Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Internal Server error: Database connection failed"}),
-                    ))
-                });
-            }
-        };
+        // let pool = match req.app_data::<web::Data<DbPool>>() {
+        //     Some(pool) => pool.clone(),
+        //     None => {
+        //         tracing::error!("Internal Server error: Database connection failed");
+        //         return Box::pin(async {
+        //             Err(ErrorUnauthorized(
+        //                 json!({"status": "fail", "message": "Internal Server error: Database connection failed"}),
+        //             ))
+        //         });
+        //     }
+        // };
 
         match decode {
             Ok(decoded_token) => {
-                let user_id = decoded_token.claims.sub.clone();
+                // let user_id = decoded_token.claims.sub.clone();
                 Box::pin(async move {
-                    let user_result =
-                        user_repository::fetch_user_by_id(pool.as_ref(), user_id).await;
+                    // let user_result =
+                    //     user_repository::fetch_user_by_id(pool.as_ref(), user_id).await;
 
-                    if user_result.is_err() {
-                        return Err(ErrorUnauthorized(
-                            json!({"status": "fail", "message": "User belonging to this token no longer exists"}),
-                        ));
-                    };
+                    // if user_result.is_err() {
+                    //     return Err(ErrorUnauthorized(
+                    //         json!({"status": "fail", "message": "User belonging to this token no longer exists"}),
+                    //     ));
+                    // };
 
                     let user_id = decoded_token.claims.sub;
-                    Ok(AuthenticationGuard { user_id: user_id })
+                    Ok(AuthenticationGuard { user_id })
                 })
             }
             Err(_) => Box::pin(async {
