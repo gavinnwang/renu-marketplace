@@ -60,7 +60,6 @@ model Item {
 
 enum ItemStatus {
   ACTIVE
-  SOLD
   INACTIVE
 }
 
@@ -84,3 +83,4 @@ enum Category {
   GENERAL
   FREE
 }
+
