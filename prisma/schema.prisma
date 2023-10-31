@@ -16,7 +16,7 @@ model User {
   name                 String
   email                String      @unique
   profile_image        String?
-  role                 Role        @default(USER)
+  role                 Role        @default(STUDENT_USER)
   created_at           DateTime    @default(now()) @db.Timestamp(0)
   updated_at           DateTime    @default(now()) @updatedAt @db.Timestamp(0)
   items                Item[]
@@ -36,6 +36,7 @@ model SavedItem {
 
 enum Role {
   USER
+  STUDENT_USER
   ADMIN
 }
 
