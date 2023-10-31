@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.created_at, \n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = ?\n        GROUP BY Item.id\n        ",
+  "query": "\n        SELECT\n            Item.id,\n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.description,\n            Item.created_at, \n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item  \n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.category = ?\n        GROUP BY Item.id\n        ",
   "describe": {
     "columns": [
       {
@@ -55,6 +55,16 @@
       },
       {
         "ordinal": 5,
+        "name": "description",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 6,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -64,7 +74,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -74,7 +84,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "item_images",
         "type_info": {
           "type": "Blob",
@@ -93,10 +103,11 @@
       false,
       false,
       false,
+      true,
       false,
       false,
       true
     ]
   },
-  "hash": "d8d543abbf0f546e2b47fb015013355d537c53d04d607c4a8544ab3631ee1d3c"
+  "hash": "50eb7dffd682a2780c83f2289025ac6d9e7c254548c245e994edf5796cfa9e55"
 }

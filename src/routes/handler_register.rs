@@ -19,11 +19,16 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::user_handler::get_me_handler)
             .service(super::user_handler::get_user_by_id_handler),
     );
-    conf.service(
-        web::scope("/items")
+conf.service(
+    web::scope("/items")
             .service(super::item_handler::get_items_handler)
             .service(super::item_handler::get_item_by_id_handler)
             .service(super::item_handler::get_items_by_category_handler)
             .service(super::item_handler::get_item_with_seller_info_by_id_handler),
+    );
+
+    conf.service(
+        web::scope("/saved")
+            .service(super::saved_item_handler::get_saved_items_by_user_id),
     );
 }

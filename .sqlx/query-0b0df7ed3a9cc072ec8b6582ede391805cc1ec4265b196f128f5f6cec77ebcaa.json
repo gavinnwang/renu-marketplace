@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            Item.id,\n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.created_at, \n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item  \n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.category = ?\n        GROUP BY Item.id\n        ",
+  "query": "\n        SELECT \n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id,\n            Item.description, \n            Item.category,\n            Item.created_at,\n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM SavedItem\n        INNER JOIN Item ON SavedItem.itemId = Item.id\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.itemId \n        WHERE SavedItem.userId = ?\n        GROUP BY Item.id\n        ",
   "describe": {
     "columns": [
       {
@@ -45,6 +45,16 @@
       },
       {
         "ordinal": 4,
+        "name": "description",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 5,
         "name": "category",
         "type_info": {
           "type": "String",
@@ -54,7 +64,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -64,7 +74,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -74,7 +84,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "item_images",
         "type_info": {
           "type": "Blob",
@@ -92,11 +102,12 @@
       false,
       false,
       false,
+      true,
       false,
       false,
       false,
       true
     ]
   },
-  "hash": "813e04cfc6044d5baa10e401e3c82519d3789fc8986002d3009cf3883ba54f1e"
+  "hash": "0b0df7ed3a9cc072ec8b6582ede391805cc1ec4265b196f128f5f6cec77ebcaa"
 }

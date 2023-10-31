@@ -18,13 +18,10 @@ type UserWithCount = User & {
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
+  console.log(session)
   const [user, setUser] = useState<UserWithCount | null>(null);
-  console.log(session);
-  const {
-    data: userData,
-    isLoading: isLoadingUser,
-    isError: isErrorUser,
-  } = useQuery({
+
+  const { isError: isErrorUser } = useQuery({
     queryFn: async () =>
       fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/users/me", {
         headers: {
@@ -34,8 +31,11 @@ export default function AccountScreen() {
     queryKey: ["me"],
     enabled: !!session && !!session.token,
     onSuccess: (data) => {
-      console.log(data);
-      setUser(data.data);
+      if (data.status === "success") {
+        setUser(data.data);
+      } else {
+        console.error(data)
+      }
     },
   });
 
@@ -82,19 +82,19 @@ export default function AccountScreen() {
         <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
           <View className="flex-col w-[200px]">
             <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px]">
-              {user?.name}
+              {user?.name ?? session?.name}
             </Text>
 
             <View className="flex-row">
               <Text className="font-Manrope_400Regular text-sm mr-3">
                 <Text className="font-Manrope_600SemiBold">
-                  {user?.active_listing_count}
+                  {user?.active_listing_count ?? 0}
                 </Text>{" "}
                 Active Listings
               </Text>
               <Text className="font-Manrope_400Regular text-sm">
                 <Text className="font-Manrope_600SemiBold">
-                  {user?.sales_done_count}
+                  {user?.sales_done_count ?? 0}
                 </Text>{" "}
                 Sales Done
               </Text>

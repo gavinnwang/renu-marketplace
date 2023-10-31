@@ -1,4 +1,3 @@
-use serde::{Deserialize, Serialize};
 use sqlx::{Executor, MySql};
 
 use crate::{
@@ -6,36 +5,8 @@ use crate::{
     model::{item_model::{Item, ItemWithSellerInfo, RawItem, RawItemWithSellerInfo}, user_model::PartialUser},
 };
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct PartialItem {
-    pub id: i64,
-    pub name: String,
-    pub price: f64,
-    pub image_url: String,
-    pub user_id: i64,
-}
-pub fn convert_raw_into_items(raw_items: Vec<RawItem>) -> Vec<Item> {
-    raw_items
-        .into_iter()
-        .map(|raw_item| convert_raw_into_item(raw_item))
-        .collect()
-}
+use super::item_processing::{convert_raw_into_items, convert_raw_into_item};
 
-pub fn convert_raw_into_item(raw_item: RawItem) -> Item {
-    Item {
-        id: raw_item.id,
-        name: raw_item.name,
-        price: raw_item.price,
-        item_images: match raw_item.item_images {
-            Some(item_images) => item_images.split(",").map(|s| s.to_string()).collect(),
-            None => Vec::new(),
-        },
-        category: raw_item.category,
-        user_id: raw_item.user_id,
-        created_at: raw_item.created_at.into(),
-        updated_at: raw_item.updated_at.into(),
-    }
-}
 pub fn convert_raw_with_seller_info_into_item(
     raw_item: RawItemWithSellerInfo,
 ) -> ItemWithSellerInfo {
@@ -49,6 +20,7 @@ pub fn convert_raw_with_seller_info_into_item(
         },
         category: raw_item.category,
         user_id: raw_item.user_id,
+        description: raw_item.description,
         created_at: raw_item.created_at.into(),
         updated_at: raw_item.updated_at.into(),
         seller: PartialUser {
@@ -75,6 +47,7 @@ pub async fn fetch_all_items(
             Item.user_id, 
             Item.category,
             Item.created_at, 
+            Item.description,
             Item.updated_at,
             GROUP_CONCAT(ItemImage.url) AS item_images
         FROM Item
@@ -102,6 +75,7 @@ pub async fn fetch_items_by_category(
             Item.price, 
             Item.user_id, 
             Item.category,
+            Item.description,
             Item.created_at, 
             Item.updated_at,
             GROUP_CONCAT(ItemImage.url) AS item_images
@@ -131,6 +105,7 @@ pub async fn fetch_item_by_id(
             Item.price, 
             Item.user_id, 
             Item.category,
+            Item.description,
             Item.created_at, 
             Item.updated_at,
             GROUP_CONCAT(ItemImage.url) AS item_images
@@ -155,24 +130,25 @@ pub async fn fetch_item_with_seller_info_by_id(
         RawItemWithSellerInfo,
         r#"
         SELECT
-            Item.id, 
-            Item.name, 
-            Item.price, 
-            Item.user_id, 
-            Item.category,
-            Item.created_at, 
-            Item.updated_at,
-            User.name AS seller_name,
-            User.profile_image as seller_image_url,
-            User.sales_done_count,
-            User.active_listing_count,
-            GROUP_CONCAT(ItemImage.url) AS item_images
-        FROM Item
-        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = ?
-        INNER JOIN User ON Item.user_id = User.id
-        GROUP BY Item.id,
-        User.id
-        "#,
+        Item.id, 
+        Item.name, 
+        Item.price, 
+        Item.user_id, 
+        Item.category,
+        Item.description,
+        Item.created_at, 
+        Item.updated_at,
+        User.name AS seller_name,
+        User.profile_image as seller_image_url,
+        CAST(COALESCE(SUM(CASE WHEN SellerItems.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
+        CAST(COALESCE(SUM(CASE WHEN SellerItems.status = 'SOLD' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count,
+        GROUP_CONCAT(ItemImage.url) AS item_images
+        FROM Item 
+            INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = ?
+            INNER JOIN User ON Item.user_id = User.id
+            INNER JOIN Item AS SellerItems ON User.id = SellerItems.user_id
+        GROUP BY Item.id, User.id
+            "#,
         id
     )
     .fetch_one(conn)

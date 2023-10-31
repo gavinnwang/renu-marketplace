@@ -11,6 +11,7 @@ pub struct Item {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub item_images: Vec<String>,
+    pub description: Option<String>,
     pub category: String,
     pub user_id: i64,
 }
@@ -23,6 +24,7 @@ pub struct ItemWithSellerInfo {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub item_images: Vec<String>,
+    pub description: Option<String>,
     pub category: String,
     pub user_id: i64,
     pub seller : PartialUser
@@ -38,6 +40,7 @@ pub struct RawItem {
     pub updated_at: std::time::SystemTime,
     pub item_images: Option<String>,
     pub category: String,
+    pub description: Option<String>,
     pub user_id: i64,
 }
 
@@ -50,6 +53,7 @@ pub struct RawItemWithSellerInfo {
     pub updated_at: std::time::SystemTime,
     pub item_images: Option<String>,
     pub category: String,
+    pub description: Option<String>,
     pub user_id: i64,
     pub seller_name: String,
     pub sales_done_count: i64,

@@ -69,7 +69,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(config.clone()))
             .app_data(Data::new(pool.clone()))
             .wrap(cors)
-            .configure(routes::handler::handlers)
+            .configure(routes::handler_register::handlers)
             .wrap(TracingLogger::default())
     })
     .bind((server_host, server_port))?
