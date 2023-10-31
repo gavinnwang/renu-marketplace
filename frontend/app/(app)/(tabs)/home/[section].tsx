@@ -17,6 +17,7 @@ import { LogoWithText } from "../../../../components/Logo";
 import { ItemWithImage } from "../../../../types/types";
 import React from "react";
 import Colors from "../../../../constants/Colors";
+import Svg, { Path } from "react-native-svg";
 
 type Section = {
   display: string;
@@ -35,7 +36,7 @@ type Measure = {
   height: number;
 };
 
-export const CATEGORIES : Record<string, Section> = {
+export const CATEGORIES: Record<string, Section> = {
   ALL: { display: "All", value: "all" },
   WOMENS: { display: "Women's", value: "womens" },
   MENS: { display: "Men's", value: "mens" },
@@ -45,15 +46,33 @@ export const CATEGORIES : Record<string, Section> = {
   BIKES: { display: "Bikes & Scooters", value: "bikes" },
   TICKETS: { display: "Tickets", value: "tickets" },
   GENERAL: { display: "General", value: "general" },
-  FREE: { display: "Free", value: "free" }
-}
+  FREE: { display: "Free", value: "free" },
+};
 
-const data = Object.keys(CATEGORIES).map((i)=>({
+const data = Object.keys(CATEGORIES).map((i) => ({
   key: i,
   display: CATEGORIES[i].display,
   value: CATEGORIES[i].value,
   ref: React.createRef(),
 }));
+
+const MagnifyingGlassIcon = () => (
+  <Svg
+    width="18"
+    height="18"
+    viewBox="0 0 14 14"
+    fill="none"
+
+  >
+    <Path
+      d="M13 13L9 9M1 5.66667C1 6.2795 1.12071 6.88634 1.35523 7.45252C1.58975 8.01871 1.93349 8.53316 2.36683 8.9665C2.80018 9.39984 3.31462 9.74358 3.88081 9.97811C4.447 10.2126 5.05383 10.3333 5.66667 10.3333C6.2795 10.3333 6.88634 10.2126 7.45252 9.97811C8.01871 9.74358 8.53316 9.39984 8.9665 8.9665C9.39984 8.53316 9.74358 8.01871 9.97811 7.45252C10.2126 6.88634 10.3333 6.2795 10.3333 5.66667C10.3333 5.05383 10.2126 4.447 9.97811 3.88081C9.74358 3.31462 9.39984 2.80018 8.9665 2.36683C8.53316 1.93349 8.01871 1.58975 7.45252 1.35523C6.88634 1.12071 6.2795 1 5.66667 1C5.05383 1 4.447 1.12071 3.88081 1.35523C3.31462 1.58975 2.80018 1.93349 2.36683 2.36683C1.93349 2.80018 1.58975 3.31462 1.35523 3.88081C1.12071 4.447 1 5.05383 1 5.66667Z"
+      stroke={Colors.grayPrimary}
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
 
 export default function HomePage() {
   const param = useLocalSearchParams();
@@ -78,11 +97,12 @@ export default function HomePage() {
 
   return (
     <View className="bg-bgLight h-full">
-      <View className="flex flex-row items-center px-2.5 pb-2.5 h-[40px]">
-        <LogoWithText className="flex-grow" />
-        <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
-          <TextInput placeholder="Search here" className="p-2 w-full" />
-        </View>
+      <View className="flex flex-row items-center justify-between px-4 pb-2.5 min-h-[43px]">
+        <LogoWithText />
+        {/* <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
+          <TextInput placeholder="Search here" className="p-2.5 w-full" />
+        </View> */}
+        <MagnifyingGlassIcon />
       </View>
 
       <Tabs data={data} selectedSection={selectedSection} />

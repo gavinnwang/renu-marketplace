@@ -1,5 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { Text, Pressable, SafeAreaView, View, Dimensions } from "react-native";
+import {
+  Text,
+  Pressable,
+  SafeAreaView,
+  View,
+  Dimensions,
+  ScrollView,
+} from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useQuery } from "@tanstack/react-query";
 import Colors from "../../../constants/Colors";
@@ -62,111 +69,123 @@ export default function ItemPage() {
     },
   });
 
-  console.log("seller: ", seller);
-
   const [index, setIndex] = useState(0);
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
     setIndex(viewableItems[0].index);
   }).current;
 
   return (
-    <SafeAreaView className="h-full bg-bgLight">
-      <Pressable onPress={router.back} className="p-3">
-        <CloseIcon />
-      </Pressable>
+    <>
+      <SafeAreaView className="bg-bgLight"></SafeAreaView>
+      <View className="bg-bgLight h-full">
+        <Pressable onPress={router.back} className="p-3">
+          <CloseIcon />
+        </Pressable>
 
-      {item ? (
-        <>
-          <FlatList
-            data={item.data.item_images}
-            renderItem={({ item }) => (
-              <Image
-                style={{
-                  height: "100%",
-                  width: Dimensions.get("window").width,
-                }}
-                source={{
-                  uri: item,
-                }}
-              />
-            )}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            pagingEnabled
-            snapToAlignment="center"
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={{
-              itemVisiblePercentThreshold: 50,
-            }}
-          />
-          <View className="relative">
-            {item.data.item_images.length > 1 && (
-              <PaginationDots
-                data={item.data.item_images}
-                currentIndex={index}
-              />
-            )}
-          </View>
-          <View className="w-full flex flex-col p-3 py-3">
-            <Text className="text-base font-Poppins_600SemiBold">
-              {item.data.name}
-            </Text>
-            <View className="flex flex-row items-center">
-              <CategoryIcon />
-              <Text className="mx-1.5 font-Manrope_400Regular text-sm">
-                Category
-              </Text>
-              <Text className="font-Manrope_600SemiBold text-sm">
-                {CATEGORIES[item.data.category].display}
-              </Text>
+        {item ? (
+          <ScrollView>
+            <FlatList
+              data={item.data.item_images}
+              renderItem={({ item }) => (
+                <Image
+                  style={{
+                    height: "100%",
+                    width: Dimensions.get("window").width,
+                  }}
+                  source={{
+                    uri: item,
+                  }}
+                />
+              )}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              pagingEnabled
+              snapToAlignment="center"
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={{
+                itemVisiblePercentThreshold: 50,
+              }}
+              style={{
+                height: Dimensions.get("window").width,
+              }}
+            />
+            <View className="relative">
+              {item.data.item_images.length > 1 && (
+                <PaginationDots
+                  data={item.data.item_images}
+                  currentIndex={index}
+                />
+              )}
             </View>
-            <Text className="text-[26px] text-purplePrimary">
-              ${item.data.price}
-            </Text>
-          </View>
-          <View className="h-2 bg-grayLight" />
-          <View className="p-3 flex flex-col gap-y-2">
-            <View className="flex flex-row gap-x-0.5">
+            <View className="w-full flex flex-col p-3 py-3">
               <Text className="text-base font-Poppins_600SemiBold">
-                Description
+                {item.data.name}
+              </Text>
+              <View className="flex flex-row items-center">
+                <CategoryIcon />
+                <Text className="mx-1.5 font-Manrope_400Regular text-sm">
+                  Category
+                </Text>
+                <Text className="font-Manrope_600SemiBold text-sm">
+                  {CATEGORIES[item.data.category].display}
+                </Text>
+              </View>
+              <Text className="text-[26px] text-purplePrimary">
+                ${item.data.price}
               </Text>
             </View>
+            <View className="h-2 bg-grayLight" />
+            <View className="p-3 flex flex-col gap-y-2">
+              <View className="flex flex-row gap-x-0.5">
+                <Text className="text-base font-Poppins_600SemiBold">
+                  Description
+                </Text>
+              </View>
 
-            <View>
-              <Text className="font-Manrope_300Light text-sm mb-1">
-                {item.data.description ?? "No description provided."}
-              </Text>
-            </View>
-          </View>
-
-          <View className="h-2 bg-grayLight" />
-
-          <View className="p-3 flex flex-col gap-y-2">
-            <Text className="font-Poppins_600SemiBold text-base">Seller</Text>
-            <View className="flex flex-row">
-              <Image
-                source={{
-                  uri: seller?.name,
-                }}
-                style={{
-                  borderColor: Colors.whitePrimary,
-                }}
-                className="w-[53px] h-[53px] rounded-full bg-blackPrimary"
-              />
-              <View className="flex flex-col gap-y-1 ml-2">
-                <Text className="font-Manrope_400Regular text-sm text-blackPrimary">
-                  {seller?.name ?? ""}
+              <View>
+                <Text className="font-Manrope_300Light text-sm mb-1">
+                  {item.data.description ?? "No description provided."}
                 </Text>
               </View>
             </View>
-          </View>
-        </>
-      ) : (
-        <>
-          <Text>Loading</Text>
-        </>
-      )}
-    </SafeAreaView>
+
+            <View className="h-2 bg-grayLight" />
+
+            <View className="p-3 flex flex-col gap-y-2">
+              <Text className="font-Poppins_600SemiBold text-base">Seller</Text>
+              <View className="flex flex-row">
+                <Image
+                  source={{
+                    uri: seller?.name,
+                  }}
+                  style={{
+                    borderColor: Colors.whitePrimary,
+                  }}
+                  className="w-[53px] h-[53px] rounded-full bg-blackPrimary"
+                />
+                <View className="flex flex-col gap-y-1 ml-2">
+                  <Text className="font-Poppins_500Medium text-base text-blackPrimary">
+                    {seller?.name ?? "Loading user"}
+                  </Text>
+                  <View className="flex flex-row gap-x-1">
+                    <Text className="font-Manrope_400Regular text-sm">
+                      {seller?.active_listing_count ?? 0} listings
+                    </Text>
+                    <Text className="font-Manrope_400Regular text-sm">
+                      {seller?.sales_done_count ?? 0} sold
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+        ) : (
+          <>
+            <Text>Loading</Text>
+          </>
+        )}
+      </View>
+    </>
   );
 }
 
