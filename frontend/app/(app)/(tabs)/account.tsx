@@ -5,16 +5,12 @@ import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
-import { ItemWithImage } from "../../../types/types";
+import { ItemWithImage, UserWithCount } from "../../../types/types";
 import { ItemListing } from "../../../components/ItemListing";
 import { RefreshControl } from "react-native-gesture-handler";
 import Svg, { Path } from "react-native-svg";
 import { User } from "@prisma/client";
 
-type UserWithCount = User & {
-  active_listing_count: number;
-  sales_done_count: number;
-};
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();

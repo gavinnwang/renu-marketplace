@@ -122,38 +122,3 @@ pub async fn fetch_item_by_id(
     Ok(item)
 }
 
-pub async fn fetch_item_with_seller_info_by_id(
-    id: i64,
-    conn: impl Executor<'_, Database = MySql>,
-) -> Result<ItemWithSellerInfo, DbError> {
-    let raw_item = sqlx::query_as!(
-        RawItemWithSellerInfo,
-        r#"
-        SELECT
-        Item.id, 
-        Item.name, 
-        Item.price, 
-        Item.user_id, 
-        Item.category,
-        Item.description,
-        Item.created_at, 
-        Item.updated_at,
-        User.name AS seller_name,
-        User.profile_image as seller_image_url,
-        CAST(COALESCE(SUM(CASE WHEN SellerItems.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
-        CAST(COALESCE(SUM(CASE WHEN SellerItems.status = 'SOLD' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count,
-        GROUP_CONCAT(ItemImage.url) AS item_images
-        FROM Item 
-            INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = ?
-            INNER JOIN User ON Item.user_id = User.id
-            INNER JOIN Item AS SellerItems ON User.id = SellerItems.user_id
-        GROUP BY Item.id, User.id
-            "#,
-        id
-    )
-    .fetch_one(conn)
-    .await?;
-
-    let item = convert_raw_with_seller_info_into_item(raw_item);
-    Ok(item)
-}
