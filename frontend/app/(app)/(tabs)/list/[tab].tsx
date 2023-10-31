@@ -22,7 +22,7 @@ import { ApiResponse } from "../../../../types/api";
 import { Image } from "expo-image";
 
 const TABS = ["Listings", "Sold"];
-const STATUS = ["ACTIVE", "SOLD"];
+const STATUS = ["ACTIVE", "INACTIVE"];
 
 const data = TABS.map((i) => ({
   key: i,
