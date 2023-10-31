@@ -131,17 +131,17 @@ export default function AccountScreen() {
         <Text className="ml-2.5 mt-4 mb-3 font-Poppins_600SemiBold text-xl">
           Saved Items {" "}
           <Text className="font-Manrope_500Medium text-base">
-            ({savedItemData?.data.length})
+            ({savedItemData?.data?.length ?? 0})
           </Text>
         </Text>
 
         <View className="bg-greyLight h-full">
           {isLoadingSavedItem ? (
             <></>
-          ) : isErrorSavedItem ? (
-            <Text>Something went wrong</Text>
-          ) : savedItemData?.data.length === 0 ? (
-            <Text>No items</Text>
+          ) : isErrorSavedItem || savedItemData.status === "failure" ? (
+            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">Something went wrong...</Text>
+          ) : savedItemData?.data?.length === 0 ? (
+            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">No items.</Text>
           ) : (
             <FlatList
               showsVerticalScrollIndicator={false}
