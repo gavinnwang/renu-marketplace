@@ -80,7 +80,7 @@ export default function HomePage() {
 
   return (
     <View className="bg-bgLight h-full">
-      <View className="flex flex-row items-center justify-between px-4 pb-2.5 min-h-[43px]">
+      <View className="flex flex-row items-center justify-between pl-4 pr-6 pb-2.5 min-h-[43px]">
         <LogoWithText />
         {/* <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
           <TextInput placeholder="Search here" className="p-2.5 w-full" />
@@ -94,11 +94,11 @@ export default function HomePage() {
         {isLoadingItems ? (
           <></>
         ) : isErrorItems ? (
-          <Text className="mx-auto my-[60%] font-Poppins_600SemiBold text-lg">
+          <Text className="mx-auto my-[70%] font-Poppins_600SemiBold text-lg">
             Something went wrong. Please refresh.
           </Text>
         ) : items.data.length === 0 ? (
-          <Text className="mx-auto my-[60%] font-Poppins_600SemiBold text-lg">
+          <Text className="mx-auto my-[70%] font-Poppins_600SemiBold text-lg">
             No item right now... List one!
           </Text>
         ) : (
