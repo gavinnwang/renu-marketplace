@@ -7,9 +7,8 @@ import { ItemWithImage } from "../types/types";
 import dayjs from "dayjs";
 dayjs.extend(relativeTime);
 
-const dimensions = Dimensions.get("window");
 const horizontalGapPx = 10;
-const imageWidth = (dimensions.width - horizontalGapPx * 3) / 2;
+const imageWidth = (Dimensions.get("window").width - horizontalGapPx * 3) / 2;
 
 export function ItemListing(props: { item: ItemWithImage }) {
   return (
