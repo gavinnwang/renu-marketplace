@@ -217,7 +217,7 @@ const Tabs = ({
       ref={containerRef}
       horizontal
       showsHorizontalScrollIndicator={false}
-      className="border-y border-grayLight flex flex-row  min-h-[45px] max-h-[42px] "
+      className="border-y border-grayLight flex flex-row  min-h-[45px] max-h-[42px]"
     >
       {data.map((section) => {
         return (

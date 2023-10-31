@@ -1,10 +1,10 @@
 import { Dimensions, View, Text } from "react-native";
 import { Link } from "expo-router";
 
-import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Image } from "expo-image";
 import { ItemWithImage } from "../types/types";
+import dayjs from "dayjs";
 dayjs.extend(relativeTime);
 
 const dimensions = Dimensions.get("window");
@@ -13,7 +13,7 @@ const imageWidth = (dimensions.width - horizontalGapPx * 3) / 2;
 
 export function ItemListing(props: { item: ItemWithImage }) {
   return (
-    <Link href={`/item/${props.item.id}`} className="flex flex-col px-[5px]">
+    <Link href={`/item/${props.item.id}`} className="flex flex-col px-[5px] shadow-sm">
       <View className="flex flex-col">
         <Image
           source={{ uri: props.item.item_images[0] }}

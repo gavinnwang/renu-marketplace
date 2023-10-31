@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.description,\n            Item.created_at, \n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = ?\n        GROUP BY Item.id\n        ",
+  "query": "\n        SELECT \n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id,\n            Item.description, \n            Item.category,\n            Item.status,\n            Item.created_at,\n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM SavedItem\n        INNER JOIN Item ON SavedItem.itemId = Item.id\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.itemId \n        WHERE SavedItem.userId = ?\n        GROUP BY Item.id\n        ",
   "describe": {
     "columns": [
       {
@@ -45,16 +45,6 @@
       },
       {
         "ordinal": 4,
-        "name": "category",
-        "type_info": {
-          "type": "String",
-          "flags": "NOT_NULL | MULTIPLE_KEY | ENUM",
-          "char_set": 255,
-          "max_size": 44
-        }
-      },
-      {
-        "ordinal": 5,
         "name": "description",
         "type_info": {
           "type": "VarString",
@@ -64,7 +54,27 @@
         }
       },
       {
+        "ordinal": 5,
+        "name": "category",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | MULTIPLE_KEY | ENUM",
+          "char_set": 255,
+          "max_size": 44
+        }
+      },
+      {
         "ordinal": 6,
+        "name": "status",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | ENUM",
+          "char_set": 255,
+          "max_size": 32
+        }
+      },
+      {
+        "ordinal": 7,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -74,7 +84,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -84,7 +94,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "item_images",
         "type_info": {
           "type": "Blob",
@@ -102,12 +112,13 @@
       false,
       false,
       false,
-      false,
       true,
+      false,
+      false,
       false,
       false,
       true
     ]
   },
-  "hash": "37a51e5d5d2cbc78de2a6c458bf70c2174af0cd82b17479d4eab02f62fc02503"
+  "hash": "a58f7a459f942ad145f95576af96b5a1d71d112738875b11bc359b60a3428fe1"
 }

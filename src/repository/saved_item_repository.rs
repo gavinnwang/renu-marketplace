@@ -20,6 +20,7 @@ pub async fn fetch_saved_items_by_user_id(
             Item.user_id,
             Item.description, 
             Item.category,
+            Item.status,
             Item.created_at,
             Item.updated_at,
             GROUP_CONCAT(ItemImage.url) AS item_images
