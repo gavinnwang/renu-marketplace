@@ -5,3 +5,15 @@ export type UserWithCount = User & {
   sales_done_count: number;
 };
 export type ItemWithImage = Item & { item_images: string[] };
+
+export type Measure = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type RefAndKey = {
+  key: string;
+  ref: React.RefObject<any>;
+};
