@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.created_at, \n            Item.description,\n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id\n        GROUP BY Item.id\n        ",
+  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.created_at, \n            Item.description,\n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.status = ?\n        GROUP BY Item.id\n        ORDER BY Item.created_at DESC\n        ",
   "describe": {
     "columns": [
       {
@@ -95,7 +95,7 @@
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 1
     },
     "nullable": [
       false,
@@ -109,5 +109,5 @@
       true
     ]
   },
-  "hash": "7b4061dc4a71284510fa40fc70064d7e44d002befb74a2b10999a3191be7d73f"
+  "hash": "b302e03971d714f178fc13fc88d77283d9164a5042fc347fd521ef89456d5934"
 }
