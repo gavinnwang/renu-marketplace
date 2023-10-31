@@ -2,16 +2,11 @@ import { Link, router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Animated, Dimensions, Pressable, Text, View } from "react-native";
 import Colors from "../../../../constants/Colors";
-import { RefAndKey } from "../../../../types/types";
+import { Measure, RefAndKey } from "../../../../types/types";
+import { useSession } from "../../../../providers/ctx";
 
 const TABS = ["Listings", "Sold"];
 
-type Measure = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
 
 const data = TABS.map((i) => ({
   key: i,
@@ -23,6 +18,9 @@ export default function ListScreen() {
   const selectedTab = param.tab;
   const selectedTabInt = parseInt(selectedTab as string);
   const tabDisplay = TABS[selectedTabInt];
+
+  const { session } = useSession();
+
 
   return (
     <View className="bg-bgLight h-full">
@@ -162,3 +160,4 @@ const Indicator = ({
   );
 };
 
+// const ItemList = () => {

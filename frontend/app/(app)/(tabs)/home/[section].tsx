@@ -13,7 +13,7 @@ import { useState } from "react";
 import { ApiResponse } from "../../../../types/api";
 import { ItemListing } from "../../../../components/ItemListing";
 import { LogoWithText } from "../../../../components/Logo";
-import { ItemWithImage, Measure } from "../../../../types/types";
+import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
 import React from "react";
 import Colors from "../../../../constants/Colors";
 import Svg, { Path } from "react-native-svg";
@@ -23,10 +23,7 @@ type Section = {
   value: string;
 };
 
-type SectionWithRefAndKey = Section & {
-  key: string;
-  ref: React.RefObject<any>;
-};
+type SectionWithRefAndKey = Section & RefAndKey;
 
 export const CATEGORIES: Record<string, Section> = {
   ALL: { display: "All", value: "all" },
