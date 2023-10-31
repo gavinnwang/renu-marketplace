@@ -133,3 +133,23 @@ pub async fn fetch_items_by_user_id_and_status(
     let items = convert_raw_into_items(raw_items);
     Ok(items)
 }
+
+pub async fn update_item_status(
+    id: i64,
+    status: String,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<(), DbError> {
+    sqlx::query!(
+        r#"
+        UPDATE Item
+        SET status = ?
+        WHERE id = ?
+        "#,
+        status,
+        id
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(())
+}
