@@ -1,12 +1,23 @@
 import { Link, router, useLocalSearchParams } from "expo-router";
 import React from "react";
-import { Animated, Dimensions, Pressable, Text, View } from "react-native";
+import {
+  Animated,
+  Dimensions,
+  FlatList,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import Colors from "../../../../constants/Colors";
-import { Measure, RefAndKey } from "../../../../types/types";
+import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
 import { useSession } from "../../../../providers/ctx";
+import { useQuery } from "@tanstack/react-query";
+
+import { ApiResponse } from "../../../../types/api";
+import { Image } from "expo-image";
 
 const TABS = ["Listings", "Sold"];
-
+const STATUS = ["ACTIVE", "SOLD"];
 
 const data = TABS.map((i) => ({
   key: i,
@@ -21,6 +32,38 @@ export default function ListScreen() {
 
   const { session } = useSession();
 
+  const [items, setItems] = React.useState<ItemWithImage[]>([]);
+
+  const {
+    data: itemData,
+    isError: isErrorItem,
+    isLoading: isLoadingItem,
+  } = useQuery({
+    queryFn: async () =>
+      fetch(
+        process.env.EXPO_PUBLIC_BACKEND_URL +
+          "/users/me/items?status=" +
+          STATUS[selectedTabInt],
+        {
+          headers: {
+            authorization: `Bearer ${session?.token}`,
+          },
+        }
+      ).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
+    queryKey: [selectedTab as string],
+    enabled: !!session && !!session.token,
+    onError(err) {
+      console.error("error", err);
+    },
+    onSuccess(data) {
+      console.log(data);
+      if (data.status === "success") {
+        setItems(data.data);
+      } else {
+        console.error(data);
+      }
+    },
+  });
 
   return (
     <View className="bg-bgLight h-full">
@@ -28,9 +71,75 @@ export default function ListScreen() {
         {tabDisplay}
       </Text>
       <Tabs data={data} selectedTabInt={selectedTabInt} />
+      {isErrorItem ? (
+        <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
+          Something wrong happened...
+        </Text>
+      ) : isLoadingItem ? (
+        <></>
+      ) : items.length === 0 ? (
+        <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
+          No item found.
+        </Text>
+      ) : (
+        <FlatList
+          // refreshControl={
+          //   <RefreshControl
+          //     refreshing={refreshing}
+          //     onRefresh={() => {
+          //       refetchItems();
+          //     }}
+          //   />
+          // }
+          data={items}
+          numColumns={1}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={ListingPageItem}
+        />
+      )}
     </View>
   );
 }
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { CATEGORIES } from "../home/[section]";
+dayjs.extend(relativeTime);
+
+const ListingPageItem = ({ item }: { item: ItemWithImage }) => {
+  const width = Dimensions.get("window").width / 2 - 30;
+  return (
+    <View className="flex flex-row mt-4 mx-4 ">
+      <Image
+        source={{ uri: item.item_images[0] }}
+        className="object-cover"
+        style={{
+          width: width,
+          maxWidth: width,
+          height: (width * 4) / 3,
+        }}
+      />
+      <View className="flex flex-col justify-between px-4 pt-2">
+        <View className="flex flex-col gap-y-1">
+          <Text className="font-Manrope_600SemiBold text-base">
+            {item.name}
+          </Text>
+          <Text className="font-Manrope_400Regular text-sm">
+            {dayjs(item.created_at).fromNow()}
+          </Text>
+          <Text className="font-Manrope_400Regular text-sm">
+            {CATEGORIES[item.category].display}{" "}
+          </Text>
+        </View>
+        <View className="border-[1.5px] h-[35px] w-[180px] flex items-center justify-center">
+          <Text className="font-SecularOne_400Regular text-xs">
+            {item.status === "ACTIVE" ? "MARK AS SOLD" : "RELIST"}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+};
 
 const Tab = React.forwardRef(
   (
@@ -159,5 +268,3 @@ const Indicator = ({
     ></Animated.View>
   );
 };
-
-// const ItemList = () => {

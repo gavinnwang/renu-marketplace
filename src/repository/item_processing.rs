@@ -18,9 +18,11 @@ pub fn convert_raw_into_item(raw_item: RawItem) -> Item {
             None => Vec::new(),
         },
         category: raw_item.category,
+        status: raw_item.status,
         user_id: raw_item.user_id,
         description: raw_item.description,
         created_at: raw_item.created_at.into(),
         updated_at: raw_item.updated_at.into(),
     }
 }
+
