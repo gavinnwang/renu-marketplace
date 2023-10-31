@@ -90,3 +90,30 @@ async fn get_items_by_user_id_and_status_handler(
         }
     }
 }
+
+#[get("/me/items")]
+async fn get_items_by_me_by_status_handler(
+    auth_guard: AuthenticationGuard,
+    query: Option<web::Query<StatusQuery>>,
+    pool: web::Data<DbPool>,
+) -> impl Responder {
+    let user_id = auth_guard.user_id;
+
+    let status = match query {
+        Some(query) => query.status.to_owned().unwrap_or("ACTIVE".to_string()),
+        None => "ACTIVE".to_string(),
+    };
+    let items = item_repository::fetch_items_by_user_id_and_status(user_id, status.clone(), pool.as_ref()).await;
+
+    match items {
+        Ok(items) => {
+            tracing::info!("API: Items with user_id {} and status {} successfully fetched", user_id, status);
+            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
+        }
+        Err(_) => {
+            tracing::error!("API: Failed to fetch items with user_id {} and status {}", user_id, status);
+            HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+        }
+    }
+}
