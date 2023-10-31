@@ -52,7 +52,7 @@ async fn get_user_by_id_handler(
 
 #[derive(serde::Deserialize)]
 struct StatusQuery {
-    status: Option<String>,
+    status: String,
 }
 
 #[get("/{id}/items")]
@@ -72,19 +72,18 @@ async fn get_items_by_user_id_and_status_handler(
         Ok(_) => {}
     }
 
-    let status = match query {
-        Some(query) => query.status.to_owned().unwrap_or("ACTIVE".to_string()),
-        None => "ACTIVE".to_string(),
+    let items =  match query {
+        Some(query) => item_repository::fetch_items_by_user_id_and_status(user_id, query.status.clone(), pool.as_ref()).await,
+        None => item_repository::fetch_items_by_user_id(user_id, pool.as_ref()).await
     };
-    let items = item_repository::fetch_items_by_user_id_and_status(user_id, status.clone(), pool.as_ref()).await;
 
     match items {
         Ok(items) => {
-            tracing::info!("API: Items with user_id {} and status {} successfully fetched", user_id, status);
+            tracing::info!("API: Items with user_id {} successfully fetched", user_id);
             HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
         }
         Err(_) => {
-            tracing::error!("API: Failed to fetch items with user_id {} and status {}", user_id, status);
+            tracing::error!("API: Failed to fetch items with user_id {}", user_id);
             HttpResponse::InternalServerError()
                 .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
         }
@@ -99,19 +98,18 @@ async fn get_items_by_me_by_status_handler(
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
 
-    let status = match query {
-        Some(query) => query.status.to_owned().unwrap_or("ACTIVE".to_string()),
-        None => "ACTIVE".to_string(),
+    let items =  match query {
+        Some(query) => item_repository::fetch_items_by_user_id_and_status(user_id, query.status.clone(), pool.as_ref()).await,
+        None => item_repository::fetch_items_by_user_id(user_id, pool.as_ref()).await
     };
-    let items = item_repository::fetch_items_by_user_id_and_status(user_id, status.clone(), pool.as_ref()).await;
 
     match items {
         Ok(items) => {
-            tracing::info!("API: Items with user_id {} and status {} successfully fetched", user_id, status);
+            tracing::info!("API: Items with user_id {} successfully fetched", user_id);
             HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
         }
         Err(_) => {
-            tracing::error!("API: Failed to fetch items with user_id {} and status {}", user_id, status);
+            tracing::error!("API: Failed to fetch items with  user id {}", user_id);
             HttpResponse::InternalServerError()
                 .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
         }

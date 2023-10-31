@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import Colors from "../../../../constants/Colors";
-import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
+import { ItemWithImage, Measure, RefAndKey, Session } from "../../../../types/types";
 import { useSession } from "../../../../providers/ctx";
 import { useQuery } from "@tanstack/react-query";
 
@@ -34,11 +34,7 @@ export default function ListScreen() {
 
   const [items, setItems] = React.useState<ItemWithImage[]>([]);
 
-  const {
-    data: itemData,
-    isError: isErrorItem,
-    isLoading: isLoadingItem,
-  } = useQuery({
+  const { isError: isErrorItem, isLoading: isLoadingItem } = useQuery({
     queryFn: async () =>
       fetch(
         process.env.EXPO_PUBLIC_BACKEND_URL +
@@ -50,7 +46,7 @@ export default function ListScreen() {
           },
         }
       ).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
-    queryKey: [selectedTab as string],
+    queryKey: ["list"],
     enabled: !!session && !!session.token,
     onError(err) {
       console.error("error", err);
@@ -105,7 +101,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { CATEGORIES } from "../home/[section]";
 dayjs.extend(relativeTime);
 
-const ListingPageItem = ({ item }: { item: ItemWithImage }) => {
+const ListingPageItem = ({ item, session }: { item: ItemWithImage, session: Session }) => {
   const width = Dimensions.get("window").width / 2 - 30;
   return (
     <View className="flex flex-row mt-4 mx-4 ">
@@ -130,11 +126,29 @@ const ListingPageItem = ({ item }: { item: ItemWithImage }) => {
             {CATEGORIES[item.category].display}{" "}
           </Text>
         </View>
-        <View className="border-[1.5px] h-[35px] w-[180px] flex items-center justify-center">
+        <Pressable
+          onPress={() => {
+            fetch(
+              process.env.EXPO_PUBLIC_BACKEND_URL + `/items/${item.id}`,
+              {
+                method: "POST",
+                headers: {
+                  authorization: `Bearer ${session?.token}`,
+                },
+                body: JSON.stringify({
+                  status: item.status === "ACTIVE" ? "SOLD" : "ACTIVE",
+                }),
+              }
+            ).then(
+              
+            )
+          }}
+          className="border-[1.5px] h-[35px] w-[180px] flex items-center justify-center"
+        >
           <Text className="font-SecularOne_400Regular text-xs">
             {item.status === "ACTIVE" ? "MARK AS SOLD" : "RELIST"}
           </Text>
-        </View>
+        </Pressable>
       </View>
     </View>
   );

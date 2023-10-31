@@ -1,6 +1,8 @@
 use actix_web::{get, post, web, HttpResponse, Responder};
 
-use crate::{model::db_model::DbPool, repository::item_repository};
+use crate::{
+    authentication::jwt::AuthenticationGuard, model::db_model::DbPool, repository::item_repository,
+};
 
 // #[derive(serde::Deserialize)]
 // struct ItemQuery {
@@ -39,9 +41,9 @@ async fn get_item_by_id_handler(path: web::Path<i64>, pool: web::Data<DbPool>) -
             );
             tracing::error!("Error message: {}\n", err);
             match err {
-            crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item with id {item_id}" )})),
-            _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
-        }
+                crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item with id {item_id}" )})),
+                _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+            }
         }
     }
 }
@@ -53,11 +55,35 @@ struct ItemUpdateBody {
 
 #[post("/{id}")]
 async fn update_item_status_handler(
+    auth_gaurd: AuthenticationGuard,
     path: web::Path<i64>,
-    data: web::Data<ItemUpdateBody>,
+    data: web::Json<ItemUpdateBody>,
     pool: web::Data<DbPool>,
 ) -> impl Responder {
     let item_id = path.into_inner();
+    let user_id = auth_gaurd.user_id;
+
+    let item = item_repository::fetch_item_by_id(item_id, pool.as_ref()).await;
+
+    match item {
+        Ok(item) => {
+            if item.user_id != user_id {
+                return HttpResponse::Unauthorized()
+                    .json(serde_json::json!({"status": "fail", "message": "API: Unauthorized"}));
+            }
+        }
+        Err(err) => {
+            tracing::error!(
+                "{}\n",
+                format!("API: Failed to fetch item with id {item_id}")
+            );
+            tracing::error!("Error message: {}\n", err);
+            match err {
+                crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item with id {item_id}" )})),
+                _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+            };
+        }
+    };
 
     let new_status = match data.status.to_owned() {
         Some(status) => status,

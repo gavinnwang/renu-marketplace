@@ -17,3 +17,9 @@ export type RefAndKey = {
   key: string;
   ref: React.RefObject<any>;
 };
+
+export type Session = {
+  token: string;
+  email: string;
+  name: string;
+};

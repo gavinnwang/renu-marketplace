@@ -5,12 +5,8 @@ import * as Linking from "expo-linking";
 import "react-native-url-polyfill/auto";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
+import { Session } from "../types/types";
 
-type Session = {
-  token: string;
-  email: string;
-  name: string;
-};
 
 type AuthContextType = {
   signIn: (from: string) => Promise<void>;
