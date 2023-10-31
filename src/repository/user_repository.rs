@@ -18,7 +18,7 @@ pub async fn fetch_user_by_id(
         u.email, 
         u.profile_image,
         CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
-        CAST(COALESCE(SUM(CASE WHEN i.status = 'SOLD' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
+        CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
         FROM 
             User u
         INNER JOIN 
@@ -47,7 +47,7 @@ pub async fn fetch_user_by_email(
         u.email, 
         u.profile_image,
         CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
-        CAST(COALESCE(SUM(CASE WHEN i.status = 'SOLD' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
+        CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
         FROM 
             User u
         INNER JOIN 

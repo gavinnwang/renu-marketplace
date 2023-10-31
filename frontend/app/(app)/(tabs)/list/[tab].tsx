@@ -152,7 +152,7 @@ const ListingPageItem = ({
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                status: item.status === "ACTIVE" ? "SOLD" : "ACTIVE",
+                status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
               }),
             }).then(refetch);
           }}
