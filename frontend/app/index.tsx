@@ -3,13 +3,13 @@ import { useSession } from "../providers/ctx";
 import { router } from "expo-router";
 import { LogoWithText } from "../components/Logo";
 import { useEffect } from "react";
-import { SECTIONS } from "./(app)/(tabs)/home/[section]";
+import { CATEGORIES } from "./(app)/(tabs)/home/[section]";
 
 export default function Index() {
   const {  session, signIn } = useSession();
   useEffect(() => {
     if (session) {
-      router.replace(`/home/${SECTIONS[0].value}`);
+      router.replace(`/home/${CATEGORIES["ALL"].value}`);
     }
   }, [session]);
   return (
