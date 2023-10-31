@@ -69,7 +69,7 @@ export default function ListScreen() {
       <Text className="ml-2.5 mt-4 font-Poppins_600SemiBold text-xl text-blackPrimary ">
         {tabDisplay}
       </Text>
-      <Tabs data={data} selectedTabInt={selectedTabInt} />
+      <Tabs data={data} selectedTabInt={selectedTabInt} itemData={items} />
       {isErrorItem ? (
         <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
           Something wrong happened...
@@ -82,14 +82,6 @@ export default function ListScreen() {
         </Text>
       ) : (
         <FlatList
-          // refreshControl={
-          //   <RefreshControl
-          //     refreshing={refreshing}
-          //     onRefresh={() => {
-          //       refetchItems();
-          //     }}
-          //   />
-          // }
           data={items.filter((item) => item.status === STATUS[selectedTabInt])}
           numColumns={1}
           keyExtractor={(item) => item.id.toString()}
@@ -121,8 +113,9 @@ const ListingPageItem = ({
   refetch: any;
 }) => {
   const width = (Dimensions.get("window").width - 30) / 2;
+  const [isSold, setIsSold] = React.useState<boolean>(false);
   return (
-    <View className="flex flex-row mt-4 mx-4 ">
+    <View className="flex flex-row mt-4 mx-4 bg-bgLight">
       <Image
         source={{ uri: item.item_images[0] }}
         className="object-cover rounded-sm"
@@ -145,22 +138,33 @@ const ListingPageItem = ({
           </Text>
         </View>
         <Pressable
+          onPressIn={() => {
+            setIsSold(true);
+          }}
+          onPressOut={() => {
+            setIsSold(false);
+          }}
           onPress={() => {
             fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${item.id}`, {
               method: "POST",
               headers: {
                 authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                "status": item.status === "ACTIVE" ? "SOLD" : "ACTIVE",
+                status: item.status === "ACTIVE" ? "SOLD" : "ACTIVE",
               }),
-            })
-            .then(refetch)
+            }).then(refetch);
           }}
-          className="border-[1.5px] h-[35px] w-[180px] flex items-center justify-center"
+          className={`border-[1.5px] h-[35px] w-[180px] flex items-center justify-center ${
+            isSold ? "bg-blackPrimary" : "bg-bgLight"
+          }`}
         >
-          <Text className="font-SecularOne_400Regular text-xs">
+          <Text
+            className={`font-SecularOne_400Regular text-sm ${
+              isSold ? "text-bgLight" : "text-blackPrimary"
+            }`}
+          >
             {item.status === "ACTIVE" ? "MARK AS SOLD" : "RELIST"}
           </Text>
         </Pressable>
@@ -174,9 +178,11 @@ const Tab = React.forwardRef(
     {
       selectedTabInt,
       sectionIndex,
+      data,
     }: {
       selectedTabInt: number;
       sectionIndex: number;
+      data: ItemWithImage[];
     },
     ref: any
   ) => {
@@ -195,7 +201,15 @@ const Tab = React.forwardRef(
                 : "text-grayPrimary"
             }`}
           >
-            {TABS[sectionIndex]}
+            {TABS[sectionIndex]}{" "}
+            <Text className="font-Poppins_500Medium text-sm">
+              (
+              {
+                data.filter((item) => item.status === STATUS[sectionIndex])
+                  .length
+              }
+              )
+            </Text>
           </Text>
         </View>
       </Link>
@@ -206,9 +220,11 @@ const Tab = React.forwardRef(
 const Tabs = ({
   data,
   selectedTabInt,
+  itemData,
 }: {
   data: RefAndKey[];
   selectedTabInt: number;
+  itemData: ItemWithImage[];
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();
@@ -258,6 +274,7 @@ const Tabs = ({
             selectedTabInt={selectedTabInt}
             sectionIndex={i}
             ref={section.ref}
+            data={itemData}
           />
         );
       })}

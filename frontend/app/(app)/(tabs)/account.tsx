@@ -129,8 +129,9 @@ export default function AccountScreen() {
         <View className="w-full h-2 bg-grayLight mt-2" />
 
         <Text className="ml-2.5 mt-4 mb-3 font-Poppins_600SemiBold text-xl">
-          Saved Items {" "}
-          <Text className="font-Manrope_500Medium text-base">
+          Saved Items
+          <Text className="font-Poppins_500Medium text-sm">
+            {" "}
             ({savedItemData?.data?.length ?? 0})
           </Text>
         </Text>
@@ -139,9 +140,13 @@ export default function AccountScreen() {
           {isLoadingSavedItem ? (
             <></>
           ) : isErrorSavedItem || savedItemData.status === "failure" ? (
-            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">Something went wrong...</Text>
+            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">
+              Something went wrong...
+            </Text>
           ) : savedItemData?.data?.length === 0 ? (
-            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">No items.</Text>
+            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">
+              No items.
+            </Text>
           ) : (
             <FlatList
               showsVerticalScrollIndicator={false}
