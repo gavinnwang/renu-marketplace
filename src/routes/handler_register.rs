@@ -26,7 +26,7 @@ conf.service(
             .service(super::item_handler::get_items_handler)
             .service(super::item_handler::get_item_by_id_handler)
             .service(super::item_handler::get_items_by_category_handler)
-            // .service(super::item_handler::get_item_with_seller_info_by_id_handler),
+            .service(super::item_handler::update_item_status_handler),
     );
 
     conf.service(
