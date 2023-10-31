@@ -11,10 +11,9 @@ import { RefreshControl } from "react-native-gesture-handler";
 import Svg, { Path } from "react-native-svg";
 import { User } from "@prisma/client";
 
-
 export default function AccountScreen() {
   const { signOut, session } = useSession();
-  console.log(session)
+  console.log(session);
   const [user, setUser] = useState<UserWithCount | null>(null);
 
   const { isError: isErrorUser } = useQuery({
@@ -30,24 +29,42 @@ export default function AccountScreen() {
       if (data.status === "success") {
         setUser(data.data);
       } else {
-        console.error(data)
+        console.error(data);
       }
     },
   });
 
   const {
-    data: items,
-    isLoading: isLoadingItems,
-    isError: isErrorItems,
-    refetch: refetchItems,
+    data: savedItemData,
+    isError: isErrorSavedItem,
+    isLoading: isLoadingSavedItem,
   } = useQuery({
     queryFn: async () =>
-      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/items/").then((x) =>
-        x.json()
-      ) as Promise<ApiResponse<ItemWithImage[]>>,
-    queryKey: ["item"],
-    enabled: !!session,
+      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/saved/", {
+        headers: {
+          authorization: `Bearer ${session?.token}`,
+        },
+      }).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
+    queryKey: ["saved"],
+    enabled: !!session && !!session.token,
+    onSuccess(data) {
+      console.log(data);
+    },
   });
+
+  // const {
+  //   data: items,
+  //   isLoading: isLoadingItems,
+  //   isError: isErrorItems,
+  //   refetch: refetchItems,
+  // } = useQuery({
+  //   queryFn: async () =>
+  //     fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/items/").then((x) =>
+  //       x.json()
+  //     ) as Promise<ApiResponse<ItemWithImage[]>>,
+  //   queryKey: ["item"],
+  //   enabled: !!session,
+  // });
 
   const [refreshing, _] = useState(false);
 
@@ -112,29 +129,24 @@ export default function AccountScreen() {
         <View className="w-full h-2 bg-grayLight mt-2" />
 
         <Text className="ml-2.5 mt-4 mb-3 font-Poppins_600SemiBold text-xl">
-          Saved Items
+          Saved Items {" "}
+          <Text className="font-Manrope_500Medium text-base">
+            ({savedItemData?.data.length})
+          </Text>
         </Text>
 
         <View className="bg-greyLight h-full">
-          {isLoadingItems ? (
-            <Text>...</Text>
-          ) : isErrorItems ? (
+          {isLoadingSavedItem ? (
+            <></>
+          ) : isErrorSavedItem ? (
             <Text>Something went wrong</Text>
-          ) : items.data.length === 0 ? (
+          ) : savedItemData?.data.length === 0 ? (
             <Text>No items</Text>
           ) : (
             <FlatList
               showsVerticalScrollIndicator={false}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={() => {
-                    refetchItems();
-                  }}
-                />
-              }
               scrollEnabled={false}
-              data={items.data}
+              data={savedItemData?.data}
               numColumns={2}
               columnWrapperStyle={{
                 justifyContent: "flex-start",
