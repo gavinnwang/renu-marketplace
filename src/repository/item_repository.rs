@@ -60,6 +60,7 @@ pub async fn fetch_items_by_category(
         FROM Item  
         INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.category = ?
         GROUP BY Item.id
+        ORDER BY Item.created_at DESC
         "#,
         category
     )
@@ -122,6 +123,7 @@ pub async fn fetch_items_by_user_id(
         FROM Item
         INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.user_id = ? 
         GROUP BY Item.id
+        ORDER BY Item.created_at DESC
         "#,
         user_id
     )
@@ -154,6 +156,7 @@ pub async fn fetch_items_by_user_id_and_status(
         FROM Item
         INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.user_id = ? AND Item.status = ?
         GROUP BY Item.id
+        ORDER BY Item.created_at DESC
         "#,
         user_id,
         status

@@ -9,7 +9,12 @@ import {
   View,
 } from "react-native";
 import Colors from "../../../../constants/Colors";
-import { ItemWithImage, Measure, RefAndKey, Session } from "../../../../types/types";
+import {
+  ItemWithImage,
+  Measure,
+  RefAndKey,
+  Session,
+} from "../../../../types/types";
 import { useSession } from "../../../../providers/ctx";
 import { useQuery } from "@tanstack/react-query";
 
@@ -34,18 +39,17 @@ export default function ListScreen() {
 
   const [items, setItems] = React.useState<ItemWithImage[]>([]);
 
-  const { isError: isErrorItem, isLoading: isLoadingItem } = useQuery({
+  const {
+    isError: isErrorItem,
+    isLoading: isLoadingItem,
+    refetch,
+  } = useQuery({
     queryFn: async () =>
-      fetch(
-        process.env.EXPO_PUBLIC_BACKEND_URL +
-          "/users/me/items?status=" +
-          STATUS[selectedTabInt],
-        {
-          headers: {
-            authorization: `Bearer ${session?.token}`,
-          },
-        }
-      ).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
+      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/users/me/items", {
+        headers: {
+          authorization: `Bearer ${session?.token}`,
+        },
+      }).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
     queryKey: ["list"],
     enabled: !!session && !!session.token,
     onError(err) {
@@ -86,10 +90,16 @@ export default function ListScreen() {
           //     }}
           //   />
           // }
-          data={items}
+          data={items.filter((item) => item.status === STATUS[selectedTabInt])}
           numColumns={1}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={ListingPageItem}
+          renderItem={(object) => (
+            <ListingPageItem
+              item={object.item}
+              token={session?.token}
+              refetch={refetch}
+            />
+          )}
         />
       )}
     </View>
@@ -101,16 +111,24 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { CATEGORIES } from "../home/[section]";
 dayjs.extend(relativeTime);
 
-const ListingPageItem = ({ item, session }: { item: ItemWithImage, session: Session }) => {
-  const width = Dimensions.get("window").width / 2 - 30;
+const ListingPageItem = ({
+  item,
+  token,
+  refetch,
+}: {
+  item: ItemWithImage;
+  token: string | undefined;
+  refetch: any;
+}) => {
+  const width = (Dimensions.get("window").width - 30) / 2;
   return (
     <View className="flex flex-row mt-4 mx-4 ">
       <Image
         source={{ uri: item.item_images[0] }}
-        className="object-cover"
+        className="object-cover rounded-sm"
         style={{
           width: width,
-          maxWidth: width,
+          maxWidth: width - 20,
           height: (width * 4) / 3,
         }}
       />
@@ -128,20 +146,17 @@ const ListingPageItem = ({ item, session }: { item: ItemWithImage, session: Sess
         </View>
         <Pressable
           onPress={() => {
-            fetch(
-              process.env.EXPO_PUBLIC_BACKEND_URL + `/items/${item.id}`,
-              {
-                method: "POST",
-                headers: {
-                  authorization: `Bearer ${session?.token}`,
-                },
-                body: JSON.stringify({
-                  status: item.status === "ACTIVE" ? "SOLD" : "ACTIVE",
-                }),
-              }
-            ).then(
-              
-            )
+            fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${item.id}`, {
+              method: "POST",
+              headers: {
+                authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                "status": item.status === "ACTIVE" ? "SOLD" : "ACTIVE",
+              }),
+            })
+            .then(refetch)
           }}
           className="border-[1.5px] h-[35px] w-[180px] flex items-center justify-center"
         >
