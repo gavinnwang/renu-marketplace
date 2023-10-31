@@ -34,23 +34,24 @@ type Measure = {
   width: number;
   height: number;
 };
-export const SECTIONS: Section[] = [
-  { display: "All", value: "all" },
-  { display: "Women's", value: "womens" },
-  { display: "Men's", value: "mens" },
-  { display: "Home & Tools", value: "home" },
-  { display: "Furniture", value: "furniture" },
-  { display: "Electronics", value: "electronics" },
-  { display: "Bikes & Scooters", value: "bikes" },
-  { display: "Tickets", value: "tickets" },
-  { display: "General", value: "general" },
-  { display: "Free", value: "free" },
-];
 
-const data = Object.entries(SECTIONS).map((i) => ({
-  key: i[0],
-  display: i[1].display,
-  value: i[1].value,
+export const CATEGORIES : Record<string, Section> = {
+  ALL: { display: "All", value: "all" },
+  WOMENS: { display: "Women's", value: "womens" },
+  MENS: { display: "Men's", value: "mens" },
+  HOME: { display: "Home & Tools", value: "home" },
+  FURNITURE: { display: "Furniture", value: "furniture" },
+  ELECTRONICS: { display: "Electronics", value: "electronics" },
+  BIKES: { display: "Bikes & Scooters", value: "bikes" },
+  TICKETS: { display: "Tickets", value: "tickets" },
+  GENERAL: { display: "General", value: "general" },
+  FREE: { display: "Free", value: "free" }
+}
+
+const data = Object.keys(CATEGORIES).map((i)=>({
+  key: i,
+  display: CATEGORIES[i].display,
+  value: CATEGORIES[i].value,
   ref: React.createRef(),
 }));
 
@@ -192,7 +193,7 @@ const Tabs = ({
   const animatedWidth = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    const idx = SECTIONS.findIndex((x) => x.value === selectedSection);
+    const idx = data.findIndex((item) => item.value === selectedSection);
     if (measures[idx]) {
       Animated.parallel([
         Animated.timing(animatedValueX, {
