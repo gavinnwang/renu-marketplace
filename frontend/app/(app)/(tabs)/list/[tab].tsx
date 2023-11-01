@@ -51,6 +51,7 @@ export default function ListScreen() {
       console.error("error", err);
     },
     onSuccess(data) {
+      console.log(data)
       if (data.status === "success") {
         setItems(data.data);
       } else {
