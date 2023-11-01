@@ -64,28 +64,41 @@ async fn google_oauth_handler(
         return response.append_header((LOCATION, format!("{}{}", state, "/failed_sign_in"))).json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
     }
 
-    let user = user_repository::fetch_user_by_email(pool.as_ref(), &google_user.email).await;
+    let user = user_repository::fetch_user_by_email(pool.as_ref(), google_user.email.clone()).await;
 
     let user_id = match user {
-        Err(_) => {
-            let user_id = user_repository::add_user(
-                pool.as_ref(),
-                &NewUser {
-                    name: google_user.name.clone(),
-                    email: google_user.email.clone(),
-                },
-            )
-            .await;
-            match user_id {
-                Err(message) => {
-                    let message = message.to_string();
-                    tracing::error!("Failed to add user: {}", message);
-                    return HttpResponse::BadGateway()
-                        .json(serde_json::json!({"status": "fail", "message": message}));
+        Err(err) => match err {
+            crate::error::DbError::NotFound => { // if user doesn't exist, create new user
+                tracing::info!(
+                    "API: User with email {} not found, creating new user\n",
+                    google_user.email
+                );
+                let user_id = user_repository::add_user(
+                    pool.as_ref(),
+                    &NewUser {
+                        name: google_user.name.clone(),
+                        email: google_user.email.clone(),
+                    },
+                )
+                .await;
+                match user_id {
+                    Err(err) => {
+                        let err_msg = err.to_string();
+                        tracing::error!("Failed to add user: {}", err_msg);
+                        return HttpResponse::BadGateway()
+                            .json(serde_json::json!({"status": "fail", "message": err_msg}));
+                    }
+                    Ok(user_id) => user_id,
                 }
-                Ok(user_id) => user_id,
             }
-        }
+
+            _ => { // if error, return error
+                let err_msg = err.to_string();
+                tracing::error!("Failed to fetch user: {}", err_msg);
+                return HttpResponse::BadGateway()
+                    .json(serde_json::json!({"status": "fail", "message": err_msg}));
+            }
+        },
         Ok(user) => user.id,
     };
 
@@ -115,9 +128,12 @@ async fn google_oauth_handler(
     //     .finish();
 
     let mut response = HttpResponse::Found();
-    let redirect_url = format!("{}?email={}&name={}&token={}", state, google_user.email, google_user.name, token);
+    let redirect_url = format!(
+        "{}?email={}&name={}&token={}",
+        state, google_user.email, google_user.name, token
+    );
     tracing::info!("API: Redirecting to {}\n", redirect_url);
-    response.append_header((LOCATION,redirect_url ));
+    response.append_header((LOCATION, redirect_url));
     // response.cookie(cookie);
     response.finish()
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT \n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id,\n            Item.description, \n            Item.category,\n            Item.status,\n            Item.created_at,\n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM SavedItem\n        INNER JOIN Item ON SavedItem.itemId = Item.id\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.itemId \n        WHERE SavedItem.userId = ?\n        GROUP BY Item.id\n        ",
+  "query": "\n        SELECT \n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id,\n            Item.description, \n            Item.category,\n            Item.status,\n            Item.created_at,\n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM SavedItem\n        INNER JOIN Item ON SavedItem.item_id = Item.id\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.item_id \n        WHERE SavedItem.userId = ?\n        GROUP BY Item.id\n        ",
   "describe": {
     "columns": [
       {
@@ -120,5 +120,5 @@
       true
     ]
   },
-  "hash": "a58f7a459f942ad145f95576af96b5a1d71d112738875b11bc359b60a3428fe1"
+  "hash": "e62c3bdc5d93bb23f2e22b5f686a1c748cde64449a5d15f616c20e28b2397fbe"
 }

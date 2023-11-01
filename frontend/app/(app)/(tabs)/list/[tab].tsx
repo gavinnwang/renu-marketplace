@@ -13,7 +13,6 @@ import {
   ItemWithImage,
   Measure,
   RefAndKey,
-  Session,
 } from "../../../../types/types";
 import { useSession } from "../../../../providers/ctx";
 import { useQuery } from "@tanstack/react-query";
