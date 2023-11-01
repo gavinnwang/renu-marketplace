@@ -1,7 +1,8 @@
 use sqlx::{Executor, MySql};
 
 use crate::{
-    error::DbError, model::item_model::{Item, RawItem},
+    error::DbError,
+    model::item_model::{Item, RawItem},
 };
 
 use super::item_processing::convert_raw_into_items;
@@ -25,8 +26,8 @@ pub async fn fetch_saved_items_by_user_id(
             Item.updated_at,
             GROUP_CONCAT(ItemImage.url) AS item_images
         FROM SavedItem
-        INNER JOIN Item ON SavedItem.itemId = Item.id
-        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.itemId 
+        INNER JOIN Item ON SavedItem.item_id = Item.id
+        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.item_id 
         WHERE SavedItem.userId = ?
         GROUP BY Item.id
         "#,

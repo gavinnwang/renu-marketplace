@@ -37,7 +37,7 @@ pub async fn fetch_user_by_id(
 
 pub async fn fetch_user_by_email(
     conn: impl Executor<'_, Database = MySql>,
-    email: &str,
+    email: String,
 ) -> Result<PartialUser, DbError> {
     let user = sqlx::query_as!(
         PartialUser,
