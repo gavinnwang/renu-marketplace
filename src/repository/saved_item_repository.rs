@@ -28,7 +28,7 @@ pub async fn fetch_saved_items_by_user_id(
         FROM SavedItem
         INNER JOIN Item ON SavedItem.item_id = Item.id
         INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.item_id 
-        WHERE SavedItem.userId = ?
+        WHERE SavedItem.user_id = ?
         GROUP BY Item.id
         "#,
         user_id
