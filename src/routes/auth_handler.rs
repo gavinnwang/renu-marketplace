@@ -64,9 +64,9 @@ async fn google_oauth_handler(
         return response.append_header((LOCATION, format!("{}{}", state, "/failed_sign_in"))).json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
     }
 
-    let user = user_repository::fetch_user_by_email(pool.as_ref(), google_user.email.clone()).await;
+    let user_id = user_repository::fetch_user_id_by_email(pool.as_ref(), google_user.email.clone()).await;
 
-    let user_id = match user {
+    let user_id = match user_id {
         Err(err) => match err {
             crate::error::DbError::NotFound => { // if user doesn't exist, create new user
                 tracing::info!(
@@ -99,7 +99,7 @@ async fn google_oauth_handler(
                     .json(serde_json::json!({"status": "fail", "message": err_msg}));
             }
         },
-        Ok(user) => user.id,
+        Ok(user_id) => user_id,
     };
 
     tracing::info!("API: User id authenticating: {}\n", user_id);

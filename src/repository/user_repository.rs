@@ -35,34 +35,48 @@ pub async fn fetch_user_by_id(
     Ok(user)
 }
 
-pub async fn fetch_user_by_email(
+pub async fn fetch_user_id_by_email(
     conn: impl Executor<'_, Database = MySql>,
     email: String,
-) -> Result<PartialUser, DbError> {
-    let user = sqlx::query_as!(
-        PartialUser,
-        r#"SELECT 
-        u.id, 
-        u.name, 
-        u.email, 
-        u.profile_image,
-        CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
-        CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
-        FROM 
-            User u
-        INNER JOIN 
-            Item i ON u.id = i.user_id
-        WHERE 
-            u.email = ?
-        GROUP BY 
-            u.id;"#,     
+) -> Result<i64, DbError> {
+    let user_id = sqlx::query!(
+        r#"SELECT id FROM User WHERE email = ?"#,
         email
     )
     .fetch_one(conn)
     .await?;
 
-    Ok(user)
+    Ok(user_id.id as i64)
 }
+
+// pub async fn fetch_user_by_email(
+//     conn: impl Executor<'_, Database = MySql>,
+//     email: String,
+// ) -> Result<PartialUser, DbError> {
+//     let user = sqlx::query_as!(
+//         PartialUser,
+//         r#"SELECT 
+//         u.id, 
+//         u.name, 
+//         u.email, 
+//         u.profile_image,
+//         CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
+//         CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
+//         FROM 
+//             User u
+//         INNER JOIN 
+//             Item i ON u.id = i.user_id
+//         WHERE 
+//             u.email = ?
+//         GROUP BY 
+//             u.id;"#,     
+//         email
+//     )
+//     .fetch_one(conn)
+//     .await?;
+
+//     Ok(user)
+// }
 
 pub async fn add_user(
     conn: impl Executor<'_, Database = MySql>,
