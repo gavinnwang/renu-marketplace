@@ -145,7 +145,7 @@ export default function AccountScreen() {
             </Text>
           ) : savedItemData?.data?.length === 0 ? (
             <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">
-              No items.
+              No items found.
             </Text>
           ) : (
             <FlatList

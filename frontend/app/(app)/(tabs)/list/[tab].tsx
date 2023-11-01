@@ -9,11 +9,7 @@ import {
   View,
 } from "react-native";
 import Colors from "../../../../constants/Colors";
-import {
-  ItemWithImage,
-  Measure,
-  RefAndKey,
-} from "../../../../types/types";
+import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
 import { useSession } from "../../../../providers/ctx";
 import { useQuery } from "@tanstack/react-query";
 
@@ -75,8 +71,9 @@ export default function ListScreen() {
         </Text>
       ) : isLoadingItem ? (
         <></>
-      ) : items.length === 0 ? (
-        <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
+      ) : items.filter((item) => item.status === STATUS[selectedTabInt])
+          .length === 0 ? (
+        <Text className="mx-auto my-[70%] font-Poppins_600SemiBold text-lg">
           No item found.
         </Text>
       ) : (
@@ -155,13 +152,11 @@ const ListingPageItem = ({
               }),
             }).then(refetch);
           }}
-          className={`border-[1.5px] h-[35px] w-[180px] flex items-center justify-center ${
-            isSold ? "bg-blackPrimary" : "bg-bgLight"
-          }`}
+          className={`border-[1.5px] h-[35px] w-[180px] flex items-center justify-center`}
         >
           <Text
             className={`font-SecularOne_400Regular text-sm ${
-              isSold ? "text-bgLight" : "text-blackPrimary"
+              isSold ? "text-gray-500" : "text-blackPrimary"
             }`}
           >
             {item.status === "ACTIVE" ? "MARK AS SOLD" : "RELIST"}
