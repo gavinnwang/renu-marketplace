@@ -21,7 +21,7 @@ pub async fn fetch_user_by_id(
         CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
         FROM 
             User u
-        INNER JOIN 
+        LEFT JOIN 
             Item i ON u.id = i.user_id
         WHERE 
             u.id = ?
@@ -64,7 +64,7 @@ pub async fn fetch_user_id_by_email(
 //         CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
 //         FROM 
 //             User u
-//         INNER JOIN 
+//         LEFT JOIN 
 //             Item i ON u.id = i.user_id
 //         WHERE 
 //             u.email = ?

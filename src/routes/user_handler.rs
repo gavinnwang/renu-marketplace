@@ -15,8 +15,8 @@ async fn get_me_handler(
     let user = user_repository::fetch_user_by_id(pool.as_ref(), user_id).await;
 
     match user {
-        Err(_) => {
-            tracing::error!("API: Failed to fetch user with id: {}", user_id);
+        Err(err) => {
+            tracing::error!("API: Failed to fetch user with id: {} with error message {}", user_id, err);
             HttpResponse::NotFound()
                 .json(serde_json::json!({"status": "fail", "message": "User not found"}))
         }
