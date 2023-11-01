@@ -139,7 +139,7 @@ export default function AccountScreen() {
         <View className="bg-greyLight h-full">
           {isLoadingSavedItem ? (
             <></>
-          ) : isErrorSavedItem || savedItemData.status === "failure" ? (
+          ) : isErrorSavedItem || savedItemData.status === "fail" ? (
             <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">
               Something went wrong...
             </Text>
