@@ -57,7 +57,7 @@ pub async fn fetch_items_by_category(
             Item.created_at, 
             Item.updated_at,
             GROUP_CONCAT(ItemImage.url) AS item_images
-        FROM Item  
+        FROM Item 
         INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.category = ? AND Item.status = 'ACTIVE'
         GROUP BY Item.id
         ORDER BY Item.created_at DESC

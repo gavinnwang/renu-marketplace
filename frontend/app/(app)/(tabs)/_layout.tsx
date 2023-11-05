@@ -27,12 +27,12 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="message"
+          name="message/[tab]"
           options={{
             title: "Message",
             headerShown: false,
             tabBarIcon: ({ color }) => <MessageIcon color={color} />,
-            href: "message",
+            href: "message/0",
           }}
         />
         <Tabs.Screen

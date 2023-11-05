@@ -182,13 +182,18 @@ const Tab = React.forwardRef(
     ref: any
   ) => {
     return (
-      <Link
+      <Pressable
         key={sectionIndex}
-        href={`/list/${sectionIndex}`}
-        className="mx-auto"
+        onPress={() => {
+          if (selectedTabInt === sectionIndex) {
+            return;
+          }
+          void router.replace(`/list/${sectionIndex}`);
+        }}
+        className="w-[50%] justify-center items-center"
         ref={ref}
       >
-        <View className="">
+        <View>
           <Text
             className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
               sectionIndex === selectedTabInt
@@ -207,7 +212,7 @@ const Tab = React.forwardRef(
             </Text>
           </Text>
         </View>
-      </Link>
+      </Pressable>
     );
   }
 );
