@@ -33,5 +33,9 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
         web::scope("/saved").service(super::saved_item_handler::get_saved_items_by_user_id),
     );
 
-    conf.service(web::scope("/chats").service(super::chat_handler::get_chat_groups_by_seller_id));
+    conf.service(
+        web::scope("/chats")
+            .service(super::chat_handler::get_chat_groups_by_seller_id)
+            .service(super::chat_handler::get_chat_groups_by_buyer_id),
+    );
 }
