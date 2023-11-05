@@ -34,19 +34,29 @@ impl FromRequest for AuthenticationGuard {
             .or_else(|| {
                 req.headers()
                     .get(http::header::AUTHORIZATION)
-                    .map(|h| h.to_str().unwrap().split_at(7).1.to_string())
+                    .map(|h| h.to_str().unwrap_or("")
+                    .to_string())
             });
         
-        let token = match token {
-            Some(token) => token,
-            None => {
-                return Box::pin(async {
-                    Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "You are not logged in. Please provide a token"}),
-                    ))
-                })
-            }
-        };
+            let token = match token {
+                Some(token) if token.len() < 7 => {
+                    tracing::error!("Auth gaurd error: token too short");
+                    return Box::pin(async {
+                        Err(ErrorUnauthorized(
+                            json!({"status": "fail", "message": "Invalid token: token too short"}),
+                        ))
+                    })
+                }
+                Some(token) => token.split_at(7).1.to_string(),
+                None => {
+                    tracing::error!("Auth guard error: User token not found.");
+                    return Box::pin(async {
+                        Err(ErrorUnauthorized(
+                            json!({"status": "fail", "message": "You are not logged in. Please provide a token"}),
+                        ))
+                    })
+                }
+            };
 
         let jwt_secret = match req.app_data::<web::Data<Config>>() {
             Some(config) => config.jwt_secret.clone(),

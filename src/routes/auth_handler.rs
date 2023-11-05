@@ -64,11 +64,13 @@ async fn google_oauth_handler(
         return response.append_header((LOCATION, format!("{}{}", state, "/failed_sign_in"))).json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
     }
 
-    let user_id = user_repository::fetch_user_id_by_email(pool.as_ref(), google_user.email.clone()).await;
+    let user_id =
+        user_repository::fetch_user_id_by_email(pool.as_ref(), google_user.email.clone()).await;
 
     let user_id = match user_id {
         Err(err) => match err {
-            crate::error::DbError::NotFound => { // if user doesn't exist, create new user
+            crate::error::DbError::NotFound => {
+                // if user doesn't exist, create new user
                 tracing::info!(
                     "API: User with email {} not found, creating new user\n",
                     google_user.email
@@ -92,7 +94,8 @@ async fn google_oauth_handler(
                 }
             }
 
-            _ => { // if error, return error
+            _ => {
+                // if error, return error
                 let err_msg = err.to_string();
                 tracing::error!("Failed to fetch user: {}", err_msg);
                 return HttpResponse::BadGateway()
@@ -114,12 +117,19 @@ async fn google_oauth_handler(
         iat,
     };
 
-    let token = encode(
+    let token = match encode(
         &Header::default(),
         &claims,
         &EncodingKey::from_secret(jwt_secret.as_ref()),
-    )
-    .unwrap();
+    ) {
+        Err(err) => {
+            let err_msg = err.to_string();
+            tracing::error!("Failed to encode token: {}", err_msg);
+            return HttpResponse::BadGateway()
+                .json(serde_json::json!({"status": "fail", "message": err_msg}));
+        }
+        Ok(token) => token,
+    };
 
     // let cookie = Cookie::build("token", token.clone())
     //     .path("/")

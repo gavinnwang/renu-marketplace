@@ -12,17 +12,18 @@ datasource db {
 }
 
 model User {
-  id            Int         @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   name          String
-  email         String      @unique
+  email         String     @unique
   profile_image String?
-  role          Role        @default(STUDENT_USER)
-  created_at    DateTime    @default(now()) @db.Timestamp(0)
-  updated_at    DateTime    @default(now()) @updatedAt @db.Timestamp(0)
-  items         Item[]
-  saved_items   SavedItem[]
-  group_users   GroupUser[]
-  Message       Message[]
+  role          Role       @default(STUDENT_USER)
+  created_at    DateTime   @default(now()) @db.Timestamp(0)
+  updated_at    DateTime   @default(now()) @updatedAt @db.Timestamp(0)
+  buyer_chats   ItemChat[] @relation("buyer_chats")
+
+  items       Item[]
+  saved_items SavedItem[]
+  Message     Message[]
 }
 
 enum Role {
@@ -44,7 +45,7 @@ model Item {
   user_id     Int
   status      ItemStatus  @default(ACTIVE)
   saved_items SavedItem[]
-  groups      Group[]
+  chats       ItemChat[]
 
   @@index([user_id], name: "user_id")
   @@index([category], name: "category")
@@ -87,34 +88,29 @@ enum Category {
   FREE
 }
 
-model GroupUser {
-  group_id Int
-  user_id  Int
-  group    Group @relation(fields: [group_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
-  user     User  @relation(fields: [user_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
+model ItemChat {
+  id       Int       @id @default(autoincrement())
+  item_id  Int
+  item     Item      @relation(fields: [item_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
+  buyer_id Int
+  buyer    User      @relation("buyer_chats", fields: [buyer_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
+  messages Message[]
 
-  @@id([group_id, user_id])
-  @@index([group_id], name: "group_id")
-  @@index([user_id], name: "user_id")
-}
-
-model Group {
-  id         Int         @id @default(autoincrement())
-  user_id    Int
-  item_id    Int
-  item       Item        @relation(fields: [item_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
-  created_at DateTime    @default(now()) @db.Timestamp(0)
-  GroupUser  GroupUser[]
-
+  @@unique([item_id, buyer_id])
   @@index([item_id], name: "item_id")
+  @@index([buyer_id], name: "buyer_id")
 }
 
 model Message {
-  id      Int     @id @default(autoincrement())
-  user_id Int 
-  user    User    @relation(fields: [user_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
-  read    Boolean @default(false)
-  content String
+  id        Int      @id @default(autoincrement())
+  content   String
+  chat_id   Int
+  sender_id Int
+  read      Boolean  @default(false)
+  sent_at   DateTime @default(now()) @db.Timestamp(0)
+  chat      ItemChat @relation(fields: [chat_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
+  sender    User     @relation(fields: [sender_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
 
-  @@index([user_id], name: "user_id")
+  @@index([chat_id], name: "chat_id")
+  @@index([sender_id], name: "sender_id")
 }
