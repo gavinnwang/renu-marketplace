@@ -21,8 +21,8 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::user_handler::get_items_by_me_by_status_handler)
             .service(super::user_handler::get_items_by_user_id_and_status_handler),
     );
-conf.service(
-    web::scope("/items")
+    conf.service(
+        web::scope("/items")
             .service(super::item_handler::get_items_handler)
             .service(super::item_handler::get_item_by_id_handler)
             .service(super::item_handler::get_items_by_category_handler)
@@ -30,7 +30,8 @@ conf.service(
     );
 
     conf.service(
-        web::scope("/saved")
-            .service(super::saved_item_handler::get_saved_items_by_user_id),
+        web::scope("/saved").service(super::saved_item_handler::get_saved_items_by_user_id),
     );
+
+    conf.service(web::scope("/chats").service(super::chat_handler::get_chat_groups_by_seller_id));
 }
