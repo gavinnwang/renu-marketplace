@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n            SELECT ItemChat.id AS chat_id, item_id, buyer_id, name AS item_name, price, category, created_at, updated_at, description, status FROM ItemChat\n            JOIN Item ON ItemChat.item_id = Item.id\n            WHERE Item.user_id = ?;\n        ",
+  "query": "\n        SELECT \n            ItemChat.id AS chat_id, \n            item_id,\n            buyer_id,\n            User.id AS seller_id, \n            Item.name AS item_name, \n            price, \n            category, \n            Item.created_at, \n            Item.updated_at, \n            description, \n            status\n        FROM ItemChat\n        JOIN Item ON ItemChat.item_id = Item.id\n        JOIN User ON Item.user_id = User.id\n        WHERE ItemChat.buyer_id = ?;\n        ",
   "describe": {
     "columns": [
       {
@@ -35,6 +35,16 @@
       },
       {
         "ordinal": 3,
+        "name": "seller_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 4,
         "name": "item_name",
         "type_info": {
           "type": "VarString",
@@ -44,7 +54,7 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "price",
         "type_info": {
           "type": "Double",
@@ -54,7 +64,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "category",
         "type_info": {
           "type": "String",
@@ -64,7 +74,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -74,7 +84,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -84,7 +94,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "description",
         "type_info": {
           "type": "VarString",
@@ -94,7 +104,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "status",
         "type_info": {
           "type": "String",
@@ -116,9 +126,10 @@
       false,
       false,
       false,
+      false,
       true,
       false
     ]
   },
-  "hash": "5fd017f542513212c043575c792f051564913f845de634de107598be222e2ddc"
+  "hash": "f383321e5109dd2f8001c0cc0b3cd232f707d9cf7302bb0936ff9863a8b33410"
 }

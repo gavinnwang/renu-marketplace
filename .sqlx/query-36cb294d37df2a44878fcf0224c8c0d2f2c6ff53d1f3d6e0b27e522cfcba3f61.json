@@ -1,0 +1,135 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            SELECT \n                ItemChat.id AS chat_id, \n                item_id, \n                buyer_id, \n                Item.user_id AS seller_id,\n                name AS item_name, \n                price, \n                category, \n                Item.created_at, \n                Item.updated_at, \n                description, \n                status \n            FROM ItemChat\n            JOIN Item ON ItemChat.item_id = Item.id\n            WHERE Item.user_id = ?;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "chat_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "item_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | MULTIPLE_KEY | NO_DEFAULT_VALUE | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "buyer_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | MULTIPLE_KEY | NO_DEFAULT_VALUE | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "seller_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | MULTIPLE_KEY | NO_DEFAULT_VALUE | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "item_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "price",
+        "type_info": {
+          "type": "Double",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE | NUM",
+          "char_set": 63,
+          "max_size": 22
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "category",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | MULTIPLE_KEY | ENUM",
+          "char_set": 255,
+          "max_size": 44
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": {
+          "type": "Timestamp",
+          "flags": "NOT_NULL | BINARY | TIMESTAMP",
+          "char_set": 63,
+          "max_size": 19
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "updated_at",
+        "type_info": {
+          "type": "Timestamp",
+          "flags": "NOT_NULL | BINARY | TIMESTAMP",
+          "char_set": 63,
+          "max_size": 19
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "description",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "status",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | ENUM",
+          "char_set": 255,
+          "max_size": 32
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "36cb294d37df2a44878fcf0224c8c0d2f2c6ff53d1f3d6e0b27e522cfcba3f61"
+}
