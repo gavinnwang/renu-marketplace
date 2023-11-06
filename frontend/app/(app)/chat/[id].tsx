@@ -4,9 +4,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ChatScreen() {
   const router = useRouter();
+
+  const { data: item } = useQuery({
+    queryFn: async () =>
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/window${itemId}`).then(
+        (x) => x.json()
+      ) as Promise<ApiResponse<ItemWithImage>>,
+    queryKey: ["item", itemId],
+    enabled: !!itemId,
+  });
 
   return (
     <SafeAreaView className="bg-bgLight">
@@ -14,7 +24,7 @@ export default function ChatScreen() {
         <View className="flex flex-row">
           <Pressable onPress={router.back} className="p-3">
             <CloseIcon />
-          </Pressable>e
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
