@@ -64,3 +64,11 @@ export type ChatWindow = {
   item_status: string;
   item_image: string;
 }
+
+export type ChatMessage = {
+  id: number;
+  chat_id: number;
+  sender_id: number;
+  content: string;
+  sent_at: Date;
+}

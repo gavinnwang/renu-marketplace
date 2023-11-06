@@ -104,9 +104,9 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   return (
     <Pressable
       onPress={() => {
-        router.push(`/chat-window`);
+        router.push(`/chat/${chat.chat_id}`);
       }}
-      className="flex flex-row py-4 px-4 bg-bgLight opacity-75 border-b-[1px] border-gray-200"
+      className="flex flex-row py-4 px-4 bg-bgLight opacity-75 border-b border-b-grayPrimary"
     >
       <Image
         source={{ uri: chat.item_image }}
@@ -166,7 +166,7 @@ const Tab = React.forwardRef(
           <Text
             className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
               sectionIndex === selectedTabInt
-                ? "text-blackPrimary border-b border-grayPrimary"
+                ? "text-blackPrimary border-b-[1px] border-b-grayPrimary"
                 : "text-grayPrimary"
             }`}
           >
