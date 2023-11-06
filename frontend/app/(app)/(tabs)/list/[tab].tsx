@@ -153,7 +153,7 @@ const ListingPageItem = ({
               }),
             }).then(refetch);
           }}
-          className={`border-[1.5px] max-h-[35px] flex-grow flex items-center justify-center`}
+          className="border-[1.5px] h-[35px] flex-grow-0 flex items-center justify-center"
         >
           <Text
             className={`font-SecularOne_400Regular text-sm ${
