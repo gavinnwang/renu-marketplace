@@ -23,3 +23,32 @@ export type Session = {
   email: string;
   name: string;
 };
+// #[derive(Debug, Deserialize, Serialize)]
+// pub struct ChatGroup {
+//     pub chat_id: i64,
+//     pub item_id: i64,
+//     pub buyer_id: i64,
+//     pub seller_id: i64,
+//     pub item_name: String,
+//     pub price: f64,
+//     pub category: String,
+//     pub description: Option<String>,
+//     pub status: String,
+//     pub created_at: DateTime<Utc>,
+//     pub updated_at: DateTime<Utc>,
+// }
+
+export type ChatGroup = {
+  chat_id: number;
+  item_id: number;
+  buyer_id: number;
+  seller_id: number;
+  item_name: string;
+  item_price: number;
+  item_category: string;
+  item_description: string;
+  item_status: string;
+  created_at: string;
+  updated_at: string;
+  item_image: string;
+}

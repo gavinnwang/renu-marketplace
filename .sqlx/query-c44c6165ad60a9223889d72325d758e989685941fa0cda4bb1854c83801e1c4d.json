@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT \n            ItemChat.id AS chat_id, \n            item_id,\n            buyer_id,\n            User.id AS seller_id, \n            Item.name AS item_name, \n            price, \n            category, \n            Item.created_at, \n            Item.updated_at, \n            description, \n            status\n        FROM ItemChat\n        JOIN Item ON ItemChat.item_id = Item.id\n        JOIN User ON Item.user_id = User.id\n        WHERE ItemChat.buyer_id = ?;\n        ",
+  "query": "\n        SELECT \n            ItemChat.id AS chat_id, \n            ItemChat.item_id, \n            Item.name AS item_name, \n            User.id AS other_user_id,\n            User.name AS other_user_name,\n            Item.price AS item_price, \n            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,\n            Item.category AS item_category, \n            Item.description AS item_description,\n            Item.status AS item_status,\n            Item.created_at, \n            Item.updated_at\n        FROM ItemChat\n        JOIN Item ON ItemChat.item_id = Item.id\n        JOIN User ON User.id = ItemChat.buyer_id\n        WHERE Item.user_id = ?;\n        ",
   "describe": {
     "columns": [
       {
@@ -25,26 +25,6 @@
       },
       {
         "ordinal": 2,
-        "name": "buyer_id",
-        "type_info": {
-          "type": "Long",
-          "flags": "NOT_NULL | MULTIPLE_KEY | NO_DEFAULT_VALUE | NUM",
-          "char_set": 63,
-          "max_size": 11
-        }
-      },
-      {
-        "ordinal": 3,
-        "name": "seller_id",
-        "type_info": {
-          "type": "Long",
-          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT | NUM",
-          "char_set": 63,
-          "max_size": 11
-        }
-      },
-      {
-        "ordinal": 4,
         "name": "item_name",
         "type_info": {
           "type": "VarString",
@@ -54,8 +34,28 @@
         }
       },
       {
+        "ordinal": 3,
+        "name": "other_user_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "other_user_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
         "ordinal": 5,
-        "name": "price",
+        "name": "item_price",
         "type_info": {
           "type": "Double",
           "flags": "NOT_NULL | NO_DEFAULT_VALUE | NUM",
@@ -65,7 +65,17 @@
       },
       {
         "ordinal": 6,
-        "name": "category",
+        "name": "item_image",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "item_category",
         "type_info": {
           "type": "String",
           "flags": "NOT_NULL | MULTIPLE_KEY | ENUM",
@@ -74,7 +84,27 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
+        "name": "item_description",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "item_status",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | ENUM",
+          "char_set": 255,
+          "max_size": 32
+        }
+      },
+      {
+        "ordinal": 10,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -84,33 +114,13 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 11,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
           "flags": "NOT_NULL | BINARY | TIMESTAMP",
           "char_set": 63,
           "max_size": 19
-        }
-      },
-      {
-        "ordinal": 9,
-        "name": "description",
-        "type_info": {
-          "type": "VarString",
-          "flags": "",
-          "char_set": 255,
-          "max_size": 764
-        }
-      },
-      {
-        "ordinal": 10,
-        "name": "status",
-        "type_info": {
-          "type": "String",
-          "flags": "NOT_NULL | ENUM",
-          "char_set": 255,
-          "max_size": 32
         }
       }
     ],
@@ -124,12 +134,13 @@
       false,
       false,
       false,
-      false,
-      false,
+      true,
       false,
       true,
+      false,
+      false,
       false
     ]
   },
-  "hash": "f383321e5109dd2f8001c0cc0b3cd232f707d9cf7302bb0936ff9863a8b33410"
+  "hash": "c44c6165ad60a9223889d72325d758e989685941fa0cda4bb1854c83801e1c4d"
 }
