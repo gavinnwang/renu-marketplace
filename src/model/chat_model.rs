@@ -1,4 +1,4 @@
-use chrono::{Utc, DateTime};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
@@ -13,9 +13,8 @@ pub struct RawChatGroup {
     pub item_description: Option<String>,
     pub item_status: String,
     pub item_image: Option<String>,
-    pub last_message: Option<String>,
-    pub created_at: std::time::SystemTime,
-    pub updated_at: std::time::SystemTime,
+    pub last_message_content: Option<String>,
+    pub last_message_sent_at: std::time::SystemTime,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -30,7 +29,6 @@ pub struct ChatGroup {
     pub item_description: Option<String>,
     pub item_status: String,
     pub item_image: Option<String>,
-    pub last_message: Option<String>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub last_message_content: Option<String>,
+    pub last_message_sent_at: DateTime<Utc>,
 }

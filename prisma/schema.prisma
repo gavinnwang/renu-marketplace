@@ -102,14 +102,14 @@ model ItemChat {
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
-  content   String
-  chat_id   Int
-  sender_id Int
-  read      Boolean  @default(false)
-  sent_at   DateTime @default(now()) @db.Timestamp(0)
-  chat      ItemChat @relation(fields: [chat_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
-  sender    User     @relation(fields: [sender_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  content    String
+  chat_id    Int
+  sender_id  Int
+  read       Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  chat       ItemChat @relation(fields: [chat_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
+  sender     User     @relation(fields: [sender_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
 
   @@index([chat_id], name: "chat_id")
   @@index([sender_id], name: "sender_id")

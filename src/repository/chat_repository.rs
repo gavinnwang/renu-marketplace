@@ -20,15 +20,20 @@ pub async fn fetch_chat_groups_by_seller_id(
             User.name AS other_user_name,
             Item.price AS item_price, 
             (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
-            (SELECT content FROM Message WHERE Message.chat_id = ItemChat.id ORDER BY sent_at DESC LIMIT 1) AS last_message,
+            Message.content AS last_message_content,
+            Message.created_at AS last_message_sent_at,
             Item.category AS item_category, 
             Item.description AS item_description,
-            Item.status AS item_status,
-            Item.created_at, 
-            Item.updated_at
+            Item.status AS item_status
         FROM ItemChat
         JOIN Item ON ItemChat.item_id = Item.id
         JOIN User ON User.id = ItemChat.buyer_id
+        JOIN (
+            SELECT content, created_at, chat_id 
+            FROM Message 
+            ORDER BY created_at DESC
+            LIMIT 1
+        ) AS Message ON Message.chat_id = ItemChat.id
         WHERE Item.user_id = ?;
         "#,
         user_id
@@ -49,9 +54,8 @@ pub async fn fetch_chat_groups_by_seller_id(
             item_description: raw_group.item_description,
             item_status: raw_group.item_status,
             item_image: raw_group.item_image,
-            last_message: raw_group.last_message,
-            created_at: raw_group.created_at.into(),
-            updated_at: raw_group.updated_at.into(),
+            last_message_content: raw_group.last_message_content,
+            last_message_sent_at: raw_group.last_message_sent_at.into(),
         })
         .collect())
 }
@@ -71,15 +75,20 @@ pub async fn fetch_chat_groups_by_buyer_id(
             User.name AS other_user_name,
             Item.price AS item_price, 
             (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
-            (SELECT content FROM Message WHERE Message.chat_id = ItemChat.id ORDER BY sent_at DESC LIMIT 1) AS last_message,
+            Message.content AS last_message_content,
+            Message.created_at AS last_message_sent_at,
             Item.category AS item_category, 
             Item.description AS item_description,
-            Item.status AS item_status,
-            Item.created_at, 
-            Item.updated_at
+            Item.status AS item_status
         FROM ItemChat
         JOIN Item ON ItemChat.item_id = Item.id
         JOIN User ON Item.user_id = User.id
+        JOIN (
+            SELECT content, created_at, chat_id 
+            FROM Message 
+            ORDER BY created_at DESC
+            LIMIT 1
+        ) AS Message ON Message.chat_id = ItemChat.id
         WHERE ItemChat.buyer_id = ?;
         "#,
         user_id
@@ -97,12 +106,12 @@ pub async fn fetch_chat_groups_by_buyer_id(
             item_name: raw_group.item_name,
             item_price: raw_group.item_price,
             item_category: raw_group.item_category,
-            item_description: raw_group.item_description,
+            item_description: raw_group.item_description,   
             item_status: raw_group.item_status,
             item_image: raw_group.item_image,
-            last_message: raw_group.last_message,
-            created_at: raw_group.created_at.into(),
-            updated_at: raw_group.updated_at.into(),
+
+            last_message_content: raw_group.last_message_content,
+            last_message_sent_at: raw_group.last_message_sent_at.into(),
         })
         .collect())
 }
