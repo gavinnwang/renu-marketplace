@@ -13,20 +13,16 @@ pub async fn fetch_user_by_id(
     let user = sqlx::query_as!(
         PartialUser,
         r#"SELECT 
-        u.id, 
-        u.name, 
-        u.email, 
-        u.profile_image,
+            u.id, 
+            u.name, 
+            u.email, 
+            u.profile_image,
         CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
         CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
-        FROM 
-            User u
-        LEFT JOIN 
-            Item i ON u.id = i.user_id
-        WHERE 
-            u.id = ?
-        GROUP BY 
-            u.id;"#,
+        FROM User u
+        LEFT JOIN Item i ON u.id = i.user_id
+        WHERE u.id = ?
+        GROUP BY u.id;"#,
         id
     )
     .fetch_one(conn)

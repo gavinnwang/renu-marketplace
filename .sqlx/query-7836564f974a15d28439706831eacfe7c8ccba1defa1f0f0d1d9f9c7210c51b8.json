@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT \n        u.id, \n        u.name, \n        u.email, \n        u.profile_image,\n        CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,\n        CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count\n        FROM \n            User u\n        LEFT JOIN \n            Item i ON u.id = i.user_id\n        WHERE \n            u.id = ?\n        GROUP BY \n            u.id;",
+  "query": "SELECT \n            u.id, \n            u.name, \n            u.email, \n            u.profile_image,\n        CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,\n        CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count\n        FROM User u\n        LEFT JOIN Item i ON u.id = i.user_id\n        WHERE u.id = ?\n        GROUP BY u.id;",
   "describe": {
     "columns": [
       {
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "6672d6646d0240a7218ecbb12b963ba22a4ffba38dddffcbf9d086bb7eeedf4c"
+  "hash": "7836564f974a15d28439706831eacfe7c8ccba1defa1f0f0d1d9f9c7210c51b8"
 }
