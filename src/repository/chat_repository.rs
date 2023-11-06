@@ -20,6 +20,7 @@ pub async fn fetch_chat_groups_by_seller_id(
             User.name AS other_user_name,
             Item.price AS item_price, 
             (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
+            (SELECT content FROM Message WHERE Message.chat_id = ItemChat.id ORDER BY sent_at DESC LIMIT 1) AS last_message,
             Item.category AS item_category, 
             Item.description AS item_description,
             Item.status AS item_status,
@@ -48,6 +49,7 @@ pub async fn fetch_chat_groups_by_seller_id(
             item_description: raw_group.item_description,
             item_status: raw_group.item_status,
             item_image: raw_group.item_image,
+            last_message: raw_group.last_message,
             created_at: raw_group.created_at.into(),
             updated_at: raw_group.updated_at.into(),
         })
@@ -69,6 +71,7 @@ pub async fn fetch_chat_groups_by_buyer_id(
             User.name AS other_user_name,
             Item.price AS item_price, 
             (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
+            (SELECT content FROM Message WHERE Message.chat_id = ItemChat.id ORDER BY sent_at DESC LIMIT 1) AS last_message,
             Item.category AS item_category, 
             Item.description AS item_description,
             Item.status AS item_status,
@@ -97,6 +100,7 @@ pub async fn fetch_chat_groups_by_buyer_id(
             item_description: raw_group.item_description,
             item_status: raw_group.item_status,
             item_image: raw_group.item_image,
+            last_message: raw_group.last_message,
             created_at: raw_group.created_at.into(),
             updated_at: raw_group.updated_at.into(),
         })

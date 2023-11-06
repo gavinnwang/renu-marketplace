@@ -79,36 +79,34 @@ export default function MessageScreen() {
 }
 
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { CATEGORIES } from "../home/[section]";
 
 const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   const width = (Dimensions.get("window").width - 130) / 2;
   return (
     <View className="flex flex-row mt-4 mx-4 bg-bgLight">
-       <Image
-      source={{ uri: chat.item_image }}
-      className="object-cover rounded-sm"
-      style={{
-        width: width,
-        maxWidth: width - 50,
-        height: ((width - 50) * 4) / 3,
-      }}
-    />
-    <View className="flex flex-col justify-between px-4 pt-2">
-      <View className="flex flex-col gap-y-1">
-        <Text className="font-Manrope_600SemiBold text-base">
-          {chat.item_name}
-        </Text>
-        <Text className="font-Manrope_400Regular text-sm">
-          {dayjs(chat.updated_at).fromNow()}
-        </Text>
+      <Image
+        source={{ uri: chat.item_image }}
+        className="object-cover rounded-sm"
+        style={{
+          width: width,
+          maxWidth: width,
+          height: (width * 4) / 3,
+        }}
+      />
+      <View className="flex flex-col px-4 pt-2 flex-grow">
+        <View className="flex flex-row gap-y-1 justify-between">
+          <Text className="font-Manrope_600SemiBold text-base">
+            {chat.item_name}
+          </Text>
+          <Text className="font-Manrope_400Regular text-xs">
+            {dayjs(chat.updated_at).fromNow()}
+          </Text>
+        </View>
         <Text className="font-Manrope_400Regular text-sm">
           {CATEGORIES[chat.item_category].display}{" "}
         </Text>
       </View>
-     
-    </View>
     </View>
   );
 };

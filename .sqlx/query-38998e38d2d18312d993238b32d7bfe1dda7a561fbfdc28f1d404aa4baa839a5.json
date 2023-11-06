@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT \n            ItemChat.id AS chat_id, \n            ItemChat.item_id, \n            Item.name AS item_name, \n            User.id AS other_user_id,\n            User.name AS other_user_name,\n            Item.price AS item_price, \n            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,\n            Item.category AS item_category, \n            Item.description AS item_description,\n            Item.status AS item_status,\n            Item.created_at, \n            Item.updated_at\n        FROM ItemChat\n        JOIN Item ON ItemChat.item_id = Item.id\n        JOIN User ON User.id = ItemChat.buyer_id\n        WHERE Item.user_id = ?;\n        ",
+  "query": "\n        SELECT \n            ItemChat.id AS chat_id, \n            ItemChat.item_id, \n            Item.name AS item_name, \n            User.id AS other_user_id,\n            User.name AS other_user_name,\n            Item.price AS item_price, \n            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,\n            (SELECT content FROM Message WHERE Message.chat_id = ItemChat.id ORDER BY sent_at DESC LIMIT 1) AS last_message,\n            Item.category AS item_category, \n            Item.description AS item_description,\n            Item.status AS item_status,\n            Item.created_at, \n            Item.updated_at\n        FROM ItemChat\n        JOIN Item ON ItemChat.item_id = Item.id\n        JOIN User ON Item.user_id = User.id\n        WHERE ItemChat.buyer_id = ?;\n        ",
   "describe": {
     "columns": [
       {
@@ -75,6 +75,16 @@
       },
       {
         "ordinal": 7,
+        "name": "last_message",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 8,
         "name": "item_category",
         "type_info": {
           "type": "String",
@@ -84,7 +94,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "item_description",
         "type_info": {
           "type": "VarString",
@@ -94,7 +104,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "item_status",
         "type_info": {
           "type": "String",
@@ -104,7 +114,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -114,7 +124,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -135,6 +145,7 @@
       false,
       false,
       true,
+      true,
       false,
       true,
       false,
@@ -142,5 +153,5 @@
       false
     ]
   },
-  "hash": "c44c6165ad60a9223889d72325d758e989685941fa0cda4bb1854c83801e1c4d"
+  "hash": "38998e38d2d18312d993238b32d7bfe1dda7a561fbfdc28f1d404aa4baa839a5"
 }
