@@ -1,6 +1,9 @@
 use sqlx::{Executor, MySql};
 
-use crate::{error::DbError, model::chat_model::{ChatGroup, RawChatGroup}};
+use crate::{
+    error::DbError,
+    model::chat_model::{ChatGroup, RawChatGroup},
+};
 
 pub async fn fetch_chat_groups_by_seller_id(
     user_id: i64,
@@ -9,42 +12,46 @@ pub async fn fetch_chat_groups_by_seller_id(
     let raw_groups = sqlx::query_as!(
         RawChatGroup,
         r#"
-            SELECT 
-                ItemChat.id AS chat_id, 
-                item_id, 
-                buyer_id, 
-                Item.user_id AS seller_id,
-                name AS item_name, 
-                price, 
-                category, 
-                Item.created_at, 
-                Item.updated_at, 
-                description, 
-                status 
-            FROM ItemChat
-            JOIN Item ON ItemChat.item_id = Item.id
-            WHERE Item.user_id = ?;
+        SELECT 
+            ItemChat.id AS chat_id, 
+            ItemChat.item_id, 
+            Item.name AS item_name, 
+            User.id AS other_user_id,
+            User.name AS other_user_name,
+            Item.price AS item_price, 
+            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
+            Item.category AS item_category, 
+            Item.description AS item_description,
+            Item.status AS item_status,
+            Item.created_at, 
+            Item.updated_at
+        FROM ItemChat
+        JOIN Item ON ItemChat.item_id = Item.id
+        JOIN User ON User.id = ItemChat.buyer_id
+        WHERE Item.user_id = ?;
         "#,
         user_id
     )
     .fetch_all(conn)
     .await?;
 
-    raw_groups.iter().map(|raw_group| {
-        Ok(ChatGroup {
+    Ok(raw_groups
+        .into_iter()
+        .map(|raw_group| ChatGroup {
             chat_id: raw_group.chat_id,
             item_id: raw_group.item_id,
-            buyer_id: raw_group.buyer_id,
-            seller_id: raw_group.seller_id,
-            item_name: raw_group.item_name.clone(),
-            price: raw_group.price,
-            category: raw_group.category.clone(),
-            description: raw_group.description.clone(),
-            status: raw_group.status.clone(),
+            other_user_id: raw_group.other_user_id,
+            other_user_name: raw_group.other_user_name,
+            item_name: raw_group.item_name,
+            item_price: raw_group.item_price,
+            item_category: raw_group.item_category,
+            item_description: raw_group.item_description,
+            item_status: raw_group.item_status,
+            item_image: raw_group.item_image,
             created_at: raw_group.created_at.into(),
             updated_at: raw_group.updated_at.into(),
         })
-    }).collect::<Result<Vec<ChatGroup>, DbError>>()
+        .collect())
 }
 
 pub async fn fetch_chat_groups_by_buyer_id(
@@ -56,16 +63,17 @@ pub async fn fetch_chat_groups_by_buyer_id(
         r#"
         SELECT 
             ItemChat.id AS chat_id, 
-            item_id,
-            buyer_id,
-            User.id AS seller_id, 
+            ItemChat.item_id, 
             Item.name AS item_name, 
-            price, 
-            category, 
+            User.id AS other_user_id,
+            User.name AS other_user_name,
+            Item.price AS item_price, 
+            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
+            Item.category AS item_category, 
+            Item.description AS item_description,
+            Item.status AS item_status,
             Item.created_at, 
-            Item.updated_at, 
-            description, 
-            status
+            Item.updated_at
         FROM ItemChat
         JOIN Item ON ItemChat.item_id = Item.id
         JOIN User ON Item.user_id = User.id
@@ -76,20 +84,21 @@ pub async fn fetch_chat_groups_by_buyer_id(
     .fetch_all(conn)
     .await?;
 
-    raw_groups.iter().map(|raw_group| {
-        Ok(ChatGroup {
+    Ok(raw_groups
+        .into_iter()
+        .map(|raw_group| ChatGroup {
             chat_id: raw_group.chat_id,
             item_id: raw_group.item_id,
-            buyer_id: raw_group.buyer_id,
-            seller_id: raw_group.seller_id,
-            item_name: raw_group.item_name.clone(),
-            price: raw_group.price,
-            category: raw_group.category.clone(),
-            description: raw_group.description.clone(),
-            status: raw_group.status.clone(),
+            other_user_id: raw_group.other_user_id,
+            other_user_name: raw_group.other_user_name,
+            item_name: raw_group.item_name,
+            item_price: raw_group.item_price,
+            item_category: raw_group.item_category,
+            item_description: raw_group.item_description,
+            item_status: raw_group.item_status,
+            item_image: raw_group.item_image,
             created_at: raw_group.created_at.into(),
             updated_at: raw_group.updated_at.into(),
         })
-    }).collect::<Result<Vec<ChatGroup>, DbError>>()
+        .collect())
 }
-

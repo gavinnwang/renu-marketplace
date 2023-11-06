@@ -5,11 +5,15 @@ import {
   Dimensions,
   Animated,
   Pressable,
+  FlatList,
 } from "react-native";
 import { Link, router, useLocalSearchParams } from "expo-router";
-import { Measure, RefAndKey } from "../../../../types/types";
+import { ChatGroup, Measure, RefAndKey } from "../../../../types/types";
 import Colors from "../../../../constants/Colors";
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "../../../../providers/ctx";
+import { ApiResponse } from "../../../../types/api";
 
 const TABS = ["Buy", "Sell"];
 const data = TABS.map((i) => ({
@@ -22,44 +26,89 @@ export default function MessageScreen() {
   const selectedTab = param.tab;
   const selectedTabInt = parseInt(selectedTab as string);
 
+  const { session } = useSession();
+
+  const [chats, setChats] = React.useState<ChatGroup[]>([]);
+  const {
+    isError: isErrorChats,
+    isLoading: isLoadingChats,
+    refetch,
+  } = useQuery({
+    queryFn: async () =>
+      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/chats/buyer", {
+        headers: {
+          authorization: `Bearer ${session?.token}`,
+        },
+      }).then((x) => x.json()) as Promise<ApiResponse<ChatGroup[]>>,
+    queryKey: ["chats"],
+    enabled: !!session && !!session.token,
+    onError(err) {
+      console.error("error", err);
+    },
+    onSuccess(data) {
+      console.log(data);
+      if (data.status === "success") {
+        setChats(data.data);
+      } else {
+        console.error(data);
+      }
+    },
+  });
+
   return (
     <View className="bg-bgLight h-full">
       <Text className="ml-2.5 mt-4 font-Poppins_600SemiBold text-xl text-blackPrimary ">
         Messages
       </Text>
       <Tabs data={data} selectedTabInt={selectedTabInt} />
+      {isErrorChats ? (
+        <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
+          Something wrong happened...
+        </Text>
+      ) : (
+        <FlatList
+          data={chats}
+          renderItem={({ item }) => <ChatRow chat={item} />}
+          keyExtractor={(item) => item.chat_id.toString()}
+          onRefresh={() => refetch()}
+          refreshing={isLoadingChats}
+        />
+      )}
     </View>
   );
 }
 
-const ChatRow = () => {
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { CATEGORIES } from "../home/[section]";
+
+const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   const width = (Dimensions.get("window").width - 130) / 2;
   return (
-    <View className="flex flex-row items-start justify-between mt-2 pl-4 pr-6 pb-2.5 min-h-[43px]">
-      <Image
-        source={{ uri: "https://i.imgur.com/w9F0IAR.jpeg" }}
-        className="object-cover rounded-sm"
-        style={{
-          width: width,
-          maxWidth: width - 20,
-          height: (width * 4) / 3,
-        }}
-      />
-      <View className=" flex-row">
-        <View className="flex-col justify-start">
-          <Text className=" font-Poppins_500Medium text-sm">
-            Seller Name Example
-          </Text>
-          <Text> Product Name Example</Text>
-          <Text>Product category example</Text>
-        </View>
-        <View className="flex-col justify-start">
-          <Text>3 Days Ago</Text>
-          <View className=" bg-purplePrimary rounded-full">
-            <Text className=" text-white">99</Text>
-          </View>
-        </View>
+    <View className="flex flex-row mt-4 mx-4 bg-bgLight">
+       <Image
+      source={{ uri: chat.item_image }}
+      className="object-cover rounded-sm"
+      style={{
+        width: width,
+        maxWidth: width - 50,
+        height: ((width - 50) * 4) / 3,
+      }}
+    />
+    <View className="flex flex-col justify-between px-4 pt-2">
+      <View className="flex flex-col gap-y-1">
+        <Text className="font-Manrope_600SemiBold text-base">
+          {chat.item_name}
+        </Text>
+        <Text className="font-Manrope_400Regular text-sm">
+          {dayjs(chat.updated_at).fromNow()}
+        </Text>
+        <Text className="font-Manrope_400Regular text-sm">
+          {CATEGORIES[chat.item_category].display}{" "}
+        </Text>
       </View>
+     
+    </View>
     </View>
   );
 };

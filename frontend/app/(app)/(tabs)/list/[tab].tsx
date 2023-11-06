@@ -51,7 +51,7 @@ export default function ListScreen() {
       console.error("error", err);
     },
     onSuccess(data) {
-      console.log(data)
+      console.log(data);
       if (data.status === "success") {
         setItems(data.data);
       } else {
@@ -118,8 +118,8 @@ const ListingPageItem = ({
         className="object-cover rounded-sm"
         style={{
           width: width,
-          maxWidth: width - 20,
-          height: (width * 4) / 3,
+          maxWidth: width - 50,
+          height: ((width - 50) * 4) / 3,
         }}
       />
       <View className="flex flex-col justify-between px-4 pt-2">
@@ -153,7 +153,7 @@ const ListingPageItem = ({
               }),
             }).then(refetch);
           }}
-          className={`border-[1.5px] h-[35px] w-[180px] flex items-center justify-center`}
+          className={`border-[1.5px] h-[35px] w-[220px] flex items-center justify-center`}
         >
           <Text
             className={`font-SecularOne_400Regular text-sm ${
