@@ -100,12 +100,10 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
             {chat.item_name}
           </Text>
           <Text className="font-Manrope_400Regular text-xs">
-            {dayjs(chat.updated_at).fromNow()}
+            {dayjs(chat.last_message_sent_at).fromNow()}
           </Text>
         </View>
-        <Text className="font-Manrope_400Regular text-sm">
-          {CATEGORIES[chat.item_category].display}{" "}
-        </Text>
+
       </View>
     </View>
   );
