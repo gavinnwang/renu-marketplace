@@ -1,21 +1,55 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ApiResponse } from "../../../types/api";
+import { ChatWindow } from "../../../types/types";
 
 export default function ChatScreen() {
   const router = useRouter();
+  const param = useLocalSearchParams();
+  const chatId = param.id;
 
-  const { data: item } = useQuery({
+  const [chatWindow, setChatWindow] = React.useState<ChatWindow | undefined>(
+    undefined
+  );
+  const [chatMessages, setChatMessages] = React.useState<
+    ChatWindow | undefined
+  >(undefined);
+
+  const { data: chatWindowData, isError: isErrorChatWindow } = useQuery({
     queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/window${itemId}`).then(
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/window/${chatId}`).then(
         (x) => x.json()
-      ) as Promise<ApiResponse<ItemWithImage>>,
-    queryKey: ["item", itemId],
-    enabled: !!itemId,
+      ) as Promise<ApiResponse<ChatWindow>>,
+    queryKey: ["chat", chatId],
+    enabled: !!chatId,
+    onSuccess(data) {
+      if (data.status === "success") {
+        setChatWindow(data.data);
+      } else {
+        console.error(data);
+      }
+    },
+  });
+
+  const { data: chatMessagesData, isError: isErrorChatMessages } = useQuery({
+    queryFn: async () =>
+      fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/messages/${chatId}`
+      ).then((x) => x.json()) as Promise<ApiResponse<ChatWindow>>,
+    queryKey: ["chat", chatId],
+    enabled: !!chatId,
+    onSuccess(data) {
+      if (data.status === "success") {
+        setChatMessages(data.data);
+      } else {
+        console.error(data);
+      }
+    },
   });
 
   return (

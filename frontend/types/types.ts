@@ -38,3 +38,29 @@ export type ChatGroup = {
   last_message_content: string;
   last_message_sent_at: Date;
 }
+
+// #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
+// pub struct ChatWindow {
+//     pub chat_id: i64,
+//     pub item_id: i64,
+//     pub other_user_id: i64,
+//     pub other_user_name: String,
+//     pub item_name: String,
+//     pub item_price: f64,
+//     pub item_category: String,
+//     pub item_description: Option<String>,
+//     pub item_status: String,
+//     pub item_image: Option<String>,
+// }
+export type ChatWindow = {
+  chat_id: number;
+  item_id: number;
+  other_user_id: number;
+  other_user_name: string;
+  item_name: string;
+  item_price: number;
+  item_category: string;
+  item_description: string;
+  item_status: string;
+  item_image: string;
+}

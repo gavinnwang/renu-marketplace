@@ -193,7 +193,8 @@ pub async fn check_if_user_id_is_part_of_chat_group(
         r#"
         SELECT EXISTS (
             SELECT id FROM ItemChat
-            WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR ItemChat.seller_id = ?)
+            JOIN Item ON ItemChat.item_id = Item.id    
+            WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR Item.user_id = ?)
         ) AS is_part;
         "#,
         chat_id,
