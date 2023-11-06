@@ -151,6 +151,7 @@ pub async fn fetch_chat_window_by_chat_id(
 }
 
 pub async fn fetch_chat_messages_by_chat_id(
+    user_id: i64,
     chat_id: i64,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<ChatMessage>, DbError> {
@@ -162,11 +163,17 @@ pub async fn fetch_chat_messages_by_chat_id(
             Message.chat_id,
             Message.sender_id,
             Message.content,
-            Message.created_at AS sent_at
+            Message.created_at AS sent_at,
+            CASE
+                WHEN Message.sender_id = ? THEN 1
+                ELSE 0
+            END
+                AS from_me
         FROM Message
         WHERE Message.chat_id = ?
         ORDER BY Message.created_at ASC;
         "#,
+        user_id,
         chat_id
     )
     .fetch_all(conn)
@@ -180,6 +187,7 @@ pub async fn fetch_chat_messages_by_chat_id(
             sender_id: message.sender_id,
             content: message.content,
             sent_at: message.sent_at.into(),
+            from_me: message.from_me,
         })
         .collect())
 }

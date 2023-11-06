@@ -40,6 +40,7 @@ pub struct RawChatMessage {
     pub sender_id: i64,
     pub content: String,
     pub sent_at: std::time::SystemTime,
+    pub from_me: i64,
 }
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
@@ -63,5 +64,6 @@ pub struct ChatMessage {
     pub sender_id: i64,
     pub content: String,
     pub sent_at: DateTime<Utc>,
+    pub from_me: i64,
 }
 

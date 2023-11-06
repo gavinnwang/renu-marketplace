@@ -89,7 +89,7 @@ async fn get_chat_messages_by_chat_id(
         }
     }
 
-    let messages = chat_repository::fetch_chat_messages_by_chat_id( chat_id, pool.as_ref()).await;
+    let messages = chat_repository::fetch_chat_messages_by_chat_id( user_id, chat_id, pool.as_ref()).await;
 
     match messages {
         Ok(messages) => HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": messages})),
