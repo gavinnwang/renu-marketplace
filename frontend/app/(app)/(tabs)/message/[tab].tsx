@@ -70,7 +70,7 @@ export default function MessageScreen() {
         <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
           Something wrong happened...
         </Text>
-      ) :isLoadingChats ? (
+      ) : isLoadingChats ? (
         <></>
       ) : chats && chats.length <= 0 ? (
         <>
@@ -106,7 +106,9 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
       onPress={() => {
         router.push(`/chat/${chat.chat_id}`);
       }}
-      className="flex flex-row py-4 px-4 bg-bgLight opacity-75 border-b border-b-grayPrimary"
+      className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary ${
+        chat.item_status === "INACTIVE" ? "opacity-70" : ""
+      }`}
     >
       <Image
         source={{ uri: chat.item_image }}
@@ -117,7 +119,7 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
           height: (width * 4) / 3,
         }}
       />
-      <View className="flex flex-col px-4 py-2 flex-grow justify-between">
+      <View className="flex flex-col px-4 pt-2 flex-grow justify-between ">
         <View>
           <View className="flex flex-row gap-y-1 justify-between">
             <Text className="font-Manrope_600SemiBold text-base">
@@ -127,11 +129,24 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
               {dayjs(chat.last_message_sent_at).fromNow()}
             </Text>
           </View>
-          <Text className="text-lg text-gray-600 font-Manrope_400Regular">
-            {chat.last_message_content}
+          <Text className="text-base text-gray-600 font-Manrope_400Regular max-w-[250px]">
+            {chat.last_message_content.length >= 50 ? (
+              <>{chat.last_message_content.slice(0, 50)}...</>
+            ) : (
+              chat.last_message_content
+            )}
           </Text>
         </View>
-        <Text className="font-Poppins_400Regular">{chat.other_user_name} {chat.item_status}</Text>
+        <View className="flex flex-col">
+          <Text className="font-Poppins_400Regular">
+            {chat.other_user_name}
+          </Text>
+          <Text className="font-Poppins_400Regular text-sm">
+            {chat.item_status === "INACTIVE"
+              ? "Item is no longer available."
+              : ""}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );
@@ -166,7 +181,7 @@ const Tab = React.forwardRef(
           <Text
             className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
               sectionIndex === selectedTabInt
-                ? "text-blackPrimary border-b-[1px] border-b-grayPrimary"
+                ? "text-blackPrimary border-b-[1px] border-b-grayLight"
                 : "text-grayPrimary"
             }`}
           >

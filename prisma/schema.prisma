@@ -103,7 +103,7 @@ model ItemChat {
 
 model Message {
   id         Int      @id @default(autoincrement())
-  content    String
+  content    String   @db.VarChar(1000)
   chat_id    Int
   sender_id  Int
   read       Boolean  @default(false)
