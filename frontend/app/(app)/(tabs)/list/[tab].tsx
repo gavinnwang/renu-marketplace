@@ -109,7 +109,7 @@ const ListingPageItem = ({
   token: string | undefined;
   refetch: any;
 }) => {
-  const width = (Dimensions.get("window").width - 30) / 2;
+  const width = (Dimensions.get("window").width - 130) / 2;
   const [isSold, setIsSold] = React.useState<boolean>(false);
   return (
     <View className="flex flex-row mt-4 mx-4 bg-bgLight">
@@ -118,12 +118,12 @@ const ListingPageItem = ({
         className="object-cover rounded-sm"
         style={{
           width: width,
-          maxWidth: width - 50,
-          height: ((width - 50) * 4) / 3,
+          maxWidth: width,
+          height: ((width) * 4) / 3,
         }}
       />
-      <View className="flex flex-col justify-between px-4 pt-2">
-        <View className="flex flex-col gap-y-1">
+      <View className="flex flex-col flex-grow justify-between px-4 pt-2">
+        <View className="flex flex-col flex-grow gap-y-1">
           <Text className="font-Manrope_600SemiBold text-base">
             {item.name}
           </Text>
@@ -153,7 +153,7 @@ const ListingPageItem = ({
               }),
             }).then(refetch);
           }}
-          className={`border-[1.5px] h-[35px] w-[220px] flex items-center justify-center`}
+          className={`border-[1.5px] max-h-[35px] flex-grow flex items-center justify-center`}
         >
           <Text
             className={`font-SecularOne_400Regular text-sm ${

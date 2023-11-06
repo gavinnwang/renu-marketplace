@@ -13,6 +13,7 @@ pub struct RawChatGroup {
     pub item_description: Option<String>,
     pub item_status: String,
     pub item_image: Option<String>,
+    pub last_message: Option<String>,
     pub created_at: std::time::SystemTime,
     pub updated_at: std::time::SystemTime,
 }
@@ -29,6 +30,7 @@ pub struct ChatGroup {
     pub item_description: Option<String>,
     pub item_status: String,
     pub item_image: Option<String>,
+    pub last_message: Option<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
