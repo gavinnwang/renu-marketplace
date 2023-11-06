@@ -22,7 +22,7 @@ async fn main() -> std::io::Result<()> {
 
     tracing::info!("Connecting to database");
     let pool = match MySqlPoolOptions::new()
-        .max_connections(10)
+        .max_connections(30)
         .connect(&config.database_url)
         .await
     {

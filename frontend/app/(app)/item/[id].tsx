@@ -12,7 +12,6 @@ import { useQuery } from "@tanstack/react-query";
 import Colors from "../../../constants/Colors";
 import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
-import { useSession } from "../../../providers/ctx";
 import { ItemWithImage, UserWithCount } from "../../../types/types";
 import { FlatList } from "react-native-gesture-handler";
 import PaginationDots from "../../../components/PaginationDots";
@@ -39,8 +38,6 @@ const CloseIcon = () => (
 export default function ItemPage() {
   const param = useLocalSearchParams();
   const itemId = param.id;
-
-  const { session } = useSession();
 
   const { data: item } = useQuery({
     queryFn: async () =>

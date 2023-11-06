@@ -2,7 +2,7 @@ use sqlx::{Executor, MySql};
 
 use crate::{
     error::DbError,
-    model::chat_model::{ChatGroup, RawChatGroup},
+    model::chat_model::{ChatGroup, ChatMessage, ChatWindow, RawChatGroup, RawChatMessage},
 };
 
 pub async fn fetch_chat_groups_by_seller_id(
@@ -106,7 +106,7 @@ pub async fn fetch_chat_groups_by_buyer_id(
             item_name: raw_group.item_name,
             item_price: raw_group.item_price,
             item_category: raw_group.item_category,
-            item_description: raw_group.item_description,   
+            item_description: raw_group.item_description,
             item_status: raw_group.item_status,
             item_image: raw_group.item_image,
 
@@ -114,4 +114,94 @@ pub async fn fetch_chat_groups_by_buyer_id(
             last_message_sent_at: raw_group.last_message_sent_at.into(),
         })
         .collect())
+}
+
+pub async fn fetch_chat_window_by_chat_id(
+    user_id: i64,
+    chat_id: i64,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<ChatWindow, DbError> {
+    let window = sqlx::query_as!(
+        ChatWindow,
+        r#"
+        SELECT
+            ItemChat.id AS chat_id,
+            ItemChat.item_id,
+            Item.name AS item_name, 
+            User.id AS other_user_id,
+            User.name AS other_user_name,
+            Item.price AS item_price,
+            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
+            Item.category AS item_category, 
+            Item.description AS item_description,
+            Item.status AS item_status
+        FROM ItemChat
+        JOIN Item ON ItemChat.item_id = Item.id
+        JOIN User ON Item.user_id = User.id
+        WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR Item.user_id = ?);
+        "#,
+        chat_id,
+        user_id,
+        user_id
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(window)
+}
+
+pub async fn fetch_chat_messages_by_chat_id(
+    chat_id: i64,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<Vec<ChatMessage>, DbError> {
+    let messages = sqlx::query_as!(
+        RawChatMessage,
+        r#"
+        SELECT
+            Message.id,
+            Message.chat_id,
+            Message.sender_id,
+            Message.content,
+            Message.created_at AS sent_at
+        FROM Message
+        WHERE Message.chat_id = ?
+        ORDER BY Message.created_at ASC;
+        "#,
+        chat_id
+    )
+    .fetch_all(conn)
+    .await?;
+
+    Ok(messages
+        .into_iter()
+        .map(|message| ChatMessage {
+            id: message.id,
+            chat_id: message.chat_id,
+            sender_id: message.sender_id,
+            content: message.content,
+            sent_at: message.sent_at.into(),
+        })
+        .collect())
+}
+
+pub async fn check_if_user_id_is_part_of_chat_group(
+    user_id: i64,
+    chat_id: i64,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<bool, DbError> {
+    let result = sqlx::query!(
+        r#"
+        SELECT EXISTS (
+            SELECT id FROM ItemChat
+            WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR ItemChat.seller_id = ?)
+        ) AS is_part;
+        "#,
+        chat_id,
+        user_id,
+        user_id
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(result.is_part == 1)
 }
