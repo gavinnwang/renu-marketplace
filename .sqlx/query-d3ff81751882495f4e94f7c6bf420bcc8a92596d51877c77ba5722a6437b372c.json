@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT EXISTS (\n            SELECT id FROM ItemChat\n            WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR ItemChat.seller_id = ?)\n        ) AS is_part;\n        ",
+  "query": "\n        SELECT EXISTS (\n            SELECT id FROM ItemChat\n            JOIN Item ON ItemChat.item_id = Item.id    \n            WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR Item.user_id = ?)\n        ) AS is_part;\n        ",
   "describe": {
     "columns": [
       {
@@ -21,5 +21,5 @@
       false
     ]
   },
-  "hash": "3a9288a116c2e0f3312299178d7458083c7d8140dfebf6996d4f9f5a7f3f0b7a"
+  "hash": "d3ff81751882495f4e94f7c6bf420bcc8a92596d51877c77ba5722a6437b372c"
 }

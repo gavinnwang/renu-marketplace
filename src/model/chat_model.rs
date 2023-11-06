@@ -57,16 +57,6 @@ pub struct ChatWindow {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct CRawhatMessage {
-    pub id: i64,
-    pub chat_id: i64,
-    pub sender_id: i64,
-    pub content: String,
-    pub sent_at: std::time::SystemTime,
-}
-
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct ChatMessage {
     pub id: i64,
     pub chat_id: i64,
