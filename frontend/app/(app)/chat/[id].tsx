@@ -9,6 +9,7 @@ import { ApiResponse } from "../../../types/api";
 import { ChatMessage, ChatWindow } from "../../../types/types";
 import { useSession } from "../../../providers/ctx";
 import { Image } from "expo-image";
+import { FlatList, TextInput } from "react-native-gesture-handler";
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -61,13 +62,13 @@ export default function ChatScreen() {
     },
   });
 
-  const width = 50;
+  const width = Dimensions.get("window").width / 6;
 
   return (
     <SafeAreaView className="bg-bgLight">
       <View className="bg-bgLight h-full">
         <View className="flex flex-row items-center justify-between ">
-          <Pressable onPress={router.back} className="w-5 p-3">
+          <Pressable onPress={router.back} className="w-10 p-3">
             <CloseIcon />
           </Pressable>
           {chatWindow && (
@@ -75,28 +76,28 @@ export default function ChatScreen() {
               {chatWindow.other_user_name}
             </Text>
           )}
-          <View className="w-5 p-3" />
+          <View className="w-10 p-3" />
         </View>
 
         <Pressable
           onPress={() => router.push(`/item/${chatWindow?.item_id}`)}
-         className="p-3 flex-row justify-between gap-x-4 items-center border-y border-grayPrimary bg-gray-50">
+          className="p-4 flex-row justify-between  items-center border-y border-y-grayPrimary bg-gray-100"
+        >
           {chatWindow && (
             <Image
               source={{ uri: chatWindow.item_image }}
               className="object-cover rounded-sm"
               style={{
                 width: width,
-                maxWidth: width,
                 height: (width * 4) / 3,
               }}
             />
           )}
-          <View className="flex flex-grow flex-col ">
+          <View className="mx-4 flex flex-grow flex-col gap-y-1">
             <Text className="font-Poppins_600SemiBold text-sm text-blackPrimary">
               {chatWindow && chatWindow.item_name}
             </Text>
-            <Text className="font-Manrope_400Regular text-sm text-blackPrimary">
+            <Text className="font-Manrope_400Regular text-xs max-w-[250px] max-h-[40px] text-blackPrimary">
               {chatWindow && chatWindow.item_description}
             </Text>
           </View>
@@ -105,15 +106,35 @@ export default function ChatScreen() {
           </Text>
         </Pressable>
 
-        {chatMessages?.map((message) => (
-          <View key={message.id} className="flex flex-row">
-            <Text>{message.content}</Text>
-          </View>
-        ))}
+        <FlatList
+          className="p-4"
+          data={chatMessages}
+          renderItem={({ item }) => <Message message={item} />}
+          keyExtractor={(item) => item.id.toString()}
+        />
+
+        <View className="fixed bottom-0 right-0 left-0">
+          <TextInput
+            placeholder="Message"
+            className="bg-white px-4 py-2 mx-2 border rounded-full border-gray-400"
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
 }
+
+const Message = ({ message }: { message: ChatMessage }) => {
+  return (
+    <View
+      className={`flex flex-row border my-1.5 border-gray-300 rounded-lg bg-gray-100 p-2 w-fit ${
+        message.from_me ? "mr-auto" : "ml-auto"
+      }`}
+    >
+      <Text>{message.content}</Text>
+    </View>
+  );
+};
 
 const CloseIcon = () => (
   <Svg

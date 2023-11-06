@@ -40,7 +40,7 @@
           "type": "VarString",
           "flags": "NOT_NULL | NO_DEFAULT_VALUE",
           "char_set": 255,
-          "max_size": 764
+          "max_size": 4000
         }
       },
       {

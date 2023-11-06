@@ -214,3 +214,24 @@ pub async fn check_if_user_id_is_part_of_chat_group(
 
     Ok(result.is_part == 1)
 }
+
+pub async fn insert_chat_message(
+    user_id: i64,
+    chat_id: i64,
+    content: &str,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<bool, DbError> {
+    let result = sqlx::query!(
+        r#"
+        INSERT INTO Message (chat_id, sender_id, content)
+        VALUES (?, ?, ?);
+        "#,
+        chat_id,
+        user_id,
+        content
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(result.rows_affected() == 1)
+}
