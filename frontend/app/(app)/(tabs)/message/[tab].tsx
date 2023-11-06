@@ -35,12 +35,17 @@ export default function MessageScreen() {
     refetch,
   } = useQuery({
     queryFn: async () =>
-      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/chats/buyer", {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }).then((x) => x.json()) as Promise<ApiResponse<ChatGroup[]>>,
-    queryKey: ["chats"],
+      fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${
+          selectedTabInt ? "seller" : "buyer"
+        }`,
+        {
+          headers: {
+            authorization: `Bearer ${session?.token}`,
+          },
+        }
+      ).then((x) => x.json()) as Promise<ApiResponse<ChatGroup[]>>,
+    queryKey: ["chats", selectedTabInt],
     enabled: !!session && !!session.token,
     onError(err) {
       console.error("error", err);
@@ -65,6 +70,18 @@ export default function MessageScreen() {
         <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
           Something wrong happened...
         </Text>
+      ) : chats.length <= 0 ? (
+        <>
+          <Text className="mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
+            No chats yet.
+          </Text>
+          <Pressable
+            onPress={() => refetch()}
+            className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center"
+          >
+            <Text>Refresh</Text>
+          </Pressable>
+        </>
       ) : (
         <FlatList
           data={chats}
@@ -79,7 +96,6 @@ export default function MessageScreen() {
 }
 
 import dayjs from "dayjs";
-import { CATEGORIES } from "../home/[section]";
 
 const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   const width = (Dimensions.get("window").width - 130) / 2;
@@ -94,16 +110,21 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
           height: (width * 4) / 3,
         }}
       />
-      <View className="flex flex-col px-4 pt-2 flex-grow">
-        <View className="flex flex-row gap-y-1 justify-between">
-          <Text className="font-Manrope_600SemiBold text-base">
-            {chat.item_name}
-          </Text>
-          <Text className="font-Manrope_400Regular text-xs">
-            {dayjs(chat.last_message_sent_at).fromNow()}
+      <View className="flex flex-col px-4 py-2 flex-grow justify-between">
+        <View>
+          <View className="flex flex-row gap-y-1 justify-between">
+            <Text className="font-Manrope_600SemiBold text-base">
+              {chat.item_name}
+            </Text>
+            <Text className="font-Manrope_400Regular text-xs">
+              {dayjs(chat.last_message_sent_at).fromNow()}
+            </Text>
+          </View>
+          <Text className="text-lg text-gray-600 font-Manrope_400Regular">
+            {chat.last_message_content}
           </Text>
         </View>
-
+        <Text className="font-Poppins_400Regular">{chat.other_user_name}</Text>
       </View>
     </View>
   );

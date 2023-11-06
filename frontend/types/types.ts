@@ -27,8 +27,8 @@ export type Session = {
 export type ChatGroup = {
   chat_id: number;
   item_id: number;
-  buyer_id: number;
-  seller_id: number;
+  other_user_id: number;
+  other_user_name: string;
   item_name: string;
   item_price: number;
   item_category: string;
