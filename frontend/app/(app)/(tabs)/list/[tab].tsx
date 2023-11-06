@@ -74,9 +74,17 @@ export default function ListScreen() {
         <></>
       ) : items.filter((item) => item.status === STATUS[selectedTabInt])
           .length === 0 ? (
-        <Text className="mx-auto my-[70%] font-Poppins_600SemiBold text-lg">
-          No item found.
-        </Text>
+        <>
+          <Text className="mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
+            You have no {tabDisplay ? "sold items." : "listings."}
+          </Text>
+          <Pressable
+            onPress={() => refetch()}
+            className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center"
+          >
+            <Text className="font-Poppins_500Medium">Refresh</Text>
+          </Pressable>
+        </>
       ) : (
         <FlatList
           data={items.filter((item) => item.status === STATUS[selectedTabInt])}
@@ -109,17 +117,21 @@ const ListingPageItem = ({
   token: string | undefined;
   refetch: any;
 }) => {
-  const width = (Dimensions.get("window").width - 130) / 2;
+  const width = (Dimensions.get("window").width - 200) / 2;
   const [isSold, setIsSold] = React.useState<boolean>(false);
   return (
-    <View className="flex flex-row mt-4 mx-4 bg-bgLight">
+    <Pressable
+      onPress={() => {
+        void router.push(`/item/${item.id}`);
+      }}
+    className="flex flex-row mt-4 mx-4 bg-bgLight">
       <Image
         source={{ uri: item.item_images[0] }}
         className="object-cover rounded-sm"
         style={{
           width: width,
           maxWidth: width,
-          height: ((width) * 4) / 3,
+          height: (width * 4) / 3,
         }}
       />
       <View className="flex flex-col flex-grow justify-between px-4 pt-2">
@@ -164,7 +176,7 @@ const ListingPageItem = ({
           </Text>
         </Pressable>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

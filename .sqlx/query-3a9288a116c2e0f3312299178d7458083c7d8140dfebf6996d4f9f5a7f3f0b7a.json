@@ -1,0 +1,25 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        SELECT EXISTS (\n            SELECT id FROM ItemChat\n            WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR ItemChat.seller_id = ?)\n        ) AS is_part;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "is_part",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | BINARY | NUM",
+          "char_set": 63,
+          "max_size": 1
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "3a9288a116c2e0f3312299178d7458083c7d8140dfebf6996d4f9f5a7f3f0b7a"
+}

@@ -28,7 +28,7 @@ export default function MessageScreen() {
 
   const { session } = useSession();
 
-  const [chats, setChats] = React.useState<ChatGroup[]>([]);
+  const [chats, setChats] = React.useState<ChatGroup[] | undefined>(undefined);
   const {
     isError: isErrorChats,
     isLoading: isLoadingChats,
@@ -70,16 +70,18 @@ export default function MessageScreen() {
         <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
           Something wrong happened...
         </Text>
-      ) : chats.length <= 0 ? (
+      ) :isLoadingChats ? (
+        <></>
+      ) : chats && chats.length <= 0 ? (
         <>
           <Text className="mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
-            No chats yet.
+            You have no messages.
           </Text>
           <Pressable
             onPress={() => refetch()}
             className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center"
           >
-            <Text>Refresh</Text>
+            <Text className="font-Poppins_500Medium">Refresh</Text>
           </Pressable>
         </>
       ) : (
@@ -98,9 +100,14 @@ export default function MessageScreen() {
 import dayjs from "dayjs";
 
 const ChatRow = ({ chat }: { chat: ChatGroup }) => {
-  const width = (Dimensions.get("window").width - 130) / 2;
+  const width = (Dimensions.get("window").width - 200) / 2;
   return (
-    <View className="flex flex-row mt-4 mx-4 bg-bgLight">
+    <Pressable
+      onPress={() => {
+        router.push(`/chat-window`);
+      }}
+      className="flex flex-row py-4 px-4 bg-bgLight opacity-75 border-b-[1px] border-gray-200"
+    >
       <Image
         source={{ uri: chat.item_image }}
         className="object-cover rounded-sm"
@@ -116,7 +123,7 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
             <Text className="font-Manrope_600SemiBold text-base">
               {chat.item_name}
             </Text>
-            <Text className="font-Manrope_400Regular text-xs">
+            <Text className="font-Manrope_400Regular text-sm">
               {dayjs(chat.last_message_sent_at).fromNow()}
             </Text>
           </View>
@@ -124,9 +131,9 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
             {chat.last_message_content}
           </Text>
         </View>
-        <Text className="font-Poppins_400Regular">{chat.other_user_name}</Text>
+        <Text className="font-Poppins_400Regular">{chat.other_user_name} {chat.item_status}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
