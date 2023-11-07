@@ -286,6 +286,6 @@ const Indicator = ({
         transform: [{ translateX }],
         bottom: -2,
       }}
-    ></Animated.View>
+    />
   );
 };

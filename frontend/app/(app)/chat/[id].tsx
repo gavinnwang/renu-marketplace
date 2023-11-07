@@ -1,5 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Dimensions, Pressable, Text, View } from "react-native";
+import {
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
@@ -43,7 +50,7 @@ export default function ChatScreen() {
     },
   });
 
-  const { isError: isErrorChatMessages } = useQuery({
+  const { isError: isErrorChatMessages, refetch } = useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/messages/${chatId}`, {
         headers: {
@@ -62,7 +69,8 @@ export default function ChatScreen() {
     },
   });
 
-  const width = Dimensions.get("window").width / 6;
+  const width = Dimensions.get("window").width / 8;
+  const [inputText, setInputText] = React.useState("");
 
   return (
     <SafeAreaView className="bg-bgLight">
@@ -82,12 +90,17 @@ export default function ChatScreen() {
         <Pressable
           onPress={() => router.push(`/item/${chatWindow?.item_id}`)}
           className="p-4 flex-row justify-between  items-center border-y border-y-grayPrimary bg-gray-100"
+          style={{
+            height: (width * 4) / 3 + 32,
+          }}
         >
           {chatWindow && (
             <Image
               source={{ uri: chatWindow.item_image }}
               className="object-cover rounded-sm"
               style={{
+                minWidth: width,
+                minHeight: (width * 4) / 3,
                 width: width,
                 height: (width * 4) / 3,
               }}
@@ -105,20 +118,46 @@ export default function ChatScreen() {
             ${chatWindow && chatWindow.item_price}
           </Text>
         </Pressable>
-
-        <FlatList
-          className="p-4"
-          data={chatMessages}
-          renderItem={({ item }) => <Message message={item} />}
-          keyExtractor={(item) => item.id.toString()}
-        />
-
-        <View className="fixed bottom-0 right-0 left-0">
-          <TextInput
-            placeholder="Message"
-            className="bg-white px-4 py-2 mx-2 border rounded-full border-gray-400"
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "height" : "height"}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={64}
+        >
+          <FlatList
+            className="p-4"
+            data={chatMessages}
+            renderItem={({ item }) => <Message message={item} />}
+            keyExtractor={(item) => item.id.toString()}
           />
-        </View>
+
+          <View className="fixed bottom-0 right-0 left-0">
+            <TextInput
+              placeholder="Message"
+              className="px-4 py-2 mx-2 border rounded-full border-gray-400"
+              value={inputText}
+              onChangeText={setInputText}
+              onSubmitEditing={(e) => {
+                if (!inputText) return;
+                setInputText("");
+                fetch(
+                  `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/message/${chatId}`,
+                  {
+                    method: "POST",
+                    headers: {
+                      authorization: `Bearer ${session?.token}`,
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      content: e.nativeEvent.text,
+                    }),
+                  }
+                ).then(() => {
+                  refetch();
+                });
+              }}
+            />
+          </View>
+        </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
   );
@@ -127,8 +166,8 @@ export default function ChatScreen() {
 const Message = ({ message }: { message: ChatMessage }) => {
   return (
     <View
-      className={`flex flex-row border my-1.5 border-gray-300 rounded-lg bg-gray-100 p-2 w-fit ${
-        message.from_me ? "mr-auto" : "ml-auto"
+      className={`flex flex-row border mb-3 border-gray-300 rounded-lg bg-gray-100 p-2 w-fit ${
+        message.from_me ? "ml-auto" : "mr-auto"
       }`}
     >
       <Text>{message.content}</Text>
