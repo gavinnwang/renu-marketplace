@@ -117,7 +117,10 @@ async fn post_chat_message(
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
     let chat_id = path.into_inner();
-    let content = message.content.clone();
+
+    if message.content.len() < 1 {
+        return HttpResponse::BadRequest().json(serde_json::json!({"status": "fail", "message": "API: Message content cannot be null"}));
+    }
 
     let is_part_of_chat_group = chat_repository::check_if_user_id_is_part_of_chat_group(user_id, chat_id, pool.as_ref()).await;
 
@@ -135,7 +138,7 @@ async fn post_chat_message(
         }
     }
 
-    let message = chat_repository::insert_chat_message(user_id, chat_id, content.as_ref(), pool.as_ref()).await;
+    let message = chat_repository::insert_chat_message(user_id, chat_id, &message.content, pool.as_ref()).await;
 
     match message {
         Ok(message) => HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": message})),

@@ -73,6 +73,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(TracingLogger::default())
     })
     .bind((server_host, server_port))?
+    .workers(20)
     .run()
     .await
 }
