@@ -4,7 +4,9 @@ pub mod error;
 pub mod model;
 pub mod repository;
 pub mod routes;
+pub mod websocket;
 
+use actix::Actor;
 use actix_cors::Cors;
 use actix_web::{http::header, web::Data, App, HttpServer};
 use dotenv::dotenv;
@@ -19,6 +21,8 @@ async fn main() -> std::io::Result<()> {
     let config = config::Config::init();
 
     tracing_subscriber::fmt::init();
+
+    // tracing::debug!("Debugging enabled");
 
     tracing::info!("Connecting to database");
     let pool = match MySqlPoolOptions::new()
@@ -49,11 +53,15 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
-    tracing::info!("Starting Actix web server");
     let server_host = config.server_host.clone();
     let server_port = config.server_port;
 
     tracing::info!("Server listening on {}:{}", server_host, server_port);
+
+    tracing::info!("Starting websocket chat server");
+    let server = websocket::server::ChatServer::new().start();
+
+    tracing::info!("Starting Actix web server");
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -68,8 +76,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(config.clone()))
             .app_data(Data::new(pool.clone()))
+            .app_data(Data::new(server.clone()))
             .wrap(cors)
             .configure(routes::handler_register::handlers)
+            .service(websocket::ws_handler::ws_route)
             .wrap(TracingLogger::default())
     })
     .bind((server_host, server_port))?

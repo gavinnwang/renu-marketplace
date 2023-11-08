@@ -119,7 +119,7 @@ async fn post_chat_message(
     let chat_id = path.into_inner();
 
     if message.content.len() < 1 {
-        return HttpResponse::BadRequest().json(serde_json::json!({"status": "fail", "message": "API: Message content cannot be null"}));
+        return HttpResponse::BadRequest().json(serde_json::json!({"status": "fail", "message": "API: Message content cannot be empty"}));
     }
 
     let is_part_of_chat_group = chat_repository::check_if_user_id_is_part_of_chat_group(user_id, chat_id, pool.as_ref()).await;
