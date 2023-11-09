@@ -4,7 +4,12 @@ use actix::{
     fut, prelude::ContextFutureSpawner, Actor, ActorContext, ActorFutureExt, Addr, AsyncContext,
     Handler, StreamHandler, WrapFuture,
 };
+use actix_web::web::Data;
 use actix_web_actors::ws;
+
+use crate::{
+    model::db_model::DbPool, repository::chat_repository::check_if_user_id_is_part_of_chat_group,
+};
 
 use super::server;
 
@@ -29,6 +34,8 @@ pub struct WsChatSession {
 
     // chat server address to send message
     pub server_addr: Addr<server::ChatServer>,
+
+    // pool: Data<DbPool>,
 }
 
 impl WsChatSession {
@@ -80,6 +87,7 @@ impl Actor for WsChatSession {
                             "Session with user id {} connected to chat server",
                             act.user_id
                         );
+                        ctx.text("hello");
                     }
                     // something is wrong with chat server
                     _ => {
@@ -89,7 +97,7 @@ impl Actor for WsChatSession {
                 }
                 fut::ready(())
             })
-            .wait(ctx);
+            .spawn(ctx);
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> actix::Running {
@@ -120,16 +128,81 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
 
         match msg {
             ws::Message::Ping(msg) => {
-                tracing::info!("Ping received: {:?}", msg);
+                // tracing::info!("Ping received: {:?}", msg);
                 self.hb = Instant::now();
                 ctx.pong(&msg);
             }
             ws::Message::Pong(msg) => {
-                tracing::info!("Pong received: {:?}", msg);
+                // tracing::info!("Pong received: {:?}", msg);
                 self.hb = Instant::now();
             }
             ws::Message::Text(text) => {
                 tracing::info!("WS text: {:?}", text);
+
+                let m = text.trim();
+
+                if m.starts_with('/') {
+                    let v: Vec<&str> = m.splitn(2, ' ').collect();
+                    match v[0] {
+                        "/join" => {
+                            let user_id = self.user_id as i64;
+                            let chat_id = match v[1].parse::<usize>() {
+                                Ok(chat_id) => chat_id as i64,
+                                Err(_) => {
+                                    ctx.text(format!("Invalid chat id: {}", v[1]));
+                                    return;
+                                }
+                            };
+
+
+                            self.server_addr.send(server::Join {
+                                user_id: self.user_id,
+                                chat_id: chat_id as usize,
+                            })
+                            .into_actor(self)
+                            .then(
+                                |res, _, ctx| {
+                                    match res {
+                                        Ok(is_part_of_chat_group) => {
+                                            if !is_part_of_chat_group {
+                                                ctx.text("You are not part of this chat group".to_string());
+                                            } else {
+                                                ctx.text("You are part of this chat group".to_string());
+                                            }
+                                        }
+                                        Err(err) => {
+                                            tracing::error!("Error message: {}\n", err);
+                                            ctx.text("Something went wrong".to_string());
+                                        }
+                                    }
+                                    fut::ready(())
+                                }
+                            ).wait(ctx);
+
+
+                            // let stuff =check_if_user_id_is_part_of_chat_group(user_id, chat_id, pool.as_ref()).into_actor(self);
+                            // // Spawn a new async task to handle the future
+                            // stuff.then(
+                            //     |res, _, context| { // The `move` keyword is used to move `pool` into the closure.
+                            //         match res {
+                            //             Ok(is_part_of_chat_group) => {
+                            //                 if !is_part_of_chat_group {
+                            //                     context.text("You are not part of this chat group".to_string());
+                            //                 }
+                            //                 // Since pool was moved into the closure, it will be dropped here when no longer needed.
+                            //             }
+                            //             Err(err) => {
+                            //                 tracing::error!("Error message: {}\n", err);
+                            //                 context.text("Something went wrong".to_string());
+                            //             }
+                            //         }
+                            //         fut::ready(())
+                            //     }
+                            // ).spawn(ctx); // Use spawn instead of wait to avoid blocking the actor.
+                        }
+                        _ => ctx.text(format!("Unknown command: {}", m)),
+                    }
+                }
             }
             ws::Message::Close(reason) => {
                 ctx.close(reason);
