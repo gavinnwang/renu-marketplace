@@ -132,7 +132,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 self.hb = Instant::now();
                 ctx.pong(&msg);
             }
-            ws::Message::Pong(msg) => {
+            ws::Message::Pong(_) => {
                 // tracing::info!("Pong received: {:?}", msg);
                 self.hb = Instant::now();
             }
@@ -161,7 +161,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                             })
                             .into_actor(self)
                             .then(
-                                |res, _, ctx| {
+                                |res, act, ctx| {
                                     match res {
                                         Ok(is_part_of_chat_group) => {
                                             if !is_part_of_chat_group {

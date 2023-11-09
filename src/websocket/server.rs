@@ -1,25 +1,72 @@
-use std::collections::{HashMap, HashSet};
+use std::{collections::{HashMap, HashSet}, cell::RefCell, rc::Rc};
 
 use actix::{
-    fut, prelude::ContextFutureSpawner, Actor, ActorFutureExt, Context, Handler, Message,
-    MessageResult, Recipient, WrapFuture, AsyncContext, ResponseFuture,
+    fut, prelude::ContextFutureSpawner, Actor, ActorFutureExt, AsyncContext, Context, Handler,
+    Message, MessageResult, Recipient, ResponseFuture, WrapFuture, Addr,
 };
 use actix_web::web::Data;
 use tokio::{runtime::Handle, sync::mpsc, task};
 use uuid::Uuid;
 
 use crate::{
-    model::db_model::DbPool, repository::chat_repository::check_if_user_id_is_part_of_chat_group,
+    error::DbError, model::db_model::DbPool,
+    repository::chat_repository::check_if_user_id_is_part_of_chat_group,
 };
+
+#[derive(Debug, Clone)]
+pub struct DbActor {
+    pool: Data<DbPool>,
+}
+
+impl Actor for DbActor {
+    type Context = Context<Self>;
+}
+
+// impl DbActor {
+//     pub fn new(pool: Data<DbPool>) -> DbActor {
+//         DbActor { pool }
+//     }
+// }
+
+// impl Handler<Join> for DbActor {
+//     type Result = ResponseFuture<bool>;
+
+//     fn handle(&mut self, msg: Join, _: &mut Self::Context) -> Self::Result {
+//         let pool = self.pool.clone();
+//         // do something async
+//         Box::pin(async move {
+//             let is_part_of_chat_group = check_if_user_id_is_part_of_chat_group(
+//                 msg.user_id as i64,
+//                 msg.chat_id as i64,
+//                 pool.as_ref(),
+//             )
+//             .await;
+
+//             match is_part_of_chat_group {
+//                 Ok(is_part_of_chat_group) => {
+//                     if !is_part_of_chat_group {
+//                         tracing::info!("is not part of chat group");
+//                         false
+//                     } else {
+//                         tracing::info!("is part of chat group");
+
+//                     }
+//                 }
+//                 Err(err) => {
+//                     tracing::error!("Error message: {}\n", err);
+//                     false
+//                 }
+//             }
+//         })
+//     }
+// }
 
 // chat server manages chat rooms and responsible for coordinating chat session
 #[derive(Debug, Clone)]
 pub struct ChatServer {
-    sessions: HashMap<usize, (Recipient<ChatMessage>, Option<Uuid>)>, // maps session id to session address and the room id the session is in
-    rooms: HashMap<Uuid, HashSet<usize>>, // maps room id to set of session ids in the room
+    sessions: Rc<RefCell<HashMap<usize, (Recipient<ChatMessage>, Option<Uuid>)>>>, // maps session id to session address and the room id the session is in
+    rooms: Rc<RefCell<HashMap<Uuid, HashSet<usize>>>>, // maps room id to set of session ids in the room
     pool: Data<DbPool>,
-
-    is_part: bool,
 }
 
 /// Make actor from `ChatServer`
@@ -32,10 +79,9 @@ impl Actor for ChatServer {
 impl ChatServer {
     pub fn new(pool: Data<DbPool>) -> ChatServer {
         ChatServer {
-            sessions: HashMap::new(),
-            rooms: HashMap::new(),
+            sessions: Rc::new(RefCell::new(HashMap::new())),
+            rooms: Rc::new(RefCell::new(HashMap::new())),
             pool,
-            is_part: true,
         }
     }
 }
@@ -65,7 +111,7 @@ impl Handler<Connect> for ChatServer {
     fn handle(&mut self, msg: Connect, ctx: &mut Self::Context) -> Self::Result {
         // create a session id using the user_id and add to sessions
 
-        self.sessions.insert(msg.user_id, (msg.addr, None));
+        self.sessions.borrow_mut().insert(msg.user_id, (msg.addr, None));
     }
 }
 
@@ -82,16 +128,17 @@ impl Handler<Disconnect> for ChatServer {
     fn handle(&mut self, msg: Disconnect, _: &mut Self::Context) -> Self::Result {
         tracing::info!("Session with id {} disconnected", msg.user_id);
 
-        match self.sessions.remove(&msg.user_id) {
+
+        match self.sessions.borrow_mut().remove(&msg.user_id) {
             // if session is in a room, remove the session from the room
-            Some((_, Some(room_id))) => match self.rooms.get_mut(&room_id) {
+            Some((_, Some(room_id))) => match self.rooms.borrow_mut().get_mut(&room_id) {
                 Some(room) => {
                     match room.remove(&msg.user_id) {
                         // remove session from room
                         true => {
                             // if room is empty, remove room
                             if room.is_empty() {
-                                self.rooms.remove(&room_id);
+                                self.rooms.borrow_mut().remove(&room_id);
                             }
                         }
                         false => {
@@ -118,6 +165,7 @@ impl Handler<Disconnect> for ChatServer {
 }
 
 //  session is disconnected #[derive(Message)]
+#[derive(Clone)]
 pub struct Join {
     pub user_id: usize,
     pub chat_id: usize,
@@ -128,10 +176,14 @@ impl actix::Message for Join {
 }
 
 impl Handler<Join> for ChatServer {
-    type Result = MessageResult<Join>;
+    type Result = ResponseFuture<bool>;
 
     fn handle(&mut self, msg: Join, ctx: &mut Self::Context) -> Self::Result {
+
         let pool = self.pool.clone();
+
+        let rooms = self.rooms.clone();
+        let sessions = self.sessions.clone();
 
         // do something async
         Box::pin(async move {
@@ -142,39 +194,28 @@ impl Handler<Join> for ChatServer {
             )
             .await;
 
-            is_part_of_chat_group
+            match is_part_of_chat_group {
+                Ok(is_part_of_chat_group) => {
+                    if !is_part_of_chat_group {
+                        tracing::info!("is not part of chat group");
+                        false
+                    } else {
+                        tracing::info!("is part of chat group");
 
-        }).into_actor(self).then(
-            |res, _, ctx| {
-                // The `move` keyword is used to move `pool` into the closure.
-                match res {
-                    Ok(is_part_of_chat_group) => {
-                        if !is_part_of_chat_group {
-                            tracing::info!("is not part of chat group");
-                        } else {
-                            tracing::info!("is part of chat group");
-                           
-                        }
-                    }
-                    Err(err) => {
-                        tracing::error!("Error message: {}\n", err);
+                        let room_id = Uuid::new_v4();
+
+                        rooms.borrow_mut().insert(room_id, HashSet::new());
+                        tracing::info!("rooms: {:?}", rooms);
+
+                        true
                     }
                 }
-                fut::ready(())
+                Err(err) => {
+                    tracing::error!("Error message: {}\n", err);
+                    false
+                }
             }
-        ).wait(ctx);
-
-        MessageResult(
-            true
-        )
-            // match is_part_of_chat_group {
-            //     Ok(is_part_of_chat_group) => {
-            //         if !is_part_of_chat_group {
-            //             tracing::info!("is not part of chat group");
-            //             false
-            //         } else {
-            //             tracing::info!("is part of chat group");
-                       
+        })
     }
 }
 // let stuff = check_if_user_id_is_part_of_chat_group(msg.user_id as i64, msg.chat_id as i64, self.pool.as_ref()).into_actor(self).then(
