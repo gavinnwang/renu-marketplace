@@ -192,10 +192,10 @@ pub async fn fetch_chat_messages_by_chat_id(
         .collect())
 }
 
-pub async fn check_if_user_id_is_part_of_chat_group(
+pub async fn check_if_user_id_is_part_of_chat_group<'a>(
     user_id: i64,
     chat_id: i64,
-    conn: impl Executor<'_, Database = MySql>,
+    conn: impl Executor<'a, Database = MySql>,
 ) -> Result<bool, DbError> {
     let result = sqlx::query!(
         r#"

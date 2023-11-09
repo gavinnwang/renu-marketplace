@@ -59,7 +59,7 @@ async fn main() -> std::io::Result<()> {
     tracing::info!("Server listening on {}:{}", server_host, server_port);
 
     tracing::info!("Starting websocket chat server");
-    let server = websocket::server::ChatServer::new().start();
+    let server = websocket::server::ChatServer::new(Data::new(pool.clone())).start();
 
     tracing::info!("Starting Actix web server");
 
