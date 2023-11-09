@@ -34,7 +34,6 @@ pub struct WsChatSession {
 
     // chat server address to send message
     pub server_addr: Addr<server::ChatServer>,
-
     // pool: Data<DbPool>,
 }
 
@@ -154,31 +153,44 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                 }
                             };
 
-
-                            self.server_addr.send(server::Join {
-                                user_id: self.user_id,
-                                chat_id: chat_id as usize,
-                            })
-                            .into_actor(self)
-                            .then(
-                                |res, act, ctx| {
+                            self.server_addr
+                                .send(server::Join {
+                                    user_id: self.user_id,
+                                    chat_id: chat_id as usize,
+                                })
+                                .into_actor(self)
+                                .then(move |res, _, ctx| {
                                     match res {
-                                        Ok(is_part_of_chat_group) => {
-                                            if !is_part_of_chat_group {
-                                                ctx.text("You are not part of this chat group".to_string());
-                                            } else {
-                                                ctx.text("You are part of this chat group".to_string());
-                                            }
+                                        Ok(Ok(_)) => {
+                                            tracing::info!(
+                                                "User id {} joined chat id {}",
+                                                user_id,
+                                                chat_id
+                                            );
+                                            ctx.text(format!("Joined chat id {}", chat_id));
+                                        }
+                                        Ok(Err(err)) => {
+                                            tracing::error!("Error message: {}\n", err);
+                                            tracing::error!(
+                                                "User id {} failed to join chat id {}",
+                                                user_id,
+                                                chat_id
+                                            );
+                                            ctx.text(format!("Failed to join chat. Error message: {}", err));
                                         }
                                         Err(err) => {
                                             tracing::error!("Error message: {}\n", err);
+                                            tracing::error!(
+                                                "User id {} failed to join chat id {}",
+                                                user_id,
+                                                chat_id
+                                            );
                                             ctx.text("Something went wrong".to_string());
                                         }
                                     }
                                     fut::ready(())
-                                }
-                            ).wait(ctx);
-
+                                })
+                                .wait(ctx);
 
                             // let stuff =check_if_user_id_is_part_of_chat_group(user_id, chat_id, pool.as_ref()).into_actor(self);
                             // // Spawn a new async task to handle the future

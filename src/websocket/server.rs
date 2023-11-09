@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, HashSet}, cell::RefCell, rc::Rc};
+use std::{collections::{HashMap, HashSet}, cell::RefCell, rc::Rc, fmt::Error, f32::consts::E};
 
 use actix::{
     fut, prelude::ContextFutureSpawner, Actor, ActorFutureExt, AsyncContext, Context, Handler,
@@ -64,8 +64,8 @@ impl Actor for DbActor {
 // chat server manages chat rooms and responsible for coordinating chat session
 #[derive(Debug, Clone)]
 pub struct ChatServer {
-    sessions: Rc<RefCell<HashMap<usize, (Recipient<ChatMessage>, Option<Uuid>)>>>, // maps session id to session address and the room id the session is in
-    rooms: Rc<RefCell<HashMap<Uuid, HashSet<usize>>>>, // maps room id to set of session ids in the room
+    sessions: Rc<RefCell<HashMap<usize, (Recipient<ChatMessage>, Option<usize>)>>>, // maps session id to session address and the room id the session is in
+    rooms: Rc<RefCell<HashMap<usize, HashSet<usize>>>>, // maps room id to set of session ids in the room
     pool: Data<DbPool>,
 }
 
@@ -172,11 +172,11 @@ pub struct Join {
 }
 
 impl actix::Message for Join {
-    type Result = bool;
+    type Result = Result<(), String>;
 }
 
 impl Handler<Join> for ChatServer {
-    type Result = ResponseFuture<bool>;
+    type Result = ResponseFuture<Result<(), String>>;
 
     fn handle(&mut self, msg: Join, ctx: &mut Self::Context) -> Self::Result {
 
@@ -198,21 +198,18 @@ impl Handler<Join> for ChatServer {
                 Ok(is_part_of_chat_group) => {
                     if !is_part_of_chat_group {
                         tracing::info!("is not part of chat group");
-                        false
+
+                        Err("You are not part of this chat group".to_string())
                     } else {
                         tracing::info!("is part of chat group");
-
-                        let room_id = Uuid::new_v4();
-
-                        rooms.borrow_mut().insert(room_id, HashSet::new());
-                        tracing::info!("rooms: {:?}", rooms);
-
-                        true
+                        
+                        Ok(())
                     }
                 }
                 Err(err) => {
                     tracing::error!("Error message: {}\n", err);
-                    false
+                    
+                    Err("Something went wrong".to_string())
                 }
             }
         })
