@@ -13,13 +13,13 @@ use crate::config::Config;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {
-    pub sub: i64,
+    pub sub: i32,
     pub iat: usize,
     pub exp: usize,
 }
 
 pub struct AuthenticationGuard {
-    pub user_id: i64,
+    pub user_id: i32,
 }
 
 impl FromRequest for AuthenticationGuard {

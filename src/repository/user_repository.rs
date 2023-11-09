@@ -8,7 +8,7 @@ use crate::{
 
 pub async fn fetch_user_by_id(
     conn: impl Executor<'_, Database = MySql>,
-    id: i64,
+    id: i32,
 ) -> Result<PartialUser, DbError> {
     let user = sqlx::query_as!(
         PartialUser,
@@ -34,7 +34,7 @@ pub async fn fetch_user_by_id(
 pub async fn fetch_user_id_by_email(
     conn: impl Executor<'_, Database = MySql>,
     email: String,
-) -> Result<i64, DbError> {
+) -> Result<i32, DbError> {
     let user_id = sqlx::query!(
         r#"SELECT id FROM User WHERE email = ?"#,
         email
@@ -42,7 +42,7 @@ pub async fn fetch_user_id_by_email(
     .fetch_one(conn)
     .await?;
 
-    Ok(user_id.id as i64)
+    Ok(user_id.id as i32)
 }
 
 // pub async fn fetch_user_by_email(
@@ -77,7 +77,7 @@ pub async fn fetch_user_id_by_email(
 pub async fn add_user(
     conn: impl Executor<'_, Database = MySql>,
     new_user: &NewUser,
-) -> Result<i64, DbError> {
+) -> Result<i32, DbError> {
     tracing::info!(
         "User repository: Adding user with name {}\n",
         &new_user.name
@@ -92,5 +92,5 @@ pub async fn add_user(
     .await?
     .last_insert_id();
 
-    Ok(id as i64)
+    Ok(id as i32)
 }

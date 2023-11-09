@@ -72,7 +72,7 @@ pub async fn fetch_items_by_category(
 }
 
 pub async fn fetch_item_by_id(
-    id: i64,
+    id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Item, DbError> {
     let raw_item = sqlx::query_as!(
@@ -103,7 +103,7 @@ pub async fn fetch_item_by_id(
 }
 
 pub async fn fetch_items_by_user_id(
-    user_id: i64,
+    user_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<Item>, DbError> {
     let raw_items = sqlx::query_as!(
@@ -135,7 +135,7 @@ pub async fn fetch_items_by_user_id(
 }
 
 pub async fn fetch_items_by_user_id_and_status(
-    user_id: i64,
+    user_id: i32,
     status: String,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<Item>, DbError> {
@@ -169,7 +169,7 @@ pub async fn fetch_items_by_user_id_and_status(
 }
 
 pub async fn update_item_status(
-    id: i64,
+    id: i32,
     status: String,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<(), DbError> {

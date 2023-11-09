@@ -4,12 +4,7 @@ use actix::{
     fut, prelude::ContextFutureSpawner, Actor, ActorContext, ActorFutureExt, Addr, AsyncContext,
     Handler, StreamHandler, WrapFuture,
 };
-use actix_web::web::Data;
 use actix_web_actors::ws;
-
-use crate::{
-    model::db_model::DbPool, repository::chat_repository::check_if_user_id_is_part_of_chat_group,
-};
 
 use super::server;
 
@@ -144,9 +139,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                     let v: Vec<&str> = m.splitn(2, ' ').collect();
                     match v[0] {
                         "/join" => {
-                            let user_id = self.user_id as i64;
+                            let user_id = self.user_id as i32;
                             let chat_id = match v[1].parse::<usize>() {
-                                Ok(chat_id) => chat_id as i64,
+                                Ok(chat_id) => chat_id as i32,
                                 Err(_) => {
                                     ctx.text(format!("Invalid chat id: {}", v[1]));
                                     return;

@@ -41,9 +41,9 @@ export type ChatGroup = {
 
 // #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 // pub struct ChatWindow {
-//     pub chat_id: i64,
-//     pub item_id: i64,
-//     pub other_user_id: i64,
+//     pub chat_id: i32,
+//     pub item_id: i32,
+//     pub other_user_id: i32,
 //     pub other_user_name: String,
 //     pub item_name: String,
 //     pub item_price: f64,

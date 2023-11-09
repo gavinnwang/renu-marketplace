@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 pub struct Item {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub price: f64,
     pub created_at: DateTime<Utc>,
@@ -12,14 +12,14 @@ pub struct Item {
     pub description: Option<String>,
     pub category: String,
     pub status: String,
-    pub user_id: i64,
+    pub user_id: i32,
 }
 
 
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 pub struct RawItem {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub price: f64,
     pub created_at: std::time::SystemTime,
@@ -28,6 +28,6 @@ pub struct RawItem {
     pub category: String,
     pub status: String,
     pub description: Option<String>,
-    pub user_id: i64,
+    pub user_id: i32,
 }
 
