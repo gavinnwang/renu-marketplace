@@ -170,8 +170,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                             ctx.text(format!("Joined chat id {}", chat_id));
                                         }
                                         Ok(Err(err)) => {
-                                            tracing::error!("Error message: {}\n", err);
-                                            tracing::error!(
+                                            tracing::warn!("Error message: {}\n", err);
+                                            tracing::warn!(
                                                 "User id {} failed to join chat id {}",
                                                 user_id,
                                                 chat_id

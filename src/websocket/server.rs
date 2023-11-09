@@ -1,8 +1,14 @@
-use std::{collections::{HashMap, HashSet}, cell::RefCell, rc::Rc, fmt::Error, f32::consts::E};
+use std::{
+    cell::RefCell,
+    collections::{HashMap, HashSet},
+    f32::consts::E,
+    fmt::Error,
+    rc::Rc,
+};
 
 use actix::{
-    fut, prelude::ContextFutureSpawner, Actor, ActorFutureExt, AsyncContext, Context, Handler,
-    Message, MessageResult, Recipient, ResponseFuture, WrapFuture, Addr,
+    fut, prelude::ContextFutureSpawner, Actor, ActorFutureExt, Addr, AsyncContext, Context,
+    Handler, Message, MessageResult, Recipient, ResponseFuture, WrapFuture,
 };
 use actix_web::web::Data;
 use tokio::{runtime::Handle, sync::mpsc, task};
@@ -111,7 +117,9 @@ impl Handler<Connect> for ChatServer {
     fn handle(&mut self, msg: Connect, ctx: &mut Self::Context) -> Self::Result {
         // create a session id using the user_id and add to sessions
 
-        self.sessions.borrow_mut().insert(msg.user_id, (msg.addr, None));
+        self.sessions
+            .borrow_mut()
+            .insert(msg.user_id, (msg.addr, None));
     }
 }
 
@@ -128,12 +136,11 @@ impl Handler<Disconnect> for ChatServer {
     fn handle(&mut self, msg: Disconnect, _: &mut Self::Context) -> Self::Result {
         tracing::info!("Session with id {} disconnected", msg.user_id);
 
-
         match self.sessions.borrow_mut().remove(&msg.user_id) {
             // if session is in a room, remove the session from the room
             Some((_, Some(room_id))) => match self.rooms.borrow_mut().get_mut(&room_id) {
                 Some(room) => {
-                    match room.remove(&msg.user_id) {
+                    match room.remove(&room_id) {
                         // remove session from room
                         true => {
                             // if room is empty, remove room
@@ -179,7 +186,6 @@ impl Handler<Join> for ChatServer {
     type Result = ResponseFuture<Result<(), String>>;
 
     fn handle(&mut self, msg: Join, ctx: &mut Self::Context) -> Self::Result {
-
         let pool = self.pool.clone();
 
         let rooms = self.rooms.clone();
@@ -201,14 +207,45 @@ impl Handler<Join> for ChatServer {
 
                         Err("You are not part of this chat group".to_string())
                     } else {
+                        let mut sessions = sessions.borrow_mut();
+                        let mut rooms = rooms.borrow_mut();
                         tracing::info!("is part of chat group");
-                        
-                        Ok(())
+
+                        sessions.get_mut(&msg.user_id).unwrap().1 = Some(msg.chat_id);
+
+                        // create a new room if room doens't exist otherwise add session to room
+                        match rooms.get_mut(&msg.chat_id) {
+                            Some(room) => match room.insert(msg.user_id) {
+                                true => {
+                                    tracing::info!("Session with id {} added to room", msg.user_id);
+                                    Ok(())
+                                }
+                                false => {
+                                    tracing::warn!(
+                                        "Session with id {} is already in room",
+                                        msg.user_id
+                                    );
+                                    Err(format!(
+                                        "Warn: Session with id {} is already in room",
+                                        msg.user_id
+                                    ))
+                                }
+                            },
+                            None => {
+                                tracing::info!("Room does not exist. Creating room");
+                                let mut room = HashSet::new();
+                                room.insert(msg.user_id);
+                                rooms.insert(msg.chat_id, room);
+                                Ok(())
+                            }
+                        }
+
+                        // Ok(())
                     }
                 }
                 Err(err) => {
                     tracing::error!("Error message: {}\n", err);
-                    
+
                     Err("Something went wrong".to_string())
                 }
             }
