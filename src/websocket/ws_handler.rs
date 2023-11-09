@@ -4,7 +4,7 @@ use actix::Addr;
 use actix_web::{get, HttpResponse, HttpRequest, web::{Payload, Data}, Error};
 use actix_web_actors::ws;
 
-use crate::{websocket::session, authentication::jwt::AuthenticationGuard, model::db_model::DbPool};
+use crate::{websocket::session, authentication::jwt::AuthenticationGuard};
 
 use super::server;
 

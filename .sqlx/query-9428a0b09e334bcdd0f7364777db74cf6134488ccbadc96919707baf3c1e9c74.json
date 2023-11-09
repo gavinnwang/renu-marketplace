@@ -1,0 +1,36 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        SELECT ItemChat.buyer_id, Item.user_id FROM ItemChat\n        JOIN Item ON ItemChat.item_id = Item.id    \n        WHERE ItemChat.id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "buyer_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | MULTIPLE_KEY | NO_DEFAULT_VALUE | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | MULTIPLE_KEY | NO_DEFAULT_VALUE | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "9428a0b09e334bcdd0f7364777db74cf6134488ccbadc96919707baf3c1e9c74"
+}

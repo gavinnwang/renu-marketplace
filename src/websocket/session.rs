@@ -133,6 +133,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
             ws::Message::Text(text) => {
                 tracing::info!("WS text: {:?}", text);
 
+                
+
                 let m = text.trim();
 
                 if m.starts_with('/') {
@@ -171,7 +173,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                                 user_id,
                                                 chat_id
                                             );
-                                            ctx.text(format!("Failed to join chat. Error message: {}", err));
+                                            ctx.text(format!(
+                                                "Failed to join chat. Error message: {}",
+                                                err
+                                            ));
                                         }
                                         Err(err) => {
                                             tracing::error!("Error message: {}\n", err);
@@ -186,26 +191,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     fut::ready(())
                                 })
                                 .wait(ctx);
-
-                            // let stuff =check_if_user_id_is_part_of_chat_group(user_id, chat_id, pool.as_ref()).into_actor(self);
-                            // // Spawn a new async task to handle the future
-                            // stuff.then(
-                            //     |res, _, context| { // The `move` keyword is used to move `pool` into the closure.
-                            //         match res {
-                            //             Ok(is_part_of_chat_group) => {
-                            //                 if !is_part_of_chat_group {
-                            //                     context.text("You are not part of this chat group".to_string());
-                            //                 }
-                            //                 // Since pool was moved into the closure, it will be dropped here when no longer needed.
-                            //             }
-                            //             Err(err) => {
-                            //                 tracing::error!("Error message: {}\n", err);
-                            //                 context.text("Something went wrong".to_string());
-                            //             }
-                            //         }
-                            //         fut::ready(())
-                            //     }
-                            // ).spawn(ctx); // Use spawn instead of wait to avoid blocking the actor.
                         }
                         _ => ctx.text(format!("Unknown command: {}", m)),
                     }
