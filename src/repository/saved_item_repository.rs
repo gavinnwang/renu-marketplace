@@ -8,7 +8,7 @@ use crate::{
 use super::item_processing::convert_raw_into_items;
 
 pub async fn fetch_saved_items_by_user_id(
-    user_id: i64,
+    user_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<Item>, DbError> {
     let raw_items = sqlx::query_as!(

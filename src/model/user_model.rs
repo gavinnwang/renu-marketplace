@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
 pub struct User {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub email: String,
     pub role: String,
@@ -22,7 +22,7 @@ pub struct NewUser {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PartialUser {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub email: String,
     pub profile_image: Option<String>,

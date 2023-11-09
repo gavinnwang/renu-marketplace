@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 pub struct RawChatGroup {
-    pub chat_id: i64,
-    pub item_id: i64,
-    pub other_user_id: i64,
+    pub chat_id: i32,
+    pub item_id: i32,
+    pub other_user_id: i32,
     pub other_user_name: String,
     pub item_name: String,
     pub item_price: f64,
@@ -19,9 +19,9 @@ pub struct RawChatGroup {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ChatGroup {
-    pub chat_id: i64,
-    pub item_id: i64,
-    pub other_user_id: i64,
+    pub chat_id: i32,
+    pub item_id: i32,
+    pub other_user_id: i32,
     pub other_user_name: String,
     pub item_name: String,
     pub item_price: f64,
@@ -35,9 +35,9 @@ pub struct ChatGroup {
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 pub struct RawChatMessage {
-    pub id: i64,
-    pub chat_id: i64,
-    pub sender_id: i64,
+    pub id: i32,
+    pub chat_id: i32,
+    pub sender_id: i32,
     pub content: String,
     pub sent_at: std::time::SystemTime,
     pub from_me: i64,
@@ -45,9 +45,9 @@ pub struct RawChatMessage {
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 pub struct ChatWindow {
-    pub chat_id: i64,
-    pub item_id: i64,
-    pub other_user_id: i64,
+    pub chat_id: i32,
+    pub item_id: i32,
+    pub other_user_id: i32,
     pub other_user_name: String,
     pub item_name: String,
     pub item_price: f64,
@@ -59,11 +59,11 @@ pub struct ChatWindow {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ChatMessage {
-    pub id: i64,
-    pub chat_id: i64,
-    pub sender_id: i64,
+    pub id: i32,
+    pub chat_id: i32,
+    pub sender_id: i32,
     pub content: String,
     pub sent_at: DateTime<Utc>,
-    pub from_me: i64,
+    pub from_me: i32,
 }
 

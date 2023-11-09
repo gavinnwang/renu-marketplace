@@ -6,8 +6,8 @@ use crate::{
 
 // #[derive(serde::Deserialize)]
 // struct ItemQuery {
-//     // page: Option<i64>,
-//     // limit: Option<i64>,
+//     // page: Option<i32>,
+//     // limit: Option<i32>,
 //     status: String,
 // }
 
@@ -28,7 +28,7 @@ async fn get_items_handler(pool: web::Data<DbPool>) -> impl Responder {
 }
 
 #[get("/{id}")]
-async fn get_item_by_id_handler(path: web::Path<i64>, pool: web::Data<DbPool>) -> impl Responder {
+async fn get_item_by_id_handler(path: web::Path<i32>, pool: web::Data<DbPool>) -> impl Responder {
     let item_id = path.into_inner();
     let item = item_repository::fetch_item_by_id(item_id, pool.as_ref()).await;
 
@@ -56,7 +56,7 @@ struct ItemUpdateBody {
 #[post("/{id}")]
 async fn update_item_status_handler(
     auth_gaurd: AuthenticationGuard,
-    path: web::Path<i64>,
+    path: web::Path<i32>,
     data: web::Json<ItemUpdateBody>,
     pool: web::Data<DbPool>,
 ) -> impl Responder {

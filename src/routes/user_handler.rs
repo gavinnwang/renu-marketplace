@@ -30,7 +30,7 @@ async fn get_me_handler(
 
 #[get("/{id}")]
 async fn get_user_by_id_handler(
-    path: web::Path<i64>,
+    path: web::Path<i32>,
     pool: web::Data<DbPool>,
 ) -> impl Responder {
     let user_id = path.into_inner();
@@ -57,7 +57,7 @@ struct StatusQuery {
 
 #[get("/{id}/items")]
 async fn get_items_by_user_id_and_status_handler(
-    path: web::Path<i64>,
+    path: web::Path<i32>,
     query: Option<web::Query<StatusQuery>>,
     pool: web::Data<DbPool>,
 ) -> impl Responder {

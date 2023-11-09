@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub async fn fetch_chat_groups_by_seller_id(
-    user_id: i64,
+    user_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<ChatGroup>, DbError> {
     let raw_groups = sqlx::query_as!(
@@ -61,7 +61,7 @@ pub async fn fetch_chat_groups_by_seller_id(
 }
 
 pub async fn fetch_chat_groups_by_buyer_id(
-    user_id: i64,
+    user_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<ChatGroup>, DbError> {
     let raw_groups = sqlx::query_as!(
@@ -117,8 +117,8 @@ pub async fn fetch_chat_groups_by_buyer_id(
 }
 
 pub async fn fetch_chat_window_by_chat_id(
-    user_id: i64,
-    chat_id: i64,
+    user_id: i32,
+    chat_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<ChatWindow, DbError> {
     let window = sqlx::query_as!(
@@ -151,8 +151,8 @@ pub async fn fetch_chat_window_by_chat_id(
 }
 
 pub async fn fetch_chat_messages_by_chat_id(
-    user_id: i64,
-    chat_id: i64,
+    user_id: i32,
+    chat_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<ChatMessage>, DbError> {
     let messages = sqlx::query_as!(
@@ -174,7 +174,7 @@ pub async fn fetch_chat_messages_by_chat_id(
         ORDER BY Message.created_at ASC;
         "#,
         user_id,
-        chat_id
+        chat_id 
     )
     .fetch_all(conn)
     .await?;
@@ -187,37 +187,40 @@ pub async fn fetch_chat_messages_by_chat_id(
             sender_id: message.sender_id,
             content: message.content,
             sent_at: message.sent_at.into(),
-            from_me: message.from_me,
+            from_me: message.from_me as i32,
         })
         .collect())
 }
 
-pub async fn check_if_user_id_is_part_of_chat_group<'a>(
-    user_id: i64,
-    chat_id: i64,
-    conn: impl Executor<'a, Database = MySql>,
-) -> Result<bool, DbError> {
-    let result = sqlx::query!(
+pub async fn check_if_user_id_is_part_of_chat_group(
+    user_id: i32,
+    chat_id: i32,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<Option<i32>, DbError> {
+    let participants = sqlx::query!(
         r#"
-        SELECT EXISTS (
-            SELECT id FROM ItemChat
-            JOIN Item ON ItemChat.item_id = Item.id    
-            WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR Item.user_id = ?)
-        ) AS is_part;
+        SELECT ItemChat.buyer_id, Item.user_id FROM ItemChat
+        JOIN Item ON ItemChat.item_id = Item.id    
+        WHERE ItemChat.id = ?
         "#,
-        chat_id,
-        user_id,
-        user_id
+        chat_id
     )
     .fetch_one(conn)
     .await?;
 
-    Ok(result.is_part == 1)
+    if participants.buyer_id == user_id {
+        Ok(Some(participants.user_id))
+    } else if participants.user_id == user_id {
+        Ok(Some(participants.buyer_id))
+    } else {
+        Ok(None)
+    }
 }
 
+
 pub async fn insert_chat_message(
-    user_id: i64,
-    chat_id: i64,
+    user_id: i32,
+    chat_id: i32,
     content: &str,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<bool, DbError> {
