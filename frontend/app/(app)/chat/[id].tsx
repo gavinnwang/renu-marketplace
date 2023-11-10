@@ -17,6 +17,7 @@ import { useSession } from "../../../providers/ctx";
 import { Image } from "expo-image";
 import { FlatList, TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
+import { FlashList } from "@shopify/flash-list";
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -29,6 +30,8 @@ export default function ChatScreen() {
     undefined
   );
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
+
+  const [page, setPage] = React.useState(0);
 
   const { isError: isErrorChatWindow } = useQuery({
     queryFn: async () =>
@@ -78,7 +81,6 @@ export default function ChatScreen() {
     // lastJsonMessage,
     // readyState,
     // getWebSocket,
-    
   } = useWebSocket(socketUrl, {
     queryParams: {
       authorization: `Bearer_${session?.token}`,
@@ -87,14 +89,6 @@ export default function ChatScreen() {
     //Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (closeEvent) => true,
   });
-
-  // const flatListRef = React.createRef<FlatList<any>>();
-
-  // useEffect(() => {
-  //   if (flatListRef.current) {
-  //     flatListRef.current.scrollToEnd({ animated: true });
-  //   }
-  // }, [chatMessages]); // This effect runs every time `chatMessages` changes
 
   const queryClient = useQueryClient();
 
@@ -149,16 +143,11 @@ export default function ChatScreen() {
           style={{ flex: 1 }}
           keyboardVerticalOffset={64}
         >
-          <FlatList
+          <FlashList
             // ref={flatListRef}
             className="p-4"
-            data={chatMessages.reverse()}
-            renderItem={({ item, index }) => (
-              <Message
-                message={item}
-                isLast={index === chatMessages.length - 1}
-              />
-            )}
+            data={chatMessages}
+            renderItem={({ item }) => <Message message={item} />}
             keyExtractor={(item) => item.id.toString()}
             maintainVisibleContentPosition={{
               minIndexForVisible: 0,
@@ -166,7 +155,7 @@ export default function ChatScreen() {
             inverted
           />
 
-          <View className="">
+          <View>
             <TextInput
               placeholder="Message"
               className="px-4 py-2 mx-2 border rounded-full border-gray-400"
@@ -182,7 +171,7 @@ export default function ChatScreen() {
                 setChatMessages((prev) => [
                   ...prev,
                   {
-                    id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
+                    id: prev.length > 0 ? prev[0].id + 1 : 1,
                     content: inputText,
                     from_me: 1,
                     sent_at: new Date(),
@@ -197,13 +186,7 @@ export default function ChatScreen() {
   );
 }
 
-const Message = ({
-  message,
-  isLast,
-}: {
-  message: ChatMessage;
-  isLast: boolean;
-}) => {
+const Message = ({ message }: { message: ChatMessage }) => {
   return (
     <>
       <View
@@ -213,7 +196,6 @@ const Message = ({
       >
         <Text>{message.content}</Text>
       </View>
-      {/* {isLast && <View className="h-10"></View>} */}
     </>
   );
 };

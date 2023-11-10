@@ -171,7 +171,7 @@ pub async fn fetch_chat_messages_by_chat_id(
                 AS from_me
         FROM Message
         WHERE Message.chat_id = ?
-        ORDER BY Message.created_at DESC
+        ORDER BY Message.created_at ASC
         LIMIT 35;
         "#,
         user_id,
