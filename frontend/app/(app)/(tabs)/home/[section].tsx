@@ -12,7 +12,7 @@ import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";
 import { ApiResponse } from "../../../../types/api";
 import { ItemListing } from "../../../../components/ItemListing";
-import { LogoWithText } from "../../../../components/Logo";
+import Logo, { LogoWithText } from "../../../../components/Logo";
 import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
 import React from "react";
 import Colors from "../../../../constants/Colors";
@@ -98,9 +98,23 @@ export default function HomePage() {
             Something went wrong. Please refresh.
           </Text>
         ) : items.data.length === 0 ? (
-          <Text className="mx-auto my-[70%] font-Poppins_600SemiBold text-lg">
-            No item right now... List one!
-          </Text>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => {
+                  refetchItems();
+                }}
+              />
+            }
+          >
+            <View className="flex flex-col gap-y-2 mx-auto my-[60%] items-center">
+              <LogoWithText />
+              <Text className="font-Poppins_600SemiBold text-lg">
+                No item right now... List one!
+              </Text>
+            </View>
+          </ScrollView>
         ) : (
           <FlatList
             showsVerticalScrollIndicator={false}
