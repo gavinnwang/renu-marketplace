@@ -1,0 +1,25 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        SELECT\n            ItemChat.id\n        FROM ItemChat\n        WHERE ItemChat.item_id = ? AND (ItemChat.buyer_id = ? OR ItemChat.buyer_id = ?);\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT | NUM",
+          "char_set": 63,
+          "max_size": 11
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "de74f4248a7532127bf3a105715e1dd54b57d834de62f8e4da5ada132427c040"
+}

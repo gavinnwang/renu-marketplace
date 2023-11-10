@@ -202,13 +202,19 @@ pub async fn fetch_chat_messages_by_chat_id(
         .collect())
 }
 
+struct UserInChatGroup {
+    buyer_id: i32,
+    user_id: i32,
+}
+
 // check if user_id is part of chat group and returns the other user_id
 pub async fn check_if_user_id_is_part_of_chat_group(
     user_id: i32,
     chat_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Option<i32>, DbError> {
-    let result = sqlx::query!(
+    let users_in_chat = sqlx::query_as!(
+        UserInChatGroup,
         r#"
         SELECT ItemChat.buyer_id, Item.user_id FROM ItemChat
         JOIN Item ON ItemChat.item_id = Item.id    
@@ -219,14 +225,14 @@ pub async fn check_if_user_id_is_part_of_chat_group(
     .fetch_one(conn)
     .await;
 
-    match result {
+    match users_in_chat {
         Err(sqlx::Error::RowNotFound) => Ok(None),
         Err(err) => Err(err.into()),
-        Ok(user_ids) => {
-            if user_ids.buyer_id == user_id {
-                Ok(Some(user_ids.user_id))
-            } else if user_ids.user_id == user_id {
-                Ok(Some(user_ids.buyer_id))
+        Ok(users_in_chat) => {
+            if users_in_chat.user_id == user_id {
+                Ok(Some(users_in_chat.user_id))
+            } else if users_in_chat.user_id == user_id {
+                Ok(Some(users_in_chat.buyer_id))
             } else {
                 Ok(None)
             }
@@ -256,51 +262,34 @@ pub async fn insert_chat_message(
 }
 
 // fetch the item info by chat id and if there is a chat room between the user and other user regarding this item
-pub async fn fetch_item_and_potential_chat_id_by_item_id(
+pub async fn fetch_chat_id_by_item_id(
     user_id: i32,
     item_id: i32,
     conn: impl Executor<'_, Database = MySql>,
-) -> Result<ItemWithChatId, DbError> {
-    let raw_item = sqlx::query_as!(
-        RawItemWithChatId,
+) -> Result<Option<i32>, DbError> {
+    let result = sqlx::query!(
         r#"
         SELECT
-            Item.id, 
-            Item.name, 
-            Item.price, 
-            Item.user_id, 
-            Item.category,
-            Item.status,
-            Item.description,
-            Item.created_at, 
-            Item.updated_at,
-            ItemChat.id as chat_id,
-            GROUP_CONCAT(ItemImage.url) AS item_images
-        FROM Item
-        JOIN ItemImage ON Item.id = ItemImage.item_id
-        LEFT JOIN ItemChat ON ItemChat.item_id = Item.id AND (ItemChat.buyer_id = ? OR Item.user_id = ?)
-        WHERE Item.id = ?
-        GROUP BY Item.id, Item.name, Item.price, Item.user_id, Item.category, Item.status, Item.description, Item.created_at, Item.updated_at, ItemChat.id;
+            ItemChat.id
+        FROM ItemChat
+        WHERE ItemChat.item_id = ? AND (ItemChat.buyer_id = ? OR ItemChat.buyer_id = ?);
         "#,
+        item_id,
         user_id,
-        user_id,
-        item_id
-    ).fetch_one(conn).await?;
+        user_id
+    ).fetch_one(conn).await;
 
-    Ok(ItemWithChatId {
-        id: raw_item.id,
-        name: raw_item.name,
-        price: raw_item.price,
-        item_images: match raw_item.item_images {
-            Some(item_images) => item_images.split(",").map(|s| s.to_string()).collect(),
-            None => Vec::new(),
-        },
-        category: raw_item.category,
-        status: raw_item.status,
-        user_id: raw_item.user_id,
-        description: raw_item.description,
-        created_at: raw_item.created_at.into(),
-        updated_at: raw_item.updated_at.into(),
-        chat_id: raw_item.chat_id,
-    })
+    match result {
+        Err(sqlx::Error::RowNotFound) => Ok(None),
+        Err(err) => Err(err.into()),
+        Ok(chat_id) => {
+            if chat_id.id == 0 {
+                Ok(None)
+            } else {
+                Ok(Some(chat_id.id))
+            }
+        }
+    }
+
+ 
 }
