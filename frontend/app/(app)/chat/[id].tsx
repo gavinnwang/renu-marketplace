@@ -31,7 +31,7 @@ export default function ChatScreen() {
   );
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
 
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState(1);
 
   const { isError: isErrorChatWindow } = useQuery({
     queryFn: async () =>
@@ -153,6 +153,7 @@ export default function ChatScreen() {
               minIndexForVisible: 0,
             }}
             inverted
+            estimatedItemSize={page * 35}
           />
 
           <View>
