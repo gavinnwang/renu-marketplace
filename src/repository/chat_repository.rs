@@ -192,12 +192,13 @@ pub async fn fetch_chat_messages_by_chat_id(
         .collect())
 }
 
+// check if user_id is part of chat group and returns the other user_id
 pub async fn check_if_user_id_is_part_of_chat_group(
     user_id: i32,
     chat_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Option<i32>, DbError> {
-    let participants = sqlx::query!(
+    let result = sqlx::query!(
         r#"
         SELECT ItemChat.buyer_id, Item.user_id FROM ItemChat
         JOIN Item ON ItemChat.item_id = Item.id    
@@ -206,14 +207,20 @@ pub async fn check_if_user_id_is_part_of_chat_group(
         chat_id
     )
     .fetch_one(conn)
-    .await?;
+    .await;
 
-    if participants.buyer_id == user_id {
-        Ok(Some(participants.user_id))
-    } else if participants.user_id == user_id {
-        Ok(Some(participants.buyer_id))
-    } else {
-        Ok(None)
+    match result {
+        Err(sqlx::Error::RowNotFound) => Ok(None),
+        Err(err) => Err(err.into()),
+        Ok(user_ids) => {
+            if user_ids.buyer_id == user_id {
+                Ok(Some(user_ids.user_id))
+            } else if user_ids.user_id == user_id {
+                Ok(Some(user_ids.buyer_id))
+            } else {
+                Ok(None)
+            }
+        }
     }
 }
 

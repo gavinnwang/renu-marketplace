@@ -25,7 +25,7 @@ pub struct WsChatSession {
     pub hb: Instant,
 
     // joined room id and other user id in the room
-    pub room_id_and_other_user_id: Option<(usize, usize)>,
+    pub chat_id_and_other_user_id: Option<(usize, usize)>,
 
     // chat server address to send message
     pub server_addr: Addr<server::ChatServer>,
@@ -167,7 +167,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                             );
                                             ctx.text(format!("Joined chat id {}", chat_id));
 
-                                            act.room_id_and_other_user_id =
+                                            act.chat_id_and_other_user_id =
                                                 Some((chat_id as usize, other_user_id));
                                         }
                                         Ok(Err(err)) => {
@@ -200,6 +200,47 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                     }
                 } else {
                     //    self.server_addr.send(session::)
+                    match self.chat_id_and_other_user_id {
+                        Some((chat_id, other_user_id)) => {
+                            self.server_addr
+                                .send(server::ChatMessageToServer {
+                                    sender_id: self.user_id,
+                                    receiver_id: other_user_id,
+                                    chat_id,
+                                    content: m.to_owned(),
+                                })
+                                .into_actor(self)
+                                .then(move |res, act, ctx| {
+                                    match res {
+                                        Ok(()) => {
+                                            tracing::info!(
+                                                "User id {} sent message to chat id {}",
+                                                act.user_id,
+                                                chat_id
+                                            );
+                                        }
+                                        Err(err) => {
+                                            tracing::error!("Error message: {}\n", err);
+                                            tracing::error!(
+                                                "User id {} failed to send message to chat id {}",
+                                                act.user_id,
+                                                chat_id
+                                            );
+                                            ctx.text("Something went wrong".to_string());
+                                        }
+                                    }
+                                    fut::ready(())
+                                })
+                                .wait(ctx);
+                        }
+                        None => {
+                            tracing::warn!(
+                                "User id {} is not part of any chat group",
+                                self.user_id
+                            );
+                            ctx.text("You are not part of any chat group".to_string());
+                        }
+                    }
                 }
             }
             ws::Message::Close(reason) => {

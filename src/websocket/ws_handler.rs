@@ -20,7 +20,7 @@ async fn ws_route(
         session::WsChatSession {
             user_id,
             hb: Instant::now(),
-            room_id_and_other_user_id: None,
+            chat_id_and_other_user_id: None,
             server_addr: srv.get_ref().clone(),
         },
         &req,
