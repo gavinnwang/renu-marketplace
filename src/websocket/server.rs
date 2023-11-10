@@ -206,7 +206,22 @@ impl Handler<Join> for ChatServer {
                                 msg.chat_id
                             );
 
-                            sessions.get_mut(&msg.user_id).unwrap().1 = Some(msg.chat_id);
+                            match sessions.get_mut(&msg.user_id) {
+                                Some((_, room_id)) => {
+                                    *room_id = Some(msg.chat_id);
+                                }
+                                None => {
+                                    tracing::error!(
+                                        "Session with id {} does not exist",
+                                        msg.user_id
+                                    );
+
+                                    Err(format!(
+                                        "Session with id {} does not exist",
+                                        msg.user_id
+                                    ))?;
+                                }
+                            }
 
                             Ok(other_user_id as usize)
                         }
@@ -225,7 +240,7 @@ impl Handler<Join> for ChatServer {
                 Err(err) => {
                     tracing::error!("Error checking if user is part of chat group: Error message: {}\n", err);
 
-                    Err("Something went wrong".to_string())
+                    Err(format!("Failed to check if user is part of chat group: {}\n", err))
                 }
             }
         })
