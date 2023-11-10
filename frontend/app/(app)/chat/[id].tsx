@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
-import React, { useEffect } from "react";
+import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
 import { ChatMessage, ChatWindow } from "../../../types/types";
