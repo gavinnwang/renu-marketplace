@@ -31,8 +31,6 @@ export default function ChatScreen() {
   );
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
 
-  const [offset, setOffset] = React.useState(1);
-
   const { isError: isErrorChatWindow } = useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/window/${chatId}`, {
@@ -51,19 +49,25 @@ export default function ChatScreen() {
     },
   });
 
+  const [offset, setOffset] = React.useState(0);
+  const limit = 5;
+
   const { isError: isErrorChatMessages, refetch } = useQuery({
     queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/messages/${chatId}`, {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }).then((x) => x.json()) as Promise<ApiResponse<ChatMessage[]>>,
+      fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/messages/${chatId}?offset=${offset}?limit=${limit}`,
+        {
+          headers: {
+            authorization: `Bearer ${session?.token}`,
+          },
+        }
+      ).then((x) => x.json()) as Promise<ApiResponse<ChatMessage[]>>,
     queryKey: ["messages", chatId],
     enabled: !!chatId,
     onSuccess(data) {
       if (data.status === "success") {
-        setChatMessages(data.data);
-        // console.log(data);
+        setChatMessages([...chatMessages, ...data.data]);
+        setOffset((prev) => prev + limit);
       } else {
         console.error(data);
       }
@@ -144,7 +148,6 @@ export default function ChatScreen() {
           keyboardVerticalOffset={64}
         >
           <FlashList
-            className="p-4"
             data={chatMessages}
             renderItem={({ item }) => <Message message={item} />}
             keyExtractor={(item, index) => index.toString()}
@@ -152,7 +155,14 @@ export default function ChatScreen() {
               minIndexForVisible: 0,
             }}
             inverted
-            estimatedItemSize={offset * 35}
+            estimatedItemSize={offset ? offset : 35}
+            onEndReached={() => {
+              refetch();
+            }}
+            showsVerticalScrollIndicator={true}
+            contentContainerStyle={{
+              padding: 10,
+            }}
           />
 
           <View>
@@ -177,6 +187,7 @@ export default function ChatScreen() {
                   } as ChatMessage,
                   ...prev,
                 ]);
+                setOffset((prev) => prev + 1);
               }}
             />
           </View>
