@@ -2,7 +2,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   Dimensions,
   KeyboardAvoidingView,
-  Platform,
   Pressable,
   Text,
   View,
@@ -11,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
 import React, { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
 import { ChatMessage, ChatWindow } from "../../../types/types";
 import { useSession } from "../../../providers/ctx";
@@ -71,7 +70,7 @@ export default function ChatScreen() {
   const width = Dimensions.get("window").width / 8;
   const [inputText, setInputText] = React.useState("");
 
-  let socketUrl = "ws://localhost:8080/ws";
+  let socketUrl = "wss://api.gavinwang.dev/ws";
   const {
     sendMessage,
     sendJsonMessage,
@@ -95,6 +94,8 @@ export default function ChatScreen() {
       flatListRef.current.scrollToEnd({ animated: true });
     }
   }, [chatMessages]); // This effect runs every time `chatMessages` changes
+
+  const queryClient = useQueryClient();
 
   return (
     <SafeAreaView className="bg-bgLight">
@@ -143,7 +144,7 @@ export default function ChatScreen() {
           </Text>
         </Pressable>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "height" : "height"}
+          behavior="padding"
           style={{ flex: 1 }}
           keyboardVerticalOffset={64}
         >
@@ -168,8 +169,10 @@ export default function ChatScreen() {
               onChangeText={setInputText}
               onSubmitEditing={(e) => {
                 if (!inputText) return;
-                sendMessage(`/message ${inputText}`);
+                sendMessage(`/message ${chatId} ${inputText}`);
                 setInputText("");
+                queryClient.invalidateQueries(["chats", 0]); // todo: improve this cache invalidation logic
+                queryClient.invalidateQueries(["chats", 1]);
 
                 setChatMessages((prev) => [
                   ...prev,
