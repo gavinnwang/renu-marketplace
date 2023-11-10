@@ -2,7 +2,11 @@ use sqlx::{Executor, MySql};
 
 use crate::{
     error::DbError,
-    model::chat_model::{ChatGroup, ChatMessage, ChatWindow, RawChatGroup, RawChatMessage},
+    model::item_model::RawItemWithChatId,
+    model::{
+        chat_model::{ChatGroup, ChatMessage, ChatWindow, RawChatGroup, RawChatMessage},
+        item_model::ItemWithChatId,
+    },
 };
 
 pub async fn fetch_chat_groups_by_seller_id(
@@ -195,7 +199,7 @@ pub async fn fetch_chat_messages_by_chat_id(
             sent_at: message.sent_at.into(),
             from_me: message.from_me as i32,
         })
-     .collect()) 
+        .collect())
 }
 
 // check if user_id is part of chat group and returns the other user_id
@@ -230,7 +234,6 @@ pub async fn check_if_user_id_is_part_of_chat_group(
     }
 }
 
-
 pub async fn insert_chat_message(
     user_id: i32,
     chat_id: i32,
@@ -250,4 +253,54 @@ pub async fn insert_chat_message(
     .await?;
 
     Ok(result.rows_affected() == 1)
+}
+
+// fetch the item info by chat id and if there is a chat room between the user and other user regarding this item
+pub async fn fetch_item_and_potential_chat_id_by_item_id(
+    user_id: i32,
+    item_id: i32,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<ItemWithChatId, DbError> {
+    let raw_item = sqlx::query_as!(
+        RawItemWithChatId,
+        r#"
+        SELECT
+            Item.id, 
+            Item.name, 
+            Item.price, 
+            Item.user_id, 
+            Item.category,
+            Item.status,
+            Item.description,
+            Item.created_at, 
+            Item.updated_at,
+            ItemChat.id as chat_id,
+            GROUP_CONCAT(ItemImage.url) AS item_images
+        FROM Item
+        JOIN ItemImage ON Item.id = ItemImage.item_id
+        LEFT JOIN ItemChat ON ItemChat.item_id = Item.id AND (ItemChat.buyer_id = ? OR Item.user_id = ?)
+        WHERE Item.id = ?
+        GROUP BY Item.id, Item.name, Item.price, Item.user_id, Item.category, Item.status, Item.description, Item.created_at, Item.updated_at, ItemChat.id;
+        "#,
+        user_id,
+        user_id,
+        item_id
+    ).fetch_one(conn).await?;
+
+    Ok(ItemWithChatId {
+        id: raw_item.id,
+        name: raw_item.name,
+        price: raw_item.price,
+        item_images: match raw_item.item_images {
+            Some(item_images) => item_images.split(",").map(|s| s.to_string()).collect(),
+            None => Vec::new(),
+        },
+        category: raw_item.category,
+        status: raw_item.status,
+        user_id: raw_item.user_id,
+        description: raw_item.description,
+        created_at: raw_item.created_at.into(),
+        updated_at: raw_item.updated_at.into(),
+        chat_id: raw_item.chat_id,
+    })
 }
