@@ -104,7 +104,7 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   return (
     <Pressable
       onPress={() => {
-        router.push(`/chat/${chat.chat_id}`);
+        router.push(`/chat/${chat.item_id}`);
       }}
       className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary ${
         chat.item_status === "INACTIVE" ? "opacity-70" : ""

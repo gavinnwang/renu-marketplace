@@ -179,7 +179,7 @@ export default function ItemPage() {
 
                 <View className="ml-auto flex flex-col w-[100px] gap-y-0.5">
                   <Pressable 
-                  onPress={() => router.push(`/chat/${seller?.id}`)}
+                  onPress={() => router.push(`/chat/${item.data.id}`)}
                   className="font-Manrope_400Regular bg-purplePrimary p-2">
                     <Text className="text-white text-center font-Manrope_600SemiBold">
                       Message

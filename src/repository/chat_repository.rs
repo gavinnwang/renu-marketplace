@@ -218,9 +218,11 @@ pub async fn check_if_user_id_is_part_of_chat_group(
         r#"
         SELECT ItemChat.buyer_id, Item.user_id FROM ItemChat
         JOIN Item ON ItemChat.item_id = Item.id    
-        WHERE ItemChat.id = ?
+        WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR Item.user_id = ?);
         "#,
-        chat_id
+        chat_id,
+        user_id,
+        user_id
     )
     .fetch_one(conn)
     .await;
