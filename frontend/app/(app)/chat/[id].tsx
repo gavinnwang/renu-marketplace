@@ -44,7 +44,7 @@ export default function ChatScreen() {
     enabled: !!itemId,
     onSuccess(data) {
       if (data.status === "success") {
-        console.log(data.data);
+        console.log("set chatid", data.data);
         // setChatWindow(data.data);
         setChatId(data.data.chat_id);
       } else {
@@ -199,6 +199,21 @@ export default function ChatScreen() {
                 if (!inputText) return;
                 if (!chatId) {
                   console.log("no chat id so create one");
+                  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/${chatId}`, {
+                    headers: {
+                      authorization: `Bearer ${session?.token}`,
+                    },
+                    method: "POST",
+                  }).then((x) => {
+                    x.json().then((data: ApiResponse<ChatId>) => {
+                      if (data.status === "success") {
+                        setChatId(data.data.chat_id);
+                        sendMessage(`/join ${data.data.chat_id}`);
+                      } else {
+                        console.error(data);
+                      }
+                    });
+                  });
                 }
                 sendMessage(`/message ${chatId} ${inputText}`);
                 setInputText("");
