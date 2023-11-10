@@ -1,14 +1,14 @@
-use std::{
-    cell::RefCell,
-    collections::HashMap,
-    rc::Rc,
-};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
-use actix::{Actor, Context, Handler, Message, Recipient, ResponseFuture};
+use actix::{
+    prelude::ContextFutureSpawner, Actor, Context, Handler, Message, Recipient, ResponseFuture,
+    WrapFuture,
+};
 use actix_web::web::Data;
 
 use crate::{
-    model::db_model::DbPool, repository::chat_repository::check_if_user_id_is_part_of_chat_group,
+    model::db_model::DbPool,
+    repository::chat_repository::{check_if_user_id_is_part_of_chat_group, insert_chat_message},
 };
 
 use super::session;
@@ -40,12 +40,55 @@ impl ChatServer {
 }
 // chat message to server
 
-#[derive(Message)]
+#[derive(Message, Clone)]
 #[rtype(result = "()")]
 pub struct ChatMessageToServer {
-    pub user_id: usize,
+    pub sender_id: usize,
+    pub receiver_id: usize,
     pub chat_id: usize,
     pub content: String,
+}
+
+impl Handler<ChatMessageToServer> for ChatServer {
+    type Result = ();
+
+    fn handle(&mut self, msg: ChatMessageToServer, ctx: &mut Self::Context) -> Self::Result {
+        let sessions = self.sessions.borrow();
+
+        match sessions.get(&msg.receiver_id) {
+            Some((addr, _)) => {
+                addr.do_send(session::ChatMessageToClient(msg.content.clone()));
+            }
+            None => {
+                tracing::info!(
+                    "Session with id {} isn't registered on chat server. Message not sent over websocket.",
+                    msg.receiver_id
+                );
+            }
+        }
+
+        let pool = self.pool.clone();
+        async move {
+            let result = insert_chat_message(
+                msg.sender_id as i32,
+                msg.chat_id as i32,
+                &msg.content,
+                pool.as_ref(),
+            )
+            .await;
+
+            match result {
+                Ok(_) => {
+                    tracing::info!("Message inserted to database successfully");
+                }
+                Err(err) => {
+                    tracing::error!("Failed to insert message to databse. Error message: {}\n", err);
+                }
+            }
+        }
+        .into_actor(self)
+        .spawn(ctx);
+    }
 }
 
 //  new chat session is created
@@ -85,6 +128,10 @@ impl Handler<Disconnect> for ChatServer {
         // let mut rooms = self.rooms.borrow_mut();
 
         match sessions.remove(&msg.user_id) {
+            Some((_, _)) => (), // if session is not in a room, do nothing
+            None => {
+                tracing::warn!("Session with id {} does not exist", msg.user_id);
+            } // if session does not exist, do nothing. SHOULD NOT HAPPEN
             // if session is in a room, remove the session from the room
             // Some((_, Some(room_id))) => match rooms.get_mut(&room_id) {
             //     Some(room) => {
@@ -115,10 +162,6 @@ impl Handler<Disconnect> for ChatServer {
             //         );
             //     } // if room does not exist, do nothing. SHOULD NOT HAPPEN
             // },
-            Some((_, _)) => (), // if session is not in a room, do nothing
-            None => {
-                tracing::warn!("Session with id {} does not exist", msg.user_id);
-            } // if session does not exist, do nothing. SHOULD NOT HAPPEN
         }
     }
 }
@@ -214,7 +257,7 @@ impl Handler<Join> for ChatServer {
                     }
                 }
                 Err(err) => {
-                    tracing::error!("Error message: {}\n", err);
+                    tracing::error!("Error checking if user is part of chat group: Error message: {}\n", err);
 
                     Err("Something went wrong".to_string())
                 }
