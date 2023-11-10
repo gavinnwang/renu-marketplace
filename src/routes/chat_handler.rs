@@ -83,11 +83,17 @@ async fn get_chat_window_by_chat_id(
     }
 }
 
+#[derive(Deserialize)]
+pub struct ChatMessageQuery {
+    pub offset: Option<i32>,
+}
+
 #[get("/messages/{chat_id}")]
 async fn get_chat_messages_by_chat_id(
     auth_guard: AuthenticationGuard,
     path: web::Path<i32>,
     pool: web::Data<DbPool>,
+    query: web::Query<ChatMessageQuery>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
     let chat_id = path.into_inner();
@@ -113,8 +119,20 @@ async fn get_chat_messages_by_chat_id(
         }
     }
 
-    let messages =
-        chat_repository::fetch_chat_messages_by_chat_id(user_id, chat_id, pool.as_ref()).await;
+    let offset = match query.offset {
+        Some(offset) => offset,
+        None => 0,
+    };
+    let limit = 35;
+
+    let messages = chat_repository::fetch_chat_messages_by_chat_id(
+        user_id,
+        chat_id,
+        offset,
+        limit,
+        pool.as_ref(),
+    )
+    .await;
 
     match messages {
         Ok(messages) => {

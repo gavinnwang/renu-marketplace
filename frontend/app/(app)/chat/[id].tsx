@@ -15,7 +15,7 @@ import { ApiResponse } from "../../../types/api";
 import { ChatMessage, ChatWindow } from "../../../types/types";
 import { useSession } from "../../../providers/ctx";
 import { Image } from "expo-image";
-import { FlatList, TextInput } from "react-native-gesture-handler";
+import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
 import { FlashList } from "@shopify/flash-list";
 
@@ -31,7 +31,7 @@ export default function ChatScreen() {
   );
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
 
-  const [page, setPage] = React.useState(1);
+  const [offset, setOffset] = React.useState(1);
 
   const { isError: isErrorChatWindow } = useQuery({
     queryFn: async () =>
@@ -152,7 +152,7 @@ export default function ChatScreen() {
               minIndexForVisible: 0,
             }}
             inverted
-            estimatedItemSize={page * 35}
+            estimatedItemSize={offset * 35}
           />
 
           <View>

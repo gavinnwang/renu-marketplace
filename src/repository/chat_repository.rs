@@ -153,6 +153,8 @@ pub async fn fetch_chat_window_by_chat_id(
 pub async fn fetch_chat_messages_by_chat_id(
     user_id: i32,
     chat_id: i32,
+    offset: i32,
+    limit: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<ChatMessage>, DbError> {
     let messages = sqlx::query_as!(
@@ -172,10 +174,13 @@ pub async fn fetch_chat_messages_by_chat_id(
         FROM Message
         WHERE Message.chat_id = ?
         ORDER BY Message.created_at DESC
-        LIMIT 35;
+        LIMIT ?
+        OFFSET ?;
         "#,
         user_id,
-        chat_id 
+        chat_id,
+        limit,
+        offset
     )
     .fetch_all(conn)
     .await?;
@@ -190,7 +195,7 @@ pub async fn fetch_chat_messages_by_chat_id(
             sent_at: message.sent_at.into(),
             from_me: message.from_me as i32,
         })
-     .collect()) //
+     .collect()) 
 }
 
 // check if user_id is part of chat group and returns the other user_id
