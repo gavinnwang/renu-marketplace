@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use sqlx::{Executor, MySql};
 
 use crate::{
@@ -202,6 +203,7 @@ pub async fn fetch_chat_messages_by_chat_id(
         .collect())
 }
 
+#[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 struct UserInChatGroup {
     buyer_id: i32,
     user_id: i32,
@@ -232,9 +234,9 @@ pub async fn check_if_user_id_is_part_of_chat_group(
         Err(err) => Err(err.into()),
         Ok(users_in_chat) => {
             if users_in_chat.user_id == user_id {
-                Ok(Some(users_in_chat.user_id))
-            } else if users_in_chat.user_id == user_id {
                 Ok(Some(users_in_chat.buyer_id))
+            } else if users_in_chat.buyer_id == user_id {
+                Ok(Some(users_in_chat.user_id))
             } else {
                 Ok(None)
             }
@@ -262,14 +264,18 @@ pub async fn insert_chat_message(
 
     Ok(result.rows_affected() == 1)
 }
-
+#[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
+struct ChatId {
+    id: i32,
+}
 // fetch the item info by chat id and if there is a chat room between the user and other user regarding this item
 pub async fn fetch_chat_id_by_item_id(
     user_id: i32,
     item_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Option<i32>, DbError> {
-    let result = sqlx::query!(
+    let result = sqlx::query_as!(
+        ChatId,
         r#"
         SELECT
             ItemChat.id

@@ -69,11 +69,15 @@ async fn get_chat_id_by_item_id(
     let chat_id = chat_repository::fetch_chat_id_by_item_id(user_id, item_id, pool.as_ref()).await;
 
     match chat_id {
-        Ok(chat_id) => {
-            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": {"chat_id": chat_id}}))
-        }
+        Ok(chat_id) => HttpResponse::Ok()
+            .json(serde_json::json!({"status": "success", "data": {"chat_id": chat_id}})),
         Err(err) => {
-            tracing::error!("{}\n", format!("API: Failed to fetch chat id for user with id {user_id} and item id {item_id}"));
+            tracing::error!(
+                "{}\n",
+                format!(
+                    "API: Failed to fetch chat id for user with id {user_id} and item id {item_id}"
+                )
+            );
             tracing::error!("Error message: {}\n", err);
 
             HttpResponse::InternalServerError()
@@ -248,11 +252,15 @@ async fn post_chat_room(
     let chat_id = chat_repository::insert_chat_room(user_id, item_id, pool.as_ref()).await;
 
     match chat_id {
-        Ok(chat_id) => {
-            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": {"chat_id": chat_id}}))
-        }
+        Ok(chat_id) => HttpResponse::Ok()
+            .json(serde_json::json!({"status": "success", "data": {"chat_id": chat_id}})),
         Err(err) => {
-            tracing::error!("{}\n", format!("API: Failed to insert chat for user with id {user_id} and item id {item_id}"));
+            tracing::error!(
+                "{}\n",
+                format!(
+                    "API: Failed to insert chat for user with id {user_id} and item id {item_id}"
+                )
+            );
             tracing::error!("Error message: {}\n", err);
 
             HttpResponse::InternalServerError()
