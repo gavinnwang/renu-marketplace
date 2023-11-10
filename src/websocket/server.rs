@@ -1,6 +1,6 @@
 use std::{
     cell::RefCell,
-    collections::{HashMap, HashSet},
+    collections::HashMap,
     rc::Rc,
 };
 
@@ -11,11 +11,14 @@ use crate::{
     model::db_model::DbPool, repository::chat_repository::check_if_user_id_is_part_of_chat_group,
 };
 
+use super::session;
+
 // chat server manages chat rooms and responsible for coordinating chat session
 #[derive(Debug, Clone)]
 pub struct ChatServer {
-    sessions: Rc<RefCell<HashMap<usize, (Recipient<ChatMessage>, Option<usize>)>>>, // maps session id to session address and the room id the session is in
-    rooms: Rc<RefCell<HashMap<usize, HashSet<usize>>>>, // maps room id to set of session ids in the room
+    sessions: Rc<RefCell<HashMap<usize, (Recipient<session::ChatMessageToClient>, Option<usize>)>>>, // maps session id to session address and the room id the session is in
+    // rooms: Rc<RefCell<HashMap<usize, HashSet<usize>>>>, // maps room id to set of session ids in the room
+    // we don't need rooms because we only have DM and no group chat
     pool: Data<DbPool>,
 }
 
@@ -30,29 +33,27 @@ impl ChatServer {
     pub fn new(pool: Data<DbPool>) -> ChatServer {
         ChatServer {
             sessions: Rc::new(RefCell::new(HashMap::new())),
-            rooms: Rc::new(RefCell::new(HashMap::new())),
+            // rooms: Rc::new(RefCell::new(HashMap::new())),
             pool,
         }
     }
 }
+// chat message to server
 
-impl ChatServer {
-    fn distribute_message_in_room(&self, room_id: usize, message: &str, sender_id: usize) {
-        todo!()
-    }
-}
-
-/// Chat server sends this messages to session
 #[derive(Message)]
 #[rtype(result = "()")]
-pub struct ChatMessage(pub String);
+pub struct ChatMessageToServer {
+    pub user_id: usize,
+    pub chat_id: usize,
+    pub content: String,
+}
 
 //  new chat session is created
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Connect {
     pub user_id: usize,
-    pub addr: Recipient<ChatMessage>,
+    pub addr: Recipient<session::ChatMessageToClient>,
 }
 
 impl Handler<Connect> for ChatServer {
@@ -81,40 +82,40 @@ impl Handler<Disconnect> for ChatServer {
         tracing::info!("Session with id {} disconnected", msg.user_id);
 
         let mut sessions = self.sessions.borrow_mut();
-        let mut rooms = self.rooms.borrow_mut();
+        // let mut rooms = self.rooms.borrow_mut();
 
         match sessions.remove(&msg.user_id) {
             // if session is in a room, remove the session from the room
-            Some((_, Some(room_id))) => match rooms.get_mut(&room_id) {
-                Some(room) => {
-                    match room.remove(&room_id) {
-                        // remove session from room
-                        true => {
-                            // if room is empty, remove room
-                            if room.is_empty() {
-                                rooms.remove(&room_id);
-                                tracing::info!(
-                                    "Room with id {} removed because is now empty",
-                                    room_id
-                                );
-                            }
-                        }
-                        false => {
-                            tracing::warn!(
-                                "Session with id {} is in a room that does not exist",
-                                msg.user_id
-                            );
-                        } // if session is not in room, do nothing. SHOULD NOT HAPPEN
-                    }
-                }
-                None => {
-                    tracing::warn!(
-                        "Session with id {} is in a room that does not exist",
-                        msg.user_id
-                    );
-                } // if room does not exist, do nothing. SHOULD NOT HAPPEN
-            },
-            Some((_, None)) => (), // if session is not in a room, do nothing
+            // Some((_, Some(room_id))) => match rooms.get_mut(&room_id) {
+            //     Some(room) => {
+            //         match room.remove(&room_id) {
+            //             // remove session from room
+            //             true => {
+            //                 // if room is empty, remove room
+            //                 if room.is_empty() {
+            //                     rooms.remove(&room_id);
+            //                     tracing::info!(
+            //                         "Room with id {} removed because is now empty",
+            //                         room_id
+            //                     );
+            //                 }
+            //             }
+            //             false => {
+            //                 tracing::warn!(
+            //                     "Session with id {} is in a room that does not exist",
+            //                     msg.user_id
+            //                 );
+            //             } // if session is not in room, do nothing. SHOULD NOT HAPPEN
+            //         }
+            //     }
+            //     None => {
+            //         tracing::warn!(
+            //             "Session with id {} is in a room that does not exist",
+            //             msg.user_id
+            //         );
+            //     } // if room does not exist, do nothing. SHOULD NOT HAPPEN
+            // },
+            Some((_, _)) => (), // if session is not in a room, do nothing
             None => {
                 tracing::warn!("Session with id {} does not exist", msg.user_id);
             } // if session does not exist, do nothing. SHOULD NOT HAPPEN
@@ -130,16 +131,16 @@ pub struct Join {
 }
 
 impl actix::Message for Join {
-    type Result = Result<(), String>;
+    type Result = Result<usize, String>;
 }
 
 impl Handler<Join> for ChatServer {
-    type Result = ResponseFuture<Result<(), String>>;
+    type Result = ResponseFuture<Result<usize, String>>;
 
     fn handle(&mut self, msg: Join, _: &mut Self::Context) -> Self::Result {
         let pool = self.pool.clone();
 
-        let rooms = self.rooms.clone();
+        // let rooms = self.rooms.clone();
         let sessions = self.sessions.clone();
 
         // do something async
@@ -154,9 +155,9 @@ impl Handler<Join> for ChatServer {
             match is_part_of_chat_group {
                 Ok(is_part_of_chat_group) => {
                     match is_part_of_chat_group {
-                        Some(_) => {
+                        Some(other_user_id) => {
                             let mut sessions = sessions.borrow_mut();
-                            let mut rooms = rooms.borrow_mut();
+                            // let mut rooms = rooms.borrow_mut();
                             tracing::info!(
                                 "user {} is part of chat group {} ",
                                 msg.user_id,
@@ -166,37 +167,39 @@ impl Handler<Join> for ChatServer {
                             sessions.get_mut(&msg.user_id).unwrap().1 = Some(msg.chat_id);
 
                             // create a new room if room doens't exist otherwise add session to room
-                            match rooms.get_mut(&msg.chat_id) {
-                                Some(room) => match room.insert(msg.user_id) {
-                                    true => {
-                                        tracing::info!(
-                                            "Session with id {} added to room",
-                                            msg.user_id
-                                        );
-                                        Ok(())
-                                    }
-                                    false => {
-                                        tracing::warn!(
-                                            "Session with id {} is already in room",
-                                            msg.user_id
-                                        );
-                                        Err(format!(
-                                            "Warn: Session with id {} is already in room",
-                                            msg.user_id
-                                        ))
-                                    }
-                                },
-                                None => {
-                                    tracing::info!(
-                                        "Room does not exist. Creating room with id {}",
-                                        msg.chat_id
-                                    );
-                                    let mut room = HashSet::new();
-                                    room.insert(msg.user_id);
-                                    rooms.insert(msg.chat_id, room);
-                                    Ok(())
-                                }
-                            }
+                            // match rooms.get_mut(&msg.chat_id) {
+                            //     Some(room) => match room.insert(msg.user_id) {
+                            //         true => {
+                            //             tracing::info!(
+                            //                 "Session with id {} added to room",
+                            //                 msg.user_id
+                            //             );
+                            //             Ok(())
+                            //         }
+                            //         false => {
+                            //             tracing::warn!(
+                            //                 "Session with id {} is already in room",
+                            //                 msg.user_id
+                            //             );
+                            //             Err(format!(
+                            //                 "Warn: Session with id {} is already in room",
+                            //                 msg.user_id
+                            //             ))
+                            //         }
+                            //     },
+                            //     None => {
+                            //         tracing::info!(
+                            //             "Room does not exist. Creating room with id {}",
+                            //             msg.chat_id
+                            //         );
+                            //         let mut room = HashSet::new();
+                            //         room.insert(msg.user_id);
+                            //         rooms.insert(msg.chat_id, room);
+                            //         Ok(())
+                            //     }
+                            // }
+
+                            Ok(other_user_id as usize)
                         }
 
                         None => {

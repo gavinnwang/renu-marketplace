@@ -2,7 +2,7 @@ use std::time::{Duration, Instant};
 
 use actix::{
     fut, prelude::ContextFutureSpawner, Actor, ActorContext, ActorFutureExt, Addr, AsyncContext,
-    Handler, StreamHandler, WrapFuture,
+    Handler, Message, StreamHandler, WrapFuture,
 };
 use actix_web_actors::ws;
 
@@ -24,8 +24,8 @@ pub struct WsChatSession {
     // otherwise we drop connection.
     pub hb: Instant,
 
-    // joined room id
-    pub room_id: Option<usize>,
+    // joined room id and other user id in the room
+    pub room_id_and_other_user_id: Option<(usize, usize)>,
 
     // chat server address to send message
     pub server_addr: Addr<server::ChatServer>,
@@ -102,10 +102,15 @@ impl Actor for WsChatSession {
     }
 }
 
-impl Handler<server::ChatMessage> for WsChatSession {
+/// Chat server sends this messages to session
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct ChatMessageToClient(pub String);
+
+impl Handler<ChatMessageToClient> for WsChatSession {
     type Result = ();
 
-    fn handle(&mut self, msg: server::ChatMessage, ctx: &mut Self::Context) {
+    fn handle(&mut self, msg: ChatMessageToClient, ctx: &mut Self::Context) {
         ctx.text(msg.0);
     }
 }
@@ -132,11 +137,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
             }
             ws::Message::Text(text) => {
                 tracing::info!("WS text: {:?}", text);
-
-                
-
                 let m = text.trim();
-
                 if m.starts_with('/') {
                     let v: Vec<&str> = m.splitn(2, ' ').collect();
                     match v[0] {
@@ -156,15 +157,18 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     chat_id: chat_id as usize,
                                 })
                                 .into_actor(self)
-                                .then(move |res, _, ctx| {
+                                .then(move |res, act, ctx| {
                                     match res {
-                                        Ok(Ok(_)) => {
+                                        Ok(Ok(other_user_id)) => {
                                             tracing::info!(
                                                 "User id {} joined chat id {}",
                                                 user_id,
                                                 chat_id
                                             );
                                             ctx.text(format!("Joined chat id {}", chat_id));
+
+                                            act.room_id_and_other_user_id =
+                                                Some((chat_id as usize, other_user_id));
                                         }
                                         Ok(Err(err)) => {
                                             tracing::warn!("Error message: {}\n", err);
@@ -194,6 +198,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                         }
                         _ => ctx.text(format!("Unknown command: {}", m)),
                     }
+                } else {
+                    //    self.server_addr.send(session::)
                 }
             }
             ws::Message::Close(reason) => {
