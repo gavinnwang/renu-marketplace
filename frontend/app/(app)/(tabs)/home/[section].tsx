@@ -70,7 +70,7 @@ export default function HomePage() {
     refetch: refetchItems,
   } = useQuery({
     queryFn: async () =>
-      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + fetchUrlPath).then((x) =>
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}${fetchUrlPath}`).then((x) =>
         x.json()
       ) as Promise<ApiResponse<ItemWithImage[]>>,
     queryKey: ["item", selectedSection],

@@ -86,6 +86,7 @@ async fn get_chat_window_by_chat_id(
 #[derive(Deserialize)]
 pub struct ChatMessageQuery {
     pub offset: Option<i32>,
+    pub limit: Option<i32>,
 }
 
 #[get("/messages/{chat_id}")]
@@ -123,7 +124,11 @@ async fn get_chat_messages_by_chat_id(
         Some(offset) => offset,
         None => 0,
     };
-    let limit = 35;
+
+    let limit = match query.limit {
+        Some(limit) => limit,
+        None => 15,
+    };
 
     let messages = chat_repository::fetch_chat_messages_by_chat_id(
         user_id,
