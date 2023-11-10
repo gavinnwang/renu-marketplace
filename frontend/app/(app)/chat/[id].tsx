@@ -12,7 +12,7 @@ import Colors from "../../../constants/Colors";
 import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
-import { ChatMessage, ChatWindow } from "../../../types/types";
+import { ChatMessage, ChatWindow, ItemWithChatId } from "../../../types/types";
 import { useSession } from "../../../providers/ctx";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
@@ -22,7 +22,7 @@ import { FlashList } from "@shopify/flash-list";
 export default function ChatScreen() {
   const router = useRouter();
   const param = useLocalSearchParams();
-  const chatId = param.id;
+  const itemId = param.id;
 
   const { session } = useSession();
 
@@ -31,17 +31,41 @@ export default function ChatScreen() {
   );
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
 
+  const [chatId, setChatId] = React.useState<number | undefined>(undefined);
+
   const { isError: isErrorChatWindow } = useQuery({
+    queryFn: async () =>
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/id/${itemId}`, {
+        headers: {
+          authorization: `Bearer ${session?.token}`,
+        },
+      }).then((x) => x.json()) as Promise<ApiResponse<ItemWithChatId>>,
+    queryKey: ["chat_item", itemId],
+    enabled: !!itemId,
+    onSuccess(data) {
+      if (data.status === "success") {
+        console.log(data.data)
+        // setChatWindow(data.data);
+        setChatId(data.data.chat_id);
+      } else {
+        console.error(data);
+      }
+    },
+  });
+
+  useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/window/${chatId}`, {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
       }).then((x) => x.json()) as Promise<ApiResponse<ChatWindow>>,
-    queryKey: ["chat", chatId],
+    queryKey: ["chat_window", chatId],
     enabled: !!chatId,
     onSuccess(data) {
       if (data.status === "success") {
+        console.log(data.data)
+
         setChatWindow(data.data);
       } else {
         console.error(data);
@@ -173,6 +197,10 @@ export default function ChatScreen() {
               onChangeText={setInputText}
               onSubmitEditing={(e) => {
                 if (!inputText) return;
+                if (!chatId) {
+                  console.log("no chat id so create one");
+                  
+                }
                 sendMessage(`/message ${chatId} ${inputText}`);
                 setInputText("");
                 queryClient.invalidateQueries(["chats", 0]); // todo: improve this cache invalidation logic
