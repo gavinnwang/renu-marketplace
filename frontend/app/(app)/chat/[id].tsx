@@ -86,8 +86,8 @@ export default function ChatScreen() {
       authorization: `Bearer_${session?.token}`,
     },
     onOpen: () => sendMessage("/join " + chatId),
-    //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: (closeEvent) => true,
+    shouldReconnect: () => true,
+    reconnectInterval: 5,
   });
 
   const queryClient = useQueryClient();
@@ -144,11 +144,10 @@ export default function ChatScreen() {
           keyboardVerticalOffset={64}
         >
           <FlashList
-            // ref={flatListRef}
             className="p-4"
             data={chatMessages}
             renderItem={({ item }) => <Message message={item} />}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => index.toString()}
             maintainVisibleContentPosition={{
               minIndexForVisible: 0,
             }}
@@ -170,13 +169,13 @@ export default function ChatScreen() {
                 queryClient.invalidateQueries(["chats", 1]);
 
                 setChatMessages((prev) => [
-                  ...prev,
                   {
-                    id: prev.length > 0 ? prev[0].id + 1 : 1,
+                    id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
                     content: inputText,
                     from_me: 1,
                     sent_at: new Date(),
                   } as ChatMessage,
+                  ...prev,
                 ]);
               }}
             />
