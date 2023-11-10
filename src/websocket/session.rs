@@ -170,7 +170,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                 .into_actor(self)
                                 .then(move |res, act, ctx| {
                                     match res {
-                                        Ok(Ok(other_user_id)) => {
+                                        Ok(Ok(other_user_id)) => { 
                                             tracing::info!(
                                                 "User id {} joined chat id {}",
                                                 user_id,
@@ -179,35 +179,30 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                             ctx.text(format!("Joined chat id {}", chat_id));
 
                                             act.chat_id_and_other_user_id =
-                                                Some((chat_id as usize, other_user_id));
+                                                Some((chat_id, other_user_id));
                                         }
-                                        Ok(Err(err)) => {
-
+                                        Ok(Err(err)) => { 
                                             tracing::warn!(
                                                 "User id {} failed to join chat id {}, error message: {}",
                                                 user_id,
                                                 chat_id,
                                                 err
                                             );
-                                            ctx.text(format!(
-                                                "Failed to join chat. Error message: {}",
-                                                err
-                                            ));
+                                            ctx.text("Something went wrong");
                                         }
                                         Err(err) => {
-
                                             tracing::error!(
                                                 "User id {} failed to join chat id {}, error message: {}",
                                                 user_id,
                                                 chat_id,
                                                 err
                                             );
-                                            ctx.text("Something went wrong".to_string());
+                                            ctx.text("Something went wrong");
                                         }
                                     }
                                     fut::ready(())
                                 })
-                                .wait(ctx);
+                                .spawn(ctx);
                         }
                         "/message" => match self.chat_id_and_other_user_id {
                             Some((chat_id, other_user_id)) => {
@@ -255,19 +250,19 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                                 "User id {} failed to send message to chat id {chat_id}, error message: {err}",
                                                 act.user_id
                                             );
-                                                ctx.text("Something went wrong".to_string());
+                                                ctx.text("Something went wrong");
                                             }
                                         }
                                         fut::ready(())
                                     })
-                                    .wait(ctx);
+                                    .spawn(ctx);
                             }
                             None => {
                                 tracing::warn!(
                                     "User id {} is not part of any chat group",
                                     self.user_id
                                 );
-                                ctx.text("You are not part of any chat group".to_string());
+                                ctx.text("You are not part of any chat group");
                             }
                         },
                         _ => ctx.text(format!("Unknown command: {}", m)),
