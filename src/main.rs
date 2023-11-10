@@ -71,6 +71,7 @@ async fn main() -> std::io::Result<()> {
                 header::CONTENT_TYPE,
                 header::AUTHORIZATION,
                 header::ACCEPT,
+                header::UPGRADE,
             ])
             .supports_credentials();
         App::new()
