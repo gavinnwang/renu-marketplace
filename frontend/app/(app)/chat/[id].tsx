@@ -50,12 +50,12 @@ export default function ChatScreen() {
   });
 
   const [offset, setOffset] = React.useState(0);
-  const limit = 5;
+  const limit = 25;
 
   const { isError: isErrorChatMessages, refetch } = useQuery({
     queryFn: async () =>
       fetch(
-        `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/messages/${chatId}?offset=${offset}?limit=${limit}`,
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/messages/${chatId}?offset=${offset}&limit=${limit}`,
         {
           headers: {
             authorization: `Bearer ${session?.token}`,

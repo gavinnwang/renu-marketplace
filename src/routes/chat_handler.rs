@@ -57,6 +57,31 @@ async fn get_chat_groups_by_buyer_id(
     }
 }
 
+#[get("/id/{item_id}")]
+async fn get_chat_id_and_item_by_item_id(
+    auth_guard: AuthenticationGuard,
+    path: web::Path<i32>,
+    pool: web::Data<DbPool>,
+) -> impl Responder {
+    let user_id = auth_guard.user_id;
+    let item_id = path.into_inner();
+
+    let item = chat_repository::fetch_item_and_potential_chat_id_by_item_id(user_id, item_id, pool.as_ref()).await;
+
+    match item {
+        Ok(item) => {
+            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": item}))
+        }
+        Err(err) => {
+            tracing::error!("{}\n", format!("API: Failed to fetch item and potential chat id for user with id {user_id} and item id {item_id}"));
+            tracing::error!("Error message: {}\n", err);
+
+            HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+        }
+    }
+}
+
 #[get("/window/{chat_id}")]
 async fn get_chat_window_by_chat_id(
     auth_guard: AuthenticationGuard,

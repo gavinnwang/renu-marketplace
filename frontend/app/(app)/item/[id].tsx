@@ -150,7 +150,10 @@ export default function ItemPage() {
 
             <View className="p-3 flex flex-col gap-y-2">
               <Text className="font-Poppins_600SemiBold text-base">Seller</Text>
-              <View className="flex flex-row">
+              <Pressable
+                onPress={() => router.push(`/seller/${seller?.id}`)}
+                className="flex flex-row items-center"
+              >
                 <Image
                   source={{
                     uri: seller?.name,
@@ -173,12 +176,24 @@ export default function ItemPage() {
                     </Text>
                   </View>
                 </View>
-              </View>
+
+                <View className="ml-auto flex flex-col w-[100px] gap-y-0.5">
+                  <Pressable 
+                  onPress={() => router.push(`/chat/${seller?.id}`)}
+                  className="font-Manrope_400Regular bg-purplePrimary p-2">
+                    <Text className="text-white text-center font-Manrope_600SemiBold">
+                      Message
+                    </Text>
+                  </Pressable>
+                </View>
+              </Pressable>
             </View>
           </ScrollView>
         ) : (
           <>
-            <Text>Loading</Text>
+            <Text className="font-Poppins_500Medium text-base mx-auto">
+              Loading
+            </Text>
           </>
         )}
       </View>
