@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            Message.id,\n            Message.chat_id,\n            Message.sender_id,\n            Message.content,\n            Message.created_at AS sent_at,\n            CASE\n                WHEN Message.sender_id = ? THEN 1\n                ELSE 0\n            END\n                AS from_me\n        FROM Message\n        WHERE Message.chat_id = ?\n        ORDER BY Message.created_at ASC;\n        ",
+  "query": "\n        SELECT\n            Message.id,\n            Message.chat_id,\n            Message.sender_id,\n            Message.content,\n            Message.created_at AS sent_at,\n            CASE\n                WHEN Message.sender_id = ? THEN 1\n                ELSE 0\n            END\n                AS from_me\n        FROM Message\n        WHERE Message.chat_id = ?\n        ORDER BY Message.created_at ASC\n        LIMIT 35;\n        ",
   "describe": {
     "columns": [
       {
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "fc24da697f47b0f10bc8e18f8152bc7ab2336a4550edd487c7dd231ab9f725be"
+  "hash": "3db2ed1c4e89de34b01beea1c0a0394b77d50c87ccd7e085f8301c7916de7e8a"
 }

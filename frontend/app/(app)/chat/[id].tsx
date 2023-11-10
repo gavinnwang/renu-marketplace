@@ -73,11 +73,12 @@ export default function ChatScreen() {
   let socketUrl = "wss://api.gavinwang.dev/ws";
   const {
     sendMessage,
-    sendJsonMessage,
-    lastMessage,
-    lastJsonMessage,
-    readyState,
-    getWebSocket,
+    // sendJsonMessage,
+    // lastMessage,
+    // lastJsonMessage,
+    // readyState,
+    // getWebSocket,
+    
   } = useWebSocket(socketUrl, {
     queryParams: {
       authorization: `Bearer_${session?.token}`,
@@ -87,13 +88,13 @@ export default function ChatScreen() {
     shouldReconnect: (closeEvent) => true,
   });
 
-  const flatListRef = React.createRef<FlatList<any>>();
+  // const flatListRef = React.createRef<FlatList<any>>();
 
-  useEffect(() => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({ animated: true });
-    }
-  }, [chatMessages]); // This effect runs every time `chatMessages` changes
+  // useEffect(() => {
+  //   if (flatListRef.current) {
+  //     flatListRef.current.scrollToEnd({ animated: true });
+  //   }
+  // }, [chatMessages]); // This effect runs every time `chatMessages` changes
 
   const queryClient = useQueryClient();
 
@@ -131,15 +132,15 @@ export default function ChatScreen() {
               }}
             />
           )}
-          <View className="mx-4 flex flex-grow flex-col gap-y-1">
-            <Text className="font-Poppins_600SemiBold text-sm text-blackPrimary">
+          <View className="mx-4 flex flex-grow flex-col">
+            <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
               {chatWindow && chatWindow.item_name}
             </Text>
-            <Text className="font-Manrope_400Regular text-xs max-w-[250px] max-h-[40px] text-blackPrimary">
+            <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
               {chatWindow && chatWindow.item_description}
             </Text>
           </View>
-          <Text className="font-Poppins_600SemiBold text-sm text-blackPrimary">
+          <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
             ${chatWindow && chatWindow.item_price}
           </Text>
         </Pressable>
@@ -149,9 +150,9 @@ export default function ChatScreen() {
           keyboardVerticalOffset={64}
         >
           <FlatList
-            ref={flatListRef}
+            // ref={flatListRef}
             className="p-4"
-            data={chatMessages}
+            data={chatMessages.reverse()}
             renderItem={({ item, index }) => (
               <Message
                 message={item}
@@ -159,6 +160,10 @@ export default function ChatScreen() {
               />
             )}
             keyExtractor={(item) => item.id.toString()}
+            maintainVisibleContentPosition={{
+              minIndexForVisible: 0,
+            }}
+            inverted
           />
 
           <View className="">

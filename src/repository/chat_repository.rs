@@ -171,7 +171,8 @@ pub async fn fetch_chat_messages_by_chat_id(
                 AS from_me
         FROM Message
         WHERE Message.chat_id = ?
-        ORDER BY Message.created_at ASC;
+        ORDER BY Message.created_at ASC
+        LIMIT 35;
         "#,
         user_id,
         chat_id 
@@ -189,7 +190,7 @@ pub async fn fetch_chat_messages_by_chat_id(
             sent_at: message.sent_at.into(),
             from_me: message.from_me as i32,
         })
-        .collect())
+     .collect()) //
 }
 
 // check if user_id is part of chat group and returns the other user_id
