@@ -290,6 +290,23 @@ pub async fn fetch_chat_id_by_item_id(
             }
         }
     }
+}
 
- 
+pub async fn insert_chat_room(
+    user_id: i32,
+    item_id: i32,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<i32, DbError> {
+    let result = sqlx::query!(
+        r#"
+        INSERT INTO ItemChat (item_id, buyer_id)
+        VALUES (?, ?);
+        "#,
+        item_id,
+        user_id
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(result.last_insert_id() as i32)
 }

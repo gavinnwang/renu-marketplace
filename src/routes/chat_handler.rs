@@ -235,3 +235,28 @@ async fn post_chat_message(
         }
     }
 }
+
+#[post("/{item_id}")]
+async fn post_chat_room(
+    auth_guard: AuthenticationGuard,
+    path: web::Path<i32>,
+    pool: web::Data<DbPool>,
+) -> impl Responder {
+    let user_id = auth_guard.user_id;
+    let item_id = path.into_inner();
+
+    let chat_id = chat_repository::insert_chat_room(user_id, item_id, pool.as_ref()).await;
+
+    match chat_id {
+        Ok(chat_id) => {
+            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": {"chat_id": chat_id}}))
+        }
+        Err(err) => {
+            tracing::error!("{}\n", format!("API: Failed to insert chat for user with id {user_id} and item id {item_id}"));
+            tracing::error!("Error message: {}\n", err);
+
+            HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+        }
+    }
+}

@@ -12,7 +12,7 @@ import Colors from "../../../constants/Colors";
 import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
-import { ChatMessage, ChatWindow, ItemWithChatId } from "../../../types/types";
+import { ChatId, ChatMessage, ChatWindow } from "../../../types/types";
 import { useSession } from "../../../providers/ctx";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
@@ -39,12 +39,12 @@ export default function ChatScreen() {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
-      }).then((x) => x.json()) as Promise<ApiResponse<ItemWithChatId>>,
+      }).then((x) => x.json()) as Promise<ApiResponse<ChatId>>,
     queryKey: ["chat_item", itemId],
     enabled: !!itemId,
     onSuccess(data) {
       if (data.status === "success") {
-        console.log(data.data)
+        console.log(data.data);
         // setChatWindow(data.data);
         setChatId(data.data.chat_id);
       } else {
@@ -64,7 +64,7 @@ export default function ChatScreen() {
     enabled: !!chatId,
     onSuccess(data) {
       if (data.status === "success") {
-        console.log(data.data)
+        console.log(data.data);
 
         setChatWindow(data.data);
       } else {
@@ -199,7 +199,6 @@ export default function ChatScreen() {
                 if (!inputText) return;
                 if (!chatId) {
                   console.log("no chat id so create one");
-                  
                 }
                 sendMessage(`/message ${chatId} ${inputText}`);
                 setInputText("");

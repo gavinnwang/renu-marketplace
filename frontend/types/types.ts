@@ -61,4 +61,4 @@ export type ChatMessage = {
   // sender_id: number;
 }
 
-export type ItemWithChatId = ItemWithImage & { chat_id: number };
+export type ChatId = { chat_id: number };
