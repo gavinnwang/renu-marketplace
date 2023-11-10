@@ -18,7 +18,7 @@ export default function Index() {
         <LogoWithText />
         <Pressable
           className="bg-grayLight p-3 rounded-md px-8 mt-4"
-          onPress={() => signIn("/welcome")}
+          onPress={() => signIn("/")}
         >
           <Text className="text-xl">Sign In</Text>
         </Pressable>

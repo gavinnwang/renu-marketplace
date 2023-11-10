@@ -67,8 +67,8 @@ export type ChatWindow = {
 
 export type ChatMessage = {
   id: number;
-  chat_id: number;
-  sender_id: number;
+  // chat_id: number;
+  // sender_id: number;
   content: string;
   sent_at: Date;
   from_me: number;

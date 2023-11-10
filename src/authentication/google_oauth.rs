@@ -61,7 +61,7 @@ pub async fn get_google_user(
     id_token: &str,
 ) -> Result<GoogleUserResult, Box<dyn Error>> {
     let client = Client::new();
-    let mut url = Url::parse("https://www.googleapis.com/oauth2/v1/userinfo").unwrap();
+    let mut url = Url::parse("https://www.googleapis.com/oauth2/v1/userinfo").expect("Invalid URL");
     url.query_pairs_mut().append_pair("alt", "json");
     url.query_pairs_mut()
         .append_pair("access_token", access_token);

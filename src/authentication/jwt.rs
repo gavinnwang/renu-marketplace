@@ -35,7 +35,12 @@ impl FromRequest for AuthenticationGuard {
                 req.headers()
                     .get(http::header::AUTHORIZATION)
                     .map(|h| h.to_str().unwrap_or("")
-                    .to_string())
+                    .to_string()).or_else(|| {
+                        req.query_string()
+                            .split("&")
+                            .find(|s| s.starts_with("authorization="))
+                            .map(|s| s.split_at(("authorization=").len()).1.to_string())
+                    })
             });
         
             let token = match token {
@@ -105,11 +110,13 @@ impl FromRequest for AuthenticationGuard {
                     Ok(AuthenticationGuard { user_id })
                 })
             }
-            Err(_) => Box::pin(async {
+            Err(err) => {
+                tracing::error!("token decoding error: {:?}", err);
+                Box::pin(async {
                 Err(ErrorUnauthorized(
                     json!({"status": "fail", "message": "Invalid token or user doesn't exist"}),
                 ))
-            }),
+            })},
         }
     }
 }

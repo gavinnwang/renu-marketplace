@@ -27,12 +27,12 @@ impl Config {
 
         Config {
             jwt_secret,
-            jwt_max_age: jwt_max_age.parse::<i64>().unwrap(),
+            jwt_max_age: jwt_max_age.parse::<i64>().expect("TOKEN_MAXAGE must be an integer"),
             google_oauth_client_id,
             google_oauth_client_secret,
             google_oauth_redirect_url,
             database_url,
-            server_port: server_port.parse::<u16>().unwrap(),
+            server_port: server_port.parse::<u16>().expect("SERVER_PORT must be an integer"),
             server_host,
         }
     }

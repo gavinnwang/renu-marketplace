@@ -10,13 +10,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
-import React from "react";
+import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
 import { ChatMessage, ChatWindow } from "../../../types/types";
 import { useSession } from "../../../providers/ctx";
 import { Image } from "expo-image";
 import { FlatList, TextInput } from "react-native-gesture-handler";
+import useWebSocket from "react-use-websocket";
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -28,9 +29,7 @@ export default function ChatScreen() {
   const [chatWindow, setChatWindow] = React.useState<ChatWindow | undefined>(
     undefined
   );
-  const [chatMessages, setChatMessages] = React.useState<
-    ChatMessage[] | undefined
-  >(undefined);
+  const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
 
   const { isError: isErrorChatWindow } = useQuery({
     queryFn: async () =>
@@ -62,7 +61,7 @@ export default function ChatScreen() {
     onSuccess(data) {
       if (data.status === "success") {
         setChatMessages(data.data);
-        console.log(data);
+        // console.log(data);
       } else {
         console.error(data);
       }
@@ -71,6 +70,31 @@ export default function ChatScreen() {
 
   const width = Dimensions.get("window").width / 8;
   const [inputText, setInputText] = React.useState("");
+
+  let socketUrl = "ws://localhost:8080/ws";
+  const {
+    sendMessage,
+    sendJsonMessage,
+    lastMessage,
+    lastJsonMessage,
+    readyState,
+    getWebSocket,
+  } = useWebSocket(socketUrl, {
+    queryParams: {
+      authorization: `Bearer_${session?.token}`,
+    },
+    onOpen: () => sendMessage("/join " + chatId),
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: (closeEvent) => true,
+  });
+
+  const flatListRef = React.createRef<FlatList<any>>();
+
+  useEffect(() => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  }, [chatMessages]); // This effect runs every time `chatMessages` changes
 
   return (
     <SafeAreaView className="bg-bgLight">
@@ -124,13 +148,19 @@ export default function ChatScreen() {
           keyboardVerticalOffset={64}
         >
           <FlatList
+            ref={flatListRef}
             className="p-4"
             data={chatMessages}
-            renderItem={({ item }) => <Message message={item} />}
+            renderItem={({ item, index }) => (
+              <Message
+                message={item}
+                isLast={index === chatMessages.length - 1}
+              />
+            )}
             keyExtractor={(item) => item.id.toString()}
           />
 
-          <View className="fixed bottom-0 right-0 left-0">
+          <View className="">
             <TextInput
               placeholder="Message"
               className="px-4 py-2 mx-2 border rounded-full border-gray-400"
@@ -138,22 +168,18 @@ export default function ChatScreen() {
               onChangeText={setInputText}
               onSubmitEditing={(e) => {
                 if (!inputText) return;
+                sendMessage(`/message ${inputText}`);
                 setInputText("");
-                fetch(
-                  `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/message/${chatId}`,
+
+                setChatMessages((prev) => [
+                  ...prev,
                   {
-                    method: "POST",
-                    headers: {
-                      authorization: `Bearer ${session?.token}`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      content: e.nativeEvent.text,
-                    }),
-                  }
-                ).then(() => {
-                  refetch();
-                });
+                    id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
+                    content: inputText,
+                    from_me: 1,
+                    sent_at: new Date(),
+                  } as ChatMessage,
+                ]);
               }}
             />
           </View>
@@ -163,15 +189,24 @@ export default function ChatScreen() {
   );
 }
 
-const Message = ({ message }: { message: ChatMessage }) => {
+const Message = ({
+  message,
+  isLast,
+}: {
+  message: ChatMessage;
+  isLast: boolean;
+}) => {
   return (
-    <View
-      className={`flex flex-row border mb-3 border-gray-300 rounded-lg bg-gray-100 p-2 w-fit ${
-        message.from_me ? "ml-auto" : "mr-auto"
-      }`}
-    >
-      <Text>{message.content}</Text>
-    </View>
+    <>
+      <View
+        className={`flex flex-row border border-gray-300 rounded-lg bg-gray-100 p-2 w-fit mb-3 ${
+          message.from_me ? "ml-auto" : "mr-auto"
+        }`}
+      >
+        <Text>{message.content}</Text>
+      </View>
+      {/* {isLast && <View className="h-10"></View>} */}
+    </>
   );
 };
 

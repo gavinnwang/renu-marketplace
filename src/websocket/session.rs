@@ -139,14 +139,25 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 tracing::info!("WS text: {:?}", text);
                 let m = text.trim();
                 if m.starts_with('/') {
-                    let v: Vec<&str> = m.splitn(2, ' ').collect();
+                    let v: Vec<&str> = m.splitn(3, ' ').collect();
                     match v[0] {
                         "/join" => {
                             let user_id = self.user_id as i32;
-                            let chat_id = match v[1].parse::<usize>() {
-                                Ok(chat_id) => chat_id as i32,
+                            // check for index out of bounds
+
+                            let chat_id = match v.get(1) {
+                                Some(chat_id) => *chat_id,
+                                None => {
+                                    ctx.text("Join command requires chat id".to_string());
+                                    tracing::error!("Join command requires chat id.");
+                                    return;
+                                }
+                            };
+                            let chat_id = match chat_id.parse::<usize>() {
+                                Ok(chat_id) => chat_id,
                                 Err(_) => {
-                                    ctx.text(format!("Invalid chat id: {}", v[1]));
+                                    ctx.text(format!("Invalid chat id: {}", chat_id));
+                                    tracing::error!("Invalid chat id: {}", chat_id);
                                     return;
                                 }
                             };
@@ -154,7 +165,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                             self.server_addr
                                 .send(server::Join {
                                     user_id: self.user_id,
-                                    chat_id: chat_id as usize,
+                                    chat_id,
                                 })
                                 .into_actor(self)
                                 .then(move |res, act, ctx| {
@@ -171,11 +182,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                                 Some((chat_id as usize, other_user_id));
                                         }
                                         Ok(Err(err)) => {
-                                            tracing::warn!("Error message: {}\n", err);
+
                                             tracing::warn!(
-                                                "User id {} failed to join chat id {}",
+                                                "User id {} failed to join chat id {}, error message: {}",
                                                 user_id,
-                                                chat_id
+                                                chat_id,
+                                                err
                                             );
                                             ctx.text(format!(
                                                 "Failed to join chat. Error message: {}",
@@ -183,11 +195,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                             ));
                                         }
                                         Err(err) => {
-                                            tracing::error!("Error message: {}\n", err);
+
                                             tracing::error!(
-                                                "User id {} failed to join chat id {}",
+                                                "User id {} failed to join chat id {}, error message: {}",
                                                 user_id,
-                                                chat_id
+                                                chat_id,
+                                                err
                                             );
                                             ctx.text("Something went wrong".to_string());
                                         }
@@ -196,51 +209,71 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                 })
                                 .wait(ctx);
                         }
+                        "/message" => match self.chat_id_and_other_user_id {
+                            Some((chat_id, other_user_id)) => {
+                                match v.get(1) {
+                                    Some(id) => {
+                                        if id != &chat_id.to_string() {
+                                            ctx.text("Error: chat id mismatch!");
+                                            tracing::error!("Chat id mismatch expected id {chat_id} but got id {id}");
+                                            return;
+                                        }
+                                    }
+                                    None => {
+                                        ctx.text("Message command requires chat id");
+                                        tracing::error!("Mssage command requires chat id");
+                                        return;
+                                    }
+                                };
+                                let content = match v.get(2) {
+                                    Some(content) => (*content).to_string(),
+                                    None => {
+                                        ctx.text("Message command requires content");
+                                        tracing::error!("Message command requires content");
+                                        return;
+                                    }
+                                };
+
+                                self.server_addr
+                                    .send(server::ChatMessageToServer {
+                                        sender_id: self.user_id,
+                                        receiver_id: other_user_id,
+                                        chat_id,
+                                        content,
+                                    })
+                                    .into_actor(self)
+                                    .then(move |res, act, ctx| {
+                                        match res {
+                                            Ok(()) => {
+                                                tracing::info!(
+                                                    "User id {} sent message to chat id {chat_id}",
+                                                    act.user_id
+                                                );
+                                            }
+                                            Err(err) => {
+                                                tracing::error!(
+                                                "User id {} failed to send message to chat id {chat_id}, error message: {err}",
+                                                act.user_id
+                                            );
+                                                ctx.text("Something went wrong".to_string());
+                                            }
+                                        }
+                                        fut::ready(())
+                                    })
+                                    .wait(ctx);
+                            }
+                            None => {
+                                tracing::warn!(
+                                    "User id {} is not part of any chat group",
+                                    self.user_id
+                                );
+                                ctx.text("You are not part of any chat group".to_string());
+                            }
+                        },
                         _ => ctx.text(format!("Unknown command: {}", m)),
                     }
                 } else {
-                    //    self.server_addr.send(session::)
-                    match self.chat_id_and_other_user_id {
-                        Some((chat_id, other_user_id)) => {
-                            self.server_addr
-                                .send(server::ChatMessageToServer {
-                                    sender_id: self.user_id,
-                                    receiver_id: other_user_id,
-                                    chat_id,
-                                    content: m.to_owned(),
-                                })
-                                .into_actor(self)
-                                .then(move |res, act, ctx| {
-                                    match res {
-                                        Ok(()) => {
-                                            tracing::info!(
-                                                "User id {} sent message to chat id {}",
-                                                act.user_id,
-                                                chat_id
-                                            );
-                                        }
-                                        Err(err) => {
-                                            tracing::error!("Error message: {}\n", err);
-                                            tracing::error!(
-                                                "User id {} failed to send message to chat id {}",
-                                                act.user_id,
-                                                chat_id
-                                            );
-                                            ctx.text("Something went wrong".to_string());
-                                        }
-                                    }
-                                    fut::ready(())
-                                })
-                                .wait(ctx);
-                        }
-                        None => {
-                            tracing::warn!(
-                                "User id {} is not part of any chat group",
-                                self.user_id
-                            );
-                            ctx.text("You are not part of any chat group".to_string());
-                        }
-                    }
+                    tracing::warn!("WS: Unexpected command");
                 }
             }
             ws::Message::Close(reason) => {
