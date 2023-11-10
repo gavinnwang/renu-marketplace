@@ -200,7 +200,6 @@ impl Handler<Join> for ChatServer {
                     match is_part_of_chat_group {
                         Some(other_user_id) => {
                             let mut sessions = sessions.borrow_mut();
-                            // let mut rooms = rooms.borrow_mut();
                             tracing::info!(
                                 "user {} is part of chat group {} ",
                                 msg.user_id,
@@ -208,39 +207,6 @@ impl Handler<Join> for ChatServer {
                             );
 
                             sessions.get_mut(&msg.user_id).unwrap().1 = Some(msg.chat_id);
-
-                            // create a new room if room doens't exist otherwise add session to room
-                            // match rooms.get_mut(&msg.chat_id) {
-                            //     Some(room) => match room.insert(msg.user_id) {
-                            //         true => {
-                            //             tracing::info!(
-                            //                 "Session with id {} added to room",
-                            //                 msg.user_id
-                            //             );
-                            //             Ok(())
-                            //         }
-                            //         false => {
-                            //             tracing::warn!(
-                            //                 "Session with id {} is already in room",
-                            //                 msg.user_id
-                            //             );
-                            //             Err(format!(
-                            //                 "Warn: Session with id {} is already in room",
-                            //                 msg.user_id
-                            //             ))
-                            //         }
-                            //     },
-                            //     None => {
-                            //         tracing::info!(
-                            //             "Room does not exist. Creating room with id {}",
-                            //             msg.chat_id
-                            //         );
-                            //         let mut room = HashSet::new();
-                            //         room.insert(msg.user_id);
-                            //         rooms.insert(msg.chat_id, room);
-                            //         Ok(())
-                            //     }
-                            // }
 
                             Ok(other_user_id as usize)
                         }

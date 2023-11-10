@@ -51,7 +51,7 @@ export default function MessageScreen() {
       console.error("error", err);
     },
     onSuccess(data) {
-      console.log(data);
+      // console.log(data);
       if (data.status === "success") {
         setChats(data.data);
       } else {
