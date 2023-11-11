@@ -39,6 +39,7 @@ next-env.d.ts
 
 /target
 
+.expo 
 
 secrets
 
