@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n    SELECT \n        ic.id AS chat_id, \n        ic.item_id, \n        i.name AS item_name, \n        u.id AS other_user_id,\n        u.name AS other_user_name,\n        i.price AS item_price, \n        (SELECT ii.url FROM ItemImage ii WHERE ii.item_id = i.id LIMIT 1) AS item_image,\n        m.content AS last_message_content,\n        m.created_at AS last_message_sent_at,\n        i.category AS item_category, \n        i.description AS item_description,\n        i.status AS item_status\n    FROM \n        ItemChat ic\n    JOIN \n        Item i ON ic.item_id = i.id\n    JOIN \n        User u ON u.id = i.user_id\n    INNER JOIN \n        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id\n    LEFT JOIN \n        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at\n    WHERE \n        ic.buyer_id = ?;\n        ",
+  "query": "\n    SELECT \n        ic.id AS chat_id, \n        ic.item_id, \n        i.name AS item_name, \n        u.id AS other_user_id,\n        u.name AS other_user_name,\n        i.price AS item_price, \n        i.images AS item_images,\n        m.content AS last_message_content,\n        m.created_at AS last_message_sent_at,\n        i.category AS item_category, \n        i.description AS item_description,\n        i.status AS item_status\n    FROM \n        ItemChat ic\n    JOIN \n        Item i ON ic.item_id = i.id\n    JOIN \n        User u ON u.id = ic.buyer_id\n    INNER JOIN \n        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id\n    LEFT JOIN \n        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at\n    WHERE \n        i.user_id = ?;\n        ",
   "describe": {
     "columns": [
       {
@@ -65,12 +65,12 @@
       },
       {
         "ordinal": 6,
-        "name": "item_image",
+        "name": "item_images",
         "type_info": {
-          "type": "VarString",
-          "flags": "",
-          "char_set": 255,
-          "max_size": 764
+          "type": "Json",
+          "flags": "NOT_NULL | BLOB | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 4294967295
         }
       },
       {
@@ -134,7 +134,7 @@
       false,
       false,
       false,
-      true,
+      false,
       true,
       true,
       false,
@@ -142,5 +142,5 @@
       false
     ]
   },
-  "hash": "8dc05a106f7e67fccc828386470566f61b84361ef6b05db76336cc8e0e95e320"
+  "hash": "6841dab3ad31f6cf25e209eea4e98494da7c20d3addf1242a37070debae753aa"
 }

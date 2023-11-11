@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            ItemChat.id AS chat_id,\n            ItemChat.item_id,\n            Item.name AS item_name, \n            User.id AS other_user_id,\n            User.name AS other_user_name,\n            Item.price AS item_price,\n            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,\n            Item.category AS item_category, \n            Item.description AS item_description,\n            Item.status AS item_status\n        FROM ItemChat\n        JOIN Item ON ItemChat.item_id = Item.id\n        JOIN User ON Item.user_id = User.id\n        WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR Item.user_id = ?);\n        ",
+  "query": "\n    SELECT \n        ic.id AS chat_id, \n        ic.item_id, \n        i.name AS item_name, \n        u.id AS other_user_id,\n        u.name AS other_user_name,\n        i.price AS item_price, \n        i.images AS item_images,\n        m.content AS last_message_content,\n        m.created_at AS last_message_sent_at,\n        i.category AS item_category, \n        i.description AS item_description,\n        i.status AS item_status\n    FROM \n        ItemChat ic\n    JOIN \n        Item i ON ic.item_id = i.id\n    JOIN \n        User u ON u.id = i.user_id\n    INNER JOIN \n        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id\n    LEFT JOIN \n        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at\n    WHERE \n        ic.buyer_id = ?;\n        ",
   "describe": {
     "columns": [
       {
@@ -65,16 +65,36 @@
       },
       {
         "ordinal": 6,
-        "name": "item_image",
+        "name": "item_images",
         "type_info": {
-          "type": "VarString",
-          "flags": "",
-          "char_set": 255,
-          "max_size": 764
+          "type": "Json",
+          "flags": "NOT_NULL | BLOB | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 4294967295
         }
       },
       {
         "ordinal": 7,
+        "name": "last_message_content",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NO_DEFAULT_VALUE",
+          "char_set": 255,
+          "max_size": 4000
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "last_message_sent_at",
+        "type_info": {
+          "type": "Timestamp",
+          "flags": "BINARY | TIMESTAMP",
+          "char_set": 63,
+          "max_size": 19
+        }
+      },
+      {
+        "ordinal": 9,
         "name": "item_category",
         "type_info": {
           "type": "String",
@@ -84,7 +104,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 10,
         "name": "item_description",
         "type_info": {
           "type": "VarString",
@@ -94,7 +114,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 11,
         "name": "item_status",
         "type_info": {
           "type": "String",
@@ -105,7 +125,7 @@
       }
     ],
     "parameters": {
-      "Right": 3
+      "Right": 1
     },
     "nullable": [
       false,
@@ -114,11 +134,13 @@
       false,
       false,
       false,
+      false,
+      true,
       true,
       false,
       true,
       false
     ]
   },
-  "hash": "f9b0cf85693594994cc7a58689d11b59240dd199ccb00f1b2a84b219dc88c70f"
+  "hash": "8e04e313c208f8ec8b24d216b92bedcea03ec30ccac4b91ade000bb8089bf0a8"
 }

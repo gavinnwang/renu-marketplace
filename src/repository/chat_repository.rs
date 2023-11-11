@@ -3,7 +3,7 @@ use sqlx::{Executor, MySql};
 
 use crate::{
     error::DbError,
-    model::chat_model::{ChatGroup, ChatMessage, ChatWindow, RawChatMessage},
+    model::chat_model::{ChatGroup, ChatMessage, RawChatMessage},
 };
 
 pub async fn fetch_chat_groups_by_seller_id(
@@ -12,14 +12,14 @@ pub async fn fetch_chat_groups_by_seller_id(
 ) -> Result<Vec<ChatGroup>, DbError> {
     let raw_groups = sqlx::query!(
         r#"
-        SELECT 
+    SELECT 
         ic.id AS chat_id, 
         ic.item_id, 
         i.name AS item_name, 
         u.id AS other_user_id,
         u.name AS other_user_name,
         i.price AS item_price, 
-        (SELECT ii.url FROM ItemImage ii WHERE ii.item_id = i.id LIMIT 1) AS item_image,
+        i.images AS item_images,
         m.content AS last_message_content,
         m.created_at AS last_message_sent_at,
         i.category AS item_category, 
@@ -55,7 +55,7 @@ pub async fn fetch_chat_groups_by_seller_id(
             item_category: raw_group.item_category,
             item_description: raw_group.item_description,
             item_status: raw_group.item_status,
-            item_image: raw_group.item_image,
+            item_images: raw_group.item_images,
             last_message_content: raw_group.last_message_content,
             last_message_sent_at: match raw_group.last_message_sent_at {
                 Some(time) => {
@@ -81,7 +81,7 @@ pub async fn fetch_chat_groups_by_buyer_id(
         u.id AS other_user_id,
         u.name AS other_user_name,
         i.price AS item_price, 
-        (SELECT ii.url FROM ItemImage ii WHERE ii.item_id = i.id LIMIT 1) AS item_image,
+        i.images AS item_images,
         m.content AS last_message_content,
         m.created_at AS last_message_sent_at,
         i.category AS item_category, 
@@ -117,7 +117,7 @@ pub async fn fetch_chat_groups_by_buyer_id(
             item_category: raw_group.item_category,
             item_description: raw_group.item_description,
             item_status: raw_group.item_status,
-            item_image: raw_group.item_image,
+            item_images: raw_group.item_images,
             last_message_content: raw_group.last_message_content,
             last_message_sent_at: match raw_group.last_message_sent_at {
                 Some(time) => {
@@ -131,39 +131,39 @@ pub async fn fetch_chat_groups_by_buyer_id(
 
 }
 
-pub async fn fetch_chat_window_by_chat_id(
-    user_id: i32,
-    chat_id: i32,
-    conn: impl Executor<'_, Database = MySql>,
-) -> Result<ChatWindow, DbError> {
-    let window = sqlx::query_as!(
-        ChatWindow,
-        r#"
-        SELECT
-            ItemChat.id AS chat_id,
-            ItemChat.item_id,
-            Item.name AS item_name, 
-            User.id AS other_user_id,
-            User.name AS other_user_name,
-            Item.price AS item_price,
-            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
-            Item.category AS item_category, 
-            Item.description AS item_description,
-            Item.status AS item_status
-        FROM ItemChat
-        JOIN Item ON ItemChat.item_id = Item.id
-        JOIN User ON Item.user_id = User.id
-        WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR Item.user_id = ?);
-        "#,
-        chat_id,
-        user_id,
-        user_id
-    )
-    .fetch_one(conn)
-    .await?;
+// pub async fn fetch_chat_window_by_chat_id(
+//     user_id: i32,
+//     chat_id: i32,
+//     conn: impl Executor<'_, Database = MySql>,
+// ) -> Result<ChatWindow, DbError> {
+//     let window = sqlx::query_as!(
+//         ChatWindow,
+//         r#"
+//         SELECT
+//             ItemChat.id AS chat_id,
+//             ItemChat.item_id,
+//             Item.name AS item_name, 
+//             User.id AS other_user_id,
+//             User.name AS other_user_name,
+//             Item.price AS item_price,
+//             (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
+//             Item.category AS item_category, 
+//             Item.description AS item_description,
+//             Item.status AS item_status
+//         FROM ItemChat
+//         JOIN Item ON ItemChat.item_id = Item.id
+//         JOIN User ON Item.user_id = User.id
+//         WHERE ItemChat.id = ? AND (ItemChat.buyer_id = ? OR Item.user_id = ?);
+//         "#,
+//         chat_id,
+//         user_id,
+//         user_id
+//     )
+//     .fetch_one(conn)
+//     .await?;
 
-    Ok(window)
-}
+//     Ok(window)
+// }
 
 pub async fn fetch_chat_messages_by_chat_id(
     user_id: i32,
