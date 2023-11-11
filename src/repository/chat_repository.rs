@@ -92,7 +92,7 @@ pub async fn fetch_chat_groups_by_buyer_id(
     JOIN 
         Item i ON ic.item_id = i.id
     JOIN 
-        User u ON u.id = ic.buyer_id
+        User u ON u.id = i.user_id
     INNER JOIN 
         (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id
     LEFT JOIN 
