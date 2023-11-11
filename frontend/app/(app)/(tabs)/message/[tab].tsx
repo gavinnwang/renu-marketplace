@@ -120,7 +120,7 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
       }`}
     >
       <Image
-        source={{ uri: chat.item_image }}
+        source={{ uri: chat.item_images[0] }}
         className="object-cover rounded-sm"
         style={{
           width: width,

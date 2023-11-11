@@ -292,6 +292,7 @@ export default function ChatScreen() {
                             `/message ${data.data.chat_id} ${inputText}`
                           );
                           setInputText("");
+                          console.log("invalidating:", ["chats", sellOrBuy]);
                           queryClient.invalidateQueries(["chats", sellOrBuy]);
                         } else {
                           console.error(data);
