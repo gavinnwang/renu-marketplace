@@ -24,10 +24,9 @@ pub async fn fetch_items_by_status(
             Item.created_at, 
             Item.description,
             Item.updated_at,
-            GROUP_CONCAT(ItemImage.url) AS item_images
+            Item.images as images
         FROM Item
-        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.status = ?
-        GROUP BY Item.id
+        WHERE Item.status = ?
         ORDER BY Item.created_at DESC
         "#,
         status
@@ -56,10 +55,9 @@ pub async fn fetch_items_by_category(
             Item.description,
             Item.created_at, 
             Item.updated_at,
-            GROUP_CONCAT(ItemImage.url) AS item_images
+            Item.images as images
         FROM Item 
-        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.category = ? AND Item.status = 'ACTIVE'
-        GROUP BY Item.id
+        WHERE Item.category = ? AND Item.status = 'ACTIVE'
         ORDER BY Item.created_at DESC
         "#,
         category
@@ -78,20 +76,19 @@ pub async fn fetch_item_by_id(
     let raw_item = sqlx::query_as!(
         RawItem,
         r#"
-        SELECT
-            Item.id, 
-            Item.name, 
-            Item.price, 
-            Item.user_id, 
-            Item.category,
-            Item.status,
-            Item.description,
-            Item.created_at, 
-            Item.updated_at,
-            GROUP_CONCAT(ItemImage.url) AS item_images
-        FROM Item
-        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = ?
-        GROUP BY Item.id
+    SELECT
+        Item.id, 
+        Item.name, 
+        Item.price, 
+        Item.user_id, 
+        Item.category,
+        Item.status,
+        Item.description,
+        Item.created_at, 
+        Item.updated_at,
+        Item.images as images
+    FROM Item
+    WHERE Item.id = ?
         "#,
         id
     )
@@ -119,10 +116,9 @@ pub async fn fetch_items_by_user_id(
             Item.description,
             Item.created_at, 
             Item.updated_at,
-            GROUP_CONCAT(ItemImage.url) AS item_images
+            Item.images as images
         FROM Item
-        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.user_id = ? 
-        GROUP BY Item.id
+        WHERE Item.user_id = ? 
         ORDER BY Item.created_at DESC
         "#,
         user_id
@@ -152,10 +148,9 @@ pub async fn fetch_items_by_user_id_and_status(
             Item.description,
             Item.created_at, 
             Item.updated_at,
-            GROUP_CONCAT(ItemImage.url) AS item_images
+            Item.images as images
         FROM Item
-        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.user_id = ? AND Item.status = ?
-        GROUP BY Item.id
+        WHERE Item.user_id = ? AND Item.status = ?
         ORDER BY Item.created_at DESC
         "#,
         user_id,

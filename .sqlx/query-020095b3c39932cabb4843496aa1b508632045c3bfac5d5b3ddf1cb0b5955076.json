@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT \n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id,\n            Item.description, \n            Item.category,\n            Item.status,\n            Item.created_at,\n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM SavedItem\n        INNER JOIN Item ON SavedItem.item_id = Item.id\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.item_id \n        WHERE SavedItem.user_id = ?\n        GROUP BY Item.id\n        ",
+  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.status,\n            Item.description,\n            Item.created_at, \n            Item.updated_at,\n            Item.images as images\n        FROM Item\n        WHERE Item.user_id = ? AND Item.status = ?\n        ORDER BY Item.created_at DESC\n        ",
   "describe": {
     "columns": [
       {
@@ -45,16 +45,6 @@
       },
       {
         "ordinal": 4,
-        "name": "description",
-        "type_info": {
-          "type": "VarString",
-          "flags": "",
-          "char_set": 255,
-          "max_size": 764
-        }
-      },
-      {
-        "ordinal": 5,
         "name": "category",
         "type_info": {
           "type": "String",
@@ -64,13 +54,23 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 5,
         "name": "status",
         "type_info": {
           "type": "String",
           "flags": "NOT_NULL | ENUM",
           "char_set": 255,
           "max_size": 32
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "description",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "char_set": 255,
+          "max_size": 764
         }
       },
       {
@@ -95,19 +95,21 @@
       },
       {
         "ordinal": 9,
-        "name": "item_images",
+        "name": "images",
         "type_info": {
-          "type": "Blob",
-          "flags": "",
-          "char_set": 255,
-          "max_size": 16384
+          "type": "Json",
+          "flags": "NOT_NULL | BLOB | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 4294967295
         }
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 2
     },
     "nullable": [
+      false,
+      false,
       false,
       false,
       false,
@@ -115,10 +117,8 @@
       true,
       false,
       false,
-      false,
-      false,
-      true
+      false
     ]
   },
-  "hash": "3000499eeac9bcd2e765ae1074b8193b0c277105edfd5360f39a63fed986d304"
+  "hash": "020095b3c39932cabb4843496aa1b508632045c3bfac5d5b3ddf1cb0b5955076"
 }

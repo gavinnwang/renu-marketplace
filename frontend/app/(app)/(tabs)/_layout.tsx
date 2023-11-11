@@ -3,7 +3,7 @@ import React from "react";
 import Colors from "../../../constants/Colors";
 
 import Svg, { Path } from "react-native-svg";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, View } from "react-native";
 
 export default function TabsLayout() {
   return (
@@ -14,7 +14,7 @@ export default function TabsLayout() {
           tabBarStyle: {
             backgroundColor: Colors.light.background,
           },
-          tabBarActiveTintColor: Colors.blackPrimary,
+          tabBarActiveTintColor: Colors.northwesternPurple,
         }}
       >
         <Tabs.Screen

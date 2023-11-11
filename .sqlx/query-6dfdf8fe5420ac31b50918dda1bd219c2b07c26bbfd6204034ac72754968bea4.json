@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.status,\n            Item.created_at, \n            Item.description,\n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.status = ?\n        GROUP BY Item.id\n        ORDER BY Item.created_at DESC\n        ",
+  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.status,\n            Item.description,\n            Item.created_at, \n            Item.updated_at,\n            Item.images as images\n        FROM Item\n        WHERE Item.user_id = ? \n        ORDER BY Item.created_at DESC\n        ",
   "describe": {
     "columns": [
       {
@@ -65,22 +65,22 @@
       },
       {
         "ordinal": 6,
-        "name": "created_at",
-        "type_info": {
-          "type": "Timestamp",
-          "flags": "NOT_NULL | BINARY | TIMESTAMP",
-          "char_set": 63,
-          "max_size": 19
-        }
-      },
-      {
-        "ordinal": 7,
         "name": "description",
         "type_info": {
           "type": "VarString",
           "flags": "",
           "char_set": 255,
           "max_size": 764
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": {
+          "type": "Timestamp",
+          "flags": "NOT_NULL | BINARY | TIMESTAMP",
+          "char_set": 63,
+          "max_size": 19
         }
       },
       {
@@ -95,12 +95,12 @@
       },
       {
         "ordinal": 9,
-        "name": "item_images",
+        "name": "images",
         "type_info": {
-          "type": "Blob",
-          "flags": "",
-          "char_set": 255,
-          "max_size": 16384
+          "type": "Json",
+          "flags": "NOT_NULL | BLOB | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 4294967295
         }
       }
     ],
@@ -114,11 +114,11 @@
       false,
       false,
       false,
-      false,
       true,
       false,
-      true
+      false,
+      false
     ]
   },
-  "hash": "defb6d70ddaed733fa43f7c6cf59f57582024d0744b4957b7a3074700e7356d7"
+  "hash": "6dfdf8fe5420ac31b50918dda1bd219c2b07c26bbfd6204034ac72754968bea4"
 }
