@@ -19,6 +19,10 @@ import { useRef, useState } from "react";
 import { CATEGORIES } from "../(tabs)/home/[section]";
 import { useSession } from "../../../providers/ctx";
 
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
 const CloseIcon = () => (
   <Svg
     fill="none"
@@ -144,8 +148,27 @@ export default function ItemPage() {
                 <PaginationDots data={item.item_images} currentIndex={index} />
               )}
             </View>
+            {item.user_id === session?.user_id ? (
+              <View className="px-3 py-1.5 w-full bg-purplePrimary flex justify-center">
+                <Text className="font-Manrope_500Medium text-white">
+                  {item.status === "INACTIVE"
+                    ? `You sold this item ${dayjs(item.updated_at).fromNow()}`
+                    : `You listed this item ${dayjs(
+                        item.updated_at
+                      ).fromNow()}`}.
+                </Text>
+              </View>
+            ) : (
+              item.status === "INACTIVE" && (
+                <View className="px-3 py-1.5 w-full bg-purplePrimary flex justify-center">
+                  <Text className="font-Manrope_500Medium text-white">
+                    This item is mark as sold.
+                  </Text>
+                </View>
+              )
+            )}
             <View className="w-full flex flex-col p-3 py-3">
-              <Text className="text-base font-Poppins_600SemiBold">
+              <Text className="text-lg font-Poppins_600SemiBold">
                 {item.name}
               </Text>
               <View className="flex flex-row items-center">
@@ -170,10 +193,13 @@ export default function ItemPage() {
               </View>
 
               <View>
-                <Text className="font-Manrope_300Light text-sm mb-1">
+                <Text className="font-Manrope_400Regular text-sm mb-1">
                   {item.description ?? "No description provided."}
                 </Text>
               </View>
+              <Text className="font-Manrope_400Regular text-xs">
+                Listed {dayjs(item.created_at).fromNow()}
+              </Text>
             </View>
 
             <View className="h-2 bg-grayLight" />
@@ -222,7 +248,10 @@ export default function ItemPage() {
                       } else if (chatId) {
                         router.push({
                           pathname: `/chat/${item.id}`,
-                          params: { chatIdParam: chatId?.toString(), sellOrBuy: "Buy" },
+                          params: {
+                            chatIdParam: chatId?.toString(),
+                            sellOrBuy: "Buy",
+                          },
                         });
                       } else {
                         router.push({ pathname: `/chat/${item.id}` });
