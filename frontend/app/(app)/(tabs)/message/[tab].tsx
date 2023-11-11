@@ -37,7 +37,7 @@ export default function MessageScreen() {
     queryFn: async () =>
       fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${
-          selectedTabInt ? "seller" : "buyer"
+          selectedTabInt ? "seller" : "buyer" // chats with seller or buyer info
         }`,
         {
           headers: {
@@ -45,7 +45,7 @@ export default function MessageScreen() {
           },
         }
       ).then((x) => x.json()) as Promise<ApiResponse<ChatGroup[]>>,
-    queryKey: ["chats", selectedTabInt],
+    queryKey: ["chats", TABS[selectedTabInt]],
     enabled: !!session && !!session.token,
     onError(err) {
       console.error("error", err);
@@ -101,10 +101,19 @@ import dayjs from "dayjs";
 
 const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
+  const param = useLocalSearchParams();
+  const selectedTabInt = parseInt(param.tab as string);
+
   return (
     <Pressable
       onPress={() => {
-        router.push({pathname: `/chat/${chat.item_id}`, params: { chatIdParam: chat.chat_id }});
+        router.push({
+          pathname: `/chat/${chat.item_id}`,
+          params: {
+            chatIdParam: chat.chat_id,
+            sellOrBuy: TABS[selectedTabInt],
+          },
+        });
       }}
       className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary ${
         chat.item_status === "INACTIVE" ? "opacity-70" : ""

@@ -17,6 +17,7 @@ import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
 import React from "react";
 import Colors from "../../../../constants/Colors";
 import Svg, { Path } from "react-native-svg";
+import { FlashList } from "@shopify/flash-list";
 
 type Section = {
   display: string;
