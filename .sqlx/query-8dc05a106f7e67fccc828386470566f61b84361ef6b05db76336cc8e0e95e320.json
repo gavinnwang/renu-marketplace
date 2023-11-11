@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n    SELECT \n        ic.id AS chat_id, \n        ic.item_id, \n        i.name AS item_name, \n        u.id AS other_user_id,\n        u.name AS other_user_name,\n        i.price AS item_price, \n        (SELECT ii.url FROM ItemImage ii WHERE ii.item_id = i.id LIMIT 1) AS item_image,\n        m.content AS last_message_content,\n        m.created_at AS last_message_sent_at,\n        i.category AS item_category, \n        i.description AS item_description,\n        i.status AS item_status\n    FROM \n        ItemChat ic\n    JOIN \n        Item i ON ic.item_id = i.id\n    JOIN \n        User u ON u.id = ic.buyer_id\n    INNER JOIN \n        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id\n    LEFT JOIN \n        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at\n    WHERE \n        ic.buyer_id = ?;\n        ",
+  "query": "\n    SELECT \n        ic.id AS chat_id, \n        ic.item_id, \n        i.name AS item_name, \n        u.id AS other_user_id,\n        u.name AS other_user_name,\n        i.price AS item_price, \n        (SELECT ii.url FROM ItemImage ii WHERE ii.item_id = i.id LIMIT 1) AS item_image,\n        m.content AS last_message_content,\n        m.created_at AS last_message_sent_at,\n        i.category AS item_category, \n        i.description AS item_description,\n        i.status AS item_status\n    FROM \n        ItemChat ic\n    JOIN \n        Item i ON ic.item_id = i.id\n    JOIN \n        User u ON u.id = i.user_id\n    INNER JOIN \n        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id\n    LEFT JOIN \n        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at\n    WHERE \n        ic.buyer_id = ?;\n        ",
   "describe": {
     "columns": [
       {
@@ -142,5 +142,5 @@
       false
     ]
   },
-  "hash": "6d8b0a701900f5301a25bd754301ab9dc6806ff86d77a780a86e0ebd52b6ad61"
+  "hash": "8dc05a106f7e67fccc828386470566f61b84361ef6b05db76336cc8e0e95e320"
 }
