@@ -36,7 +36,7 @@ model Item {
   id          Int         @id @default(autoincrement())
   name        String
   price       Float
-  image       ItemImage[]
+  // image       ItemImage[]
   category    Category    @default(GENERAL)
   created_at  DateTime    @default(now()) @db.Timestamp(0)
   updated_at  DateTime    @default(now()) @updatedAt @db.Timestamp(0)
@@ -44,9 +44,10 @@ model Item {
   user        User        @relation(fields: [user_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
   user_id     Int
   status      ItemStatus  @default(ACTIVE)
+  images      Json        @default("[]")
   saved_items SavedItem[]
   chats       ItemChat[]
-
+  
   @@index([user_id], name: "user_id")
   @@index([category], name: "category")
 }
@@ -56,14 +57,14 @@ enum ItemStatus {
   INACTIVE
 }
 
-model ItemImage {
-  id      Int    @id @default(autoincrement())
-  url     String
-  item    Item   @relation(fields: [item_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
-  item_id Int
+// model ItemImage {
+//   id      Int    @id @default(autoincrement())
+//   url     String
+//   item    Item   @relation(fields: [item_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
+//   item_id Int
 
-  @@index([item_id], name: "item_id")
-}
+//   @@index([item_id], name: "item_id")
+// }
 
 model SavedItem {
   user_id Int
@@ -103,7 +104,7 @@ model ItemChat {
 
 model Message {
   id         Int      @id @default(autoincrement())
-  content    String   @db.VarChar(1000) 
+  content    String   @db.VarChar(1000)
   chat_id    Int
   sender_id  Int
   read       Boolean  @default(false)

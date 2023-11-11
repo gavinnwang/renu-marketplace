@@ -13,16 +13,17 @@ pub fn convert_raw_into_item(raw_item: RawItem) -> Item {
         id: raw_item.id,
         name: raw_item.name,
         price: raw_item.price,
-        item_images: match raw_item.item_images {
-            Some(item_images) => item_images.split(",").map(|s| s.to_string()).collect(),
-            None => Vec::new(),
-        },
+        images: raw_item.images,
         category: raw_item.category,
         status: raw_item.status,
         user_id: raw_item.user_id,
         description: raw_item.description,
         created_at: raw_item.created_at.into(),
         updated_at: raw_item.updated_at.into(),
+        // item_images: match raw_item.item_images {
+        //     Some(item_images) => item_images.split(",").map(|s| s.to_string()).collect(),
+        //     None => Vec::new(),
+        // },
     }
 }
 

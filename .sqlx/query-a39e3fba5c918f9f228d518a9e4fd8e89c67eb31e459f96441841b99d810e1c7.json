@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            Item.id, \n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category,\n            Item.status,\n            Item.description,\n            Item.created_at, \n            Item.updated_at,\n            GROUP_CONCAT(ItemImage.url) AS item_images\n        FROM Item\n        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = ?\n        GROUP BY Item.id\n        ",
+  "query": "\n    SELECT\n        Item.id, \n        Item.name, \n        Item.price, \n        Item.user_id, \n        Item.category,\n        Item.status,\n        Item.description,\n        Item.created_at, \n        Item.updated_at,\n        Item.images as images\n    FROM Item\n    WHERE Item.id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -95,12 +95,12 @@
       },
       {
         "ordinal": 9,
-        "name": "item_images",
+        "name": "images",
         "type_info": {
-          "type": "Blob",
-          "flags": "",
-          "char_set": 255,
-          "max_size": 16384
+          "type": "Json",
+          "flags": "NOT_NULL | BLOB | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 4294967295
         }
       }
     ],
@@ -117,8 +117,8 @@
       true,
       false,
       false,
-      true
+      false
     ]
   },
-  "hash": "84753bb53b75bd1bc3101a0f5d7ddee99cb0d2e50795cfefc73bf4126fd82a95"
+  "hash": "a39e3fba5c918f9f228d518a9e4fd8e89c67eb31e459f96441841b99d810e1c7"
 }

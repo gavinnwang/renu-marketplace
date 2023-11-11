@@ -24,12 +24,10 @@ pub async fn fetch_saved_items_by_user_id(
             Item.status,
             Item.created_at,
             Item.updated_at,
-            GROUP_CONCAT(ItemImage.url) AS item_images
+            Item.images as images
         FROM SavedItem
         INNER JOIN Item ON SavedItem.item_id = Item.id
-        INNER JOIN ItemImage ON Item.id = ItemImage.item_id AND Item.id = SavedItem.item_id 
         WHERE SavedItem.user_id = ?
-        GROUP BY Item.id
         "#,
         user_id
     )
@@ -39,4 +37,23 @@ pub async fn fetch_saved_items_by_user_id(
     let items = convert_raw_into_items(raw_items);
 
     Ok(items)
+}
+
+pub async fn insert_saved_item(
+    user_id: i32,
+    item_id: i32,
+    conn: impl Executor<'_, Database = MySql>,
+) -> Result<(), DbError> {
+    sqlx::query!(
+        r#"
+        INSERT INTO SavedItem (user_id, item_id)
+        VALUES (?, ?)
+        "#,
+        user_id,
+        item_id
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(())
 }

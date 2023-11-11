@@ -30,7 +30,9 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
     );
 
     conf.service(
-        web::scope("/saved").service(super::saved_item_handler::get_saved_items_by_user_id),
+        web::scope("/saved")
+            .service(super::saved_item_handler::get_saved_items_by_user_id)
+            .service(super::saved_item_handler::post_saved_item),
     );
 
     conf.service(
