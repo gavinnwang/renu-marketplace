@@ -58,7 +58,7 @@ export default function ChatScreen() {
         if (data.data.chat_id) {
           setChatId(data.data.chat_id);
         } else {
-          console.log("new chat as this chat doesn't exist")
+          console.log("new chat as this chat doesn't exist");
         }
       } else {
         console.error("get chat id error", data);
@@ -66,7 +66,7 @@ export default function ChatScreen() {
     },
     onError(err) {
       console.error("error getting chat id", err);
-    }
+    },
   });
 
   const [item, setItem] = React.useState<ItemWithImage>();
@@ -86,7 +86,7 @@ export default function ChatScreen() {
     },
     onError(err) {
       console.error("error getting item", err);
-    }
+    },
   });
 
   const [seller, setSeller] = React.useState<UserWithCount>();
@@ -107,7 +107,7 @@ export default function ChatScreen() {
     },
     onError(err) {
       console.error("error getting user", err);
-    }
+    },
   });
 
   const [offset, setOffset] = React.useState(0);
@@ -128,14 +128,14 @@ export default function ChatScreen() {
     enabled: !!chatId && !endReached && !!session?.token,
     onSuccess(data) {
       if (data.status === "success") {
-        console.log("fetched messages", data.data)
+        console.log("fetched messages", data.data);
         if (data.data.length < limit) {
           console.log("end reached");
           setEndReached(true);
         }
-        setChatMessages(prev=>[...prev, ...data.data]);
+        setChatMessages((prev) => [...prev, ...data.data]);
         console.log("fetching at offet:", offset);
-        console.log("fetched messages:", data.data.length)
+        console.log("fetched messages:", data.data.length);
         setOffset((prev) => prev + limit);
       } else {
         console.error(data);
@@ -143,17 +143,14 @@ export default function ChatScreen() {
     },
     onError(err) {
       console.error("error getting messages", err);
-    }
+    },
   });
 
   const width = Dimensions.get("window").width / 8;
   const [inputText, setInputText] = React.useState("");
 
   let socketUrl = "wss://api.gavinwang.dev/ws";
-  const {
-    sendMessage,
-    lastMessage,
-  } = useWebSocket(socketUrl, {
+  const { sendMessage, lastMessage } = useWebSocket(socketUrl, {
     queryParams: {
       authorization: `Bearer_${session?.token}`,
     },
@@ -174,7 +171,7 @@ export default function ChatScreen() {
       ]);
       setOffset((prev) => prev + 1);
     }
-  }, [lastMessage,]);
+  }, [lastMessage]);
 
   React.useEffect(() => {
     if (!chatId) return;
@@ -260,26 +257,50 @@ export default function ChatScreen() {
               value={inputText}
               onChangeText={setInputText}
               onSubmitEditing={(e) => {
-                if (!inputText) return;
+                if (!inputText.trim()) return;
                 if (!chatId && item) {
                   console.log("no chat id so create one");
-                  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${item.id}`, {
-                    headers: {
-                      authorization: `Bearer ${session?.token}`,
-                    },
-                    method: "POST",
-                  }).then((x) => {
-                    x.json().then((data: ApiResponse<ChatId>) => {
-                      if (data.status === "success") {
-                        setChatId(data.data.chat_id);
-                        sendMessage(`/join ${data.data.chat_id}`);
-                      } else {
-                        console.error(data);
-                      }
-                    }).catch(err => {
-                      console.error("parse post messgae", err)
-                    })
+                  fetch(
+                    `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${item.id}`,
+                    {
+                      headers: {
+                        authorization: `Bearer ${session?.token}`,
+                      },
+                      method: "POST",
+                    }
+                  ).then((x) => {
+                    x.json()
+                      .then((data: ApiResponse<ChatId>) => {
+                        if (data.status === "success") {
+                          setChatId(data.data.chat_id);
+                          sendMessage(`/join ${data.data.chat_id}`);
+                          sendMessage(`/message ${data.data.chat_id} ${inputText}`);
+                          setInputText("");
+                          queryClient.invalidateQueries(["chats", 0]); // todo: improve this cache invalidation logic
+                          queryClient.invalidateQueries(["chats", 1]);
+
+                          setChatMessages((prev) => [
+                            {
+                              id:
+                                prev.length > 0
+                                  ? prev[prev.length - 1].id + 1
+                                  : 1,
+                              content: inputText,
+                              from_me: 1,
+                              sent_at: new Date(),
+                            } as ChatMessage,
+                            ...prev,
+                          ]);
+                          setOffset((prev) => prev + 1);
+                        } else {
+                          console.error(data);
+                        }
+                      })
+                      .catch((err) => {
+                        console.error("parse post messgae", err);
+                      });
                   });
+                  return;
                 }
                 sendMessage(`/message ${chatId} ${inputText}`);
                 setInputText("");
