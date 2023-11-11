@@ -196,47 +196,50 @@ export default function ChatScreen() {
           <View className="w-10 p-3" />
         </View>
 
-        <Pressable
-          onPress={() => router.push(`/item/${item?.id}`)}
-          className="p-3.5 flex-row justify-between  items-center border-y border-y-grayPrimary bg-stone-50"
-          style={{
-            height: (width * 4) / 3 + 28,
-            // opacity: item?.status === "INACTIVE" ? 0.8 : 1,
-          }}
-        >
-          {item && (
-            <Image
-              source={{ uri: item.item_images[0] }}
-              className="object-cover rounded-sm"
-              style={{
-                minWidth: width,
-                minHeight: (width * 4) / 3,
-                width: width,
-                height: (width * 4) / 3,
-              }}
-            />
-          )}
-          <View className="mx-4 flex flex-grow flex-col">
+        <View className="border-y border-y-stone-400">
+          <Pressable
+            onPress={() => router.push(`/item/${item?.id}`)}
+            className="p-3.5 flex-row justify-between items-center bg-stone-50"
+            style={{
+              height: (width * 4) / 3 + 28,
+              opacity: item?.status === "INACTIVE" ? 0.75 : 1,
+            }}
+          >
             {item && (
-              <>
-                <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
-                  {item.name}
-                </Text>
-                <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
-                  {item.description}
-                </Text>
-                <Text className="font-Manrope_600SemiBold text-sm text-blackPrimary">
-                  {item.status === "INACTIVE"
-                    ? "Item is no longer available."
-                    : ""}
-                </Text>
-              </>
+              <Image
+                source={{ uri: item.item_images[0] }}
+                className="object-cover rounded-sm"
+                style={{
+                  minWidth: width,
+                  minHeight: (width * 4) / 3,
+                  width: width,
+                  height: (width * 4) / 3,
+                }}
+              />
             )}
-          </View>
-          <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
-            ${item && item.price}
-          </Text>
-        </Pressable>
+            <View className="mx-4 flex flex-grow flex-col">
+              {item && (
+                <>
+                  <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
+                    {item.name}
+                  </Text>
+                  <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
+                    {item.description}
+                  </Text>
+                  <Text className="font-Manrope_600SemiBold text-sm text-blackPrimary">
+                    {item.status === "INACTIVE"
+                      ? "Item is no longer available."
+                      : ""}
+                  </Text>
+                </>
+              )}
+            </View>
+            <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
+              ${item && item.price}
+            </Text>
+          </Pressable>
+        </View>
+
         <KeyboardAvoidingView
           behavior="padding"
           style={{ flex: 1 }}
