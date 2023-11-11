@@ -81,7 +81,7 @@ impl Actor for WsChatSession {
                             "Session with user id {} connected to chat server",
                             act.user_id
                         );
-                        ctx.text("hello");
+                        // ctx.text("hello");
                     }
                     // something is wrong with chat server
                     _ => {
