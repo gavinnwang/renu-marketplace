@@ -146,7 +146,7 @@ export default function ChatScreen() {
     },
   });
 
-  const width = Dimensions.get("window").width / 8;
+  const width = Dimensions.get("window").width / 7;
   const [inputText, setInputText] = React.useState("");
 
   let socketUrl = "wss://api.gavinwang.dev/ws";
@@ -198,9 +198,10 @@ export default function ChatScreen() {
 
         <Pressable
           onPress={() => router.push(`/item/${item?.id}`)}
-          className="p-4 flex-row justify-between  items-center border-y border-y-grayPrimary bg-stone-50"
+          className="p-3.5 flex-row justify-between  items-center border-y border-y-grayPrimary bg-stone-50"
           style={{
-            height: (width * 4) / 3 + 32,
+            height: (width * 4) / 3 + 28,
+            // opacity: item?.status === "INACTIVE" ? 0.8 : 1,
           }}
         >
           {item && (
@@ -216,12 +217,21 @@ export default function ChatScreen() {
             />
           )}
           <View className="mx-4 flex flex-grow flex-col">
-            <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
-              {item && item.name}
-            </Text>
-            <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
-              {item && item.description}
-            </Text>
+            {item && (
+              <>
+                <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
+                  {item.name}
+                </Text>
+                <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
+                  {item.description}
+                </Text>
+                <Text className="font-Manrope_600SemiBold text-sm text-blackPrimary">
+                  {item.status === "INACTIVE"
+                    ? "Item is no longer available."
+                    : ""}
+                </Text>
+              </>
+            )}
           </View>
           <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
             ${item && item.price}
