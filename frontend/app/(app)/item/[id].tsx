@@ -12,11 +12,12 @@ import { useQuery } from "@tanstack/react-query";
 import Colors from "../../../constants/Colors";
 import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
-import { ItemWithImage, UserWithCount } from "../../../types/types";
+import { ChatId, ItemWithImage, UserWithCount } from "../../../types/types";
 import { FlatList } from "react-native-gesture-handler";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
 import { CATEGORIES } from "../(tabs)/home/[section]";
+import { useSession } from "../../../providers/ctx";
 
 const CloseIcon = () => (
   <Svg
@@ -39,24 +40,56 @@ export default function ItemPage() {
   const param = useLocalSearchParams();
   const itemId = param.id;
 
-  const { data: item } = useQuery({
+  const [item, setItem] = useState<ItemWithImage>();
+
+  useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
         (x) => x.json()
       ) as Promise<ApiResponse<ItemWithImage>>,
     queryKey: ["item", itemId],
     enabled: !!itemId,
+    onSuccess(data) {
+      if (data.status === "success") {
+        setItem(data.data);
+      } else {
+        console.error(data);
+      }
+    },
   });
 
   const [seller, setSeller] = useState<UserWithCount>();
 
+  const { session } = useSession();
+
+  const [chatId, setChatId] = useState<number | undefined>(undefined);
+
+  const { isError: isErrorChatId } = useQuery({
+    queryFn: async () =>
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/id/${itemId}`, {
+        headers: {
+          authorization: `Bearer ${session?.token}`,
+        },
+      }).then((x) => x.json()) as Promise<ApiResponse<ChatId>>,
+    queryKey: ["chat_item", itemId],
+    enabled: !!session && !!itemId,
+    onSuccess(data) {
+      if (data.status === "success") {
+        console.log("set chatid", data.data);
+        setChatId(data.data.chat_id);
+      } else {
+        console.error(data);
+      }
+    },
+  });
+
   useQuery({
     queryFn: async () =>
       fetch(
-        `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.data.user_id}`
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.user_id}`
       ).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
-    queryKey: ["user", item?.data.user_id],
-    enabled: !!item && item.status === "success",
+    queryKey: ["user", item?.user_id],
+    enabled: !!item && !!item.user_id,
     onSuccess(data) {
       if (data.status === "success") {
         setSeller(data.data);
@@ -82,7 +115,7 @@ export default function ItemPage() {
         {item ? (
           <ScrollView>
             <FlatList
-              data={item.data.item_images}
+              data={item.item_images}
               renderItem={({ item }) => (
                 <Image
                   style={{
@@ -107,16 +140,13 @@ export default function ItemPage() {
               }}
             />
             <View className="relative">
-              {item.data.item_images.length > 1 && (
-                <PaginationDots
-                  data={item.data.item_images}
-                  currentIndex={index}
-                />
+              {item.item_images.length > 1 && (
+                <PaginationDots data={item.item_images} currentIndex={index} />
               )}
             </View>
             <View className="w-full flex flex-col p-3 py-3">
               <Text className="text-base font-Poppins_600SemiBold">
-                {item.data.name}
+                {item.name}
               </Text>
               <View className="flex flex-row items-center">
                 <CategoryIcon />
@@ -124,11 +154,11 @@ export default function ItemPage() {
                   Category
                 </Text>
                 <Text className="font-Manrope_600SemiBold text-sm">
-                  {CATEGORIES[item.data.category].display}
+                  {CATEGORIES[item.category].display}
                 </Text>
               </View>
-              <Text className="text-[26px] text-purplePrimary">
-                ${item.data.price}
+              <Text className="text-[26px] text-purplePrimary font-Manrope_600SemiBold">
+                ${item.price}
               </Text>
             </View>
             <View className="h-2 bg-grayLight" />
@@ -141,7 +171,7 @@ export default function ItemPage() {
 
               <View>
                 <Text className="font-Manrope_300Light text-sm mb-1">
-                  {item.data.description ?? "No description provided."}
+                  {item.description ?? "No description provided."}
                 </Text>
               </View>
             </View>
@@ -178,9 +208,19 @@ export default function ItemPage() {
                 </View>
 
                 <View className="ml-auto flex flex-col w-[100px] gap-y-0.5">
-                  <Pressable 
-                  onPress={() => router.push(`/chat/${item.data.id}`)}
-                  className="font-Manrope_400Regular bg-purplePrimary p-2">
+                  <Pressable
+                    onPress={() => {
+                      if (chatId) {
+                        router.push({
+                          pathname: `/chat/${item.id}`,
+                          params: { chatIdParam: chatId?.toString() },
+                        });
+                      } else {
+                        router.push({ pathname: `/chat/${item.id}` });
+                      }
+                    }}
+                    className="font-Manrope_400Regular bg-purplePrimary p-2"
+                  >
                     <Text className="text-white text-center font-Manrope_600SemiBold">
                       Message
                     </Text>
