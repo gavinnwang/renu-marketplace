@@ -54,15 +54,14 @@ async fn google_oauth_handler(
 
     // if email doesn't end in northwestern.edu redirect to 404 page
 
-    if !google_user.email.ends_with("northwestern.edu") {
-        tracing::warn!(
-            "API: User email is not northwestern edu email: {}\n",
-            google_user.email
-        );
+    // if !google_user.email.ends_with("northwestern.edu") {
+    //     tracing::warn!(
+    //         "API: User email is not northwestern edu email: {}\n",
+    //         google_user.email
+    //     );
 
-        let mut response = HttpResponse::Found();
-        return response.append_header((LOCATION, format!("{}{}", state, "/failed_sign_in"))).json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
-    }
+    //     return HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
+    // }
 
     let user_id =
         user_repository::fetch_user_id_by_email(pool.as_ref(), google_user.email.clone()).await;
@@ -87,7 +86,7 @@ async fn google_oauth_handler(
                     Err(err) => {
                         let err_msg = err.to_string();
                         tracing::error!("Failed to add user: {}", err_msg);
-                        return HttpResponse::BadGateway()
+                        return HttpResponse::InternalServerError()
                             .json(serde_json::json!({"status": "fail", "message": err_msg}));
                     }
                     Ok(user_id) => user_id,
@@ -98,7 +97,7 @@ async fn google_oauth_handler(
                 // if error, return error
                 let err_msg = err.to_string();
                 tracing::error!("Failed to fetch user: {}", err_msg);
-                return HttpResponse::BadGateway()
+                return HttpResponse::InternalServerError()
                     .json(serde_json::json!({"status": "fail", "message": err_msg}));
             }
         },
