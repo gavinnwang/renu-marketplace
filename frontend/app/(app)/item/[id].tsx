@@ -222,7 +222,7 @@ export default function ItemPage() {
                       } else if (chatId) {
                         router.push({
                           pathname: `/chat/${item.id}`,
-                          params: { chatIdParam: chatId?.toString(), sellOrBuy: "buy" },
+                          params: { chatIdParam: chatId?.toString(), sellOrBuy: "Buy" },
                         });
                       } else {
                         router.push({ pathname: `/chat/${item.id}` });
