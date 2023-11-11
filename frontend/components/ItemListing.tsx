@@ -12,18 +12,18 @@ const imageWidth = (Dimensions.get("window").width - horizontalGapPx * 3) / 2;
 
 export function ItemListing(props: { item: ItemWithImage }) {
   return (
-    <Link href={`/item/${props.item.id}`} className="flex flex-col px-[5px] shadow-xs">
-      <View className="flex flex-col">
+    <Link href={`/item/${props.item.id}`} className="flex flex-col px-[5px] shadow">
+      <View className="flex flex-col border-1 border-grayMedium">
         <Image
           source={{ uri: props.item.item_images[0] }}
-          className="object-cover rounded-t-sm"
+          className="object-cover rounded-t"
           style={{
             width: imageWidth,
             maxWidth: imageWidth,
             height: (imageWidth * 4) / 3,
           }}
         />
-        <View className="h-fit py-2.5 px-2.5 bg-white rounded-b-sm flex flex-col">
+        <View className="h-fit py-2.5 px-2.5 bg-white rounded-b flex flex-col">
           <Text className="font-Manrope_600SemiBold text-sm">
             {props.item.name}
           </Text>
