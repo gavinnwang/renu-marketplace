@@ -4,7 +4,7 @@ export type UserWithCount = User & {
   active_listing_count: number;
   sales_done_count: number;
 };
-export type ItemWithImage = Item & { item_images: string[] };
+export type ItemWithImage = Item & { images: string[] };
 
 export type Measure = {
   x: number;
@@ -35,31 +35,17 @@ export type ChatGroup = {
   item_category: string;
   item_description: string;
   item_status: string;
-  item_image: string;
+  item_images: string[];
   last_message_content: string;
   last_message_sent_at: Date;
 };
 
-export type ChatWindow = {
-  chat_id: number;
-  item_id: number;
-  other_user_id: number;
-  other_user_name: string;
-  item_name: string;
-  item_price: number;
-  item_category: string;
-  item_description: string;
-  item_status: string;
-  item_image: string;
-};
 
 export type ChatMessage = {
   id: number;
   content: string;
   sent_at: Date;
   from_me: number;
-  // chat_id: number;
-  // sender_id: number;
 };
 
 export type ChatId = { chat_id: number };

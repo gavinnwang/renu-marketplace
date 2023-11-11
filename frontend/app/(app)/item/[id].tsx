@@ -119,7 +119,7 @@ export default function ItemPage() {
         {item ? (
           <ScrollView>
             <FlatList
-              data={item.item_images}
+              data={item.images}
               renderItem={({ item }) => (
                 <Image
                   style={{
@@ -144,8 +144,8 @@ export default function ItemPage() {
               }}
             />
             <View className="relative">
-              {item.item_images.length > 1 && (
-                <PaginationDots data={item.item_images} currentIndex={index} />
+              {item.images.length > 1 && (
+                <PaginationDots data={item.images} currentIndex={index} />
               )}
             </View>
             {item.user_id === session?.user_id ? (

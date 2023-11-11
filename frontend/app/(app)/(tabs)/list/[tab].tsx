@@ -128,7 +128,7 @@ const ListingPageItem = ({
       }}
     className="flex flex-row mt-4 mx-4 bg-bgLight">
       <Image
-        source={{ uri: item.item_images[0] }}
+        source={{ uri: item.images[0] }}
         className="object-cover rounded-sm"
         style={{
           width: width,

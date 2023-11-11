@@ -207,7 +207,7 @@ export default function ChatScreen() {
           >
             {item && (
               <Image
-                source={{ uri: item.item_images[0] }}
+                source={{ uri: item.images[0] }}
                 className="object-cover rounded-sm"
                 style={{
                   minWidth: width,
