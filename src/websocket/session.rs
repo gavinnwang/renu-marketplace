@@ -176,7 +176,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                                 user_id,
                                                 chat_id
                                             );
-                                            ctx.text(format!("Joined chat id {}", chat_id));
+                                            // ctx.text(format!("Joined chat id {}", chat_id));
 
                                             act.chat_id_and_other_user_id =
                                                 Some((chat_id, other_user_id));
