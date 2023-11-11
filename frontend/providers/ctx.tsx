@@ -7,7 +7,6 @@ import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import { Session } from "../types/types";
 
-
 type AuthContextType = {
   signIn: (from: string) => Promise<void>;
   signOut: () => void;
@@ -52,11 +51,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const email = params.get("email");
       const name = params.get("name");
       const user_id = params.get("user_id");
-      if (token && email && name) {
+      if (token && email && name && user_id) {
         const s = {
-          token: token,
-          email: email,
-          name: name,
+          token,
+          email,
+          name,
+          user_id: parseInt(user_id),
         };
         setSession(s);
         void save("session", JSON.stringify(s));
