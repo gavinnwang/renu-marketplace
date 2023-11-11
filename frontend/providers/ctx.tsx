@@ -51,6 +51,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const token = params.get("token");
       const email = params.get("email");
       const name = params.get("name");
+      const user_id = params.get("user_id");
       if (token && email && name) {
         const s = {
           token: token,

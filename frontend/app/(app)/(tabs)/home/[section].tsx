@@ -90,57 +90,56 @@ export default function HomePage() {
 
       <Tabs data={data} selectedSection={selectedSection} />
 
-      <View className="bg-grayMedium h-full ">
-        {isLoadingItems ? (
-          <></>
-        ) : isErrorItems ? (
-          <Text className="mx-auto my-[70%] font-Poppins_600SemiBold text-lg">
-            Something went wrong. Please refresh.
-          </Text>
-        ) : items.data.length === 0 ? (
-          <ScrollView
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={() => {
-                  refetchItems();
-                }}
-              />
-            }
-          >
-            <View className="flex flex-col gap-y-2 mx-auto my-[60%] items-center">
-              <LogoWithText />
-              <Text className="font-Poppins_600SemiBold text-lg">
-                No item right now... List one!
-              </Text>
-            </View>
-          </ScrollView>
-        ) : (
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={() => {
-                  refetchItems();
-                }}
-              />
-            }
-            data={items.data}
-            numColumns={2}
-            columnWrapperStyle={{
-              justifyContent: "flex-start",
-              marginTop: 12,
-              paddingHorizontal: 10,
-            }}
-            contentContainerStyle={{
-              paddingBottom: 92,
-            }}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={ItemListing}
-          />
-        )}
-      </View>
+      {isLoadingItems ? (
+        <></>
+      ) : isErrorItems ? (
+        <Text className="mx-auto my-[70%] font-Poppins_600SemiBold text-lg">
+          Something went wrong. Please refresh.
+        </Text>
+      ) : items.data.length === 0 ? (
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                refetchItems();
+              }}
+            />
+          }
+        >
+          <View className="flex flex-col gap-y-2 px-auto pt-[60%] items-center ">
+            <LogoWithText />
+            <Text className="font-Poppins_600SemiBold text-lg">
+              No item right now... List one!
+            </Text>
+          </View>
+        </ScrollView>
+      ) : (
+        <FlatList
+          className="bg-grayLight h-full"
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                refetchItems();
+              }}
+            />
+          }
+          data={items.data}
+          numColumns={2}
+          columnWrapperStyle={{
+            justifyContent: "flex-start",
+            marginTop: 12,
+            paddingHorizontal: 10,
+          }}
+          contentContainerStyle={{
+            paddingBottom: 92,
+          }}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={ItemListing}
+        />
+      )}
     </View>
   );
 }
