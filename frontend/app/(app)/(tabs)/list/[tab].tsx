@@ -122,7 +122,7 @@ const ListingPageItem = ({
   return (
     <Pressable
       onPress={() => {
-        void router.push(`/item/${item.id}`);
+        void router.push({pathname: `/item/${item.id}`});
       }}
     className="flex flex-row mt-4 mx-4 bg-bgLight">
       <Image
@@ -320,7 +320,7 @@ const Indicator = ({
         width: Dimensions.get("window").width / 2,
         backgroundColor: Colors.blackPrimary,
         transform: [{ translateX }],
-        bottom: -2,
+        bottom: -1,
       }}
     ></Animated.View>
   );

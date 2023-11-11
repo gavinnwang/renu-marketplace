@@ -30,7 +30,7 @@ pub struct ChatGroup {
     pub item_status: String,
     pub item_image: Option<String>,
     pub last_message_content: Option<String>,
-    pub last_message_sent_at: DateTime<Utc>,
+    pub last_message_sent_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]

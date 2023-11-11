@@ -9,10 +9,15 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
-import React from "react";
+import React, { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
-import { ChatId, ChatMessage, ChatWindow } from "../../../types/types";
+import {
+  ChatId,
+  ChatMessage,
+  ItemWithImage,
+  UserWithCount,
+} from "../../../types/types";
 import { useSession } from "../../../providers/ctx";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
@@ -21,56 +26,88 @@ import { FlashList } from "@shopify/flash-list";
 
 export default function ChatScreen() {
   const router = useRouter();
-  const param = useLocalSearchParams();
-  const itemId = param.id;
+  const { id: itemId, chatIdParam } = useLocalSearchParams();
 
   const { session } = useSession();
 
-  const [chatWindow, setChatWindow] = React.useState<ChatWindow | undefined>(
-    undefined
-  );
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
 
   const [chatId, setChatId] = React.useState<number | undefined>(undefined);
 
-  const { isError: isErrorChatWindow } = useQuery({
+  useEffect(() => {
+    if (chatIdParam) {
+      setChatId(parseInt(chatIdParam as string));
+      console.log("set chat id to param", chatIdParam);
+    }
+  }, [chatIdParam]);
+
+  const { isError: isErrorChatId } = useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/id/${itemId}`, {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
-      }).then((x) => x.json()) as Promise<ApiResponse<ChatId>>,
+      }).then((x) => {
+        console.log("fetching chat id because not given in param");
+        return x.json();
+      }) as Promise<ApiResponse<ChatId>>,
     queryKey: ["chat_item", itemId],
+    enabled: !!itemId && !chatIdParam,
+    onSuccess(data) {
+      if (data.status === "success") {
+        if (data.data.chat_id) {
+          setChatId(data.data.chat_id);
+        } else {
+          console.log("new chat as this chat doesn't exist")
+        }
+      } else {
+        console.error("get chat id error", data);
+      }
+    },
+    onError(err) {
+      console.error("error getting chat id", err);
+    }
+  });
+
+  const [item, setItem] = React.useState<ItemWithImage>();
+  useQuery({
+    queryFn: async () =>
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
+        (x) => x.json()
+      ) as Promise<ApiResponse<ItemWithImage>>,
+    queryKey: ["item", itemId],
     enabled: !!itemId,
     onSuccess(data) {
       if (data.status === "success") {
-        console.log("set chatid", data.data);
-        // setChatWindow(data.data);
-        setChatId(data.data.chat_id);
+        setItem(data.data);
       } else {
         console.error(data);
       }
     },
+    onError(err) {
+      console.error("error getting item", err);
+    }
   });
+
+  const [seller, setSeller] = React.useState<UserWithCount>();
 
   useQuery({
     queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/window/${chatId}`, {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }).then((x) => x.json()) as Promise<ApiResponse<ChatWindow>>,
-    queryKey: ["chat_window", chatId],
-    enabled: !!chatId,
+      fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.user_id}`
+      ).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
+    queryKey: ["user", item?.user_id],
+    enabled: !!item && !!item.user_id,
     onSuccess(data) {
       if (data.status === "success") {
-        console.log(data.data);
-
-        setChatWindow(data.data);
+        setSeller(data.data);
       } else {
         console.error(data);
       }
     },
+    onError(err) {
+      console.error("error getting user", err);
+    }
   });
 
   const [offset, setOffset] = React.useState(0);
@@ -96,6 +133,9 @@ export default function ChatScreen() {
         console.error(data);
       }
     },
+    onError(err) {
+      console.error("error getting messages", err);
+    }
   });
 
   const width = Dimensions.get("window").width / 8;
@@ -113,10 +153,14 @@ export default function ChatScreen() {
     queryParams: {
       authorization: `Bearer_${session?.token}`,
     },
-    onOpen: () => sendMessage("/join " + chatId),
     shouldReconnect: () => true,
     reconnectInterval: 5,
   });
+
+  React.useEffect(() => {
+    if (!chatId) return;
+    sendMessage(`/join ${chatId}`);
+  }, [chatId]);
 
   const queryClient = useQueryClient();
 
@@ -127,24 +171,24 @@ export default function ChatScreen() {
           <Pressable onPress={router.back} className="w-10 p-3">
             <CloseIcon />
           </Pressable>
-          {chatWindow && (
+          {seller && (
             <Text className="font-Poppins_600SemiBold text-base text-blackPrimary ">
-              {chatWindow.other_user_name}
+              {seller.name}
             </Text>
           )}
           <View className="w-10 p-3" />
         </View>
 
         <Pressable
-          onPress={() => router.push(`/item/${chatWindow?.item_id}`)}
+          onPress={() => router.push(`/item/${item?.id}`)}
           className="p-4 flex-row justify-between  items-center border-y border-y-grayPrimary bg-gray-100"
           style={{
             height: (width * 4) / 3 + 32,
           }}
         >
-          {chatWindow && (
+          {item && (
             <Image
-              source={{ uri: chatWindow.item_image }}
+              source={{ uri: item.item_images[0] }}
               className="object-cover rounded-sm"
               style={{
                 minWidth: width,
@@ -156,14 +200,14 @@ export default function ChatScreen() {
           )}
           <View className="mx-4 flex flex-grow flex-col">
             <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
-              {chatWindow && chatWindow.item_name}
+              {item && item.name}
             </Text>
             <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
-              {chatWindow && chatWindow.item_description}
+              {item && item.description}
             </Text>
           </View>
           <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
-            ${chatWindow && chatWindow.item_price}
+            ${item && item.price}
           </Text>
         </Pressable>
         <KeyboardAvoidingView
@@ -197,9 +241,9 @@ export default function ChatScreen() {
               onChangeText={setInputText}
               onSubmitEditing={(e) => {
                 if (!inputText) return;
-                if (!chatId) {
+                if (!chatId && item) {
                   console.log("no chat id so create one");
-                  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/${chatId}`, {
+                  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${item.id}`, {
                     headers: {
                       authorization: `Bearer ${session?.token}`,
                     },
@@ -212,7 +256,9 @@ export default function ChatScreen() {
                       } else {
                         console.error(data);
                       }
-                    });
+                    }).catch(err => {
+                      console.error("parse post messgae", err)
+                    })
                   });
                 }
                 sendMessage(`/message ${chatId} ${inputText}`);

@@ -23,8 +23,8 @@ const data = TABS.map((i) => ({
 
 export default function MessageScreen() {
   const param = useLocalSearchParams();
-  const selectedTab = param.tab;
-  const selectedTabInt = parseInt(selectedTab as string);
+  const selectedTab = param.tab as string;
+  const selectedTabInt = parseInt(selectedTab);
 
   const { session } = useSession();
 
@@ -104,7 +104,7 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   return (
     <Pressable
       onPress={() => {
-        router.push(`/chat/${chat.item_id}`);
+        router.push({pathname: `/chat/${chat.item_id}`, params: { chatIdParam: chat.chat_id }});
       }}
       className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary ${
         chat.item_status === "INACTIVE" ? "opacity-70" : ""
@@ -284,7 +284,7 @@ const Indicator = ({
         width: Dimensions.get("window").width / 2,
         backgroundColor: Colors.blackPrimary,
         transform: [{ translateX }],
-        bottom: -2,
+        bottom: -1,
       }}
     />
   );

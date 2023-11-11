@@ -3,43 +3,40 @@ use sqlx::{Executor, MySql};
 
 use crate::{
     error::DbError,
-    model::item_model::RawItemWithChatId,
-    model::{
-        chat_model::{ChatGroup, ChatMessage, ChatWindow, RawChatGroup, RawChatMessage},
-        item_model::ItemWithChatId,
-    },
+    model::chat_model::{ChatGroup, ChatMessage, ChatWindow, RawChatMessage},
 };
 
 pub async fn fetch_chat_groups_by_seller_id(
     user_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<ChatGroup>, DbError> {
-    let raw_groups = sqlx::query_as!(
-        RawChatGroup,
+    let raw_groups = sqlx::query!(
         r#"
         SELECT 
-            ItemChat.id AS chat_id, 
-            ItemChat.item_id, 
-            Item.name AS item_name, 
-            User.id AS other_user_id,
-            User.name AS other_user_name,
-            Item.price AS item_price, 
-            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
-            Message.content AS last_message_content,
-            Message.created_at AS last_message_sent_at,
-            Item.category AS item_category, 
-            Item.description AS item_description,
-            Item.status AS item_status
-        FROM ItemChat
-        JOIN Item ON ItemChat.item_id = Item.id
-        JOIN User ON User.id = ItemChat.buyer_id
-        JOIN (
-            SELECT content, created_at, chat_id 
-            FROM Message 
-            ORDER BY created_at DESC
-            LIMIT 1
-        ) AS Message ON Message.chat_id = ItemChat.id
-        WHERE Item.user_id = ?;
+        ic.id AS chat_id, 
+        ic.item_id, 
+        i.name AS item_name, 
+        u.id AS other_user_id,
+        u.name AS other_user_name,
+        i.price AS item_price, 
+        (SELECT ii.url FROM ItemImage ii WHERE ii.item_id = i.id LIMIT 1) AS item_image,
+        m.content AS last_message_content,
+        m.created_at AS last_message_sent_at,
+        i.category AS item_category, 
+        i.description AS item_description,
+        i.status AS item_status
+    FROM 
+        ItemChat ic
+    JOIN 
+        Item i ON ic.item_id = i.id
+    JOIN 
+        User u ON u.id = ic.buyer_id
+    INNER JOIN 
+        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id
+    LEFT JOIN 
+        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at
+    WHERE 
+        i.user_id = ?;
         "#,
         user_id
     )
@@ -60,7 +57,13 @@ pub async fn fetch_chat_groups_by_seller_id(
             item_status: raw_group.item_status,
             item_image: raw_group.item_image,
             last_message_content: raw_group.last_message_content,
-            last_message_sent_at: raw_group.last_message_sent_at.into(),
+            last_message_sent_at: match raw_group.last_message_sent_at {
+                Some(time) => {
+                    let time: std::time::SystemTime = time.into();
+                    Some(time.into())
+                },
+                None => None,
+            },
         })
         .collect())
 }
@@ -69,32 +72,33 @@ pub async fn fetch_chat_groups_by_buyer_id(
     user_id: i32,
     conn: impl Executor<'_, Database = MySql>,
 ) -> Result<Vec<ChatGroup>, DbError> {
-    let raw_groups = sqlx::query_as!(
-        RawChatGroup,
+    let raw_groups = sqlx::query!(
         r#"
-        SELECT 
-            ItemChat.id AS chat_id, 
-            ItemChat.item_id, 
-            Item.name AS item_name, 
-            User.id AS other_user_id,
-            User.name AS other_user_name,
-            Item.price AS item_price, 
-            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,
-            Message.content AS last_message_content,
-            Message.created_at AS last_message_sent_at,
-            Item.category AS item_category, 
-            Item.description AS item_description,
-            Item.status AS item_status
-        FROM ItemChat
-        JOIN Item ON ItemChat.item_id = Item.id
-        JOIN User ON Item.user_id = User.id
-        JOIN (
-            SELECT content, created_at, chat_id 
-            FROM Message 
-            ORDER BY created_at DESC
-            LIMIT 1
-        ) AS Message ON Message.chat_id = ItemChat.id
-        WHERE ItemChat.buyer_id = ?;
+    SELECT 
+        ic.id AS chat_id, 
+        ic.item_id, 
+        i.name AS item_name, 
+        u.id AS other_user_id,
+        u.name AS other_user_name,
+        i.price AS item_price, 
+        (SELECT ii.url FROM ItemImage ii WHERE ii.item_id = i.id LIMIT 1) AS item_image,
+        m.content AS last_message_content,
+        m.created_at AS last_message_sent_at,
+        i.category AS item_category, 
+        i.description AS item_description,
+        i.status AS item_status
+    FROM 
+        ItemChat ic
+    JOIN 
+        Item i ON ic.item_id = i.id
+    JOIN 
+        User u ON u.id = ic.buyer_id
+    INNER JOIN 
+        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id
+    LEFT JOIN 
+        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at
+    WHERE 
+        ic.buyer_id = ?;
         "#,
         user_id
     )
@@ -114,11 +118,17 @@ pub async fn fetch_chat_groups_by_buyer_id(
             item_description: raw_group.item_description,
             item_status: raw_group.item_status,
             item_image: raw_group.item_image,
-
             last_message_content: raw_group.last_message_content,
-            last_message_sent_at: raw_group.last_message_sent_at.into(),
+            last_message_sent_at: match raw_group.last_message_sent_at {
+                Some(time) => {
+                    let time: std::time::SystemTime = time.into();
+                    Some(time.into())
+                },
+                None => None,
+            },
         })
         .collect())
+
 }
 
 pub async fn fetch_chat_window_by_chat_id(
@@ -285,7 +295,9 @@ pub async fn fetch_chat_id_by_item_id(
         item_id,
         user_id,
         user_id
-    ).fetch_one(conn).await;
+    )
+    .fetch_one(conn)
+    .await;
 
     match result {
         Err(sqlx::Error::RowNotFound) => Ok(None),

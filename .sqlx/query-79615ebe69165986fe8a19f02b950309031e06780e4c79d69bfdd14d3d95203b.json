@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT \n            ItemChat.id AS chat_id, \n            ItemChat.item_id, \n            Item.name AS item_name, \n            User.id AS other_user_id,\n            User.name AS other_user_name,\n            Item.price AS item_price, \n            (SELECT url FROM ItemImage WHERE ItemImage.item_id = Item.id LIMIT 1) AS item_image,\n            Message.content AS last_message_content,\n            Message.created_at AS last_message_sent_at,\n            Item.category AS item_category, \n            Item.description AS item_description,\n            Item.status AS item_status\n        FROM ItemChat\n        JOIN Item ON ItemChat.item_id = Item.id\n        JOIN User ON User.id = ItemChat.buyer_id\n        JOIN (\n            SELECT content, created_at, chat_id \n            FROM Message \n            ORDER BY created_at DESC\n            LIMIT 1\n        ) AS Message ON Message.chat_id = ItemChat.id\n        WHERE Item.user_id = ?;\n        ",
+  "query": "\n        SELECT \n        ic.id AS chat_id, \n        ic.item_id, \n        i.name AS item_name, \n        u.id AS other_user_id,\n        u.name AS other_user_name,\n        i.price AS item_price, \n        (SELECT ii.url FROM ItemImage ii WHERE ii.item_id = i.id LIMIT 1) AS item_image,\n        m.content AS last_message_content,\n        m.created_at AS last_message_sent_at,\n        i.category AS item_category, \n        i.description AS item_description,\n        i.status AS item_status\n    FROM \n        ItemChat ic\n    JOIN \n        Item i ON ic.item_id = i.id\n    JOIN \n        User u ON u.id = ic.buyer_id\n    INNER JOIN \n        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id\n    LEFT JOIN \n        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at\n    WHERE \n        i.user_id = ?;\n        ",
   "describe": {
     "columns": [
       {
@@ -78,7 +78,7 @@
         "name": "last_message_content",
         "type_info": {
           "type": "VarString",
-          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "flags": "NO_DEFAULT_VALUE",
           "char_set": 255,
           "max_size": 4000
         }
@@ -88,9 +88,9 @@
         "name": "last_message_sent_at",
         "type_info": {
           "type": "Timestamp",
-          "flags": "NOT_NULL | BINARY | TIMESTAMP",
-          "char_set": 255,
-          "max_size": 76
+          "flags": "BINARY | TIMESTAMP",
+          "char_set": 63,
+          "max_size": 19
         }
       },
       {
@@ -135,12 +135,12 @@
       false,
       false,
       true,
-      false,
-      false,
+      true,
+      true,
       false,
       true,
       false
     ]
   },
-  "hash": "f03d2577ab424ae5ccb6b78bd80b3012e096a65aac34356b90d091014de9e07c"
+  "hash": "79615ebe69165986fe8a19f02b950309031e06780e4c79d69bfdd14d3d95203b"
 }
