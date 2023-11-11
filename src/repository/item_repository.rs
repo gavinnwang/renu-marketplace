@@ -177,6 +177,7 @@ pub async fn update_item_status(
         r#"
         UPDATE Item
         SET status = ?
+        AND updated_at = NOW()
         WHERE id = ?
         "#,
         status,

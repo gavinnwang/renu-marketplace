@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE Item\n        SET status = ?\n        AND updated_at = NOW()\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "4f1772508a822fde2de4f8311b22423a7e71426699d5e23908d6278f52635d0f"
+}
