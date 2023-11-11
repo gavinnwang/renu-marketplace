@@ -152,11 +152,7 @@ export default function ChatScreen() {
   let socketUrl = "wss://api.gavinwang.dev/ws";
   const {
     sendMessage,
-    // sendJsonMessage,
     lastMessage,
-    // lastJsonMessage,
-    // readyState,
-    // getWebSocket,
   } = useWebSocket(socketUrl, {
     queryParams: {
       authorization: `Bearer_${session?.token}`,
