@@ -181,7 +181,14 @@ export default function ItemPage() {
             <View className="p-3 flex flex-col gap-y-2">
               <Text className="font-Poppins_600SemiBold text-base">Seller</Text>
               <Pressable
-                onPress={() => router.push(`/seller/${seller?.id}`)}
+                onPress={() => {
+                  console.log("seller", item.user_id);
+                  if (seller?.id === session?.user_id) {
+                    router.push("/account");
+                  } else {
+                    router.push(`/seller/${seller?.id}`);
+                  }
+                }}
                 className="flex flex-row items-center"
               >
                 <Image
@@ -210,10 +217,12 @@ export default function ItemPage() {
                 <View className="ml-auto flex flex-col w-[100px] gap-y-0.5">
                   <Pressable
                     onPress={() => {
-                      if (chatId) {
+                      if (item.user_id === session?.user_id) {
+                        router.push("/account");
+                      } else if (chatId) {
                         router.push({
                           pathname: `/chat/${item.id}`,
-                          params: { chatIdParam: chatId?.toString() },
+                          params: { chatIdParam: chatId?.toString(), sellOrBuy: "buy" },
                         });
                       } else {
                         router.push({ pathname: `/chat/${item.id}` });
@@ -222,7 +231,7 @@ export default function ItemPage() {
                     className="font-Manrope_400Regular bg-purplePrimary p-2"
                   >
                     <Text className="text-white text-center font-Manrope_600SemiBold">
-                      Message
+                      {item.user_id === session?.user_id ? "Edit" : "Message"}
                     </Text>
                   </Pressable>
                 </View>

@@ -26,7 +26,7 @@ import { FlashList } from "@shopify/flash-list";
 
 export default function ChatScreen() {
   const router = useRouter();
-  const { id: itemId, chatIdParam } = useLocalSearchParams();
+  const { id: itemId, chatIdParam, sellOrBuy } = useLocalSearchParams();
 
   const { session } = useSession();
 
@@ -175,6 +175,7 @@ export default function ChatScreen() {
 
   React.useEffect(() => {
     if (!chatId) return;
+    console.log("joining chat");
     sendMessage(`/join ${chatId}`);
   }, [chatId]);
 
@@ -256,7 +257,7 @@ export default function ChatScreen() {
               className="px-4 py-2 mx-2 border rounded-full border-gray-400"
               value={inputText}
               onChangeText={setInputText}
-              onSubmitEditing={(e) => {
+              onSubmitEditing={() => {
                 if (!inputText.trim()) return;
                 if (!chatId && item) {
                   console.log("no chat id so create one");
@@ -278,22 +279,7 @@ export default function ChatScreen() {
                             `/message ${data.data.chat_id} ${inputText}`
                           );
                           setInputText("");
-                          queryClient.invalidateQueries(["chats", 0]); // todo: improve this cache invalidation logic
-                          queryClient.invalidateQueries(["chats", 1]);
-
-                          setChatMessages((prev) => [
-                            {
-                              id:
-                                prev.length > 0
-                                  ? prev[prev.length - 1].id + 1
-                                  : 1,
-                              content: inputText,
-                              from_me: 1,
-                              sent_at: new Date(),
-                            } as ChatMessage,
-                            ...prev,
-                          ]);
-                          setOffset((prev) => prev + 1);
+                          queryClient.invalidateQueries(["chats", sellOrBuy]);
                         } else {
                           console.error(data);
                         }
@@ -306,8 +292,7 @@ export default function ChatScreen() {
                 }
                 sendMessage(`/message ${chatId} ${inputText}`);
                 setInputText("");
-                queryClient.invalidateQueries(["chats", 0]); // todo: improve this cache invalidation logic
-                queryClient.invalidateQueries(["chats", 1]);
+                queryClient.invalidateQueries(["chats", sellOrBuy]);
 
                 setChatMessages((prev) => [
                   {
