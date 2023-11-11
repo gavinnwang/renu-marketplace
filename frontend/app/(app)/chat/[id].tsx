@@ -128,7 +128,7 @@ export default function ChatScreen() {
     enabled: !!chatId && !endReached && !!session?.token,
     onSuccess(data) {
       if (data.status === "success") {
-        console.log("fetched messages", data.data);
+        // console.log("fetched messages", data.data);
         if (data.data.length < limit) {
           console.log("end reached");
           setEndReached(true);
@@ -197,7 +197,7 @@ export default function ChatScreen() {
 
         <Pressable
           onPress={() => router.push(`/item/${item?.id}`)}
-          className="p-4 flex-row justify-between  items-center border-y border-y-grayPrimary bg-gray-100"
+          className="p-4 flex-row justify-between  items-center border-y border-y-grayPrimary bg-stone-50"
           style={{
             height: (width * 4) / 3 + 32,
           }}
@@ -274,7 +274,9 @@ export default function ChatScreen() {
                         if (data.status === "success") {
                           setChatId(data.data.chat_id);
                           sendMessage(`/join ${data.data.chat_id}`);
-                          sendMessage(`/message ${data.data.chat_id} ${inputText}`);
+                          sendMessage(
+                            `/message ${data.data.chat_id} ${inputText}`
+                          );
                           setInputText("");
                           queryClient.invalidateQueries(["chats", 0]); // todo: improve this cache invalidation logic
                           queryClient.invalidateQueries(["chats", 1]);
@@ -330,8 +332,8 @@ const Message = ({ message }: { message: ChatMessage }) => {
   return (
     <>
       <View
-        className={`flex flex-row border border-gray-300 rounded-lg bg-gray-100 p-2 w-fit mb-3 ${
-          message.from_me ? "ml-auto" : "mr-auto"
+        className={`flex flex-row border border-stone-300 rounded-lg p-2.5 w-fit mb-3 ${
+          message.from_me ? "ml-auto bg-stone-100" : "mr-auto bg-stone-100"
         }`}
       >
         <Text>{message.content}</Text>
