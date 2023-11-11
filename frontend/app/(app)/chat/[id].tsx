@@ -112,6 +112,7 @@ export default function ChatScreen() {
 
   const [offset, setOffset] = React.useState(0);
   const limit = 25;
+  const [endReached, setEndReached] = React.useState(false);
 
   const { isError: isErrorChatMessages, refetch } = useQuery({
     queryFn: async () =>
@@ -124,10 +125,17 @@ export default function ChatScreen() {
         }
       ).then((x) => x.json()) as Promise<ApiResponse<ChatMessage[]>>,
     queryKey: ["messages", chatId],
-    enabled: !!chatId,
+    enabled: !!chatId && !endReached && !!session?.token,
     onSuccess(data) {
       if (data.status === "success") {
-        setChatMessages([...chatMessages, ...data.data]);
+        console.log("fetched messages", data.data)
+        if (data.data.length < limit) {
+          console.log("end reached");
+          setEndReached(true);
+        }
+        setChatMessages(prev=>[...prev, ...data.data]);
+        console.log("fetching at offet:", offset);
+        console.log("fetched messages:", data.data.length)
         setOffset((prev) => prev + limit);
       } else {
         console.error(data);
@@ -145,7 +153,7 @@ export default function ChatScreen() {
   const {
     sendMessage,
     // sendJsonMessage,
-    // lastMessage,
+    lastMessage,
     // lastJsonMessage,
     // readyState,
     // getWebSocket,
@@ -156,6 +164,21 @@ export default function ChatScreen() {
     shouldReconnect: () => true,
     reconnectInterval: 5,
   });
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      setChatMessages((prev) => [
+        {
+          id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
+          content: lastMessage.data,
+          from_me: 0,
+          sent_at: new Date(),
+        } as ChatMessage,
+        ...prev,
+      ]);
+      setOffset((prev) => prev + 1);
+    }
+  }, [lastMessage,]);
 
   React.useEffect(() => {
     if (!chatId) return;
@@ -225,6 +248,7 @@ export default function ChatScreen() {
             inverted
             estimatedItemSize={offset ? offset : 35}
             onEndReached={() => {
+              if (endReached) return;
               refetch();
             }}
             showsVerticalScrollIndicator={true}
