@@ -138,8 +138,8 @@ async fn google_oauth_handler(
 
     let mut response = HttpResponse::Found();
     let redirect_url = format!(
-        "{}?email={}&name={}&token={}",
-        state, google_user.email, google_user.name, token
+        "{}?email={}&name={}&token={}&user_id={}",
+        state, google_user.email, google_user.name, token, user_id
     );
     tracing::info!("API: Redirecting to {}\n", redirect_url);
     response.append_header((LOCATION, redirect_url));
