@@ -86,31 +86,31 @@ async fn get_chat_id_by_item_id(
     }
 }
 
-#[get("/window/{chat_id}")]
-async fn get_chat_window_by_chat_id(
-    auth_guard: AuthenticationGuard,
-    path: web::Path<i32>,
-    pool: web::Data<DbPool>,
-) -> impl Responder {
-    let user_id = auth_guard.user_id;
-    let chat_id = path.into_inner();
+// #[get("/window/{chat_id}")]
+// async fn get_chat_window_by_chat_id(
+//     auth_guard: AuthenticationGuard,
+//     path: web::Path<i32>,
+//     pool: web::Data<DbPool>,
+// ) -> impl Responder {
+//     let user_id = auth_guard.user_id;
+//     let chat_id = path.into_inner();
 
-    let window =
-        chat_repository::fetch_chat_window_by_chat_id(user_id, chat_id, pool.as_ref()).await;
+//     let window =
+//         chat_repository::fetch_chat_window_by_chat_id(user_id, chat_id, pool.as_ref()).await;
 
-    match window {
-        Ok(window) => {
-            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": window}))
-        }
-        Err(err) => {
-            tracing::error!("{}\n", format!("API: Failed to fetch chat window for user with id {user_id} and chat id {chat_id}"));
-            tracing::error!("Error message: {}\n", err);
+//     match window {
+//         Ok(window) => {
+//             HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": window}))
+//         }
+//         Err(err) => {
+//             tracing::error!("{}\n", format!("API: Failed to fetch chat window for user with id {user_id} and chat id {chat_id}"));
+//             tracing::error!("Error message: {}\n", err);
 
-            HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
-        }
-    }
-}
+//             HttpResponse::InternalServerError()
+//                 .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+//         }
+//     }
+// }
 
 #[derive(Deserialize)]
 pub struct ChatMessageQuery {
