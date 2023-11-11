@@ -11,7 +11,7 @@ import {
 import Colors from "../../../../constants/Colors";
 import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
 import { useSession } from "../../../../providers/ctx";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiResponse } from "../../../../types/api";
 import { Image } from "expo-image";
@@ -119,6 +119,8 @@ const ListingPageItem = ({
 }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
   const [isSold, setIsSold] = React.useState<boolean>(false);
+
+  const queryClient = useQueryClient();
   return (
     <Pressable
       onPress={() => {
@@ -163,7 +165,10 @@ const ListingPageItem = ({
               body: JSON.stringify({
                 status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
               }),
-            }).then(refetch);
+            }).then(()=> {
+              refetch();
+              queryClient.invalidateQueries(["me"]); // revalidate account because num of listing or sold items changed
+            });
           }}
           className="border-[1.5px] h-[35px] flex-grow-0 flex items-center justify-center"
         >
