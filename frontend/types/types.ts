@@ -22,6 +22,7 @@ export type Session = {
   token: string;
   email: string;
   name: string;
+  user_id: number;
 };
 
 export type ChatGroup = {
@@ -37,7 +38,7 @@ export type ChatGroup = {
   item_image: string;
   last_message_content: string;
   last_message_sent_at: Date;
-}
+};
 
 export type ChatWindow = {
   chat_id: number;
@@ -50,7 +51,7 @@ export type ChatWindow = {
   item_description: string;
   item_status: string;
   item_image: string;
-}
+};
 
 export type ChatMessage = {
   id: number;
@@ -59,6 +60,6 @@ export type ChatMessage = {
   from_me: number;
   // chat_id: number;
   // sender_id: number;
-}
+};
 
 export type ChatId = { chat_id: number };
