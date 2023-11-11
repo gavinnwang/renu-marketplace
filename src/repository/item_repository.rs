@@ -2,7 +2,7 @@ use sqlx::{Executor, MySql};
 
 use crate::{
     error::DbError,
-    model::item_model::{Item, RawItem, ItemWithChatId, RawItemWithChatId},
+    model::item_model::{Item, ItemWithChatId, RawItem, RawItemWithChatId},
 };
 
 use super::item_processing::{convert_raw_into_item, convert_raw_into_items};
@@ -176,8 +176,7 @@ pub async fn update_item_status(
     sqlx::query!(
         r#"
         UPDATE Item
-        SET status = ?
-        AND updated_at = NOW()
+        SET status = ?, updated_at = NOW()
         WHERE id = ?
         "#,
         status,
@@ -188,7 +187,6 @@ pub async fn update_item_status(
 
     Ok(())
 }
-
 
 // fetch the item info by chat id and if there is a chat room between the user and other user regarding this item
 pub async fn fetch_item_and_potential_chat_id_by_item_id(
