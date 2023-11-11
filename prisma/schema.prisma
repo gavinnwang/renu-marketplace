@@ -114,4 +114,5 @@ model Message {
 
   @@index([chat_id], name: "chat_id")
   @@index([sender_id], name: "sender_id")
+  @@index([chat_id, created_at], name: "chat_id_created_at")
 }

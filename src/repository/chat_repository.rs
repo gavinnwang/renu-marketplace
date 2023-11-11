@@ -12,31 +12,39 @@ pub async fn fetch_chat_groups_by_seller_id(
 ) -> Result<Vec<ChatGroup>, DbError> {
     let raw_groups = sqlx::query!(
         r#"
-    SELECT 
-        ic.id AS chat_id, 
-        ic.item_id, 
-        i.name AS item_name, 
-        u.id AS other_user_id,
-        u.name AS other_user_name,
-        i.price AS item_price, 
-        i.images AS item_images,
-        m.content AS last_message_content,
-        m.created_at AS last_message_sent_at,
-        i.category AS item_category, 
-        i.description AS item_description,
-        i.status AS item_status
-    FROM 
-        ItemChat ic
-    JOIN 
-        Item i ON ic.item_id = i.id
-    JOIN 
-        User u ON u.id = ic.buyer_id
-    INNER JOIN 
-        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id
-    LEFT JOIN 
-        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at
-    WHERE 
-        i.user_id = ?;
+        SELECT 
+            ic.id AS chat_id, 
+            ic.item_id, 
+            i.name AS item_name, 
+            u.id AS other_user_id,
+            u.name AS other_user_name,
+            i.price AS item_price, 
+            i.images AS item_images,
+            (
+                SELECT m.content 
+                FROM Message m 
+                WHERE m.chat_id = ic.id 
+                ORDER BY m.created_at DESC 
+                LIMIT 1
+            ) AS last_message_content,
+            (
+                SELECT m.created_at 
+                FROM Message m 
+                WHERE m.chat_id = ic.id 
+                ORDER BY m.created_at DESC 
+                LIMIT 1
+            ) AS last_message_sent_at,
+            i.category AS item_category, 
+            i.description AS item_description,
+            i.status AS item_status
+        FROM 
+            ItemChat ic
+        JOIN 
+            Item i ON ic.item_id = i.id
+        JOIN 
+            User u ON u.id = ic.buyer_id
+        WHERE 
+            i.user_id = ?
         "#,
         user_id
     )
@@ -74,31 +82,39 @@ pub async fn fetch_chat_groups_by_buyer_id(
 ) -> Result<Vec<ChatGroup>, DbError> {
     let raw_groups = sqlx::query!(
         r#"
-    SELECT 
-        ic.id AS chat_id, 
-        ic.item_id, 
-        i.name AS item_name, 
-        u.id AS other_user_id,
-        u.name AS other_user_name,
-        i.price AS item_price, 
-        i.images AS item_images,
-        m.content AS last_message_content,
-        m.created_at AS last_message_sent_at,
-        i.category AS item_category, 
-        i.description AS item_description,
-        i.status AS item_status
-    FROM 
-        ItemChat ic
-    JOIN 
-        Item i ON ic.item_id = i.id
-    JOIN 
-        User u ON u.id = i.user_id
-    INNER JOIN 
-        (SELECT chat_id, MAX(created_at) AS max_created_at FROM Message GROUP BY chat_id) AS latest_msg ON latest_msg.chat_id = ic.id
-    LEFT JOIN 
-        Message m ON m.chat_id = ic.id AND m.created_at = latest_msg.max_created_at
-    WHERE 
-        ic.buyer_id = ?;
+        SELECT 
+            ic.id AS chat_id, 
+            ic.item_id, 
+            i.name AS item_name, 
+            u.id AS other_user_id,
+            u.name AS other_user_name,
+            i.price AS item_price, 
+            i.images AS item_images,
+            (
+                SELECT m.content 
+                FROM Message m 
+                WHERE m.chat_id = ic.id 
+                ORDER BY m.created_at DESC 
+                LIMIT 1
+            ) AS last_message_content,
+            (
+                SELECT m.created_at 
+                FROM Message m 
+                WHERE m.chat_id = ic.id 
+                ORDER BY m.created_at DESC 
+                LIMIT 1
+            ) AS last_message_sent_at,
+            i.category AS item_category, 
+            i.description AS item_description,
+            i.status AS item_status
+        FROM 
+            ItemChat ic
+        JOIN 
+            Item i ON ic.item_id = i.id
+        JOIN 
+            User u ON u.id = ic.buyer_id
+        WHERE 
+            ic.buyer_id = ?
         "#,
         user_id
     )
