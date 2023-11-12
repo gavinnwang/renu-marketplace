@@ -122,7 +122,7 @@ export default function UploadListingStepOne() {
           <View className="fixed bottom-0 h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
             <Pressable
               onPress={() => {
-                if (images.length < 1) {
+                if (images.length < 2) {
                   alert("Please add at least one image");
                   return;  
                 }
