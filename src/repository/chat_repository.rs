@@ -112,7 +112,7 @@ pub async fn fetch_chat_groups_by_buyer_id(
         JOIN 
             Item i ON ic.item_id = i.id
         JOIN 
-            User u ON u.id = ic.buyer_id
+            User u ON u.id = i.user_id
         WHERE 
             ic.buyer_id = ?
         "#,
