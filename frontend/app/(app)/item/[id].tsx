@@ -252,20 +252,28 @@ export default function ItemPage() {
                     onPress={() => {
                       if (item.user_id === session?.user_id) {
                         router.push("/account");
-                      } else if (chatId) {
-                        router.push({
-                          pathname: `/chat/${item.id}`,
-                          params: {
-                            chatIdParam: chatId?.toString(),
-                            sellOrBuy: "Buy",
-                            newChat: "false",
-                          },
-                        });
-                      } else {
-                        router.push({ pathname: `/chat/${item.id}`,params: {
-                          sellOrBuy: "Buy",
-                          newChat: "true",
-                        } });
+                      }
+                      if (seller) {
+                        if (chatId) {
+                          router.push({
+                            pathname: `/chat/${item.id}`,
+                            params: {
+                              chatIdParam: chatId?.toString(),
+                              sellOrBuy: "Buy",
+                              newChat: "false",
+                              otherUserName: seller.name,
+                            },
+                          });
+                        } else {
+                          router.push({
+                            pathname: `/chat/${item.id}`,
+                            params: {
+                              sellOrBuy: "Buy",
+                              newChat: "true",
+                              otherUserName: seller.name,
+                            },
+                          });
+                        }
                       }
                     }}
                     className="font-Manrope_400Regular bg-purplePrimary p-2"

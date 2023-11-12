@@ -104,20 +104,25 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   const param = useLocalSearchParams();
   const selectedTabInt = parseInt(param.tab as string);
 
+  const [touching, setTouching] = React.useState(false);
+
   return (
     <Pressable
+      onTouchStart={() => setTouching(true)}
+      onTouchEnd={() => setTouching(false)}
       onPress={() => {
         router.push({
           pathname: `/chat/${chat.item_id}`,
           params: {
             chatIdParam: chat.chat_id,
             sellOrBuy: TABS[selectedTabInt],
+            otherUserName: chat.other_user_name,
           },
         });
       }}
       className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary ${
         chat.item_status === "INACTIVE" ? "opacity-70" : ""
-      }`}
+      } ${touching ? "bg-gray-100" : ""}`}
     >
       <Image
         source={{ uri: chat.item_images[0] }}
