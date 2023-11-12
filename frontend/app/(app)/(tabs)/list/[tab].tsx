@@ -5,6 +5,7 @@ import {
   Dimensions,
   FlatList,
   Pressable,
+  RefreshControl,
   Text,
   View,
 } from "react-native";
@@ -60,6 +61,8 @@ export default function ListScreen() {
     },
   });
 
+  const [refreshing, setRefreshing] = React.useState(false);
+
   return (
     <View className="bg-bgLight h-full">
       <Text className="ml-2.5 mt-4 font-Poppins_600SemiBold text-xl text-blackPrimary ">
@@ -90,6 +93,14 @@ export default function ListScreen() {
           data={items.filter((item) => item.status === STATUS[selectedTabInt])}
           numColumns={1}
           keyExtractor={(item) => item.id.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                refetch();
+              }}
+            />
+          }
           renderItem={(object) => (
             <ListingPageItem
               item={object.item}
@@ -124,9 +135,10 @@ const ListingPageItem = ({
   return (
     <Pressable
       onPress={() => {
-        void router.push({pathname: `/item/${item.id}`});
+        void router.push({ pathname: `/item/${item.id}` });
       }}
-    className="flex flex-row mt-4 mx-4 bg-bgLight">
+      className="flex flex-row mt-4 mx-4 bg-bgLight"
+    >
       <Image
         source={{ uri: item.images[0] }}
         className="object-cover rounded-sm"
@@ -165,7 +177,7 @@ const ListingPageItem = ({
               body: JSON.stringify({
                 status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
               }),
-            }).then(()=> {
+            }).then(() => {
               refetch();
               queryClient.invalidateQueries(["me"]); // revalidate account because num of listing or sold items changed
             });
