@@ -45,4 +45,9 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::chat_handler::post_chat_message)
             .service(super::chat_handler::post_chat_room_and_send_first_message),
     );
+
+    conf.service(
+        web::scope("/images")
+            .service(super::image_upload_handler::post_image),
+    );
 }
