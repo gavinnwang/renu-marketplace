@@ -17,8 +17,11 @@ async fn post_image(
     let image = match form.into_inner().image {
         Some(image) => image,
         None => return HttpResponse::BadRequest().body("No image provided"),
-    }; 
-    let uploaded_file = s3_client.upload(&image, "images/").await;
+    };
+    let uploaded_file = match s3_client.upload(&image, "images/").await {
+        Ok(uploaded_file) => uploaded_file,
+        Err(e) => return HttpResponse::InternalServerError().body(e),
+    };
     tracing::info!("Uploaded file: {:#?}", uploaded_file);
     HttpResponse::Ok().json(uploaded_file)
 }

@@ -1,5 +1,5 @@
-use tokio::io::AsyncReadExt as _;
 use super::types::UploadedFile;
+use tokio::io::AsyncReadExt as _;
 
 /// S3 client wrapper to expose semantic upload operations.
 #[derive(Debug, Clone)]
@@ -16,7 +16,6 @@ impl Client {
             s3: aws_sdk_s3::Client::from_conf(config),
             bucket_name,
             region,
-
         }
     }
 
@@ -32,13 +31,16 @@ impl Client {
         &self,
         file: &actix_multipart::form::tempfile::TempFile,
         key_prefix: &str,
-    ) -> UploadedFile {
-        let filename = file.file_name.as_deref().expect("TODO");
+    ) -> Result<UploadedFile, String> {
+        let filename = match file.file_name.as_deref() {
+            Some(filename) => filename.to_string(),
+            None => return Err("No filename provided".to_string()),
+        };
         let key = format!("{key_prefix}{filename}");
         let s3_url = self
             .put_object_from_file(file.file.path().to_str().unwrap(), &key)
             .await;
-        UploadedFile::new(filename, key, s3_url)
+        Ok(UploadedFile::new(filename, key, s3_url))
     }
 
     /// Real upload of file to S3

@@ -132,8 +132,8 @@ export default function UploadListingStepOne() {
                   name: "name",
                   type: "image/png",
                 } as any);
-                console.log(formData)
-                fetch(`http://localhost:8080/images/`, {
+                console.log(formData);
+                fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/images/`, {
                   headers: {
                     "Content-Type": "multipart/form-data",
                   },
