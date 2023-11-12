@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT \n            ic.id AS chat_id, \n            ic.item_id, \n            i.name AS item_name, \n            u.id AS other_user_id,\n            u.name AS other_user_name,\n            i.price AS item_price, \n            i.images AS item_images,\n            (\n                SELECT m.content \n                FROM Message m \n                WHERE m.chat_id = ic.id \n                ORDER BY m.created_at DESC \n                LIMIT 1\n            ) AS last_message_content,\n            (\n                SELECT m.created_at \n                FROM Message m \n                WHERE m.chat_id = ic.id \n                ORDER BY m.created_at DESC \n                LIMIT 1\n            ) AS last_message_sent_at,\n            i.category AS item_category, \n            i.description AS item_description,\n            i.status AS item_status\n        FROM \n            ItemChat ic\n        JOIN \n            Item i ON ic.item_id = i.id\n        JOIN \n            User u ON u.id = ic.buyer_id\n        WHERE \n            ic.buyer_id = ?\n        ",
+  "query": "\n        SELECT \n            ic.id AS chat_id, \n            ic.item_id, \n            i.name AS item_name, \n            u.id AS other_user_id,\n            u.name AS other_user_name,\n            i.price AS item_price, \n            i.images AS item_images,\n            (\n                SELECT m.content \n                FROM Message m \n                WHERE m.chat_id = ic.id \n                ORDER BY m.created_at DESC \n                LIMIT 1\n            ) AS last_message_content,\n            (\n                SELECT m.created_at \n                FROM Message m \n                WHERE m.chat_id = ic.id \n                ORDER BY m.created_at DESC \n                LIMIT 1\n            ) AS last_message_sent_at,\n            i.category AS item_category, \n            i.description AS item_description,\n            i.status AS item_status\n        FROM \n            ItemChat ic\n        JOIN \n            Item i ON ic.item_id = i.id\n        JOIN \n            User u ON u.id = i.user_id\n        WHERE \n            ic.buyer_id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -142,5 +142,5 @@
       false
     ]
   },
-  "hash": "c8ca8b7ec2ab7a99bd5eff31054781c83806a8780d760f2a55d21e13b0ed9ae5"
+  "hash": "9310a84ef7e5ffda81252ef9d040eaaa41d7445c9e0c4b353107554a46334dae"
 }
