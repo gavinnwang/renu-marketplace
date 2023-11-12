@@ -26,8 +26,13 @@ import { FlashList } from "@shopify/flash-list";
 
 export default function ChatScreen() {
   const router = useRouter();
-  const { id: itemId, chatIdParam, sellOrBuy, newChat } = useLocalSearchParams();
-  console.log(sellOrBuy, newChat)
+  const {
+    id: itemId,
+    chatIdParam,
+    sellOrBuy,
+    newChat,
+  } = useLocalSearchParams();
+  // console.log(sellOrBuy, newChat)
   const { session } = useSession();
 
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
@@ -115,17 +120,20 @@ export default function ChatScreen() {
   const [endReached, setEndReached] = React.useState(false);
 
   const { isError: isErrorChatMessages, refetch } = useQuery({
-    queryFn: async () =>
-      fetch(
+    queryFn: async () => {
+      console.log("enabled:", !!chatId && !endReached);
+      console.log("fetching message");
+      return fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/messages/${chatId}?offset=${offset}&limit=${limit}`,
         {
           headers: {
             authorization: `Bearer ${session?.token}`,
           },
         }
-      ).then((x) => x.json()) as Promise<ApiResponse<ChatMessage[]>>,
+      ).then((x) => x.json()) as Promise<ApiResponse<ChatMessage[]>>;
+    },
     queryKey: ["messages", chatId],
-    enabled: !!chatId && !endReached && !!session?.token,
+    enabled: !!chatId && !endReached,
     onSuccess(data) {
       if (data.status === "success") {
         // console.log("fetched messages", data.data);
@@ -158,7 +166,7 @@ export default function ChatScreen() {
     onOpen: () => {
       console.log("opened");
       if (chatId) {
-        console.log("joining chat after openning")
+        console.log("joining chat after openning");
         sendMessage(`/join ${chatId}`);
       }
     },
@@ -262,7 +270,8 @@ export default function ChatScreen() {
             inverted
             estimatedItemSize={offset ? offset : 35}
             onEndReached={() => {
-              if (endReached) return;
+              if (endReached || !chatId) return;
+              console.log("refetching messages");
               refetch();
             }}
             showsVerticalScrollIndicator={true}
@@ -286,6 +295,7 @@ export default function ChatScreen() {
                     {
                       headers: {
                         authorization: `Bearer ${session?.token}`,
+                        "content-type": "application/json",
                       },
                       method: "POST",
                       body: JSON.stringify({
@@ -304,8 +314,14 @@ export default function ChatScreen() {
                           //   `/message ${data.data.chat_id} ${inputText}`
                           // );
                           setInputText("");
-                          console.log("invalidating:", ["messages", data.data.chat_id]);
-                          queryClient.invalidateQueries(["messages", data.data.chat_id]);
+                          console.log("invalidating:", [
+                            "messages",
+                            data.data.chat_id,
+                          ]);
+                          queryClient.invalidateQueries([
+                            "messages",
+                            data.data.chat_id,
+                          ]);
                           console.log("invalidating:", ["chats", sellOrBuy]);
                           queryClient.invalidateQueries(["chats", sellOrBuy]);
                         } else {

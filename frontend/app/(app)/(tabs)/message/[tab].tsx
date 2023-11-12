@@ -138,13 +138,15 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
               {dayjs(chat.last_message_sent_at).fromNow()}
             </Text>
           </View>
-          <Text className="text-base text-gray-600 font-Manrope_400Regular max-w-[250px]">
-            {chat.last_message_content.length >= 50 ? (
-              <>{chat.last_message_content.slice(0, 50)}...</>
-            ) : (
-              chat.last_message_content
-            )}
-          </Text>
+          {chat.last_message_content && (
+            <Text className="text-base text-gray-600 font-Manrope_400Regular max-w-[250px]">
+              {chat.last_message_content.length >= 50 ? (
+                <>{chat.last_message_content.slice(0, 50)}...</>
+              ) : (
+                chat.last_message_content
+              )}
+            </Text>
+          )}
         </View>
         <View className="flex flex-col">
           <Text className="font-Poppins_400Regular">
