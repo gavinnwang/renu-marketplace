@@ -188,11 +188,11 @@ export default function ChatScreen() {
     }
   }, [lastMessage]);
 
-  React.useEffect(() => {
-    if (!chatId) return;
-    console.log("joining chat");
-    sendMessage(`/join ${chatId}`);
-  }, [chatId]);
+  // React.useEffect(() => {
+  //   if (!chatId) return;
+  //   console.log("joining chat");
+  //   sendMessage(`/join ${chatId}`);
+  // }, [chatId]);
 
   const queryClient = useQueryClient();
 
@@ -306,7 +306,6 @@ export default function ChatScreen() {
                     x.json()
                       .then((data: ApiResponse<ChatId>) => {
                         if (data.status === "success") {
-                          setChatId(data.data.chat_id);
                           sendMessage(`/join ${data.data.chat_id}`);
                           console.log("JOINING CHAT ID AFTER CREATING");
                           // console.log("sending message")
@@ -314,14 +313,24 @@ export default function ChatScreen() {
                           //   `/message ${data.data.chat_id} ${inputText}`
                           // );
                           setInputText("");
-                          console.log("invalidating:", [
-                            "messages",
-                            data.data.chat_id,
+                          // console.log("invalidating:", [
+                          //   "messages",
+                          //   data.data.chat_id,
+                          // ]);
+                          // queryClient.invalidateQueries([
+                          //   "messages",
+                          //   data.data.chat_id,
+                          // ]);
+                          setChatMessages([
+                            {
+                              id: 1,
+                              content: inputText,
+                              from_me: 1,
+                              sent_at: new Date(),
+                            } as ChatMessage,
                           ]);
-                          queryClient.invalidateQueries([
-                            "messages",
-                            data.data.chat_id,
-                          ]);
+                          setOffset(1);
+                          setChatId(data.data.chat_id);
                           console.log("invalidating:", ["chats", sellOrBuy]);
                           queryClient.invalidateQueries(["chats", sellOrBuy]);
                         } else {
