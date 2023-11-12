@@ -31,8 +31,10 @@ export default function ChatScreen() {
     chatIdParam,
     sellOrBuy,
     newChat,
+    otherUserName,
   } = useLocalSearchParams();
   // console.log(sellOrBuy, newChat)
+  console.log(otherUserName);
   const { session } = useSession();
 
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
@@ -94,26 +96,26 @@ export default function ChatScreen() {
     },
   });
 
-  const [seller, setSeller] = React.useState<UserWithCount>();
+  // const [seller, setSeller] = React.useState<UserWithCount>();
 
-  useQuery({
-    queryFn: async () =>
-      fetch(
-        `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.user_id}`
-      ).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
-    queryKey: ["user", item?.user_id],
-    enabled: !!item && !!item.user_id,
-    onSuccess(data) {
-      if (data.status === "success") {
-        setSeller(data.data);
-      } else {
-        console.error(data);
-      }
-    },
-    onError(err) {
-      console.error("error getting user", err);
-    },
-  });
+  // useQuery({
+  //   queryFn: async () =>
+  //     fetch(
+  //       `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.user_id}`
+  //     ).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
+  //   queryKey: ["user", item?.user_id],
+  //   enabled: !!item && !!item.user_id,
+  //   onSuccess(data) {
+  //     if (data.status === "success") {
+  //       setSeller(data.data);
+  //     } else {
+  //       console.error(data);
+  //     }
+  //   },
+  //   onError(err) {
+  //     console.error("error getting user", err);
+  //   },
+  // });
 
   const [offset, setOffset] = React.useState(0);
   const limit = 25;
@@ -203,9 +205,9 @@ export default function ChatScreen() {
           <Pressable onPress={router.back} className="w-10 p-3">
             <CloseIcon />
           </Pressable>
-          {seller && (
+          {otherUserName && (
             <Text className="font-Poppins_600SemiBold text-base text-blackPrimary ">
-              {seller.name}
+              {otherUserName}
             </Text>
           )}
           <View className="w-10 p-3" />

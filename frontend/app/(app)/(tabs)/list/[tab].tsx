@@ -132,12 +132,19 @@ const ListingPageItem = ({
   const [isSold, setIsSold] = React.useState<boolean>(false);
 
   const queryClient = useQueryClient();
+  const [touching, setTouching] = React.useState(false);
   return (
     <Pressable
+      onPressIn={() => {
+        setTouching(true);
+      }}
+      onPressOut={() => {
+        setTouching(false);
+      }}
       onPress={() => {
         void router.push({ pathname: `/item/${item.id}` });
       }}
-      className="flex flex-row mt-4 mx-4 bg-bgLight"
+      className={`flex flex-row py-4 px-4 border-b border-b-grayPrimary  ${touching ? "bg-gray-100" : ""}`}
     >
       <Image
         source={{ uri: item.images[0] }}
