@@ -6,9 +6,15 @@ pub struct Config {
     pub google_oauth_client_id: String,
     pub google_oauth_client_secret: String,
     pub google_oauth_redirect_url: String,
+    
     pub database_url: String,
     pub server_port: u16,
     pub server_host: String,
+
+    pub s3_bucket_name: String,
+    pub s3_region: String,
+    pub s3_key: String,
+    pub s3_key_secret: String,
 }
 
 impl Config {
@@ -25,6 +31,11 @@ impl Config {
         let server_port = std::env::var("SERVER_PORT").expect("SERVER_PORT must be set");
         let server_host = std::env::var("SERVER_HOST").expect("SERVER_HOST must be set");
 
+        let s3_bucket_name = std::env::var("S3_BUCKET_NAME").expect("S3_BUCKET_NAME must be set");
+        let s3_region = std::env::var("S3_REGION").expect("S3_REGION must be set");
+        let s3_key = std::env::var("S3_KEY").expect("S3_KEY must be set");
+        let s3_key_secret = std::env::var("S3_KEY_SECRET").expect("S3_KEY_SECRET must be set");
+
         Config {
             jwt_secret,
             jwt_max_age: jwt_max_age.parse::<i64>().expect("TOKEN_MAXAGE must be an integer"),
@@ -34,6 +45,10 @@ impl Config {
             database_url,
             server_port: server_port.parse::<u16>().expect("SERVER_PORT must be an integer"),
             server_host,
+            s3_bucket_name,
+            s3_region,
+            s3_key,
+            s3_key_secret,
         }
     }
 }

@@ -29,6 +29,9 @@ thiserror = "1.0.49"
 actix-http = "3.4.0"
 tokio = { version = "1.33.0", features = ["rt-multi-thread"] }
 dotenv = "0.15.0"
+aws-config = "0.57.1"
+aws-sdk-s3 = "0.35.0"
+actix-multipart = "0.6.1"
 
 [dependencies.uuid]
 version = "1.5.0"

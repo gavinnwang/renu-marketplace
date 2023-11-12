@@ -82,7 +82,7 @@ export default function ListScreen() {
           </Pressable>
         </View>
       ) : isLoadingItem ? (
-        <></>
+        <View className="flex flex-grow"></View>
       ) : items.filter((item) => item.status === STATUS[selectedTabInt])
           .length > 0 ? (
         <FlatList

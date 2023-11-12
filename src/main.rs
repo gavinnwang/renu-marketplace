@@ -5,6 +5,7 @@ pub mod model;
 pub mod repository;
 pub mod routes;
 pub mod websocket;
+pub mod uploads;
 
 use actix::Actor;
 use actix_cors::Cors;
@@ -22,7 +23,7 @@ async fn main() -> std::io::Result<()> {
 
     tracing_subscriber::fmt::init();
 
-    // tracing::debug!("Debugging enabled");
+    tracing::debug!("Debugging enabled");
 
     tracing::info!("Connecting to database");
     let pool = match MySqlPoolOptions::new()
@@ -61,6 +62,16 @@ async fn main() -> std::io::Result<()> {
     tracing::info!("Starting websocket chat server");
     let server = websocket::server::ChatServer::new(Data::new(pool.clone())).start();
 
+    tracing::info!("Configuring S3 client");
+    let s3_client = uploads::startup::configure_and_return_s3_client(
+        config.s3_key.clone(),
+        config.s3_key_secret.clone(),
+        config.s3_region.clone(),
+        config.s3_bucket_name.clone(),
+    ).await;
+
+    let s3_client = Data::new(s3_client);
+
     tracing::info!("Starting Actix web server");
 
     HttpServer::new(move || {
@@ -79,13 +90,14 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(config.clone()))
             .app_data(Data::new(pool.clone()))
             .app_data(Data::new(server.clone()))
+            .app_data(s3_client.clone())
             .wrap(cors)
             .configure(routes::handler_register::handlers)
             .service(websocket::ws_handler::ws_route)
             .wrap(TracingLogger::default())
     })
     .bind((server_host, server_port))?
-    .workers(20)
+    .workers(5)
     .run()
     .await
 }

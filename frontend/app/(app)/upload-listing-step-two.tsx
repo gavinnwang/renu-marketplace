@@ -23,8 +23,16 @@ const CloseIcon = () => (
 );
 
 export default function UploadListingStepTwo() {
-  const { images } = useLocalSearchParams();
-  console.log(images)
+  const param = useLocalSearchParams();
+  const imagesString = param.images as string;
+  const images = imagesString.split(",");
+  console.log(images);
+
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i];
+    
+  }
+
   return (
     <>
       <SafeAreaView className="bg-bgLight">
