@@ -262,7 +262,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     "User id {} is not part of any chat group",
                                     self.user_id
                                 );
-                                ctx.text("You are not part of any chat group");
+                                ctx.text("Error: You are not part of any chat group");
                             }
                         },
                         _ => ctx.text(format!("Unknown command: {}", m)),

@@ -43,6 +43,6 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::chat_handler::get_chat_id_by_item_id)
             // .service(super::chat_handler::get_chat_window_by_chat_id)
             .service(super::chat_handler::post_chat_message)
-            .service(super::chat_handler::post_chat_room),
+            .service(super::chat_handler::post_chat_room_and_send_first_message),
     );
 }

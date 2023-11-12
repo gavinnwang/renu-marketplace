@@ -26,8 +26,8 @@ import { FlashList } from "@shopify/flash-list";
 
 export default function ChatScreen() {
   const router = useRouter();
-  const { id: itemId, chatIdParam, sellOrBuy } = useLocalSearchParams();
-
+  const { id: itemId, chatIdParam, sellOrBuy, newChat } = useLocalSearchParams();
+  console.log(sellOrBuy, newChat)
   const { session } = useSession();
 
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
@@ -51,8 +51,8 @@ export default function ChatScreen() {
         console.log("fetching chat id because not given in param");
         return x.json();
       }) as Promise<ApiResponse<ChatId>>,
-    queryKey: ["chat_item", itemId],
-    enabled: !!itemId && !chatIdParam,
+    queryKey: ["chat_id", itemId],
+    enabled: !!itemId && !chatIdParam && !!session?.token && !newChat,
     onSuccess(data) {
       if (data.status === "success") {
         if (data.data.chat_id) {
@@ -155,6 +155,13 @@ export default function ChatScreen() {
       authorization: `Bearer_${session?.token}`,
     },
     shouldReconnect: () => true,
+    onOpen: () => {
+      console.log("opened");
+      if (chatId) {
+        console.log("joining chat after openning")
+        sendMessage(`/join ${chatId}`);
+      }
+    },
     reconnectInterval: 5,
   });
 
@@ -281,6 +288,9 @@ export default function ChatScreen() {
                         authorization: `Bearer ${session?.token}`,
                       },
                       method: "POST",
+                      body: JSON.stringify({
+                        first_message_content: inputText,
+                      }),
                     }
                   ).then((x) => {
                     x.json()
@@ -288,10 +298,14 @@ export default function ChatScreen() {
                         if (data.status === "success") {
                           setChatId(data.data.chat_id);
                           sendMessage(`/join ${data.data.chat_id}`);
-                          sendMessage(
-                            `/message ${data.data.chat_id} ${inputText}`
-                          );
+                          console.log("JOINING CHAT ID AFTER CREATING");
+                          // console.log("sending message")
+                          // sendMessage(
+                          //   `/message ${data.data.chat_id} ${inputText}`
+                          // );
                           setInputText("");
+                          console.log("invalidating:", ["messages", data.data.chat_id]);
+                          queryClient.invalidateQueries(["messages", data.data.chat_id]);
                           console.log("invalidating:", ["chats", sellOrBuy]);
                           queryClient.invalidateQueries(["chats", sellOrBuy]);
                         } else {
