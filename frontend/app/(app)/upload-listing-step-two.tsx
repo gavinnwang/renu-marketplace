@@ -28,10 +28,7 @@ export default function UploadListingStepTwo() {
   const images = imagesString.split(",");
   console.log(images);
 
-  for (let i = 0; i < images.length; i++) {
-    const image = images[i];
-    
-  }
+
 
   return (
     <>

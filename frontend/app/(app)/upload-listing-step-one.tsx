@@ -121,11 +121,34 @@ export default function UploadListingStepOne() {
 
           <View className="fixed bottom-0 h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
             <Pressable
-              onPress={() => {
+              onPress={async () => {
                 if (images.length < 2) {
                   alert("Please add at least one image");
-                  return;  
+                  return;
                 }
+                const formData = new FormData();
+                formData.append("image", {
+                  uri: images[0],
+                  name: "name",
+                  type: "image/png",
+                } as any);
+                console.log(formData)
+                fetch(`http://localhost:8080/images/`, {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                  method: "POST",
+                  body: formData,
+                })
+                  .then((res) => {
+                    res.json().then((data) => {
+                      console.log(data);
+                    });
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+
                 void router.push({
                   pathname: "/upload-listing-step-two",
                   params: {
