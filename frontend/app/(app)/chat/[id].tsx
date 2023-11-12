@@ -12,12 +12,7 @@ import Colors from "../../../constants/Colors";
 import React, { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
-import {
-  ChatId,
-  ChatMessage,
-  ItemWithImage,
-  UserWithCount,
-} from "../../../types/types";
+import { ChatId, ChatMessage, ItemWithImage } from "../../../types/types";
 import { useSession } from "../../../providers/ctx";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
@@ -34,7 +29,7 @@ export default function ChatScreen() {
     otherUserName,
   } = useLocalSearchParams();
   // console.log(sellOrBuy, newChat)
-  console.log(otherUserName);
+  // console.log(otherUserName);
   const { session } = useSession();
 
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
@@ -122,18 +117,15 @@ export default function ChatScreen() {
   const [endReached, setEndReached] = React.useState(false);
 
   const { isError: isErrorChatMessages, refetch } = useQuery({
-    queryFn: async () => {
-      console.log("enabled:", !!chatId && !endReached);
-      console.log("fetching message");
-      return fetch(
+    queryFn: async () =>
+      fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/messages/${chatId}?offset=${offset}&limit=${limit}`,
         {
           headers: {
             authorization: `Bearer ${session?.token}`,
           },
         }
-      ).then((x) => x.json()) as Promise<ApiResponse<ChatMessage[]>>;
-    },
+      ).then((x) => x.json()) as Promise<ApiResponse<ChatMessage[]>>,
     queryKey: ["messages", chatId],
     enabled: !!chatId && !endReached,
     onSuccess(data) {

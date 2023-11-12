@@ -42,7 +42,8 @@
     "react-native-svg": "13.9.0",
     "react-native-web": "~0.19.6",
     "react-use-websocket": "^3.0.0",
-    "@shopify/flash-list": "1.4.3"
+    "@shopify/flash-list": "1.4.3",
+    "expo-image-picker": "~14.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

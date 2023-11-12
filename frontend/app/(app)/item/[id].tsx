@@ -252,8 +252,7 @@ export default function ItemPage() {
                     onPress={() => {
                       if (item.user_id === session?.user_id) {
                         router.push("/account");
-                      }
-                      if (seller) {
+                      } else if (seller) {
                         if (chatId) {
                           router.push({
                             pathname: `/chat/${item.id}`,

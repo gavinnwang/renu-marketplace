@@ -41,7 +41,7 @@ export default function ListScreen() {
     refetch,
   } = useQuery({
     queryFn: async () =>
-      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/users/me/items", {
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/me/items`, {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
@@ -52,7 +52,7 @@ export default function ListScreen() {
       console.error("error", err);
     },
     onSuccess(data) {
-      console.log(data);
+      // console.log(data);
       if (data.status === "success") {
         setItems(data.data);
       } else {
@@ -70,16 +70,9 @@ export default function ListScreen() {
       </Text>
       <Tabs data={data} selectedTabInt={selectedTabInt} itemData={items} />
       {isErrorItem ? (
-        <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
-          Something wrong happened...
-        </Text>
-      ) : isLoadingItem ? (
-        <></>
-      ) : items.filter((item) => item.status === STATUS[selectedTabInt])
-          .length === 0 ? (
-        <>
-          <Text className="mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
-            You have no {tabDisplay ? "sold items." : "listings."}
+        <View className="flex flex-grow">
+          <Text className=" mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
+            Something went wrong...
           </Text>
           <Pressable
             onPress={() => refetch()}
@@ -87,8 +80,11 @@ export default function ListScreen() {
           >
             <Text className="font-Poppins_500Medium">Refresh</Text>
           </Pressable>
-        </>
-      ) : (
+        </View>
+      ) : isLoadingItem ? (
+        <></>
+      ) : items.filter((item) => item.status === STATUS[selectedTabInt])
+          .length > 0 ? (
         <FlatList
           data={items.filter((item) => item.status === STATUS[selectedTabInt])}
           numColumns={1}
@@ -109,7 +105,34 @@ export default function ListScreen() {
             />
           )}
         />
+      ) : (
+        <View className="flex flex-grow">
+          <Text className=" mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
+            You have no {tabDisplay ? "sold items." : "listings."}
+          </Text>
+          <Pressable
+            onPress={() => refetch()}
+            className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center"
+          >
+            <Text className="font-Poppins_500Medium">Refresh</Text>
+          </Pressable>
+        </View>
       )}
+
+      <View className="h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
+        <Pressable
+          onPress={() => {
+            void router.push({
+              pathname: "/upload-listing-step-one",
+            });
+          }}
+          className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"
+        >
+          <Text className="font-SecularOne_400Regular text-xl text-white">
+            ADD NEW LISTING
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -144,7 +167,9 @@ const ListingPageItem = ({
       onPress={() => {
         void router.push({ pathname: `/item/${item.id}` });
       }}
-      className={`flex flex-row py-4 px-4 border-b border-b-grayPrimary  ${touching ? "bg-gray-100" : ""}`}
+      className={`flex flex-row py-4 px-4 border-b border-b-grayPrimary  ${
+        touching ? "bg-gray-100" : ""
+      }`}
     >
       <Image
         source={{ uri: item.images[0] }}

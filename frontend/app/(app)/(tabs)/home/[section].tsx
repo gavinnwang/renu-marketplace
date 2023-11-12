@@ -12,12 +12,11 @@ import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";
 import { ApiResponse } from "../../../../types/api";
 import { ItemListing } from "../../../../components/ItemListing";
-import Logo, { LogoWithText } from "../../../../components/Logo";
+import { LogoWithText } from "../../../../components/Logo";
 import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
 import React from "react";
 import Colors from "../../../../constants/Colors";
 import Svg, { Path } from "react-native-svg";
-import { FlashList } from "@shopify/flash-list";
 
 type Section = {
   display: string;
@@ -81,12 +80,12 @@ export default function HomePage() {
 
   return (
     <View className="bg-bgLight h-full">
-      <View className="flex flex-row items-center justify-between pl-4 pr-6 pb-2.5 min-h-[43px]">
+      <View className="flex flex-row items-center justify-start pl-4 pr-6 pb-2.5 min-h-[43px]">
         <LogoWithText />
         {/* <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
           <TextInput placeholder="Search here" className="p-2.5 w-full" />
         </View> */}
-        <MagnifyingGlassIcon />
+        {/* <MagnifyingGlassIc150on /> */}
       </View>
 
       <Tabs data={data} selectedSection={selectedSection} />
