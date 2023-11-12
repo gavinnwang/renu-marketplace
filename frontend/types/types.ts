@@ -36,8 +36,8 @@ export type ChatGroup = {
   item_description: string;
   item_status: string;
   item_images: string[];
-  last_message_content: string;
-  last_message_sent_at: Date;
+  last_message_content: string | null;
+  last_message_sent_at: Date | null;
 };
 
 
