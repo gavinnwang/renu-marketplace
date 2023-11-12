@@ -155,7 +155,8 @@ export default function ItemPage() {
                     ? `You sold this item ${dayjs(item.updated_at).fromNow()}`
                     : `You listed this item ${dayjs(
                         item.updated_at
-                      ).fromNow()}`}.
+                      ).fromNow()}`}
+                  .
                 </Text>
               </View>
             ) : (
@@ -198,7 +199,13 @@ export default function ItemPage() {
                 </Text>
               </View>
               <Text className="font-Manrope_400Regular text-xs">
-                Listed {dayjs(item.created_at).fromNow()}
+                {item.updated_at !== item.created_at && item.status === "ACTIVE"
+                  ? `Re-listed ${dayjs(
+                      item.updated_at
+                    ).fromNow()}. First listed ${dayjs(
+                      item.created_at
+                    ).fromNow()}`
+                  : `Listed ${dayjs(item.created_at).fromNow()}`}
               </Text>
             </View>
 
@@ -251,10 +258,14 @@ export default function ItemPage() {
                           params: {
                             chatIdParam: chatId?.toString(),
                             sellOrBuy: "Buy",
+                            newChat: "false",
                           },
                         });
                       } else {
-                        router.push({ pathname: `/chat/${item.id}` });
+                        router.push({ pathname: `/chat/${item.id}`,params: {
+                          sellOrBuy: "Buy",
+                          newChat: "true",
+                        } });
                       }
                     }}
                     className="font-Manrope_400Regular bg-purplePrimary p-2"

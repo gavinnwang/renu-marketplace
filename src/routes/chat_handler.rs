@@ -240,11 +240,17 @@ async fn post_chat_message(
     }
 }
 
+#[derive(Deserialize)]
+pub struct ChatRoomRequest {
+    pub first_message_content: String,
+}
+
 #[post("/{item_id}")]
-async fn post_chat_room(
+async fn post_chat_room_and_send_first_message(
     auth_guard: AuthenticationGuard,
     path: web::Path<i32>,
     pool: web::Data<DbPool>,
+    message: web::Json<ChatRoomRequest>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
     let item_id = path.into_inner();
@@ -252,8 +258,28 @@ async fn post_chat_room(
     let chat_id = chat_repository::insert_chat_room(user_id, item_id, pool.as_ref()).await;
 
     match chat_id {
-        Ok(chat_id) => HttpResponse::Ok()
-            .json(serde_json::json!({"status": "success", "data": {"chat_id": chat_id}})),
+        Ok(chat_id) => {
+            let send_message_result = chat_repository::insert_chat_message(
+                user_id,
+                chat_id,
+                &message.first_message_content,
+                pool.as_ref(),
+            )
+            .await;
+
+            match send_message_result {
+                Ok(_) => HttpResponse::Ok()
+                    .json(serde_json::json!({"status": "success", "data": {"chat_id": chat_id}})),
+                Err(err) => {
+                    tracing::error!("{}\n", format!("API: Failed to send first message for user with id {user_id} and chat id {chat_id}"));
+                    tracing::error!("Error message: {}\n", err);
+
+                    HttpResponse::InternalServerError().json(
+                        serde_json::json!({"status": "fail", "message": "API: Something went wrong"}),
+                    )
+                }
+            }
+        }
         Err(err) => {
             tracing::error!(
                 "{}\n",
