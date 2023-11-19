@@ -15,6 +15,7 @@ pub struct OAuthResponse {
 pub struct QueryCode {
     pub code: String,
     pub state: String,
+    pub redirect_uri: String,
 }
 
 #[derive(Deserialize, Debug)]
