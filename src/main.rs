@@ -21,7 +21,13 @@ async fn main() -> std::io::Result<()> {
     // Load the configuration struct with all the environment variables
     let config = config::Config::init();
 
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt()
+    .event_format(
+        tracing_subscriber::fmt::format()
+            .with_file(true)
+            .with_line_number(true)
+    )
+    .init();
 
     tracing::debug!("Debugging enabled");
 
