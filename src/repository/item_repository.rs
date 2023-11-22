@@ -1,124 +1,119 @@
-use sqlx::{Executor, MySql};
+use sqlx::{Executor, Postgres};
 
 use crate::{
     error::DbError,
-    model::item_model::{Item,  RawItem},
+    model::item_model::{Category, Item, ItemStatus},
 };
 
-use super::item_processing::{convert_raw_into_item, convert_raw_into_items};
-
 pub async fn fetch_items_by_status(
-    status: String,
-    conn: impl Executor<'_, Database = MySql>,
+    status: ItemStatus,
+    conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<Vec<Item>, DbError> {
-    let raw_items = sqlx::query_as!(
-        RawItem,
+    let items = sqlx::query_as!(
+        Item,
         r#"
         SELECT
-            Item.id, 
-            Item.name, 
-            Item.price, 
-            Item.user_id, 
-            Item.category,
-            Item.status,
-            Item.created_at, 
-            Item.description,
-            Item.updated_at,
-            Item.images as images
-        FROM Item
-        WHERE Item.status = ?
-        ORDER BY Item.created_at DESC
+            item.id, 
+            item.name, 
+            item.price, 
+            item.user_id, 
+            item.category::TEXT AS "category!",
+            item.status::TEXT AS "status!",
+            item.created_at, 
+            item.description,
+            item.updated_at,
+            item.images as images
+        FROM item
+        WHERE item.status = $1
+        ORDER BY item.created_at DESC
         "#,
-        status
+        status as ItemStatus
     )
     .fetch_all(conn)
     .await?;
 
-    let items = convert_raw_into_items(raw_items);
     Ok(items)
 }
 
 pub async fn fetch_items_by_category(
-    category: &str,
-    conn: impl Executor<'_, Database = MySql>,
+    category: Category,
+    conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<Vec<Item>, DbError> {
-    let raw_items = sqlx::query_as!(
-        RawItem,
+    let items = sqlx::query_as!(
+        Item,
         r#"
         SELECT
             Item.id,
             Item.name, 
             Item.price, 
             Item.user_id, 
-            Item.category,
-            Item.status,
+            Item.category::TEXT AS "category!",
+            Item.status::TEXT AS "status!",
             Item.description,
             Item.created_at, 
             Item.updated_at,
             Item.images as images
         FROM Item 
-        WHERE Item.category = ? AND Item.status = 'ACTIVE'
+        WHERE Item.category = $1 AND Item.status = 'active'
         ORDER BY Item.created_at DESC
         "#,
-        category
+        category as Category
     )
     .fetch_all(conn)
     .await?;
 
-    let items = convert_raw_into_items(raw_items);
     Ok(items)
 }
 
 pub async fn fetch_item_by_id(
     id: i32,
-    conn: impl Executor<'_, Database = MySql>,
+    conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<Item, DbError> {
-    let raw_item = sqlx::query_as!(
-        RawItem,
+    let item = sqlx::query_as!(
+        Item,
         r#"
-    SELECT
-        Item.id, 
-        Item.name, 
-        Item.price, 
-        Item.user_id, 
-        Item.category,
-        Item.status,
-        Item.description,
-        Item.created_at, 
-        Item.updated_at,
-        Item.images as images
-    FROM Item
-    WHERE Item.id = ?
+            SELECT
+                Item.id, 
+                Item.name, 
+                Item.price, 
+                Item.user_id, 
+                Item.category::TEXT as "category!",
+                Item.status::TEXT as "status!",
+                Item.description,
+                Item.created_at, 
+                Item.updated_at,
+                Item.images as images
+            FROM Item
+            WHERE Item.id = $1
         "#,
         id
     )
     .fetch_one(conn)
     .await?;
 
-    let item = convert_raw_into_item(raw_item);
     Ok(item)
 }
 
 pub async fn fetch_items_by_user_id(
     user_id: i32,
-    conn: impl Executor<'_, Database = MySql>,
+    conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<Vec<Item>, DbError> {
-    let raw_items = sqlx::query_as!(
-        RawItem,
+    let items = sqlx::query_as!(
+        Item,
         r#"
         SELECT
             Item.id, 
             Item.name, 
             Item.price, 
             Item.user_id, 
-            Item.category,
-            Item.status,
+            Item.category::TEXT AS "category!",
+            Item.status::TEXT AS "status!",
             Item.description,
             Item.created_at, 
             Item.updated_at,
             Item.images as images
         FROM Item
-        WHERE Item.user_id = ? 
+        WHERE Item.user_id = $1
         ORDER BY Item.created_at DESC
         "#,
         user_id
@@ -126,55 +121,53 @@ pub async fn fetch_items_by_user_id(
     .fetch_all(conn)
     .await?;
 
-    let items = convert_raw_into_items(raw_items);
     Ok(items)
 }
 
 pub async fn fetch_items_by_user_id_and_status(
     user_id: i32,
-    status: String,
-    conn: impl Executor<'_, Database = MySql>,
+    status: ItemStatus,
+    conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<Vec<Item>, DbError> {
-    let raw_items = sqlx::query_as!(
-        RawItem,
+    let items = sqlx::query_as!(
+        Item,
         r#"
         SELECT
             Item.id, 
             Item.name, 
             Item.price, 
             Item.user_id, 
-            Item.category,
-            Item.status,
+            Item.category::TEXT AS "category!",
+            Item.status::TEXT AS "status!",
             Item.description,
             Item.created_at, 
             Item.updated_at,
             Item.images as images
         FROM Item
-        WHERE Item.user_id = ? AND Item.status = ?
+        WHERE Item.user_id = $1 AND Item.status = $2
         ORDER BY Item.created_at DESC
         "#,
         user_id,
-        status
+        status as ItemStatus
     )
     .fetch_all(conn)
     .await?;
 
-    let items = convert_raw_into_items(raw_items);
     Ok(items)
 }
 
 pub async fn update_item_status(
     id: i32,
-    status: String,
-    conn: impl Executor<'_, Database = MySql>,
+    status: ItemStatus,
+    conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<(), DbError> {
     sqlx::query!(
         r#"
         UPDATE Item
-        SET status = ?, updated_at = NOW()
-        WHERE id = ?
+        SET status = $1, updated_at = NOW()
+        WHERE id = $2
         "#,
-        status,
+        status as ItemStatus,
         id
     )
     .execute(conn)
@@ -187,20 +180,20 @@ pub async fn update_item_status(
 // pub async fn fetch_item_and_potential_chat_id_by_item_id(
 //     user_id: i32,
 //     item_id: i32,
-//     conn: impl Executor<'_, Database = MySql>,
+//     conn: impl Executor<'_, Database = Postgres>,
 // ) -> Result<ItemWithChatId, DbError> {
 //     let raw_item = sqlx::query_as!(
 //         RawItemWithChatId,
 //         r#"
 //         SELECT
-//             Item.id, 
-//             Item.name, 
-//             Item.price, 
-//             Item.user_id, 
+//             Item.id,
+//             Item.name,
+//             Item.price,
+//             Item.user_id,
 //             Item.category,
 //             Item.status,
 //             Item.description,
-//             Item.created_at, 
+//             Item.created_at,
 //             Item.updated_at,
 //             ItemChat.id as chat_id,
 //             GROUP_CONCAT(ItemImage.url) AS item_images

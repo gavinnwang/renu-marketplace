@@ -20,7 +20,7 @@ sqlx = { version = "0.7", features = [
     "tls-native-tls",
     "time",
     "chrono",
-    "mysql",
+    "postgres",
 ] }
 tracing-actix-web = "0.7.7"
 tracing = "0.1.37"

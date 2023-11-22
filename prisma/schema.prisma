@@ -47,7 +47,7 @@ model Item {
   images      Json        @default("[]")
   saved_items SavedItem[]
   chats       ItemChat[]
-  
+
   @@index([user_id], name: "user_id")
   @@index([category], name: "category")
 }

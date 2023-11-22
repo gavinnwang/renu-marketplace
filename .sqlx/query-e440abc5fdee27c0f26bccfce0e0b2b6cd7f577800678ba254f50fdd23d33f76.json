@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT \n            u.id, \n            u.name, \n            u.email, \n            u.profile_image,\n            COUNT(*) FILTER (WHERE i.status = 'active') AS active_listing_count,\n            COUNT(*) FILTER (WHERE i.status = 'inactive') AS sales_done_count\n                FROM \"user\" u\n        LEFT JOIN \"item\" i ON u.id = i.user_id\n        WHERE u.id = $1\n        GROUP BY u.id;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "profile_image",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "active_listing_count",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "sales_done_count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      null,
+      null
+    ]
+  },
+  "hash": "e440abc5fdee27c0f26bccfce0e0b2b6cd7f577800678ba254f50fdd23d33f76"
+}
