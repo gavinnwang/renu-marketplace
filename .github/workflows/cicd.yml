@@ -42,11 +42,11 @@ jobs:
         key: ${{ secrets.DROPLET_SSH_KEY }}
         passphrase: ${{ secrets.DROPLET_PASSPHRASE }}
         script: |
-          docker stop renu-container || true
-          docker rm renu-container || true
+          docker stop renu || true
+          docker rm renu || true
           docker system prune -f -a || true
           docker pull wry0313/renu:latest
-          docker run -d --name renu-container \
+          docker run -d --name renu \
             -p 8080:8080 \
             -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
