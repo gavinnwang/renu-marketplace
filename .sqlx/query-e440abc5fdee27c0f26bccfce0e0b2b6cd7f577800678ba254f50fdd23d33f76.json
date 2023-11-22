@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT \n            u.id, \n            u.name, \n            u.email, \n            u.profile_image,\n            COUNT(*) FILTER (WHERE i.status = 'ACTIVE') AS active_listing_count,\n            COUNT(*) FILTER (WHERE i.status = 'INACTIVE') AS sales_done_count\n                FROM \"user\" u\n        LEFT JOIN \"item\" i ON u.id = i.user_id\n        WHERE u.id = $1\n        GROUP BY u.id;",
+  "query": "SELECT \n            u.id, \n            u.name, \n            u.email, \n            u.profile_image,\n            COUNT(*) FILTER (WHERE i.status = 'active') AS active_listing_count,\n            COUNT(*) FILTER (WHERE i.status = 'inactive') AS sales_done_count\n                FROM \"user\" u\n        LEFT JOIN \"item\" i ON u.id = i.user_id\n        WHERE u.id = $1\n        GROUP BY u.id;",
   "describe": {
     "columns": [
       {
@@ -48,5 +48,5 @@
       null
     ]
   },
-  "hash": "bffaf5524b700b4e075be9f5ea35fa05e9f245e54925968a08e3ec899d1a80b7"
+  "hash": "e440abc5fdee27c0f26bccfce0e0b2b6cd7f577800678ba254f50fdd23d33f76"
 }

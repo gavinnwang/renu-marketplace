@@ -29,7 +29,7 @@ impl ResponseError for DbError {
             DbError::NotFound => StatusCode::NOT_FOUND,
             DbError::Conflict => StatusCode::CONFLICT,
             DbError::ConnectionError => StatusCode::INTERNAL_SERVER_ERROR,
-            DbError::PgDatabaseError(e) => StatusCode::INTERNAL_SERVER_ERROR,
+            DbError::PgDatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             DbError::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
