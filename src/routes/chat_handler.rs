@@ -1,14 +1,15 @@
 use actix_web::{get, post, web, HttpResponse, Responder};
 use serde::Deserialize;
+use sqlx::PgPool;
 
 use crate::{
-    authentication::jwt::AuthenticationGuard, model::db_model::DbPool, repository::chat_repository,
+    authentication::jwt::AuthenticationGuard, repository::chat_repository,
 };
 
 #[get("/seller")]
 async fn get_chat_groups_by_seller_id(
     auth_guard: AuthenticationGuard,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
 
@@ -34,7 +35,7 @@ async fn get_chat_groups_by_seller_id(
 #[get("/buyer")]
 async fn get_chat_groups_by_buyer_id(
     auth_guard: AuthenticationGuard,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
 
@@ -61,7 +62,7 @@ async fn get_chat_groups_by_buyer_id(
 async fn get_chat_id_by_item_id(
     auth_guard: AuthenticationGuard,
     path: web::Path<i32>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
     let item_id = path.into_inner();
@@ -122,7 +123,7 @@ pub struct ChatMessageQuery {
 async fn get_chat_messages_by_chat_id(
     auth_guard: AuthenticationGuard,
     path: web::Path<i32>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
     query: web::Query<ChatMessageQuery>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
@@ -192,7 +193,7 @@ async fn post_chat_message(
     auth_guard: AuthenticationGuard,
     path: web::Path<i32>,
     message: web::Json<ChatMessageRequest>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
     let chat_id = path.into_inner();
@@ -249,7 +250,7 @@ pub struct ChatRoomRequest {
 async fn post_chat_room_and_send_first_message(
     auth_guard: AuthenticationGuard,
     path: web::Path<i32>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
     message: web::Json<ChatRoomRequest>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;

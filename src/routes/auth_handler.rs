@@ -5,6 +5,7 @@ use actix_web::{
 };
 use chrono::{Duration, Utc};
 use jsonwebtoken::{encode, EncodingKey, Header};
+use sqlx::PgPool;
 
 use crate::{
     authentication::{
@@ -12,7 +13,7 @@ use crate::{
         jwt::{AuthenticationGuard, TokenClaims},
     },
     config::Config,
-    model::{db_model::DbPool, user_model::NewUser},
+    model::user_model::NewUser,
     repository::user_repository,
 };
 
@@ -20,7 +21,7 @@ use crate::{
 async fn google_oauth_handler(
     query: web::Query<QueryCode>,
     config: web::Data<Config>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let code = &query.code;
     let state = &query.state;

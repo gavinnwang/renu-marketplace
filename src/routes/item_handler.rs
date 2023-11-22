@@ -1,7 +1,10 @@
 use actix_web::{get, post, web, HttpResponse, Responder};
+use sqlx::PgPool;
 
 use crate::{
-    authentication::jwt::AuthenticationGuard, model::db_model::DbPool, repository::item_repository,
+    authentication::jwt::AuthenticationGuard,
+    model::item_model::{Category, ItemStatus},
+    repository::item_repository,
 };
 
 // #[derive(serde::Deserialize)]
@@ -12,8 +15,8 @@ use crate::{
 // }
 
 #[get("/")]
-async fn get_items_handler(pool: web::Data<DbPool>) -> impl Responder {
-    let items = item_repository::fetch_items_by_status("ACTIVE".to_string(), pool.as_ref()).await;
+async fn get_items_handler(pool: web::Data<PgPool>) -> impl Responder {
+    let items = item_repository::fetch_items_by_status(ItemStatus::Active, pool.as_ref()).await;
 
     match items {
         Ok(items) => {
@@ -28,7 +31,7 @@ async fn get_items_handler(pool: web::Data<DbPool>) -> impl Responder {
 }
 
 #[get("/{id}")]
-async fn get_item_by_id_handler(path: web::Path<i32>, pool: web::Data<DbPool>) -> impl Responder {
+async fn get_item_by_id_handler(path: web::Path<i32>, pool: web::Data<PgPool>) -> impl Responder {
     let item_id = path.into_inner();
     let item = item_repository::fetch_item_by_id(item_id, pool.as_ref()).await;
 
@@ -58,7 +61,7 @@ async fn update_item_status_handler(
     auth_gaurd: AuthenticationGuard,
     path: web::Path<i32>,
     data: web::Json<ItemUpdateBody>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let item_id = path.into_inner();
     let user_id = auth_gaurd.user_id;
@@ -85,8 +88,15 @@ async fn update_item_status_handler(
         }
     };
 
-    let new_status = match data.status.to_owned() {
-        Some(status) => status,
+    let new_status = match &data.status {
+        Some(status) => match ItemStatus::from_str(status.as_str()) {
+            Ok(status) => status,
+            Err(_) => {
+                tracing::error!("API: Failed to parse status");
+                return HttpResponse::BadRequest()
+                    .json(serde_json::json!({"status": "fail", "message": "API: Invalid status"}));
+            }
+        },
         None => {
             return HttpResponse::BadRequest()
                 .json(serde_json::json!({"status": "fail", "message": "API: Missing status"}))
@@ -114,10 +124,19 @@ async fn update_item_status_handler(
 #[get("/category/{category}")]
 async fn get_items_by_category_handler(
     path: web::Path<String>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
-    let category = path.into_inner();
-    let items = item_repository::fetch_items_by_category(&category, pool.as_ref()).await;
+    let category_string = path.into_inner();
+    let category = match Category::from_str(&category_string) {
+        Ok(category) => category,
+        Err(_) => {
+            tracing::error!("API: Failed to parse category");
+            return HttpResponse::BadRequest()
+                .json(serde_json::json!({"status": "fail", "message": "API: Invalid category"}));
+        }
+    };
+
+    let items = item_repository::fetch_items_by_category(category, pool.as_ref()).await;
 
     match items {
         Ok(items) => {
@@ -126,7 +145,7 @@ async fn get_items_by_category_handler(
         Err(err) => {
             tracing::error!(
                 "{}\n",
-                format!("API: Failed to fetch items with category {category}")
+                format!("API: Failed to fetch items with category {category_string}")
             );
             tracing::error!("Error message: {}\n", err);
             HttpResponse::InternalServerError()

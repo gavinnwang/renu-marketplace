@@ -1,14 +1,15 @@
 use actix_web::{get, web, HttpResponse, Responder, post};
+use sqlx::PgPool;
 
 use crate::{
-    authentication::jwt::AuthenticationGuard, model::db_model::DbPool,
+    authentication::jwt::AuthenticationGuard,
     repository::saved_item_repository::{fetch_saved_items_by_user_id, insert_saved_item},
 };
 
 #[get("/")]
 async fn get_saved_items_by_user_id(
     auth_guard: AuthenticationGuard,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
 
@@ -38,7 +39,7 @@ struct SavedItemRequest {
 #[post("/")]
 async fn post_saved_item(
     auth_guard: AuthenticationGuard,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
     item: web::Json<SavedItemRequest>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
