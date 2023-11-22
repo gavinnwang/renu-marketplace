@@ -7,12 +7,6 @@ use crate::{
     repository::item_repository,
 };
 
-// #[derive(serde::Deserialize)]
-// struct ItemQuery {
-//     // page: Option<i32>,
-//     // limit: Option<i32>,
-//     status: String,
-// }
 
 #[get("/")]
 async fn get_items_handler(pool: web::Data<PgPool>) -> impl Responder {
