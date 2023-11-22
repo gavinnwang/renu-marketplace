@@ -26,16 +26,16 @@ type Section = {
 type SectionWithRefAndKey = Section & RefAndKey;
 
 export const CATEGORIES: Record<string, Section> = {
-  ALL: { display: "All", value: "all" },
-  WOMENS: { display: "Women's", value: "womens" },
-  MENS: { display: "Men's", value: "mens" },
-  HOME: { display: "Home & Tools", value: "home" },
-  FURNITURE: { display: "Furniture", value: "furniture" },
-  ELECTRONICS: { display: "Electronics", value: "electronics" },
-  BIKES: { display: "Bikes & Scooters", value: "bikes" },
-  TICKETS: { display: "Tickets", value: "tickets" },
-  GENERAL: { display: "General", value: "general" },
-  FREE: { display: "Free", value: "free" },
+  all: { display: "All", value: "all" },
+  womens: { display: "Women's", value: "womens" },
+  mens: { display: "Men's", value: "mens" },
+  home: { display: "Home & Tools", value: "home" },
+  furniture: { display: "Furniture", value: "furniture" },
+  electronics: { display: "Electronics", value: "electronics" },
+  bikes: { display: "Bikes & Scooters", value: "bikes" },
+  tickets: { display: "Tickets", value: "tickets" },
+  general: { display: "General", value: "general" },
+  free: { display: "Free", value: "free" },
 };
 
 const data = Object.keys(CATEGORIES).map((i) => ({

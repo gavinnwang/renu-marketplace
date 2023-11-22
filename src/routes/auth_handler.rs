@@ -25,7 +25,6 @@ async fn google_oauth_handler(
 ) -> impl Responder {
     let code = &query.code;
     let state = &query.state;
-    let redirect_uri = &query.redirect_uri;
 
     if query.code.is_empty() {
         return HttpResponse::Unauthorized().json(
@@ -36,11 +35,6 @@ async fn google_oauth_handler(
     if query.state.is_empty() {
         return HttpResponse::Unauthorized()
             .json(serde_json::json!({"status": "fail", "message": "State not provided!"}));
-    }
-
-    if query.redirect_uri.is_empty() {
-        return HttpResponse::Unauthorized()
-            .json(serde_json::json!({"status": "fail", "message": "Redirect URI not provided!"}));
     }
 
     let token_response = request_token(code.as_str(), &config).await;
@@ -150,7 +144,7 @@ async fn google_oauth_handler(
 
     let mut response = HttpResponse::Found();
     let redirect_url = format!(
-        "{redirect_uri}?email={}&name={}&token={}&user_id={}&state={state}",
+        "?email={}&name={}&token={}&user_id={}&state={state}",
         google_user.email, google_user.name, token, user_id
     );
     tracing::info!("API: Redirecting to {}\n", redirect_url);

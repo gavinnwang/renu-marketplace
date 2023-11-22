@@ -9,7 +9,7 @@ export default function Index() {
   const {  session, signIn } = useSession();
   useEffect(() => {
     if (session) {
-      router.replace(`/home/${CATEGORIES["ALL"].value}`);
+      router.replace(`/home/${CATEGORIES["all"].value}`);
     }
   }, [session]);
   return (
