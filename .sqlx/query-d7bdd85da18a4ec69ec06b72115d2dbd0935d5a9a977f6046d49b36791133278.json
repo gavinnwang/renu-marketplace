@@ -1,0 +1,55 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            Message.id,\n            Message.chat_id,\n            Message.sender_id,\n            Message.content,\n            Message.created_at AS sent_at,\n            CASE\n                WHEN Message.sender_id = $1 THEN 1\n                ELSE 0\n            END AS \"from_me!\"\n        FROM Message\n        WHERE Message.chat_id = $2\n        ORDER BY Message.created_at DESC\n        LIMIT $3\n        OFFSET $4;\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "chat_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "sender_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "content",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "sent_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "from_me!",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "d7bdd85da18a4ec69ec06b72115d2dbd0935d5a9a977f6046d49b36791133278"
+}

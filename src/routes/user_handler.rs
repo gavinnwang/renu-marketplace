@@ -1,22 +1,30 @@
 use actix_web::{get, web, HttpResponse, Responder};
+use sqlx::PgPool;
 
 use crate::{
     authentication::jwt::AuthenticationGuard,
-    model::db_model::DbPool,
-    repository::{user_repository::{self}, item_repository},
+    model::item_model::ItemStatus,
+    repository::{
+        item_repository,
+        user_repository::{self},
+    },
 };
 
 #[get("/me")]
 async fn get_me_handler(
     auth_guard: AuthenticationGuard,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
     let user = user_repository::fetch_user_by_id(pool.as_ref(), user_id).await;
 
     match user {
         Err(err) => {
-            tracing::error!("API: Failed to fetch user with id: {} with error message {}", user_id, err);
+            tracing::error!(
+                "API: Failed to fetch user with id: {} with error message {}",
+                user_id,
+                err
+            );
             HttpResponse::NotFound()
                 .json(serde_json::json!({"status": "fail", "message": "User not found"}))
         }
@@ -24,15 +32,11 @@ async fn get_me_handler(
             tracing::info!("API: User with id {} successfully fetched", user_id);
             HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": user}))
         }
-            ,
     }
 }
 
 #[get("/{id}")]
-async fn get_user_by_id_handler(
-    path: web::Path<i32>,
-    pool: web::Data<DbPool>,
-) -> impl Responder {
+async fn get_user_by_id_handler(path: web::Path<i32>, pool: web::Data<PgPool>) -> impl Responder {
     let user_id = path.into_inner();
     let user = user_repository::fetch_user_by_id(pool.as_ref(), user_id).await;
 
@@ -46,7 +50,6 @@ async fn get_user_by_id_handler(
             tracing::info!("API: User with id {} successfully fetched", user_id);
             HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": user}))
         }
-            ,
     }
 }
 
@@ -59,22 +62,36 @@ struct StatusQuery {
 async fn get_items_by_user_id_and_status_handler(
     path: web::Path<i32>,
     query: Option<web::Query<StatusQuery>>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = path.into_inner();
 
     match user_repository::fetch_user_by_id(pool.as_ref(), user_id).await {
         Err(_) => {
-            tracing::error!("API: Failed to fetch user with id: {} when getting items by user id", user_id);
+            tracing::error!(
+                "API: Failed to fetch user with id: {} when getting items by user id",
+                user_id
+            );
             return HttpResponse::NotFound()
                 .json(serde_json::json!({"status": "fail", "message": "User not found"}));
         }
         Ok(_) => {}
     }
 
-    let items =  match query {
-        Some(query) => item_repository::fetch_items_by_user_id_and_status(user_id, query.status.clone(), pool.as_ref()).await,
-        None => item_repository::fetch_items_by_user_id(user_id, pool.as_ref()).await
+    let items = match query {
+        Some(query) => {
+            let status = match ItemStatus::from_str(&query.status) {
+                Ok(status) => status,
+                Err(_) => {
+                    return HttpResponse::BadRequest().json(
+                        serde_json::json!({"status": "fail", "message": "API: Invalid status"}),
+                    )
+                }
+            };
+
+            item_repository::fetch_items_by_user_id_and_status(user_id, status, pool.as_ref()).await
+        }
+        None => item_repository::fetch_items_by_user_id(user_id, pool.as_ref()).await,
     };
 
     match items {
@@ -94,13 +111,24 @@ async fn get_items_by_user_id_and_status_handler(
 async fn get_items_by_me_by_status_handler(
     auth_guard: AuthenticationGuard,
     query: Option<web::Query<StatusQuery>>,
-    pool: web::Data<DbPool>,
+    pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
 
-    let items =  match query {
-        Some(query) => item_repository::fetch_items_by_user_id_and_status(user_id, query.status.clone(), pool.as_ref()).await,
-        None => item_repository::fetch_items_by_user_id(user_id, pool.as_ref()).await
+    let items = match query {
+        Some(query) => {
+            let status = match ItemStatus::from_str(&query.status) {
+                Ok(status) => status,
+                Err(_) => {
+                    return HttpResponse::BadRequest().json(
+                        serde_json::json!({"status": "fail", "message": "API: Invalid status"}),
+                    )
+                }
+            };
+
+            item_repository::fetch_items_by_user_id_and_status(user_id, status, pool.as_ref()).await
+        }
+        None => item_repository::fetch_items_by_user_id(user_id, pool.as_ref()).await,
     };
 
     match items {

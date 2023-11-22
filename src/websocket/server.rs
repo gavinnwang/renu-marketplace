@@ -5,10 +5,10 @@ use actix::{
     WrapFuture,
 };
 use actix_web::web::Data;
+use sqlx::PgPool;
 
-use crate::{
-    model::db_model::DbPool,
-    repository::chat_repository::{check_if_user_id_is_part_of_chat_group, insert_chat_message},
+use crate::repository::chat_repository::{
+    check_if_user_id_is_part_of_chat_group, insert_chat_message,
 };
 
 use super::session;
@@ -19,7 +19,7 @@ pub struct ChatServer {
     sessions: Rc<RefCell<HashMap<usize, (Recipient<session::ChatMessageToClient>, Option<usize>)>>>, // maps session id to session address and the room id the session is in
     // rooms: Rc<RefCell<HashMap<usize, HashSet<usize>>>>, // maps room id to set of session ids in the room
     // we don't need rooms because we only have DM and no group chat
-    pool: Data<DbPool>,
+    pool: Data<PgPool>,
 }
 
 /// Make actor from `ChatServer`
@@ -30,7 +30,7 @@ impl Actor for ChatServer {
 }
 
 impl ChatServer {
-    pub fn new(pool: Data<DbPool>) -> ChatServer {
+    pub fn new(pool: Data<PgPool>) -> ChatServer {
         ChatServer {
             sessions: Rc::new(RefCell::new(HashMap::new())),
             // rooms: Rc::new(RefCell::new(HashMap::new())),
@@ -82,7 +82,10 @@ impl Handler<ChatMessageToServer> for ChatServer {
                     tracing::info!("Message inserted to database successfully");
                 }
                 Err(err) => {
-                    tracing::error!("Failed to insert message to databse. Error message: {}\n", err);
+                    tracing::error!(
+                        "Failed to insert message to databse. Error message: {}\n",
+                        err
+                    );
                 }
             }
         }
@@ -196,51 +199,49 @@ impl Handler<Join> for ChatServer {
             .await;
 
             match is_part_of_chat_group {
-                Ok(is_part_of_chat_group) => {
-                    match is_part_of_chat_group {
-                        Some(other_user_id) => {
-                            let mut sessions = sessions.borrow_mut();
-                            tracing::info!(
-                                "user {} is part of chat group {} ",
-                                msg.user_id,
-                                msg.chat_id
-                            );
+                Ok(is_part_of_chat_group) => match is_part_of_chat_group {
+                    Some(other_user_id) => {
+                        let mut sessions = sessions.borrow_mut();
+                        tracing::info!(
+                            "user {} is part of chat group {} ",
+                            msg.user_id,
+                            msg.chat_id
+                        );
 
-                            match sessions.get_mut(&msg.user_id) {
-                                Some((_, room_id)) => {
-                                    *room_id = Some(msg.chat_id);
-                                }
-                                None => {
-                                    tracing::error!(
-                                        "Session with id {} does not exist",
-                                        msg.user_id
-                                    );
-
-                                    Err(format!(
-                                        "Session with id {} does not exist",
-                                        msg.user_id
-                                    ))?;
-                                }
+                        match sessions.get_mut(&msg.user_id) {
+                            Some((_, room_id)) => {
+                                *room_id = Some(msg.chat_id);
                             }
+                            None => {
+                                tracing::error!("Session with id {} does not exist", msg.user_id);
 
-                            Ok(other_user_id as usize)
+                                Err(format!("Session with id {} does not exist", msg.user_id))?;
+                            }
                         }
 
-                        None => {
-                            tracing::info!(
-                                "user {} is not part of chat group {} ",
-                                msg.user_id,
-                                msg.chat_id
-                            );
-
-                            Err("You are not part of this chat group".to_string())
-                        }
+                        Ok(other_user_id as usize)
                     }
-                }
-                Err(err) => {
-                    tracing::error!("Error checking if user is part of chat group: Error message: {}\n", err);
 
-                    Err(format!("Failed to check if user is part of chat group: {}\n", err))
+                    None => {
+                        tracing::info!(
+                            "user {} is not part of chat group {} ",
+                            msg.user_id,
+                            msg.chat_id
+                        );
+
+                        Err("You are not part of this chat group".to_string())
+                    }
+                },
+                Err(err) => {
+                    tracing::error!(
+                        "Error checking if user is part of chat group: Error message: {}\n",
+                        err
+                    );
+
+                    Err(format!(
+                        "Failed to check if user is part of chat group: {}\n",
+                        err
+                    ))
                 }
             }
         })
