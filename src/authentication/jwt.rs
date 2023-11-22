@@ -34,34 +34,34 @@ impl FromRequest for AuthenticationGuard {
             .or_else(|| {
                 req.headers()
                     .get(http::header::AUTHORIZATION)
-                    .map(|h| h.to_str().unwrap_or("")
-                    .to_string()).or_else(|| {
+                    .map(|h| h.to_str().unwrap_or("").to_string())
+                    .or_else(|| {
                         req.query_string()
                             .split("&")
                             .find(|s| s.starts_with("authorization="))
                             .map(|s| s.split_at(("authorization=").len()).1.to_string())
                     })
             });
-        
-            let token = match token {
-                Some(token) if token.len() < 7 => {
-                    tracing::error!("Auth gaurd error: token too short");
-                    return Box::pin(async {
-                        Err(ErrorUnauthorized(
-                            json!({"status": "fail", "message": "Invalid token: token too short"}),
-                        ))
-                    })
-                }
-                Some(token) => token.split_at(7).1.to_string(),
-                None => {
-                    tracing::error!("Auth guard error: User token not found.");
-                    return Box::pin(async {
-                        Err(ErrorUnauthorized(
-                            json!({"status": "fail", "message": "You are not logged in. Please provide a token"}),
-                        ))
-                    })
-                }
-            };
+
+        let token = match token {
+            Some(token) if token.len() < 7 => {
+                tracing::error!("Auth gaurd error: token too short");
+                return Box::pin(async {
+                    Err(ErrorUnauthorized(
+                        json!({"status": "fail", "message": "Invalid token: token too short"}),
+                    ))
+                });
+            }
+            Some(token) => token.split_at(7).1.to_string(),
+            None => {
+                tracing::warn!("Auth guard error: User token not found.");
+                return Box::pin(async {
+                    Err(ErrorUnauthorized(
+                        json!({"status": "fail", "message": "You are not logged in. Please provide a token"}),
+                    ))
+                });
+            }
+        };
 
         let jwt_secret = match req.app_data::<web::Data<Config>>() {
             Some(config) => config.jwt_secret.clone(),
@@ -113,10 +113,11 @@ impl FromRequest for AuthenticationGuard {
             Err(err) => {
                 tracing::error!("token decoding error: {:?}", err);
                 Box::pin(async {
-                Err(ErrorUnauthorized(
-                    json!({"status": "fail", "message": "Invalid token or user doesn't exist"}),
-                ))
-            })},
+                    Err(ErrorUnauthorized(
+                        json!({"status": "fail", "message": "Invalid token or user doesn't exist"}),
+                    ))
+                })
+            }
         }
     }
 }
