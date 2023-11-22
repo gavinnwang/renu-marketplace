@@ -1,6 +1,6 @@
 use actix_web::ResponseError;
 use reqwest::StatusCode;
-use sqlx::mysql::MySqlDatabaseError;
+use sqlx::postgres::PgDatabaseError;
 use thiserror::Error;
 
 /// Error representing a failure at the database layer.
@@ -17,7 +17,7 @@ pub enum DbError {
     ConnectionError,
     /// Connection error.
     #[error("mysql error: {0}")]
-    MySqlDatabaseError(Box<MySqlDatabaseError>),
+    PgDatabaseError(Box<PgDatabaseError>),
     /// Other error.
     #[error("{0}")]
     Other(sqlx::Error),
@@ -29,10 +29,7 @@ impl ResponseError for DbError {
             DbError::NotFound => StatusCode::NOT_FOUND,
             DbError::Conflict => StatusCode::CONFLICT,
             DbError::ConnectionError => StatusCode::INTERNAL_SERVER_ERROR,
-            DbError::MySqlDatabaseError(e) => match e.code() {
-                Some("1062") => StatusCode::BAD_REQUEST,
-                _ => StatusCode::INTERNAL_SERVER_ERROR,
-            },
+            DbError::PgDatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             DbError::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -44,9 +41,9 @@ impl From<sqlx::Error> for DbError {
             sqlx::Error::RowNotFound => DbError::NotFound,
             sqlx::Error::Io(_) => DbError::ConnectionError,
             sqlx::Error::Database(e) => {
-                let mysql_error = e.try_downcast::<MySqlDatabaseError>();
+                let mysql_error = e.try_downcast::<PgDatabaseError>();
                 match mysql_error {
-                    Ok(mysql_error) => DbError::MySqlDatabaseError(mysql_error),
+                    Ok(mysql_error) => DbError::PgDatabaseError(mysql_error),
                     Err(e) => DbError::Other(sqlx::Error::Database(e)),
                 }
             }

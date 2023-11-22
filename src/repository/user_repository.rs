@@ -1,81 +1,56 @@
-use sqlx::{Executor, MySql};
+use sqlx::{Executor, Postgres};
 
 use crate::{
     error::DbError,
     model::user_model::{NewUser, PartialUser},
 };
-// use chrono::{DateTime, Local};
 
 pub async fn fetch_user_by_id(
-    conn: impl Executor<'_, Database = MySql>,
+    conn: impl Executor<'_, Database = Postgres>,
     id: i32,
 ) -> Result<PartialUser, DbError> {
-    let user = sqlx::query_as!(
-        PartialUser,
+    let user = sqlx::query!(
         r#"SELECT 
             u.id, 
             u.name, 
             u.email, 
             u.profile_image,
-        CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
-        CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
-        FROM User u
-        LEFT JOIN Item i ON u.id = i.user_id
-        WHERE u.id = ?
+            COUNT(*) FILTER (WHERE i.status = 'active') AS active_listing_count,
+            COUNT(*) FILTER (WHERE i.status = 'inactive') AS sales_done_count
+                FROM "user" u
+        LEFT JOIN "item" i ON u.id = i.user_id
+        WHERE u.id = $1
         GROUP BY u.id;"#,
         id
     )
     .fetch_one(conn)
     .await?;
 
+    let user = PartialUser {
+        id: user.id as i32,
+        name: user.name,
+        email: user.email,
+        profile_image: user.profile_image,
+        active_listing_count: user.active_listing_count.unwrap_or(0),
+        sales_done_count: user.sales_done_count.unwrap_or(0),
+    };
+
     Ok(user)
 }
 
 pub async fn fetch_user_id_by_email(
-    conn: impl Executor<'_, Database = MySql>,
+    conn: impl Executor<'_, Database = Postgres>,
     email: String,
 ) -> Result<i32, DbError> {
-    let user_id = sqlx::query!(
-        r#"SELECT id FROM User WHERE email = ?"#,
-        email
-    )
-    .fetch_one(conn)
-    .await?;
+    let user_id = sqlx::query!(r#"SELECT id FROM "user" WHERE email = $1"#, email)
+        .fetch_one(conn)
+        .await?;
 
     Ok(user_id.id as i32)
 }
 
-// pub async fn fetch_user_by_email(
-//     conn: impl Executor<'_, Database = MySql>,
-//     email: String,
-// ) -> Result<PartialUser, DbError> {
-//     let user = sqlx::query_as!(
-//         PartialUser,
-//         r#"SELECT 
-//         u.id, 
-//         u.name, 
-//         u.email, 
-//         u.profile_image,
-//         CAST(COALESCE(SUM(CASE WHEN i.status = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS active_listing_count,
-//         CAST(COALESCE(SUM(CASE WHEN i.status = 'INACTIVE' THEN 1 ELSE 0 END), 0) AS SIGNED) AS sales_done_count
-//         FROM 
-//             User u
-//         LEFT JOIN 
-//             Item i ON u.id = i.user_id
-//         WHERE 
-//             u.email = ?
-//         GROUP BY 
-//             u.id;"#,     
-//         email
-//     )
-//     .fetch_one(conn)
-//     .await?;
-
-//     Ok(user)
-// }
-
 pub async fn add_user(
-    conn: impl Executor<'_, Database = MySql>,
+    conn: impl Executor<'_, Database = Postgres>,
     new_user: &NewUser,
 ) -> Result<i32, DbError> {
     tracing::info!(
@@ -83,14 +58,13 @@ pub async fn add_user(
         &new_user.name
     );
 
-    let id = sqlx::query!(
-        r#"INSERT INTO User (name, email) VALUES (?, ?)"#,
+    let record = sqlx::query!(
+        r#"INSERT INTO "user" (name, email) VALUES ($1, $2) RETURNING id"#,
         new_user.name,
         new_user.email,
     )
-    .execute(conn)
-    .await?
-    .last_insert_id();
+    .fetch_one(conn)
+    .await?;
 
-    Ok(id as i32)
+    Ok(record.id as i32)
 }

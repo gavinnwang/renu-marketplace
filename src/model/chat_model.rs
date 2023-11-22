@@ -29,19 +29,19 @@ pub struct ChatGroup {
     pub item_description: Option<String>,
     pub item_status: String,
     pub item_images: serde_json::Value,
-    pub last_message_content: Option<String>,
-    pub last_message_sent_at: Option<DateTime<Utc>>,
+    pub last_message_content: String,
+    pub last_message_sent_at: DateTime<Utc>,
 }
 
-#[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
-pub struct RawChatMessage {
-    pub id: i32,
-    pub chat_id: i32,
-    pub sender_id: i32,
-    pub content: String,
-    pub sent_at: std::time::SystemTime,
-    pub from_me: i64,
-}
+// #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
+// pub struct RawChatMessage {
+//     pub id: i32,
+//     pub chat_id: i32,
+//     pub sender_id: i32,
+//     pub content: String,
+//     pub sent_at: std::time::SystemTime,
+//     pub from_me: i64,
+// }
 
 // #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
 // pub struct ChatWindow {

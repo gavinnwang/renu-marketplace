@@ -4,14 +4,14 @@ pub mod error;
 pub mod model;
 pub mod repository;
 pub mod routes;
-pub mod websocket;
 pub mod uploads;
+pub mod websocket;
 
 use actix::Actor;
 use actix_cors::Cors;
 use actix_web::{http::header, web::Data, App, HttpServer};
 use dotenv::dotenv;
-use sqlx::{mysql::MySqlPoolOptions, query, Row};
+use sqlx::postgres::PgPoolOptions;
 use tracing_actix_web::TracingLogger;
 
 #[actix_web::main]
@@ -22,17 +22,17 @@ async fn main() -> std::io::Result<()> {
     let config = config::Config::init();
 
     tracing_subscriber::fmt()
-    .event_format(
-        tracing_subscriber::fmt::format()
-            .with_file(true)
-            .with_line_number(true)
-    )
-    .init();
+        .event_format(
+            tracing_subscriber::fmt::format()
+                .with_file(true)
+                .with_line_number(true),
+        )
+        .init();
 
     tracing::debug!("Debugging enabled");
 
     tracing::info!("Connecting to database");
-    let pool = match MySqlPoolOptions::new()
+    let pool = match PgPoolOptions::new()
         .max_connections(30)
         .connect(&config.database_url)
         .await
@@ -47,18 +47,22 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
-    // Test the connection to the database by running a show tables query
-    match query("SHOW TABLES").fetch_all(&pool).await {
-        Ok(rows) => {
-            for row in &rows {
-                let table_name: String = row.get(0);
-                tracing::info!("Table: {}", table_name);
+    match sqlx::query("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
+    .fetch_all(&pool)
+    .await
+{
+    Ok(rows) => {
+        for row in rows {
+            match sqlx::Row::try_get:: <String,_>(&row, 0) {
+                Ok(table_name) => tracing::info!("Table: {}", table_name),
+                Err(e) => tracing::error!("Error getting table name: {}", e),
             }
         }
-        Err(e) => {
-            tracing::error!("Failed to execute query: {}", e);
-        }
     }
+    Err(e) => {
+        tracing::error!("Failed to execute query: {}", e);
+    }
+}
 
     let server_host = config.server_host.clone();
     let server_port = config.server_port;
@@ -74,7 +78,8 @@ async fn main() -> std::io::Result<()> {
         config.s3_key_secret.clone(),
         config.s3_region.clone(),
         config.s3_bucket_name.clone(),
-    ).await;
+    )
+    .await;
 
     let s3_client = Data::new(s3_client);
 
