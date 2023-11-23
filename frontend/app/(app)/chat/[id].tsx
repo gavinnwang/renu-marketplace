@@ -216,6 +216,11 @@ export default function ChatScreen() {
           >
             {item && (
               <Image
+                transition={{
+                  effect: "cross-dissolve",
+                  duration: 250,
+                }}
+                placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
                 source={{ uri: item.images[0] }}
                 className="object-cover rounded-sm"
                 style={{

@@ -13,9 +13,17 @@ const imageWidth = (Dimensions.get("window").width - horizontalGapPx * 3) / 2;
 export function ItemListing(props: { item: ItemWithImage }) {
   console.log(props.item);
   return (
-    <Link href={`/item/${props.item.id}`} className="flex flex-col px-[5px] shadow-sm">
+    <Link
+      href={`/item/${props.item.id}`}
+      className="flex flex-col px-[5px] shadow-sm"
+    >
       <View className="flex flex-col">
         <Image
+          transition={{
+            effect: "cross-dissolve",
+            duration: 250,
+          }}
+          placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
           source={{ uri: props.item.images[0] }}
           className="object-cover rounded-t"
           style={{
