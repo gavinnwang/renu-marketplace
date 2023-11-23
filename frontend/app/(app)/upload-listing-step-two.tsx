@@ -15,6 +15,8 @@ import Colors from "../../constants/Colors";
 import React, { useState } from "react";
 import { Image } from "expo-image";
 import { Picker, PickerIOS } from "@react-native-picker/picker";
+import { ApiResponse } from "../../types/api";
+import { useSession } from "../../providers/ctx";
 
 const ItemCategory: Record<string, string> = {
   picking: "Pick a category",
@@ -27,12 +29,6 @@ const ItemCategory: Record<string, string> = {
   tickets: "Tickets",
   general: "General",
   free: "Free",
-};
-
-type S3File = {
-  filename: string;
-  s3_key: string;
-  s3_url: string;
 };
 
 const CloseIcon = () => (
@@ -64,6 +60,8 @@ export default function UploadListingStepTwo() {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+
+  const { session } = useSession();
 
   return (
     <>
@@ -201,13 +199,18 @@ export default function UploadListingStepTwo() {
                 alert("uploading");
                 try {
                   const formData = new FormData();
-                  formData.append("image", {
-                    uri: images[0],
-                    name: images,
-                    type: "image/png",
-                  } as any);
-                  console.log(formData);
-                  const response = await fetch(
+                  for (let i = 0; i < images.length; i++) {
+                    const uri = images[i];
+                    const fileName = uri.split("/").pop();
+                    console.log(fileName);
+                    const fileType = fileName?.split(".").pop() || "image/png";
+                    formData.append("image", {
+                      uri: images[i],
+                      name: fileName,
+                      type: fileType,
+                    } as any);
+                  }
+                  const postImageResponse = await fetch(
                     `${process.env.EXPO_PUBLIC_BACKEND_URL}/images/`,
                     {
                       headers: {
@@ -218,19 +221,45 @@ export default function UploadListingStepTwo() {
                     }
                   );
 
-                  const data: S3File[] = await response.json();
+                  const data: ApiResponse<String[]> =
+                    await postImageResponse.json();
+                  if (data.status !== "success") {
+                    throw new Error(data.message);
+                  }
                   console.log(data);
+
+                  if (!session?.token) {
+                    throw new Error("No session token");
+                  }
+
+                  const postItemResponse = await fetch(
+                    `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/`,
+                    {
+                      method: "POST",
+                      headers: {
+                        authorization: `Bearer ${session?.token}`,
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        title,
+                        price: Number(price),
+                        description,
+                        category,
+                        images: data.data,
+                      }),
+                    }
+                  );
+
+                  const itemData: ApiResponse<number> =
+                    await postItemResponse.json();
+                  if (itemData.status !== "success") {
+                    throw new Error(itemData.message);
+                  } else {
+                    router.push(`/item/${itemData.data}`);
+                  }
                 } catch (e) {
                   console.log(e);
                 }
-                // .then((res) => {
-                //   res.json().then((data) => {
-                //     console.log(data);
-                //   });
-                // })
-                // .catch((err) => {
-                //   console.log(err);
-                // });
               }}
               className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"
             >

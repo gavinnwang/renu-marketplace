@@ -151,7 +151,7 @@ async fn get_items_by_category_handler(
 struct ItemCreateBody {
     name: String,
     price: f64,
-    category: Category,
+    category: String,
     description: String,
     images: Vec<String>,
 }
@@ -166,11 +166,30 @@ async fn post_item_handler(
 
     let item = data.into_inner();
 
+    if item.name.is_empty() {
+        return HttpResponse::BadRequest()
+            .json(serde_json::json!({"status": "fail", "message": "API: Missing name"}));
+    }
+
+    if item.price <= 0.0 {
+        return HttpResponse::BadRequest()
+            .json(serde_json::json!({"status": "fail", "message": "API: Invalid price"}));
+    }
+
+    let category = match Category::from_str(&item.category) {
+        Ok(category) => category,
+        Err(_) => {
+            tracing::error!("API: Failed to parse category");
+            return HttpResponse::BadRequest()
+                .json(serde_json::json!({"status": "fail", "message": "API: Invalid category"}));
+        }
+    };
+
     let response = item_repository::insert_item(
         user_id,
         item.name,
         item.price,
-        item.category,
+        category,
         item.description,
         item.images,
         pool.as_ref(),
@@ -180,7 +199,8 @@ async fn post_item_handler(
     match response {
         Ok(item_id) => {
             tracing::info!("API: Successfully created item with id {}", item_id);
-            return HttpResponse::Ok().json(serde_json::json!({"status": "success"}));
+            return HttpResponse::Ok()
+                .json(serde_json::json!({"status": "success", "data": item_id}));
         }
         Err(err) => {
             tracing::error!("API: Failed to create item");

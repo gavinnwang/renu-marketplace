@@ -1,5 +1,5 @@
 use crate::uploads::client::Client;
-use actix_multipart::form::{MultipartForm, tempfile::TempFile};
+use actix_multipart::form::{tempfile::TempFile, MultipartForm};
 use actix_web::{post, web, HttpResponse, Responder};
 
 #[derive(MultipartForm)]
@@ -24,7 +24,7 @@ async fn post_images(
     for mut image in images {
         image.file_name = Some(uuid::Uuid::new_v4().to_string());
         match s3_client.upload(&image, "images/").await {
-            Ok(uploaded_file) => uploaded_files.push(uploaded_file),
+            Ok(uploaded_file) => uploaded_files.push(uploaded_file.s3_url),
             Err(e) => {
                 return HttpResponse::InternalServerError().json(serde_json::json!({
                     "status": "fail", "message": e.to_string()
@@ -34,5 +34,8 @@ async fn post_images(
     }
 
     tracing::info!("Uploaded files: {:#?}", uploaded_files);
-    HttpResponse::Ok().json(uploaded_files)
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "success",
+        "data": uploaded_files
+    }))
 }

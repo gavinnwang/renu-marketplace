@@ -194,7 +194,7 @@ const ListingPageItem = ({
             {dayjs(item.created_at).fromNow()}
           </Text>
           <Text className="font-Manrope_400Regular text-sm">
-            {CATEGORIES[item.category].display}{" "}
+            {CATEGORIES[item.category]}{" "}
           </Text>
         </View>
         <Pressable
