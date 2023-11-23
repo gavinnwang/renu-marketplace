@@ -4,7 +4,7 @@ use crate::uploads::client::Client;
 
 #[derive(actix_multipart::form::MultipartForm)]
 pub struct ImageForm {
-    #[multipart(limit = "5 MiB")]
+    #[multipart(limit = "25 MiB")]
     image: Option<actix_multipart::form::tempfile::TempFile>,
 }
 
