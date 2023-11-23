@@ -171,11 +171,6 @@ async fn post_item_handler(
             .json(serde_json::json!({"status": "fail", "message": "API: Missing name"}));
     }
 
-    if item.price <= 0.0 {
-        return HttpResponse::BadRequest()
-            .json(serde_json::json!({"status": "fail", "message": "API: Invalid price"}));
-    }
-
     let category = match Category::from_str(&item.category) {
         Ok(category) => category,
         Err(_) => {
@@ -185,10 +180,17 @@ async fn post_item_handler(
         }
     };
 
+    if item.price <= 0.0 {
+        return HttpResponse::BadRequest()
+            .json(serde_json::json!({"status": "fail", "message": "API: Invalid price"}));
+    }
+
+    let item_price = (item.price * 100.0).round() / 100.0;
+
     let response = item_repository::insert_item(
         user_id,
         item.name,
-        item.price,
+        item_price,
         category,
         item.description,
         item.images,
