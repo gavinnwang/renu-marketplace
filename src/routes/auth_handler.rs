@@ -23,16 +23,19 @@ async fn google_oauth_handler(
     config: web::Data<Config>,
     pool: web::Data<PgPool>,
 ) -> impl Responder {
+    tracing::info!("query: {:#?}\n", query);
     let code = &query.code;
     let state = &query.state;
 
-    if query.code.is_empty() {
+    tracing::info!("Api: code = {}\n", code);
+
+    if code.is_empty() {
         return HttpResponse::Unauthorized().json(
             serde_json::json!({"status": "fail", "message": "Authorization code not provided!"}),
         );
     }
 
-    if query.state.is_empty() {
+    if state.is_empty() {
         return HttpResponse::Unauthorized()
             .json(serde_json::json!({"status": "fail", "message": "State not provided!"}));
     }
