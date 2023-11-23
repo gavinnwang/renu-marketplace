@@ -294,14 +294,16 @@ export default function ItemPage() {
                 </View>
               </Pressable>
             </View>
+            <View className="h-16" />
           </ScrollView>
         ) : (
           <>
-            <Text className="font-Poppins_500Medium text-base mx-auto">
+            {/* <Text className="font-Poppins_500Medium text-base mx-auto">
               Loading
-            </Text>
+            </Text> */}
           </>
         )}
+
       </View>
     </>
   );

@@ -1,4 +1,4 @@
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
   Animated,
@@ -376,6 +376,6 @@ const Indicator = ({
         transform: [{ translateX }],
         bottom: -1,
       }}
-    ></Animated.View>
+    />
   );
 };

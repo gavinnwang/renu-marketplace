@@ -7,9 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
 import { ItemWithImage, UserWithCount } from "../../../types/types";
 import { ItemListing } from "../../../components/ItemListing";
-import { RefreshControl } from "react-native-gesture-handler";
 import Svg, { Path } from "react-native-svg";
-import { User } from "@prisma/client";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -51,20 +49,6 @@ export default function AccountScreen() {
       console.log(data);
     },
   });
-
-  // const {
-  //   data: items,
-  //   isLoading: isLoadingItems,
-  //   isError: isErrorItems,
-  //   refetch: refetchItems,
-  // } = useQuery({
-  //   queryFn: async () =>
-  //     fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/items/").then((x) =>
-  //       x.json()
-  //     ) as Promise<ApiResponse<ItemWithImage[]>>,
-  //   queryKey: ["item"],
-  //   enabled: !!session,
-  // });
 
   const [refreshing, _] = useState(false);
 

@@ -1,4 +1,3 @@
-import { router, useLocalSearchParams } from "expo-router";
 import {
   Animated,
   FlatList,
@@ -58,6 +57,8 @@ const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
 // );
 const pagerViewRef = React.useRef<PagerView>(null);
 
+const [currentPage, setCurrentPage] = useState(0);
+
 export default function HomePage() {
   // const param = useLocalSearchParams();
   // const selectedSection = param.section as string;
@@ -84,6 +85,8 @@ export default function HomePage() {
           if (section === selectedSection) {
             return;
           }
+          // console.log("onPageScroll", idx);
+          // setCurrentPage(idx);
           // void router.replace(`/home/${section}`);
           setSelectedSection(section);
         }}
@@ -127,7 +130,7 @@ const CategoryView = ({
     <View key={index} className="h-full flex flex-grow">
       {isLoadingItems ? (
         <></>
-      ) : isErrorItems ? (
+      ) : isErrorItems || items.status === "fail" ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
           refreshControl={
@@ -185,7 +188,7 @@ const CategoryView = ({
             paddingHorizontal: 10,
           }}
           contentContainerStyle={{
-            paddingBottom: 92,
+            paddingBottom: 10,
           }}
           keyExtractor={(item) => item.id.toString()}
           renderItem={ItemListing}
@@ -347,6 +350,6 @@ const Indicator = ({
         transform: [{ translateX }, { scaleX }],
         bottom: -4,
       }}
-    ></Animated.View>
+    />
   );
 };

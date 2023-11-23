@@ -21,7 +21,7 @@ export function ItemListing(props: { item: ItemWithImage }) {
         <Image
           transition={{
             effect: "cross-dissolve",
-            duration: 300,
+            duration: 150,
           }}
           placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
           source={{ uri: props.item.images[0] }}

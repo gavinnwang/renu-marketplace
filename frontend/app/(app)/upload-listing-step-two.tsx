@@ -196,7 +196,6 @@ export default function UploadListingStepTwo() {
                   alert("Please enter a description");
                   return;
                 }
-                alert("uploading");
                 try {
                   const formData = new FormData();
                   for (let i = 0; i < images.length; i++) {
@@ -204,12 +203,15 @@ export default function UploadListingStepTwo() {
                     const fileName = uri.split("/").pop();
                     console.log(fileName);
                     const fileType = fileName?.split(".").pop() || "image/png";
-                    formData.append("image", {
+                    console.log(fileType);
+                    formData.append("images", {
                       uri: images[i],
                       name: fileName,
                       type: fileType,
                     } as any);
                   }
+
+                  console.log("form data: ", formData);
                   const postImageResponse = await fetch(
                     `${process.env.EXPO_PUBLIC_BACKEND_URL}/images/`,
                     {
@@ -221,12 +223,12 @@ export default function UploadListingStepTwo() {
                     }
                   );
 
-                  const data: ApiResponse<String[]> =
+                  const s3UrlsResponse: ApiResponse<String[]> =
                     await postImageResponse.json();
-                  if (data.status !== "success") {
-                    throw new Error(data.message);
+                  if (s3UrlsResponse.status !== "success") {
+                    throw new Error(s3UrlsResponse.data);
                   }
-                  console.log(data);
+                  console.log(s3UrlsResponse);
 
                   if (!session?.token) {
                     throw new Error("No session token");
@@ -241,11 +243,11 @@ export default function UploadListingStepTwo() {
                         "Content-Type": "application/json",
                       },
                       body: JSON.stringify({
-                        title,
+                        name: title,
                         price: Number(price),
                         description,
                         category,
-                        images: data.data,
+                        images: s3UrlsResponse.data,
                       }),
                     }
                   );
@@ -253,12 +255,13 @@ export default function UploadListingStepTwo() {
                   const itemData: ApiResponse<number> =
                     await postItemResponse.json();
                   if (itemData.status !== "success") {
-                    throw new Error(itemData.message);
+                    throw new Error(itemData.data);
                   } else {
-                    router.push(`/item/${itemData.data}`);
+                    console.log("replace to: ", `/item/${itemData.data}`);
+                    router.replace(`/item/${itemData.data}`);
                   }
                 } catch (e) {
-                  console.log(e);
+                  console.error(e);
                 }
               }}
               className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"

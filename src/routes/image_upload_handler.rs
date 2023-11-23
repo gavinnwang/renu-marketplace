@@ -16,6 +16,7 @@ async fn post_images(
 ) -> impl Responder {
     let images = form.into_inner().images;
     if images.is_empty() {
+        tracing::error!("No images provided: {:#?}", images);
         return HttpResponse::BadRequest()
             .json(serde_json::json!({"status": "fail", "data": "No images provided"}));
     }
@@ -23,6 +24,7 @@ async fn post_images(
     let mut uploaded_files = Vec::new();
     for mut image in images {
         image.file_name = Some(uuid::Uuid::new_v4().to_string());
+        tracing::info!("Uploading file: {:#?}", image);
         match s3_client.upload(&image, "images/").await {
             Ok(uploaded_file) => uploaded_files.push(uploaded_file.s3_url),
             Err(e) => {
