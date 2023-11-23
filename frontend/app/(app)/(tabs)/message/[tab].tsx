@@ -1,7 +1,6 @@
 import {
   Text,
   View,
-  Image,
   Dimensions,
   Animated,
   Pressable,
@@ -98,6 +97,7 @@ export default function MessageScreen() {
 }
 
 import dayjs from "dayjs";
+import { Image } from "expo-image";
 
 const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
@@ -125,6 +125,11 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
       } ${touching ? "bg-gray-100" : ""}`}
     >
       <Image
+        transition={{
+          effect: "cross-dissolve",
+          duration: 250,
+        }}
+        placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
         source={{ uri: chat.item_images[0] }}
         className="object-cover rounded-sm"
         style={{

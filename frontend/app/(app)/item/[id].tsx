@@ -122,6 +122,11 @@ export default function ItemPage() {
               data={item.images}
               renderItem={({ item }) => (
                 <Image
+                  transition={{
+                    effect: "cross-dissolve",
+                    duration: 150,
+                  }}
+                  placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
                   style={{
                     height: "100%",
                     width: Dimensions.get("window").width,
@@ -225,6 +230,11 @@ export default function ItemPage() {
                 className="flex flex-row items-center"
               >
                 <Image
+                  transition={{
+                    effect: "cross-dissolve",
+                    duration: 250,
+                  }}
+                  placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
                   source={{
                     uri: seller?.name,
                   }}

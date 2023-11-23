@@ -43,7 +43,8 @@
     "react-native-web": "~0.19.6",
     "react-use-websocket": "^3.0.0",
     "@shopify/flash-list": "1.4.3",
-    "expo-image-picker": "~14.3.2"
+    "expo-image-picker": "~14.3.2",
+    "react-native-pager-view": "6.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
