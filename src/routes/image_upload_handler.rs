@@ -21,7 +21,8 @@ async fn post_images(
     }
 
     let mut uploaded_files = Vec::new();
-    for image in images {
+    for mut image in images {
+        image.file_name = Some(uuid::Uuid::new_v4().to_string());
         match s3_client.upload(&image, "images/").await {
             Ok(uploaded_file) => uploaded_files.push(uploaded_file),
             Err(e) => {
