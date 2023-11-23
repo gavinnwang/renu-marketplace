@@ -27,7 +27,7 @@ async fn get_chat_groups_by_seller_id(
             tracing::error!("Error message: {}\n", err);
 
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }
@@ -53,7 +53,7 @@ async fn get_chat_groups_by_buyer_id(
             tracing::error!("Error message: {}\n", err);
 
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }
@@ -82,7 +82,7 @@ async fn get_chat_id_by_item_id(
             tracing::error!("Error message: {}\n", err);
 
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }
@@ -108,7 +108,7 @@ async fn get_chat_id_by_item_id(
 //             tracing::error!("Error message: {}\n", err);
 
 //             HttpResponse::InternalServerError()
-//                 .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+//                 .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
 //         }
 //     }
 // }
@@ -137,7 +137,7 @@ async fn get_chat_messages_by_chat_id(
         Ok(is_part_of_chat_group) => match is_part_of_chat_group {
             Some(_) => {}
             None => {
-                return HttpResponse::Unauthorized().json(serde_json::json!({"status": "fail", "message": "API: You are not part of this chat group"}));
+                return HttpResponse::Unauthorized().json(serde_json::json!({"status": "fail", "data": "API: You are not part of this chat group"}));
             }
         },
         Err(err) => {
@@ -145,7 +145,7 @@ async fn get_chat_messages_by_chat_id(
             tracing::error!("Error message: {}\n", err);
 
             return HttpResponse::InternalServerError().json(
-                serde_json::json!({"status": "fail", "message": "API: Something went wrong"}),
+                serde_json::json!({"status": "fail", "data": "API: Something went wrong"}),
             );
         }
     }
@@ -178,7 +178,7 @@ async fn get_chat_messages_by_chat_id(
             tracing::error!("Error message: {}\n", err);
 
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }
@@ -199,7 +199,7 @@ async fn post_chat_message(
     let chat_id = path.into_inner();
 
     if message.content.len() < 1 {
-        return HttpResponse::BadRequest().json(serde_json::json!({"status": "fail", "message": "API: Message content cannot be empty"}));
+        return HttpResponse::BadRequest().json(serde_json::json!({"status": "fail", "data": "API: Message content cannot be empty"}));
     }
 
     let is_part_of_chat_group =
@@ -210,7 +210,7 @@ async fn post_chat_message(
         Ok(is_part_of_chat_group) => match is_part_of_chat_group {
             Some(_) => {}
             None => {
-                return HttpResponse::Unauthorized().json(serde_json::json!({"status": "fail", "message": "API: You are not part of this chat group"}));
+                return HttpResponse::Unauthorized().json(serde_json::json!({"status": "fail", "data": "API: You are not part of this chat group"}));
             }
         },
         Err(err) => {
@@ -218,7 +218,7 @@ async fn post_chat_message(
             tracing::error!("Error message: {}\n", err);
 
             return HttpResponse::InternalServerError().json(
-                serde_json::json!({"status": "fail", "message": "API: Something went wrong"}),
+                serde_json::json!({"status": "fail", "data": "API: Something went wrong"}),
             );
         }
     }
@@ -236,7 +236,7 @@ async fn post_chat_message(
             tracing::error!("Error message: {}\n", err);
 
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }
@@ -276,7 +276,7 @@ async fn post_chat_room_and_send_first_message(
                     tracing::error!("Error message: {}\n", err);
 
                     HttpResponse::InternalServerError().json(
-                        serde_json::json!({"status": "fail", "message": "API: Something went wrong"}),
+                        serde_json::json!({"status": "fail", "data": "API: Something went wrong"}),
                     )
                 }
             }
@@ -291,7 +291,7 @@ async fn post_chat_room_and_send_first_message(
             tracing::error!("Error message: {}\n", err);
 
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }

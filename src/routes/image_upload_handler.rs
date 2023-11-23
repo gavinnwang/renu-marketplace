@@ -17,7 +17,7 @@ async fn post_images(
     let images = form.into_inner().images;
     if images.is_empty() {
         return HttpResponse::BadRequest()
-            .json(serde_json::json!({"status": "fail", "message": "No images provided"}));
+            .json(serde_json::json!({"status": "fail", "data": "No images provided"}));
     }
 
     let mut uploaded_files = Vec::new();
@@ -27,7 +27,7 @@ async fn post_images(
             Ok(uploaded_file) => uploaded_files.push(uploaded_file.s3_url),
             Err(e) => {
                 return HttpResponse::InternalServerError().json(serde_json::json!({
-                    "status": "fail", "message": e.to_string()
+                    "status": "fail", "data": e.to_string()
                 }))
             }
         };

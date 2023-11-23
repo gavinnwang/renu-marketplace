@@ -48,7 +48,7 @@ impl FromRequest for AuthenticationGuard {
                 tracing::error!("Auth gaurd error: token too short");
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Invalid token: token too short"}),
+                        json!({"status": "fail", "data": "Invalid token: token too short"}),
                     ))
                 });
             }
@@ -57,7 +57,7 @@ impl FromRequest for AuthenticationGuard {
                 tracing::warn!("Auth guard error: User token not found.");
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "You are not logged in. Please provide a token"}),
+                        json!({"status": "fail", "data": "You are not logged in. Please provide a token"}),
                     ))
                 });
             }
@@ -69,7 +69,7 @@ impl FromRequest for AuthenticationGuard {
                 tracing::error!("Internal Server error: JWT secret not found");
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Internal Server error: JWT secret not found"}),
+                        json!({"status": "fail", "data": "Internal Server error: JWT secret not found"}),
                     ))
                 });
             }
@@ -87,7 +87,7 @@ impl FromRequest for AuthenticationGuard {
         //         tracing::error!("Internal Server error: Database connection failed");
         //         return Box::pin(async {
         //             Err(ErrorUnauthorized(
-        //                 json!({"status": "fail", "message": "Internal Server error: Database connection failed"}),
+        //                 json!({"status": "fail", "data": "Internal Server error: Database connection failed"}),
         //             ))
         //         });
         //     }
@@ -102,7 +102,7 @@ impl FromRequest for AuthenticationGuard {
 
                     // if user_result.is_err() {
                     //     return Err(ErrorUnauthorized(
-                    //         json!({"status": "fail", "message": "User belonging to this token no longer exists"}),
+                    //         json!({"status": "fail", "data": "User belonging to this token no longer exists"}),
                     //     ));
                     // };
 
@@ -114,7 +114,7 @@ impl FromRequest for AuthenticationGuard {
                 tracing::error!("token decoding error: {:?}", err);
                 Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "message": "Invalid token or user doesn't exist"}),
+                        json!({"status": "fail", "data": "Invalid token or user doesn't exist"}),
                     ))
                 })
             }

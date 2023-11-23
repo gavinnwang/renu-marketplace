@@ -26,7 +26,7 @@ async fn get_me_handler(
                 err
             );
             HttpResponse::NotFound()
-                .json(serde_json::json!({"status": "fail", "message": "User not found"}))
+                .json(serde_json::json!({"status": "fail", "data": "User not found"}))
         }
         Ok(user) => {
             tracing::info!("API: User with id {} successfully fetched", user_id);
@@ -44,7 +44,7 @@ async fn get_user_by_id_handler(path: web::Path<i32>, pool: web::Data<PgPool>) -
         Err(_) => {
             tracing::error!("API: Failed to fetch user with id: {}", user_id);
             HttpResponse::NotFound()
-                .json(serde_json::json!({"status": "fail", "message": "User not found"}))
+                .json(serde_json::json!({"status": "fail", "data": "User not found"}))
         }
         Ok(user) => {
             tracing::info!("API: User with id {} successfully fetched", user_id);
@@ -73,7 +73,7 @@ async fn get_items_by_user_id_and_status_handler(
                 user_id
             );
             return HttpResponse::NotFound()
-                .json(serde_json::json!({"status": "fail", "message": "User not found"}));
+                .json(serde_json::json!({"status": "fail", "data": "User not found"}));
         }
         Ok(_) => {}
     }
@@ -84,7 +84,7 @@ async fn get_items_by_user_id_and_status_handler(
                 Ok(status) => status,
                 Err(_) => {
                     return HttpResponse::BadRequest().json(
-                        serde_json::json!({"status": "fail", "message": "API: Invalid status"}),
+                        serde_json::json!({"status": "fail", "data": "API: Invalid status"}),
                     )
                 }
             };
@@ -102,7 +102,7 @@ async fn get_items_by_user_id_and_status_handler(
         Err(_) => {
             tracing::error!("API: Failed to fetch items with user_id {}", user_id);
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }
@@ -121,7 +121,7 @@ async fn get_items_by_me_by_status_handler(
                 Ok(status) => status,
                 Err(_) => {
                     return HttpResponse::BadRequest().json(
-                        serde_json::json!({"status": "fail", "message": "API: Invalid status"}),
+                        serde_json::json!({"status": "fail", "data": "API: Invalid status"}),
                     )
                 }
             };
@@ -139,7 +139,7 @@ async fn get_items_by_me_by_status_handler(
         Err(_) => {
             tracing::error!("API: Failed to fetch items with  user id {}", user_id);
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }

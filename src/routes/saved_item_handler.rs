@@ -24,8 +24,8 @@ async fn get_saved_items_by_user_id(
             );
             tracing::error!("Error message: {}\n", err);
             match err {
-            crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find saved items for {user_id}" )})),
-            _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+            crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "data": format!("API: Could not find saved items for {user_id}" )})),
+            _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
         }
     }
@@ -48,7 +48,7 @@ async fn post_saved_item(
     let item = insert_saved_item(user_id, item_id, pool.as_ref()).await;
 
     match item {
-        Ok(_) => HttpResponse::Ok().json(serde_json::json!({"status": "success", "message": "API: Saved item successfully"})),
+        Ok(_) => HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": "API: Saved item successfully"})),
         Err(err) => {
             tracing::error!(
                 "{}\n",
@@ -56,8 +56,8 @@ async fn post_saved_item(
             );
             tracing::error!("Error message: {}\n", err);
             match err {
-            crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item to save for {user_id}" )})),
-            _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+            crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "data": format!("API: Could not find item to save for {user_id}" )})),
+            _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
         }
     }

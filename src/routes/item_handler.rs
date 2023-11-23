@@ -18,7 +18,7 @@ async fn get_items_handler(pool: web::Data<PgPool>) -> impl Responder {
         Err(_) => {
             tracing::error!("API: Failed to fetch_all_items\n");
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }
@@ -37,8 +37,8 @@ async fn get_item_by_id_handler(path: web::Path<i32>, pool: web::Data<PgPool>) -
             );
             tracing::error!("Error message: {}\n", err);
             match err {
-                crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item with id {item_id}" )})),
-                _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "data": format!("API: Could not find item with id {item_id}" )})),
+                _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
             }
         }
     }
@@ -65,7 +65,7 @@ async fn update_item_status_handler(
         Ok(item) => {
             if item.user_id != user_id {
                 return HttpResponse::Unauthorized()
-                    .json(serde_json::json!({"status": "fail", "message": "API: Unauthorized"}));
+                    .json(serde_json::json!({"status": "fail", "data": "API: Unauthorized"}));
             }
         }
         Err(err) => {
@@ -75,8 +75,8 @@ async fn update_item_status_handler(
             );
             tracing::error!("Error message: {}\n", err);
             match err {
-                crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item with id {item_id}" )})),
-                _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "data": format!("API: Could not find item with id {item_id}" )})),
+                _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
             };
         }
     };
@@ -87,12 +87,12 @@ async fn update_item_status_handler(
             Err(_) => {
                 tracing::error!("API: Failed to parse status");
                 return HttpResponse::BadRequest()
-                    .json(serde_json::json!({"status": "fail", "message": "API: Invalid status"}));
+                    .json(serde_json::json!({"status": "fail", "data": "API: Invalid status"}));
             }
         },
         None => {
             return HttpResponse::BadRequest()
-                .json(serde_json::json!({"status": "fail", "message": "API: Missing status"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Missing status"}))
         }
     };
 
@@ -107,8 +107,8 @@ async fn update_item_status_handler(
             );
             tracing::error!("Error message: {}\n", err);
             match err {
-                crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "message": format!("API: Could not find item with id {item_id}" )})),
-                _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "data": format!("API: Could not find item with id {item_id}" )})),
+                _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
             }
         }
     }
@@ -125,7 +125,7 @@ async fn get_items_by_category_handler(
         Err(_) => {
             tracing::error!("API: Failed to parse category");
             return HttpResponse::BadRequest()
-                .json(serde_json::json!({"status": "fail", "message": "API: Invalid category"}));
+                .json(serde_json::json!({"status": "fail", "data": "API: Invalid category"}));
         }
     };
 
@@ -142,7 +142,7 @@ async fn get_items_by_category_handler(
             );
             tracing::error!("Error message: {}\n", err);
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }
@@ -168,7 +168,7 @@ async fn post_item_handler(
 
     if item.name.is_empty() {
         return HttpResponse::BadRequest()
-            .json(serde_json::json!({"status": "fail", "message": "API: Missing name"}));
+            .json(serde_json::json!({"status": "fail", "data": "API: Missing name"}));
     }
 
     let category = match Category::from_str(&item.category) {
@@ -176,13 +176,13 @@ async fn post_item_handler(
         Err(_) => {
             tracing::error!("API: Failed to parse category");
             return HttpResponse::BadRequest()
-                .json(serde_json::json!({"status": "fail", "message": "API: Invalid category"}));
+                .json(serde_json::json!({"status": "fail", "data": "API: Invalid category"}));
         }
     };
 
     if item.price <= 0.0 {
         return HttpResponse::BadRequest()
-            .json(serde_json::json!({"status": "fail", "message": "API: Invalid price"}));
+            .json(serde_json::json!({"status": "fail", "data": "API: Invalid price"}));
     }
 
     let item_price = (item.price * 100.0).round() / 100.0;
@@ -208,7 +208,7 @@ async fn post_item_handler(
             tracing::error!("API: Failed to create item");
             tracing::error!("Error message: {}\n", err);
             HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
         }
     }
 }

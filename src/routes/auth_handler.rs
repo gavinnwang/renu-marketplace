@@ -31,13 +31,13 @@ async fn google_oauth_handler(
 
     if code.is_empty() {
         return HttpResponse::Unauthorized().json(
-            serde_json::json!({"status": "fail", "message": "Authorization code not provided!"}),
+            serde_json::json!({"status": "fail", "data": "Authorization code not provided!"}),
         );
     }
 
     if state.is_empty() {
         return HttpResponse::Unauthorized()
-            .json(serde_json::json!({"status": "fail", "message": "State not provided!"}));
+            .json(serde_json::json!({"status": "fail", "data": "State not provided!"}));
     }
 
     let token_response = request_token(code.as_str(), &config).await;
@@ -46,7 +46,7 @@ async fn google_oauth_handler(
         Err(message) => {
             let message = message.to_string();
             return HttpResponse::BadGateway()
-                .json(serde_json::json!({"status": "fail", "message": message}));
+                .json(serde_json::json!({"status": "fail", "data": message}));
         }
         Ok(token_response) => token_response,
     };
@@ -56,7 +56,7 @@ async fn google_oauth_handler(
             Err(message) => {
                 let message = message.to_string();
                 return HttpResponse::BadGateway()
-                    .json(serde_json::json!({"status": "fail", "message": message}));
+                    .json(serde_json::json!({"status": "fail", "data": message}));
             }
             Ok(google_user) => google_user,
         };
@@ -69,7 +69,7 @@ async fn google_oauth_handler(
     //         google_user.email
     //     );
 
-    //     return HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "message": "User email is not northwestern.edu email"}));
+    //     return HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "User email is not northwestern.edu email"}));
     // }
 
     let user_id =
@@ -96,7 +96,7 @@ async fn google_oauth_handler(
                         let err_msg = err.to_string();
                         tracing::error!("Failed to add user: {}", err_msg);
                         return HttpResponse::InternalServerError()
-                            .json(serde_json::json!({"status": "fail", "message": err_msg}));
+                            .json(serde_json::json!({"status": "fail", "data": err_msg}));
                     }
                     Ok(user_id) => user_id,
                 }
@@ -107,7 +107,7 @@ async fn google_oauth_handler(
                 let err_msg = err.to_string();
                 tracing::error!("Failed to fetch user: {}", err_msg);
                 return HttpResponse::InternalServerError()
-                    .json(serde_json::json!({"status": "fail", "message": err_msg}));
+                    .json(serde_json::json!({"status": "fail", "data": err_msg}));
             }
         },
         Ok(user_id) => user_id,
@@ -134,7 +134,7 @@ async fn google_oauth_handler(
             let err_msg = err.to_string();
             tracing::error!("Failed to encode token: {}", err_msg);
             return HttpResponse::BadGateway()
-                .json(serde_json::json!({"status": "fail", "message": err_msg}));
+                .json(serde_json::json!({"status": "fail", "data": err_msg}));
         }
         Ok(token) => token,
     };
