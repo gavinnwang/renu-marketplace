@@ -10,13 +10,13 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";
-import { ApiResponse } from "../../../../types/api";
-import { ItemListing } from "../../../../components/ItemListing";
-import { LogoWithText } from "../../../../components/Logo";
-import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
+import { ApiResponse } from "../../../types/api";
+import { ItemListing } from "../../../components/ItemListing";
+import { LogoWithText } from "../../../components/Logo";
+import { ItemWithImage, Measure, RefAndKey } from "../../../types/types";
 import React from "react";
-import Colors from "../../../../constants/Colors";
-import Svg, { Path } from "react-native-svg";
+import Colors from "../../../constants/Colors";
+import PagerView from "react-native-pager-view";
 
 type Section = {
   display: string;
@@ -45,24 +45,69 @@ const data = Object.keys(CATEGORIES).map((i) => ({
   ref: React.createRef(),
 }));
 
-const MagnifyingGlassIcon = () => (
-  <Svg width="18" height="18" viewBox="0 0 14 14" fill="none">
-    <Path
-      d="M13 13L9 9M1 5.66667C1 6.2795 1.12071 6.88634 1.35523 7.45252C1.58975 8.01871 1.93349 8.53316 2.36683 8.9665C2.80018 9.39984 3.31462 9.74358 3.88081 9.97811C4.447 10.2126 5.05383 10.3333 5.66667 10.3333C6.2795 10.3333 6.88634 10.2126 7.45252 9.97811C8.01871 9.74358 8.53316 9.39984 8.9665 8.9665C9.39984 8.53316 9.74358 8.01871 9.97811 7.45252C10.2126 6.88634 10.3333 6.2795 10.3333 5.66667C10.3333 5.05383 10.2126 4.447 9.97811 3.88081C9.74358 3.31462 9.39984 2.80018 8.9665 2.36683C8.53316 1.93349 8.01871 1.58975 7.45252 1.35523C6.88634 1.12071 6.2795 1 5.66667 1C5.05383 1 4.447 1.12071 3.88081 1.35523C3.31462 1.58975 2.80018 1.93349 2.36683 2.36683C1.93349 2.80018 1.58975 3.31462 1.35523 3.88081C1.12071 4.447 1 5.05383 1 5.66667Z"
-      stroke={Colors.grayPrimary}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </Svg>
-);
+// const MagnifyingGlassIcon = () => (
+//   <Svg width="18" height="18" viewBox="0 0 14 14" fill="none">
+//     <Path
+//       d="M13 13L9 9M1 5.66667C1 6.2795 1.12071 6.88634 1.35523 7.45252C1.58975 8.01871 1.93349 8.53316 2.36683 8.9665C2.80018 9.39984 3.31462 9.74358 3.88081 9.97811C4.447 10.2126 5.05383 10.3333 5.66667 10.3333C6.2795 10.3333 6.88634 10.2126 7.45252 9.97811C8.01871 9.74358 8.53316 9.39984 8.9665 8.9665C9.39984 8.53316 9.74358 8.01871 9.97811 7.45252C10.2126 6.88634 10.3333 6.2795 10.3333 5.66667C10.3333 5.05383 10.2126 4.447 9.97811 3.88081C9.74358 3.31462 9.39984 2.80018 8.9665 2.36683C8.53316 1.93349 8.01871 1.58975 7.45252 1.35523C6.88634 1.12071 6.2795 1 5.66667 1C5.05383 1 4.447 1.12071 3.88081 1.35523C3.31462 1.58975 2.80018 1.93349 2.36683 2.36683C1.93349 2.80018 1.58975 3.31462 1.35523 3.88081C1.12071 4.447 1 5.05383 1 5.66667Z"
+//       stroke={Colors.grayPrimary}
+//       strokeWidth="1.8"
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//     />
+//   </Svg>
+// );
+const pagerViewRef = React.useRef<PagerView>(null);
 
 export default function HomePage() {
-  const param = useLocalSearchParams();
-  const selectedSection = param.section as string;
+  // const param = useLocalSearchParams();
+  // const selectedSection = param.section as string;
+  const [selectedSection, setSelectedSection] = useState("all");
+  return (
+    <View className="bg-bgLight h-full">
+      <View className="flex flex-row items-center justify-start pl-4 pr-6 pb-2.5 min-h-[43px]">
+        <LogoWithText />
+        {/* <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
+          <TextInput placeholder="Search here" className="p-2.5 w-full" />
+        </View> */}
+        {/* <MagnifyingGlassIc150on /> */}
+      </View>
+      <Tabs
+        data={data}
+        selectedSection={selectedSection}
+        pagerViewRef={pagerViewRef}
+      />
+      <PagerView
+        ref={pagerViewRef}
+        onPageScroll={(e) => {
+          const idx = e.nativeEvent.position;
+          const section = data[idx].value;
+          if (section === selectedSection) {
+            return;
+          }
+          // void router.replace(`/home/${section}`);
+          setSelectedSection(section);
+        }}
+        className="flex-1"
+        initialPage={0}
+        orientation="horizontal"
+      >
+        {data.map((item, index) => (
+          <CategoryView key={index} category={item.value} index={index} />
+        ))}
+      </PagerView>
+    </View>
+  );
+}
 
+const CategoryView = ({
+  category,
+  index,
+}: {
+  category: string;
+  index: number;
+}) => {
   const fetchUrlPath =
-    selectedSection == "all" ? "/items/" : `/items/category/${selectedSection}`;
+    category == "all" ? "/items/" : `/items/category/${category}`;
   const {
     data: items,
     isLoading: isLoadingItems,
@@ -73,31 +118,18 @@ export default function HomePage() {
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}${fetchUrlPath}`).then((x) =>
         x.json()
       ) as Promise<ApiResponse<ItemWithImage[]>>,
-    queryKey: ["item", selectedSection],
+    queryKey: ["item", category],
   });
 
   const [refreshing, _] = useState(false);
 
   return (
-    <View className="bg-bgLight h-full">
-      <View className="flex flex-row items-center justify-start pl-4 pr-6 pb-2.5 min-h-[43px]">
-        <LogoWithText />
-        {/* <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
-          <TextInput placeholder="Search here" className="p-2.5 w-full" />
-        </View> */}
-        {/* <MagnifyingGlassIc150on /> */}
-      </View>
-
-      <Tabs data={data} selectedSection={selectedSection} />
-
+    <View key={index} className="h-full flex flex-grow">
       {isLoadingItems ? (
         <></>
       ) : isErrorItems ? (
-        <Text className="mx-auto my-[70%] font-Poppins_600SemiBold text-lg">
-          Something went wrong. Please refresh.
-        </Text>
-      ) : items.data.length === 0 ? (
         <ScrollView
+          className="bg-grayLight h-full py-[70%]"
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -107,7 +139,26 @@ export default function HomePage() {
             />
           }
         >
-          <View className="flex flex-col gap-y-2 px-auto pt-[60%] items-center ">
+          <View className="flex flex-col gap-y-2 items-center">
+            <LogoWithText />
+            <Text className="font-Poppins_600SemiBold text-lg">
+              Something went wrong. Please try again later.
+            </Text>
+          </View>
+        </ScrollView>
+      ) : items.data.length === 0 ? (
+        <ScrollView
+          className="bg-grayLight h-full py-[70%]"
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                refetchItems();
+              }}
+            />
+          }
+        >
+          <View className="flex flex-col gap-y-2 items-center">
             <LogoWithText />
             <Text className="font-Poppins_600SemiBold text-lg">
               No item right now... List one!
@@ -142,11 +193,21 @@ export default function HomePage() {
       )}
     </View>
   );
-}
+};
 
 const Tab = React.forwardRef(
   (
-    { section, selectedSection }: { section: Section; selectedSection: string },
+    {
+      section,
+      selectedSection,
+      pagerViewRef,
+      index,
+    }: {
+      section: Section;
+      selectedSection: string;
+      pagerViewRef: React.RefObject<PagerView>;
+      index: number;
+    },
     ref: any
   ) => {
     return (
@@ -154,10 +215,7 @@ const Tab = React.forwardRef(
         ref={ref}
         key={section.value}
         onPress={() => {
-          if (section.value === selectedSection) {
-            return;
-          }
-          void router.replace(`/home/${section.value}`);
+          pagerViewRef.current?.setPage(index);
         }}
         className="px-3 h-full justify-center"
       >
@@ -178,9 +236,11 @@ const Tab = React.forwardRef(
 const Tabs = ({
   data,
   selectedSection,
+  pagerViewRef,
 }: {
   data: SectionWithRefAndKey[];
   selectedSection: string;
+  pagerViewRef: React.RefObject<PagerView>;
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();
@@ -232,13 +292,15 @@ const Tabs = ({
       showsHorizontalScrollIndicator={false}
       className="border-y border-grayLight flex flex-row  min-h-[45px] max-h-[42px]"
     >
-      {data.map((section) => {
+      {data.map((section, index) => {
         return (
           <Tab
             key={section.key}
             section={section}
             selectedSection={selectedSection}
             ref={section.ref}
+            pagerViewRef={pagerViewRef}
+            index={index}
           />
         );
       })}

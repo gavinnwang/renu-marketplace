@@ -18,12 +18,12 @@ export default function TabsLayout() {
         }}
       >
         <Tabs.Screen
-          name="home/[section]"
+          name="home"
           options={{
             title: "Home",
             headerShown: false,
             tabBarIcon: ({ color }) => <HomeIcon color={color} />,
-            href: "home/all",
+            href: "home",
           }}
         />
         <Tabs.Screen
