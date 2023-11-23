@@ -1,3 +1,4 @@
+use serde_json::Value;
 use sqlx::{Executor, Postgres};
 
 use crate::{
@@ -176,3 +177,30 @@ pub async fn update_item_status(
     Ok(())
 }
 
+pub async fn insert_item(
+    user_id: i32,
+    name: String,
+    price: f64,
+    category: Category,
+    description: String,
+    images: Vec<String>,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<i32, DbError> {
+    let result = sqlx::query!(
+        r#"
+        INSERT INTO Item (name, price, user_id, category, description, images)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id
+        "#,
+        name,
+        price,
+        user_id,
+        category as Category,
+        description,
+        Value::from(images)
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(result.id)
+}

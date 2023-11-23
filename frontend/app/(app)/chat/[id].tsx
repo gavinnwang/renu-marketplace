@@ -211,7 +211,7 @@ export default function ChatScreen() {
             className="p-3.5 flex-row justify-between items-center bg-stone-50"
             style={{
               height: (width * 4) / 3 + 28,
-              opacity: item?.status === "INACTIVE" ? 0.75 : 1,
+              opacity: item?.status === "inactive" ? 0.75 : 1,
             }}
           >
             {item && (
@@ -241,7 +241,7 @@ export default function ChatScreen() {
                     {item.description}
                   </Text>
                   <Text className="font-Manrope_600SemiBold text-sm text-blackPrimary">
-                    {item.status === "INACTIVE"
+                    {item.status === "inactive"
                       ? "Item is no longer available."
                       : ""}
                   </Text>

@@ -120,7 +120,7 @@ export default function AccountScreen() {
               className="font-Manrope_400Regular bg-purplePrimary p-2"
             >
               <Text className="text-white text-center font-Manrope_600SemiBold">
-                Edit
+                Sign out
               </Text>
             </Pressable>
           </View>

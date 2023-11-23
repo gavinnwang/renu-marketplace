@@ -18,30 +18,30 @@ import React from "react";
 import Colors from "../../../constants/Colors";
 import PagerView from "react-native-pager-view";
 
-type Section = {
-  display: string;
+export const CATEGORIES: Record<string, string> = {
+  all: "All",
+  womens: "Women's",
+  mens: "Men's",
+  home: "Home & Tools",
+  furniture: "Furniture",
+  electronics: "Electronics",
+  bikes: "Bikes & Scooters",
+  tickets: "Tickets",
+  general: "General",
+  free: "Free",
+};
+
+type CategoryTabData = {
+  key: string;
   value: string;
+  display: string;
+  ref: React.RefObject<any>;
 };
 
-type SectionWithRefAndKey = Section & RefAndKey;
-
-export const CATEGORIES: Record<string, Section> = {
-  all: { display: "All", value: "all" },
-  womens: { display: "Women's", value: "womens" },
-  mens: { display: "Men's", value: "mens" },
-  home: { display: "Home & Tools", value: "home" },
-  furniture: { display: "Furniture", value: "furniture" },
-  electronics: { display: "Electronics", value: "electronics" },
-  bikes: { display: "Bikes & Scooters", value: "bikes" },
-  tickets: { display: "Tickets", value: "tickets" },
-  general: { display: "General", value: "general" },
-  free: { display: "Free", value: "free" },
-};
-
-const data = Object.keys(CATEGORIES).map((i) => ({
+const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
   key: i,
-  display: CATEGORIES[i].display,
-  value: CATEGORIES[i].value,
+  value: i,
+  display: CATEGORIES[i],
   ref: React.createRef(),
 }));
 
@@ -203,7 +203,7 @@ const Tab = React.forwardRef(
       pagerViewRef,
       index,
     }: {
-      section: Section;
+      section: CategoryTabData;
       selectedSection: string;
       pagerViewRef: React.RefObject<PagerView>;
       index: number;
@@ -238,7 +238,7 @@ const Tabs = ({
   selectedSection,
   pagerViewRef,
 }: {
-  data: SectionWithRefAndKey[];
+  data: CategoryTabData[];
   selectedSection: string;
   pagerViewRef: React.RefObject<PagerView>;
 }) => {

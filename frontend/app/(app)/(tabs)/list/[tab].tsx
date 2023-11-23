@@ -18,7 +18,7 @@ import { ApiResponse } from "../../../../types/api";
 import { Image } from "expo-image";
 
 const TABS = ["Listings", "Sold"];
-const STATUS = ["ACTIVE", "INACTIVE"];
+const STATUS = ["active", "inactive"];
 
 const data = TABS.map((i) => ({
   key: i,
@@ -52,7 +52,7 @@ export default function ListScreen() {
       console.error("error", err);
     },
     onSuccess(data) {
-      // console.log(data);
+      console.log(data);
       if (data.status === "success") {
         setItems(data.data);
       } else {
@@ -173,6 +173,11 @@ const ListingPageItem = ({
     >
       <Image
         source={{ uri: item.images[0] }}
+        transition={{
+          effect: "cross-dissolve",
+          duration: 300,
+        }}
+        placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
         className="object-cover rounded-sm"
         style={{
           width: width,
@@ -207,7 +212,7 @@ const ListingPageItem = ({
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+                status: item.status === "active" ? "inactive" : "active",
               }),
             }).then(() => {
               refetch();
@@ -221,7 +226,7 @@ const ListingPageItem = ({
               isSold ? "text-gray-500" : "text-blackPrimary"
             }`}
           >
-            {item.status === "ACTIVE" ? "MARK AS SOLD" : "RELIST"}
+            {item.status === "active" ? "MARK AS SOLD" : "RELIST"}
           </Text>
         </Pressable>
       </View>

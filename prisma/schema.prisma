@@ -43,7 +43,7 @@ model Item {
   description String?
   user        User        @relation(fields: [user_id], references: [id], onUpdate: Restrict, onDelete: Cascade)
   user_id     Int
-  status      ItemStatus  @default(ACTIVE)
+  status      ItemStatus  @default(active)
   images      Json        @default("[]")
   saved_items SavedItem[]
   chats       ItemChat[]
@@ -53,8 +53,8 @@ model Item {
 }
 
 enum ItemStatus {
-  ACTIVE
-  INACTIVE
+  active 
+  inactive 
 }
 
 // model ItemImage {

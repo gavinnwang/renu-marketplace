@@ -156,7 +156,7 @@ export default function ItemPage() {
             {item.user_id === session?.user_id ? (
               <View className="px-3 py-1.5 w-full bg-purplePrimary flex justify-center">
                 <Text className="font-Manrope_500Medium text-white">
-                  {item.status === "INACTIVE"
+                  {item.status === "inactive"
                     ? `You sold this item ${dayjs(item.updated_at).fromNow()}`
                     : `You listed this item ${dayjs(
                         item.updated_at
@@ -165,7 +165,7 @@ export default function ItemPage() {
                 </Text>
               </View>
             ) : (
-              item.status === "INACTIVE" && (
+              item.status === "inactive" && (
                 <View className="px-3 py-1.5 w-full bg-purplePrimary flex justify-center">
                   <Text className="font-Manrope_500Medium text-white">
                     This item is mark as sold.
@@ -183,7 +183,7 @@ export default function ItemPage() {
                   Category
                 </Text>
                 <Text className="font-Manrope_600SemiBold text-sm">
-                  {CATEGORIES[item.category].display}
+                  {CATEGORIES[item.category]}
                 </Text>
               </View>
               <Text className="text-[26px] text-purplePrimary font-Manrope_600SemiBold">
@@ -204,7 +204,7 @@ export default function ItemPage() {
                 </Text>
               </View>
               <Text className="font-Manrope_400Regular text-xs">
-                {item.updated_at !== item.created_at && item.status === "ACTIVE"
+                {item.updated_at !== item.created_at && item.status === "active"
                   ? `Re-listed ${dayjs(
                       item.updated_at
                     ).fromNow()}. First listed ${dayjs(

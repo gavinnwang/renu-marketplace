@@ -121,7 +121,7 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
         });
       }}
       className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary ${
-        chat.item_status === "INACTIVE" ? "opacity-70" : ""
+        chat.item_status === "inactive" ? "opacity-70" : ""
       } ${touching ? "bg-gray-100" : ""}`}
     >
       <Image
@@ -163,7 +163,7 @@ const ChatRow = ({ chat }: { chat: ChatGroup }) => {
             {chat.other_user_name}
           </Text>
           <Text className="font-Poppins_400Regular text-sm">
-            {chat.item_status === "INACTIVE"
+            {chat.item_status === "inactive"
               ? "Item is no longer available."
               : ""}
           </Text>

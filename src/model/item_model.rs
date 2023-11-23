@@ -15,7 +15,7 @@ pub struct Item {
     pub user_id: i32,
 }
 
-#[derive(sqlx::Type)]
+#[derive(sqlx::Type, Debug, Deserialize, Serialize)]
 #[sqlx(type_name = "item_status", rename_all = "snake_case")]
 pub enum ItemStatus {
     Active,
@@ -32,7 +32,7 @@ impl ItemStatus {
     }
 }
 
-#[derive(sqlx::Type)]
+#[derive(sqlx::Type, Debug, Deserialize, Serialize)]
 #[sqlx(type_name = "category", rename_all = "snake_case")]
 pub enum Category {
     Mens,

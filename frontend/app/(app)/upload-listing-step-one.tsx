@@ -67,7 +67,7 @@ export default function UploadListingStepOne() {
               <CloseIcon />
             </Pressable>
             <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary ">
-              ADD NEW LISTING
+              ADD PHOTOS
             </Text>
             <View className="w-10 p-3" />
           </View>
@@ -126,33 +126,11 @@ export default function UploadListingStepOne() {
                   alert("Please add at least one image");
                   return;
                 }
-                const formData = new FormData();
-                formData.append("image", {
-                  uri: images[0],
-                  name: "name",
-                  type: "image/png",
-                } as any);
-                console.log(formData);
-                fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/images/`, {
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                  method: "POST",
-                  body: formData,
-                })
-                  .then((res) => {
-                    res.json().then((data) => {
-                      console.log(data);
-                    });
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
 
                 void router.push({
                   pathname: "/upload-listing-step-two",
                   params: {
-                    images: images.slice(0, images.length - 1),
+                    images: images.slice(0, images.length - 1).join(","),
                   },
                 });
               }}

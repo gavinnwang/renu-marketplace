@@ -7,7 +7,6 @@ use crate::{
     repository::item_repository,
 };
 
-
 #[get("/")]
 async fn get_items_handler(pool: web::Data<PgPool>) -> impl Responder {
     let items = item_repository::fetch_items_by_status(ItemStatus::Active, pool.as_ref()).await;
@@ -141,6 +140,50 @@ async fn get_items_by_category_handler(
                 "{}\n",
                 format!("API: Failed to fetch items with category {category_string}")
             );
+            tracing::error!("Error message: {}\n", err);
+            HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
+        }
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct ItemCreateBody {
+    name: String,
+    price: f64,
+    category: Category,
+    description: String,
+    images: Vec<String>,
+}
+
+#[post("/")]
+async fn post_item_handler(
+    auth_gaurd: AuthenticationGuard,
+    data: web::Json<ItemCreateBody>,
+    pool: web::Data<PgPool>,
+) -> impl Responder {
+    let user_id = auth_gaurd.user_id;
+
+    let item = data.into_inner();
+
+    let response = item_repository::insert_item(
+        user_id,
+        item.name,
+        item.price,
+        item.category,
+        item.description,
+        item.images,
+        pool.as_ref(),
+    )
+    .await;
+
+    match response {
+        Ok(item_id) => {
+            tracing::info!("API: Successfully created item with id {}", item_id);
+            return HttpResponse::Ok().json(serde_json::json!({"status": "success"}));
+        }
+        Err(err) => {
+            tracing::error!("API: Failed to create item");
             tracing::error!("Error message: {}\n", err);
             HttpResponse::InternalServerError()
                 .json(serde_json::json!({"status": "fail", "message": "API: Something went wrong"}))
