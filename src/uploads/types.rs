@@ -6,7 +6,6 @@ pub struct UploadedFile {
 }
 
 impl UploadedFile {
-    /// Construct new uploaded file info container.
     pub fn new(
         filename: impl Into<String>,
         s3_key: impl Into<String>,

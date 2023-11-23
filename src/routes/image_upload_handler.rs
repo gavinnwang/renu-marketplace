@@ -1,27 +1,37 @@
+use crate::uploads::client::Client;
+use actix_multipart::form::{MultipartForm, tempfile::TempFile};
 use actix_web::{post, web, HttpResponse, Responder};
 
-use crate::uploads::client::Client;
-
-#[derive(actix_multipart::form::MultipartForm)]
+#[derive(MultipartForm)]
 pub struct ImageForm {
-    #[multipart(limit = "25 MiB")]
-    image: Option<actix_multipart::form::tempfile::TempFile>,
+    #[multipart(limit = "50 MiB")]
+    images: Vec<TempFile>,
 }
 
-#[tracing::instrument(name = "Upload image", skip(form, s3_client))]
+#[tracing::instrument(name = "Upload images", skip(form, s3_client))]
 #[post("/")]
-async fn post_image(
-    form: actix_multipart::form::MultipartForm<ImageForm>,
+async fn post_images(
+    form: MultipartForm<ImageForm>,
     s3_client: web::Data<Client>,
 ) -> impl Responder {
-    let image = match form.into_inner().image {
-        Some(image) => image,
-        None => return HttpResponse::BadRequest().body("No image provided"),
-    };
-    let uploaded_file = match s3_client.upload(&image, "images/").await {
-        Ok(uploaded_file) => uploaded_file,
-        Err(e) => return HttpResponse::InternalServerError().body(e),
-    };
-    tracing::info!("Uploaded file: {:#?}", uploaded_file);
-    HttpResponse::Ok().json(uploaded_file)
+    let images = form.into_inner().images;
+    if images.is_empty() {
+        return HttpResponse::BadRequest()
+            .json(serde_json::json!({"status": "fail", "message": "No images provided"}));
+    }
+
+    let mut uploaded_files = Vec::new();
+    for image in images {
+        match s3_client.upload(&image, "images/").await {
+            Ok(uploaded_file) => uploaded_files.push(uploaded_file),
+            Err(e) => {
+                return HttpResponse::InternalServerError().json(serde_json::json!({
+                    "status": "fail", "message": e.to_string()
+                }))
+            }
+        };
+    }
+
+    tracing::info!("Uploaded files: {:#?}", uploaded_files);
+    HttpResponse::Ok().json(uploaded_files)
 }

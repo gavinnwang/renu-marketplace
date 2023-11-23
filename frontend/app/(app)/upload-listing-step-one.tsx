@@ -24,13 +24,15 @@ const CloseIcon = () => (
   </Svg>
 );
 
+const MAX_IMAGES = 6;
+
 export default function UploadListingStepOne() {
   const [images, setImages] = useState<string[]>(["picker"]);
   const [_, requestPermission] = ImagePicker.useCameraPermissions();
 
   const pickImage = async () => {
-    if (images.length > 9) {
-      alert("You can only upload 9 images");
+    if (images.length > MAX_IMAGES) {
+      alert(`You can only upload ${MAX_IMAGES} images`);
       return;
     }
 

@@ -49,6 +49,6 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
 
     conf.service(
         web::scope("/images")
-            .service(super::image_upload_handler::post_image),
+            .service(super::image_upload_handler::post_images),
     );
 }

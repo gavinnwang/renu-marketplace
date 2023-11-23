@@ -28,6 +28,13 @@ const ItemCategory: Record<string, string> = {
   general: "General",
   free: "Free",
 };
+
+type S3File = {
+  filename: string;
+  s3_key: string;
+  s3_url: string;
+};
+
 const CloseIcon = () => (
   <Svg
     fill="none"
@@ -192,31 +199,38 @@ export default function UploadListingStepTwo() {
                   return;
                 }
                 alert("uploading");
-                const formData = new FormData();
-                formData.append("image", {
-                  uri: images[0],
-                  name: "name",
-                  type: "image/png",
-                } as any);
-                console.log(formData);
-                const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/images/`, {
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                  method: "POST",
-                  body: formData,
-                });
+                try {
+                  const formData = new FormData();
+                  formData.append("image", {
+                    uri: images[0],
+                    name: images,
+                    type: "image/png",
+                  } as any);
+                  console.log(formData);
+                  const response = await fetch(
+                    `${process.env.EXPO_PUBLIC_BACKEND_URL}/images/`,
+                    {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                      },
+                      method: "POST",
+                      body: formData,
+                    }
+                  );
 
-                const data = await response.text();
-                console.log(data);
-                  // .then((res) => {
-                  //   res.json().then((data) => {
-                  //     console.log(data);
-                  //   });
-                  // })
-                  // .catch((err) => {
-                  //   console.log(err);
-                  // });
+                  const data: S3File[] = await response.json();
+                  console.log(data);
+                } catch (e) {
+                  console.log(e);
+                }
+                // .then((res) => {
+                //   res.json().then((data) => {
+                //     console.log(data);
+                //   });
+                // })
+                // .catch((err) => {
+                //   console.log(err);
+                // });
               }}
               className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"
             >
