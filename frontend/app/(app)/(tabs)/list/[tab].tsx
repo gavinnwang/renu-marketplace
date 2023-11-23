@@ -140,7 +140,7 @@ export default function ListScreen() {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-import { CATEGORIES } from "../home/[section]";
+import { CATEGORIES } from "../home";
 
 const ListingPageItem = ({
   item,

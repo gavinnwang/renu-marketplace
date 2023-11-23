@@ -16,7 +16,7 @@ import { ChatId, ItemWithImage, UserWithCount } from "../../../types/types";
 import { FlatList } from "react-native-gesture-handler";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
-import { CATEGORIES } from "../(tabs)/home/[section]";
+import { CATEGORIES } from "../(tabs)/home";
 import { useSession } from "../../../providers/ctx";
 
 import dayjs from "dayjs";
@@ -124,7 +124,7 @@ export default function ItemPage() {
                 <Image
                   transition={{
                     effect: "cross-dissolve",
-                    duration: 150,
+                    duration: 300,
                   }}
                   placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
                   style={{
