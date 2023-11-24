@@ -262,7 +262,7 @@ export default function ChatScreen() {
           <FlashList
             data={chatMessages}
             renderItem={({ item }) => <Message message={item} />}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(_, index) => index.toString()}
             maintainVisibleContentPosition={{
               minIndexForVisible: 0,
             }}

@@ -127,13 +127,9 @@ const CategoryView = ({
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/?category=${category}&offset=${offset}&limit=${limit}`
       ).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
     queryKey: ["item", category],
-    enabled: !endReached && selectedSection === index,
+    enabled: !endReached && Math.abs(selectedSection - index) < 2,
     onSuccess: (data) => {
       if (data.status === "success") {
-        if (data.data.length < limit) {
-          console.log("end reached");
-          setEndReached(true);
-        }
         console.log(
           "fetching category",
           category,
@@ -142,6 +138,11 @@ const CategoryView = ({
           " at limit ",
           limit
         );
+        if (data.data.length < limit) {
+          console.log("end reached");
+          setEndReached(true);
+          return;
+        }
         setItems((prev) => [...prev, ...data.data]);
         setOffset((prev) => prev + data.data.length);
       } else {
@@ -149,14 +150,17 @@ const CategoryView = ({
         setIsErrorAPI(true);
       }
     },
+    onSettled: () => {
+      setRefreshing(false);
+    },
   });
 
-  const [refreshing, _] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   return (
     <View key={index} className="h-full flex flex-grow">
-      {isLoadingItems ? (
-        <></>
+      {isLoadingItems || refreshing ? (
+        <View className="bg-grayLight h-full w-full" />
       ) : isErrorFetch || isErrorAPI ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
@@ -176,7 +180,7 @@ const CategoryView = ({
             </Text>
           </View>
         </ScrollView>
-      ) : items.length === 0 ? (
+      ) : !refreshing && items.length === 0 ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
           refreshControl={
@@ -203,6 +207,10 @@ const CategoryView = ({
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => {
+                setItems([]);
+                setOffset(0);
+                setEndReached(false);
+                setRefreshing(true);
                 refetchItems();
               }}
             />
