@@ -1,4 +1,5 @@
 use actix_web::{get, post, web, HttpResponse, Responder};
+use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::{
@@ -7,9 +8,45 @@ use crate::{
     repository::item_repository,
 };
 
+#[derive(Deserialize, Debug, Default)]
+pub struct GetItemQuery {
+    pub category: Option<String>,
+    pub offset: Option<i32>,
+    pub limit: Option<i32>,
+}
+
 #[get("/")]
-async fn get_items_handler(pool: web::Data<PgPool>) -> impl Responder {
-    let items = item_repository::fetch_items_by_status(ItemStatus::Active, pool.as_ref()).await;
+async fn get_items_handler(
+    pool: web::Data<PgPool>,
+    query: web::Query<GetItemQuery>,
+) -> impl Responder {
+    // tracing::info!("query: {:#?}", query);
+
+    let offset = query.offset.unwrap_or(0);
+    let limit = query.limit.unwrap_or(25);
+
+    let items = match &query.category {
+        Some(category) if category == "all" => {
+            item_repository::fetch_items_by_status(ItemStatus::Active, limit, offset, pool.as_ref())
+                .await
+        }
+        Some(category) => {
+            let category = match Category::from_str(category.as_str()) {
+                Ok(category) => category,
+                Err(_) => {
+                    tracing::error!("API: Failed to parse category");
+                    return HttpResponse::BadRequest().json(
+                        serde_json::json!({"status": "fail", "data": "API: Invalid category"}),
+                    );
+                }
+            };
+            item_repository::fetch_items_by_category(category, limit, offset, pool.as_ref()).await
+        }
+        None => {
+            item_repository::fetch_items_by_status(ItemStatus::Active, limit, offset, pool.as_ref())
+                .await
+        }
+    };
 
     match items {
         Ok(items) => {
@@ -114,38 +151,45 @@ async fn update_item_status_handler(
     }
 }
 
-#[get("/category/{category}")]
-async fn get_items_by_category_handler(
-    path: web::Path<String>,
-    pool: web::Data<PgPool>,
-) -> impl Responder {
-    let category_string = path.into_inner();
-    let category = match Category::from_str(&category_string) {
-        Ok(category) => category,
-        Err(_) => {
-            tracing::error!("API: Failed to parse category");
-            return HttpResponse::BadRequest()
-                .json(serde_json::json!({"status": "fail", "data": "API: Invalid category"}));
-        }
-    };
+// #[derive(Deserialize)]
+// pub struct ItemCategoryQuery {
+//     pub category: String,
+//     // pub offset: Option<i32>,
+//     // pub limit: Option<i32>,
+// }
 
-    let items = item_repository::fetch_items_by_category(category, pool.as_ref()).await;
+// #[get("/category/{category}")]
+// async fn get_items_by_category_handler(
+//     path: web::Path<String>,
+//     pool: web::Data<PgPool>,
+// ) -> impl Responder {
+//     let category_string = path.into_inner();
+//     let category = match Category::from_str(&category_string) {
+//         Ok(category) => category,
+//         Err(_) => {
+//             tracing::error!("API: Failed to parse category");
+//             return HttpResponse::BadRequest()
+//                 .json(serde_json::json!({"status": "fail", "data": "API: Invalid category"}));
+//         }
+//     };
 
-    match items {
-        Ok(items) => {
-            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
-        }
-        Err(err) => {
-            tracing::error!(
-                "{}\n",
-                format!("API: Failed to fetch items with category {category_string}")
-            );
-            tracing::error!("Error message: {}\n", err);
-            HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
-        }
-    }
-}
+//     let items = item_repository::fetch_items_by_category(category, pool.as_ref()).await;
+
+//     match items {
+//         Ok(items) => {
+//             HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
+//         }
+//         Err(err) => {
+//             tracing::error!(
+//                 "{}\n",
+//                 format!("API: Failed to fetch items with category {category_string}")
+//             );
+//             tracing::error!("Error message: {}\n", err);
+//             HttpResponse::InternalServerError()
+//                 .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
+//         }
+//     }
+// }
 
 #[derive(serde::Deserialize)]
 struct ItemCreateBody {

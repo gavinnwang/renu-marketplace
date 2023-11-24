@@ -55,14 +55,13 @@ const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
 //     />
 //   </Svg>
 // );
-const pagerViewRef = React.useRef<PagerView>(null);
-
-const [currentPage, setCurrentPage] = useState(0);
 
 export default function HomePage() {
   // const param = useLocalSearchParams();
   // const selectedSection = param.section as string;
-  const [selectedSection, setSelectedSection] = useState("all");
+  const [selectedSection, setSelectedSection] = useState(0);
+  const [selectedPageeIndex, setSelectedPageIndex] = useState(0);
+  const pagerViewRef = React.useRef<PagerView>(null);
   return (
     <View className="bg-bgLight h-full">
       <View className="flex flex-row items-center justify-start pl-4 pr-6 pb-2.5 min-h-[43px]">
@@ -81,14 +80,14 @@ export default function HomePage() {
         ref={pagerViewRef}
         onPageScroll={(e) => {
           const idx = e.nativeEvent.position;
-          const section = data[idx].value;
-          if (section === selectedSection) {
-            return;
-          }
+          // const section = data[idx].value;
+          // if (section === selectedSection) {
+          //   return;
+          // }
           // console.log("onPageScroll", idx);
           // setCurrentPage(idx);
           // void router.replace(`/home/${section}`);
-          setSelectedSection(section);
+          setSelectedSection(idx);
         }}
         className="flex-1"
         initialPage={0}
@@ -109,19 +108,36 @@ const CategoryView = ({
   category: string;
   index: number;
 }) => {
-  const fetchUrlPath =
-    category == "all" ? "/items/" : `/items/category/${category}`;
+  const [offset, setOffset] = React.useState(0);
+  const limit = 5;
+  const [endReached, setEndReached] = React.useState(false);
+  const [items, setItems] = React.useState<ItemWithImage[]>([]);
+  const [isErrorAPI, setIsErrorAPI] = React.useState(false);
   const {
-    data: items,
     isLoading: isLoadingItems,
-    isError: isErrorItems,
+    isError: isErrorFetch,
     refetch: refetchItems,
   } = useQuery({
     queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}${fetchUrlPath}`).then((x) =>
-        x.json()
-      ) as Promise<ApiResponse<ItemWithImage[]>>,
+      fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/?category=${category}&offset=${offset}&limit=${limit}`
+      ).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
     queryKey: ["item", category],
+    enabled: !endReached,
+    onSuccess: (data) => {
+      if (data.status === "success") {
+        if (data.data.length < limit) {
+          console.log("end reached");
+          setEndReached(true);
+        }
+        console.log("fetching category", category, " at offset ", offset, " at limit ", limit)
+        setItems((prev) => [...prev, ...data.data]);
+        setOffset((prev) => prev + data.data.length);
+      } else {
+        console.error(data.data);
+        setIsErrorAPI(true);
+      }
+    }
   });
 
   const [refreshing, _] = useState(false);
@@ -130,7 +146,7 @@ const CategoryView = ({
     <View key={index} className="h-full flex flex-grow">
       {isLoadingItems ? (
         <></>
-      ) : isErrorItems || items.status === "fail" ? (
+      ) : isErrorFetch || isErrorAPI ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
           refreshControl={
@@ -149,7 +165,7 @@ const CategoryView = ({
             </Text>
           </View>
         </ScrollView>
-      ) : items.data.length === 0 ? (
+      ) : items.length === 0 ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
           refreshControl={
@@ -180,7 +196,7 @@ const CategoryView = ({
               }}
             />
           }
-          data={items.data}
+          data={items}
           numColumns={2}
           columnWrapperStyle={{
             justifyContent: "flex-start",
@@ -207,7 +223,7 @@ const Tab = React.forwardRef(
       index,
     }: {
       section: CategoryTabData;
-      selectedSection: string;
+      selectedSection: number;
       pagerViewRef: React.RefObject<PagerView>;
       index: number;
     },
@@ -224,7 +240,7 @@ const Tab = React.forwardRef(
       >
         <Text
           className={`font-Poppins_500Medium ${
-            section.value === selectedSection
+              index === selectedSection
               ? "text-purplePrimary"
               : "text-gray-400"
           }`}
@@ -242,7 +258,7 @@ const Tabs = ({
   pagerViewRef,
 }: {
   data: CategoryTabData[];
-  selectedSection: string;
+  selectedSection: number;
   pagerViewRef: React.RefObject<PagerView>;
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
@@ -271,16 +287,16 @@ const Tabs = ({
   const animatedWidth = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    const idx = data.findIndex((item) => item.value === selectedSection);
-    if (measures[idx]) {
+    // const idx = data.findIndex((item) => item.value === selectedSection);
+    if (measures[selectedSection]) {
       Animated.parallel([
         Animated.timing(animatedValueX, {
-          toValue: measures[idx].x,
+          toValue: measures[selectedSection].x,
           duration: 150,
           useNativeDriver: true,
         }),
         Animated.timing(animatedWidth, {
-          toValue: measures[idx].width,
+          toValue: measures[selectedSection].width,
           duration: 150,
           useNativeDriver: true,
         }),

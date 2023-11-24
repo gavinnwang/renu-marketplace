@@ -8,6 +8,8 @@ use crate::{
 
 pub async fn fetch_items_by_status(
     status: ItemStatus,
+    limit: i32,
+    offset: i32,
     conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<Vec<Item>, DbError> {
     let items = sqlx::query_as!(
@@ -27,8 +29,12 @@ pub async fn fetch_items_by_status(
         FROM item
         WHERE item.status = $1
         ORDER BY item.created_at DESC
+        LIMIT $2
+        OFFSET $3;
         "#,
-        status as ItemStatus
+        status as ItemStatus,
+        limit as i64,
+        offset as i64
     )
     .fetch_all(conn)
     .await?;
@@ -38,6 +44,8 @@ pub async fn fetch_items_by_status(
 
 pub async fn fetch_items_by_category(
     category: Category,
+    limit: i32,
+    offset: i32,
     conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<Vec<Item>, DbError> {
     let items = sqlx::query_as!(
@@ -57,8 +65,12 @@ pub async fn fetch_items_by_category(
         FROM Item 
         WHERE Item.category = $1 AND Item.status = 'active'
         ORDER BY Item.created_at DESC
+        LIMIT $2
+        OFFSET $3;
         "#,
-        category as Category
+        category as Category,
+        limit as i64,
+        offset as i64
     )
     .fetch_all(conn)
     .await?;

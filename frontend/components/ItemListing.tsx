@@ -32,8 +32,8 @@ export function ItemListing(props: { item: ItemWithImage }) {
             height: (imageWidth * 4) / 3,
           }}
         />
-        <View className="h-fit py-2.5 px-2.5 bg-white rounded-b flex flex-col">
-          <Text className="font-Manrope_600SemiBold text-sm">
+        <View className="h-fit py-2 px-2.5 bg-white rounded-b flex flex-col">
+          <Text className="font-Manrope_600SemiBold text-base">
             {props.item.name}
           </Text>
           <Text className="font-Manrope_500Medium text-xs">

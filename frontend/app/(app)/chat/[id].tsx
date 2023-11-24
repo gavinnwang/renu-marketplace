@@ -138,9 +138,9 @@ export default function ChatScreen() {
         setChatMessages((prev) => [...prev, ...data.data]);
         console.log("fetching at offet:", offset);
         console.log("fetched messages:", data.data.length);
-        setOffset((prev) => prev + limit);
+        setOffset((prev) => prev + data.data.length);
       } else {
-        console.error(data);
+        console.error(data.data);
       }
     },
     onError(err) {

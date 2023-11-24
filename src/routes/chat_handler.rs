@@ -2,9 +2,7 @@ use actix_web::{get, post, web, HttpResponse, Responder};
 use serde::Deserialize;
 use sqlx::PgPool;
 
-use crate::{
-    authentication::jwt::AuthenticationGuard, repository::chat_repository,
-};
+use crate::{authentication::jwt::AuthenticationGuard, repository::chat_repository};
 
 #[get("/seller")]
 async fn get_chat_groups_by_seller_id(
@@ -114,7 +112,7 @@ async fn get_chat_id_by_item_id(
 // }
 
 #[derive(Deserialize)]
-pub struct ChatMessageQuery {
+pub struct GetChatMessageQuery {
     pub offset: Option<i32>,
     pub limit: Option<i32>,
 }
@@ -124,7 +122,7 @@ async fn get_chat_messages_by_chat_id(
     auth_guard: AuthenticationGuard,
     path: web::Path<i32>,
     pool: web::Data<PgPool>,
-    query: web::Query<ChatMessageQuery>,
+    query: web::Query<GetChatMessageQuery>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
     let chat_id = path.into_inner();
@@ -144,21 +142,13 @@ async fn get_chat_messages_by_chat_id(
             tracing::error!("{}\n", format!("API: Failed to check if user with id {user_id} is part of chat group with id {chat_id}"));
             tracing::error!("Error message: {}\n", err);
 
-            return HttpResponse::InternalServerError().json(
-                serde_json::json!({"status": "fail", "data": "API: Something went wrong"}),
-            );
+            return HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}));
         }
     }
 
-    let offset = match query.offset {
-        Some(offset) => offset,
-        None => 0,
-    };
-
-    let limit = match query.limit {
-        Some(limit) => limit,
-        None => 15,
-    };
+    let offset = query.offset.unwrap_or(0);
+    let limit = query.limit.unwrap_or(25);
 
     let messages = chat_repository::fetch_chat_messages_by_chat_id(
         user_id,
@@ -199,7 +189,9 @@ async fn post_chat_message(
     let chat_id = path.into_inner();
 
     if message.content.len() < 1 {
-        return HttpResponse::BadRequest().json(serde_json::json!({"status": "fail", "data": "API: Message content cannot be empty"}));
+        return HttpResponse::BadRequest().json(
+            serde_json::json!({"status": "fail", "data": "API: Message content cannot be empty"}),
+        );
     }
 
     let is_part_of_chat_group =
@@ -217,9 +209,8 @@ async fn post_chat_message(
             tracing::error!("{}\n", format!("API: Failed to check if user with id {user_id} is part of chat group with id {chat_id}"));
             tracing::error!("Error message: {}\n", err);
 
-            return HttpResponse::InternalServerError().json(
-                serde_json::json!({"status": "fail", "data": "API: Something went wrong"}),
-            );
+            return HttpResponse::InternalServerError()
+                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}));
         }
     }
 

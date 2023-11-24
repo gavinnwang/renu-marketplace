@@ -85,7 +85,8 @@ export default function ListScreen() {
         <View className="flex flex-grow"></View>
       ) : items.filter((item) => item.status === STATUS[selectedTabInt])
           .length > 0 ? (
-        <FlatList
+        <FlashList
+          estimatedItemSize={items.length}
           data={items.filter((item) => item.status === STATUS[selectedTabInt])}
           numColumns={1}
           keyExtractor={(item) => item.id.toString()}
@@ -141,6 +142,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import { CATEGORIES } from "../home";
+import { FlashList } from "@shopify/flash-list";
 
 const ListingPageItem = ({
   item,
