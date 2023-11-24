@@ -113,7 +113,7 @@ const CategoryView = ({
   selectedSection: number;
 }) => {
   const [offset, setOffset] = React.useState(0);
-  const limit = 5;
+  const limit = 8;
   const [endReached, setEndReached] = React.useState(false);
   const [items, setItems] = React.useState<ItemWithImage[]>([]);
   const [isErrorAPI, setIsErrorAPI] = React.useState(false);
@@ -219,6 +219,12 @@ const CategoryView = ({
           }}
           keyExtractor={(item) => item.id.toString()}
           renderItem={ItemListing}
+          onEndReached={() => {
+            if (!endReached && !isLoadingItems) {
+              console.log("fetching more items");
+              refetchItems();
+            }
+          }}
         />
       )}
     </View>
