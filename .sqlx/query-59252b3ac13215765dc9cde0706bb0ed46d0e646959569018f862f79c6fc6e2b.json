@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            item.id, \n            item.name, \n            item.price, \n            item.user_id, \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at, \n            item.description,\n            item.updated_at,\n            item.images as images\n        FROM item\n        WHERE item.status = $1\n        ORDER BY item.created_at DESC\n        ",
+  "query": "\n        SELECT\n            item.id, \n            item.name, \n            item.price, \n            item.user_id, \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at, \n            item.description,\n            item.updated_at,\n            item.images as images\n        FROM item\n        WHERE item.status = $1\n        ORDER BY item.created_at DESC\n        LIMIT $2\n        OFFSET $3;\n        ",
   "describe": {
     "columns": [
       {
@@ -66,7 +66,9 @@
               ]
             }
           }
-        }
+        },
+        "Int8",
+        "Int8"
       ]
     },
     "nullable": [
@@ -82,5 +84,5 @@
       false
     ]
   },
-  "hash": "8630186eacdb82d3435fea0bc4d9e0143c1c4ad076eba952740b4a7e99f0d801"
+  "hash": "59252b3ac13215765dc9cde0706bb0ed46d0e646959569018f862f79c6fc6e2b"
 }

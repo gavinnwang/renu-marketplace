@@ -57,10 +57,7 @@ const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
 // );
 
 export default function HomePage() {
-  // const param = useLocalSearchParams();
-  // const selectedSection = param.section as string;
   const [selectedSection, setSelectedSection] = useState(0);
-  const [selectedPageeIndex, setSelectedPageIndex] = useState(0);
   const pagerViewRef = React.useRef<PagerView>(null);
   return (
     <View className="bg-bgLight h-full">
@@ -94,7 +91,12 @@ export default function HomePage() {
         orientation="horizontal"
       >
         {data.map((item, index) => (
-          <CategoryView key={index} category={item.value} index={index} />
+          <CategoryView
+            key={index}
+            category={item.value}
+            index={index}
+            selectedSection={selectedSection}
+          />
         ))}
       </PagerView>
     </View>
@@ -104,9 +106,11 @@ export default function HomePage() {
 const CategoryView = ({
   category,
   index,
+  selectedSection,
 }: {
   category: string;
   index: number;
+  selectedSection: number;
 }) => {
   const [offset, setOffset] = React.useState(0);
   const limit = 5;
@@ -123,21 +127,28 @@ const CategoryView = ({
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/?category=${category}&offset=${offset}&limit=${limit}`
       ).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
     queryKey: ["item", category],
-    enabled: !endReached,
+    enabled: !endReached && selectedSection === index,
     onSuccess: (data) => {
       if (data.status === "success") {
         if (data.data.length < limit) {
           console.log("end reached");
           setEndReached(true);
         }
-        console.log("fetching category", category, " at offset ", offset, " at limit ", limit)
+        console.log(
+          "fetching category",
+          category,
+          " at offset ",
+          offset,
+          " at limit ",
+          limit
+        );
         setItems((prev) => [...prev, ...data.data]);
         setOffset((prev) => prev + data.data.length);
       } else {
         console.error(data.data);
         setIsErrorAPI(true);
       }
-    }
+    },
   });
 
   const [refreshing, _] = useState(false);
@@ -240,9 +251,7 @@ const Tab = React.forwardRef(
       >
         <Text
           className={`font-Poppins_500Medium ${
-              index === selectedSection
-              ? "text-purplePrimary"
-              : "text-gray-400"
+            index === selectedSection ? "text-purplePrimary" : "text-gray-400"
           }`}
         >
           {section.display}
