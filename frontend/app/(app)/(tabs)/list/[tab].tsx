@@ -10,8 +10,7 @@ import {
   View,
 } from "react-native";
 import Colors from "../../../../constants/Colors";
-import { ItemWithImage, Measure, RefAndKey } from "../../../../types/types";
-import { useSession } from "../../../../providers/ctx";
+import { Item, Measure, RefAndKey } from "../../../../types/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiResponse } from "../../../../types/api";
@@ -33,7 +32,7 @@ export default function ListScreen() {
 
   const { session } = useSession();
 
-  const [items, setItems] = React.useState<ItemWithImage[]>([]);
+  const [items, setItems] = React.useState<Item[]>([]);
 
   const {
     isError: isErrorItem,
@@ -45,7 +44,7 @@ export default function ListScreen() {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
-      }).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
+      }).then((x) => x.json()) as Promise<ApiResponse<Item[]>>,
     queryKey: ["list"],
     enabled: !!session && !!session.token,
     onError(err) {
@@ -143,13 +142,14 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import { CATEGORIES } from "../home";
 import { FlashList } from "@shopify/flash-list";
+import { useSession } from "../../../../hooks/useSession";
 
 const ListingPageItem = ({
   item,
   token,
   refetch,
 }: {
-  item: ItemWithImage;
+  item: Item;
   token: string | undefined;
   refetch: any;
 }) => {
@@ -245,7 +245,7 @@ const Tab = React.forwardRef(
     }: {
       selectedTabInt: number;
       sectionIndex: number;
-      data: ItemWithImage[];
+      data: Item[];
     },
     ref: any
   ) => {
@@ -292,7 +292,7 @@ const Tabs = ({
 }: {
   data: RefAndKey[];
   selectedTabInt: number;
-  itemData: ItemWithImage[];
+  itemData: Item[];
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();

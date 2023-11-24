@@ -12,7 +12,7 @@ import { useState } from "react";
 import { ApiResponse } from "../../../types/api";
 import { ItemListing } from "../../../components/ItemListing";
 import { LogoWithText } from "../../../components/Logo";
-import { ItemWithImage, Measure, RefAndKey } from "../../../types/types";
+import { Item, Measure, RefAndKey } from "../../../types/types";
 import React from "react";
 import Colors from "../../../constants/Colors";
 import PagerView from "react-native-pager-view";
@@ -115,8 +115,9 @@ const CategoryView = ({
   const [offset, setOffset] = React.useState(0);
   const limit = 8;
   const [endReached, setEndReached] = React.useState(false);
-  const [items, setItems] = React.useState<ItemWithImage[]>([]);
+  const [items, setItems] = React.useState<Item[]>([]);
   const [isErrorAPI, setIsErrorAPI] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const {
     isLoading: isLoadingItems,
     isError: isErrorFetch,
@@ -125,7 +126,7 @@ const CategoryView = ({
     queryFn: async () =>
       fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/?category=${category}&offset=${offset}&limit=${limit}`
-      ).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
+      ).then((x) => x.json()) as Promise<ApiResponse<Item[]>>,
     queryKey: ["item", category],
     enabled: !endReached && Math.abs(selectedSection - index) < 2,
     onSuccess: (data) => {
@@ -141,7 +142,6 @@ const CategoryView = ({
         if (data.data.length < limit) {
           console.log("end reached");
           setEndReached(true);
-          return;
         }
         setItems((prev) => [...prev, ...data.data]);
         setOffset((prev) => prev + data.data.length);
@@ -150,12 +150,7 @@ const CategoryView = ({
         setIsErrorAPI(true);
       }
     },
-    onSettled: () => {
-      setRefreshing(false);
-    },
   });
-
-  const [refreshing, setRefreshing] = useState(false);
 
   return (
     <View key={index} className="h-full flex flex-grow">
@@ -225,7 +220,7 @@ const CategoryView = ({
           contentContainerStyle={{
             paddingBottom: 10,
           }}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => `${selectedSection}-${item.id}`}
           renderItem={ItemListing}
           onEndReached={() => {
             if (!endReached && !isLoadingItems) {

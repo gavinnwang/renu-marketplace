@@ -12,15 +12,15 @@ import { useQuery } from "@tanstack/react-query";
 import Colors from "../../../constants/Colors";
 import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
-import { ChatId, ItemWithImage, UserWithCount } from "../../../types/types";
+import { ChatId, Item, User } from "../../../types/types";
 import { FlatList } from "react-native-gesture-handler";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
 import { CATEGORIES } from "../(tabs)/home";
-import { useSession } from "../../../providers/ctx";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useSession } from "../../../hooks/useSession";
 dayjs.extend(relativeTime);
 
 const CloseIcon = () => (
@@ -44,13 +44,13 @@ export default function ItemPage() {
   const param = useLocalSearchParams();
   const itemId = param.id;
 
-  const [item, setItem] = useState<ItemWithImage>();
+  const [item, setItem] = useState<Item>();
 
   useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
         (x) => x.json()
-      ) as Promise<ApiResponse<ItemWithImage>>,
+      ) as Promise<ApiResponse<Item>>,
     queryKey: ["item", itemId],
     enabled: !!itemId,
     onSuccess(data) {
@@ -62,7 +62,7 @@ export default function ItemPage() {
     },
   });
 
-  const [seller, setSeller] = useState<UserWithCount>();
+  const [seller, setSeller] = useState<User>();
 
   const { session } = useSession();
 
@@ -91,7 +91,7 @@ export default function ItemPage() {
     queryFn: async () =>
       fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.user_id}`
-      ).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
+      ).then((x) => x.json()) as Promise<ApiResponse<User>>,
     queryKey: ["user", item?.user_id],
     enabled: !!item && !!item.user_id,
     onSuccess(data) {

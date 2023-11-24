@@ -12,12 +12,12 @@ import Colors from "../../../constants/Colors";
 import React, { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
-import { ChatId, ChatMessage, ItemWithImage } from "../../../types/types";
-import { useSession } from "../../../providers/ctx";
+import { ChatId, ChatMessage, Item } from "../../../types/types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
 import { FlashList } from "@shopify/flash-list";
+import { useSession } from "../../../hooks/useSession";
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -71,12 +71,12 @@ export default function ChatScreen() {
     },
   });
 
-  const [item, setItem] = React.useState<ItemWithImage>();
+  const [item, setItem] = React.useState<Item>();
   useQuery({
     queryFn: async () =>
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
         (x) => x.json()
-      ) as Promise<ApiResponse<ItemWithImage>>,
+      ) as Promise<ApiResponse<Item>>,
     queryKey: ["item", itemId],
     enabled: !!itemId,
     onSuccess(data) {
@@ -91,13 +91,13 @@ export default function ChatScreen() {
     },
   });
 
-  // const [seller, setSeller] = React.useState<UserWithCount>();
+  // const [seller, setSeller] = React.useState<User>();
 
   // useQuery({
   //   queryFn: async () =>
   //     fetch(
   //       `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.user_id}`
-  //     ).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
+  //     ).then((x) => x.json()) as Promise<ApiResponse<User>>,
   //   queryKey: ["user", item?.user_id],
   //   enabled: !!item && !!item.user_id,
   //   onSuccess(data) {

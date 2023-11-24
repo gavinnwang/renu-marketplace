@@ -1,8 +1,8 @@
-import { Slot, Stack, Tabs, router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { SafeAreaView, View, Text, Pressable, Dimensions } from "react-native";
-import { Circle, Path, Rect, Svg } from "react-native-svg";
+import { Circle, Path, Svg } from "react-native-svg";
 import Colors from "../../constants/Colors";
-import * as ImagePicker from "expo-image-picker";
+import ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { Image } from "expo-image";
 import { FlatList } from "react-native-gesture-handler";

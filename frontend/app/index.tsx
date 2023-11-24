@@ -1,5 +1,5 @@
 import { Pressable, SafeAreaView, Text, View } from "react-native";
-import { useSession } from "../providers/ctx";
+import { useSession } from "../hooks/useSession"
 import { router } from "expo-router";
 import { LogoWithText } from "../components/Logo";
 import { useEffect } from "react";

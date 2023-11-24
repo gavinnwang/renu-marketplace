@@ -3,7 +3,7 @@ import React from "react";
 import Colors from "../../../constants/Colors";
 
 import Svg, { Path } from "react-native-svg";
-import { SafeAreaView, View } from "react-native";
+import { SafeAreaView } from "react-native";
 
 export default function TabsLayout() {
   return (

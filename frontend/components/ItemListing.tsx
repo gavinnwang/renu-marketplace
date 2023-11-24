@@ -3,14 +3,14 @@ import { Link } from "expo-router";
 
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Image } from "expo-image";
-import { ItemWithImage } from "../types/types";
+import { Item } from "../types/types";
 import dayjs from "dayjs";
 dayjs.extend(relativeTime);
 
 const horizontalGapPx = 10;
 const imageWidth = (Dimensions.get("window").width - horizontalGapPx * 3) / 2;
 
-export function ItemListing(props: { item: ItemWithImage }) {
+export function ItemListing(props: { item: Item }) {
   // console.log(props.item);
   return (
     <Link

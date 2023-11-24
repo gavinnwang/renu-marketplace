@@ -1,38 +1,12 @@
 import React from "react";
-import * as WebBrowser from "expo-web-browser";
+import WebBrowser from "expo-web-browser";
 import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
-import * as Linking from "expo-linking";
-import "react-native-url-polyfill/auto";
-import * as SecureStore from "expo-secure-store";
+import Linking from "expo-linking";
+// import "react-native-url-polyfill/auto";
+import SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import { Session } from "../types/types";
-
-type AuthContextType = {
-  signIn: (from: string) => Promise<void>;
-  signOut: () => void;
-  session: Session | null;
-  isLoading: boolean;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setSession: React.Dispatch<React.SetStateAction<Session | null>>;
-  loadedFromStorage: boolean;
-  setLoadedFromStorage: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
-
-async function save(key: string, value: string) {
-  await SecureStore.setItemAsync(key, value);
-}
-
-export function useSession() {
-  const value = React.useContext(AuthContext);
-
-  if (!value) {
-    throw new Error("useSession must be wrapped in a <SessionProvider />");
-  }
-
-  return value;
-}
+import { AuthContext } from "../context/authContext";
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
@@ -59,7 +33,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           user_id: parseInt(user_id),
         };
         setSession(s);
-        void save("session", JSON.stringify(s));
+        await SecureStore.setItemAsync("session", JSON.stringify(s));
       } else {
         router.replace("/failed-sign-in");
       }

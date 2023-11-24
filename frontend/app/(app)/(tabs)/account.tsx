@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import { Pressable, FlatList, Text, View, ScrollView } from "react-native";
-import { useSession } from "../../../providers/ctx";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
-import { ItemWithImage, UserWithCount } from "../../../types/types";
+import { Item, User } from "../../../types/types";
 import { ItemListing } from "../../../components/ItemListing";
 import Svg, { Path } from "react-native-svg";
+import { useSession } from "../../../hooks/useSession";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
   console.log(session);
-  const [user, setUser] = useState<UserWithCount | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const { isError: isErrorUser } = useQuery({
     queryFn: async () =>
@@ -20,7 +20,7 @@ export default function AccountScreen() {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
-      }).then((x) => x.json()) as Promise<ApiResponse<UserWithCount>>,
+      }).then((x) => x.json()) as Promise<ApiResponse<User>>,
     queryKey: ["me"],
     enabled: !!session && !!session.token,
     onSuccess: (data) => {
@@ -42,7 +42,7 @@ export default function AccountScreen() {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
-      }).then((x) => x.json()) as Promise<ApiResponse<ItemWithImage[]>>,
+      }).then((x) => x.json()) as Promise<ApiResponse<Item[]>>,
     queryKey: ["saved"],
     enabled: !!session && !!session.token,
     onSuccess(data) {

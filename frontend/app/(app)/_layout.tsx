@@ -1,7 +1,7 @@
 import { Redirect, Stack, useLocalSearchParams } from "expo-router";
-import { SafeAreaView, Text, View } from "react-native";
-import { useSession } from "../../providers/ctx";
+import { Text } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useSession } from "../../hooks/useSession";
 
 const queryClient = new QueryClient();
 

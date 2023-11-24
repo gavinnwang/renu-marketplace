@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import { Image } from "expo-image";
 import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { ApiResponse } from "../../types/api";
-import { useSession } from "../../providers/ctx";
+import { useSession } from "../../hooks/useSession";
 
 const ItemCategory: Record<string, string> = {
   picking: "Pick a category",

@@ -1,10 +1,35 @@
-import type { Item, User } from "@prisma/client";
+export type Item = {
+  id: number;
+  name: string;
+  price: number;
+  category:
+    | "mens"
+    | "womens"
+    | "home"
+    | "furniture"
+    | "electronics"
+    | "bikes"
+    | "tickets"
+    | "general"
+    | "free";
+  description?: string;
+  status: "active" | "inactive";
+  user_id: number;
+  created_at: Date;
+  images: string[];
+  updated_at: Date;
+};
 
-export type UserWithCount = User & {
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  profile_image?: string;
+  created_at: Date;
+  updated_at: Date;
   active_listing_count: number;
   sales_done_count: number;
 };
-export type ItemWithImage = Item & { images: string[] };
 
 export type Measure = {
   x: number;
@@ -39,7 +64,6 @@ export type ChatGroup = {
   last_message_content: string | null;
   last_message_sent_at: Date | null;
 };
-
 
 export type ChatMessage = {
   id: number;

@@ -8,7 +8,7 @@ import { useFonts } from "expo-font";
 import { Slot, SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { SafeAreaView, View, useColorScheme } from "react-native";
-import { SessionProvider, useSession } from "../providers/ctx";
+import { SessionProvider } from "../providers/sessionProvider";
 import {
   Poppins_300Light,
   Poppins_400Regular,
@@ -22,7 +22,8 @@ import {
   Manrope_600SemiBold,
 } from "@expo-google-fonts/manrope";
 import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
-import * as SecureStore from "expo-secure-store";
+import  SecureStore from "expo-secure-store";
+import { useSession } from "../hooks/useSession";
 
 export {
   // Catch any errors thrown by the Layout component.

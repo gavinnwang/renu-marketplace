@@ -11,7 +11,6 @@ import { ChatGroup, Measure, RefAndKey } from "../../../../types/types";
 import Colors from "../../../../constants/Colors";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "../../../../providers/ctx";
 import { ApiResponse } from "../../../../types/api";
 
 const TABS = ["Buy", "Sell"];
@@ -98,6 +97,7 @@ export default function MessageScreen() {
 
 import dayjs from "dayjs";
 import { Image } from "expo-image";
+import { useSession } from "../../../../hooks/useSession";
 
 const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
@@ -182,7 +182,7 @@ const Tab = React.forwardRef(
     {
       selectedTabInt: number;
       sectionIndex: number;
-      // data: ItemWithImage[];
+      // data: Item[];
     },
     ref: any
   ) => {
@@ -221,7 +221,7 @@ const Tabs = ({
 {
   data: RefAndKey[];
   selectedTabInt: number;
-  // itemData: ItemWithImage[];
+  // itemData: Item[];
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();
