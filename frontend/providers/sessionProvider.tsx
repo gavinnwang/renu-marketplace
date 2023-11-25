@@ -1,12 +1,13 @@
 import React from "react";
-import WebBrowser from "expo-web-browser";
-import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
-import Linking from "expo-linking";
-// import "react-native-url-polyfill/auto";
-import SecureStore from "expo-secure-store";
+import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
+import * as SecureStore from "expo-secure-store";
+import "react-native-url-polyfill/auto";
 import { router } from "expo-router";
+
 import { Session } from "../types/types";
 import { AuthContext } from "../context/authContext";
+import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);

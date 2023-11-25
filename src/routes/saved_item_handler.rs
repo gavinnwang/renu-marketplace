@@ -1,4 +1,4 @@
-use actix_web::{get, web, HttpResponse, Responder, post};
+use actix_web::{get, post, web, HttpResponse, Responder};
 use sqlx::PgPool;
 
 use crate::{
@@ -6,6 +6,7 @@ use crate::{
     repository::saved_item_repository::{fetch_saved_items_by_user_id, insert_saved_item},
 };
 
+#[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
 #[get("/")]
 async fn get_saved_items_by_user_id(
     auth_guard: AuthenticationGuard,
@@ -13,29 +14,28 @@ async fn get_saved_items_by_user_id(
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
 
-    let item = fetch_saved_items_by_user_id(user_id, pool.as_ref()).await;
+    let items = fetch_saved_items_by_user_id(user_id, pool.as_ref()).await;
 
-    match item {
-        Ok(item) => HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": item})),
+    match items {
+        Ok(items) => HttpResponse::Ok().json(items),
         Err(err) => {
-            tracing::error!(
-                "{}\n",
-                format!("API: Failed to fetch saved items for user {user_id}")
-            );
-            tracing::error!("Error message: {}\n", err);
+            tracing::error!("Failed to fetch saved items: {err}");
             match err {
-            crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "data": format!("API: Could not find saved items for {user_id}" )})),
-            _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
-        }
+                crate::error::DbError::NotFound => {
+                    HttpResponse::NotFound().json("Could not find saved items for user")
+                }
+                _ => HttpResponse::InternalServerError().json("Something went wrong"),
+            }
         }
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Debug)]
 struct SavedItemRequest {
     item_id: i32,
 }
 
+#[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
 #[post("/")]
 async fn post_saved_item(
     auth_guard: AuthenticationGuard,
@@ -48,16 +48,13 @@ async fn post_saved_item(
     let item = insert_saved_item(user_id, item_id, pool.as_ref()).await;
 
     match item {
-        Ok(_) => HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": "API: Saved item successfully"})),
+        Ok(_) => HttpResponse::Ok()
+            .json("Saved item successfully"),
         Err(err) => {
-            tracing::error!(
-                "{}\n",
-                format!("API: Failed to save item for user {user_id}")
-            );
-            tracing::error!("Error message: {}\n", err);
+            tracing::error!("Failed to save item: {err}");
             match err {
-            crate::error::DbError::NotFound => HttpResponse::NotFound().json(serde_json::json!({"status": "fail", "data": format!("API: Could not find item to save for {user_id}" )})),
-            _ => HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
+            crate::error::DbError::NotFound => HttpResponse::NotFound().json("Could not find item"),
+            _ => HttpResponse::InternalServerError().json("Something went wrong"),
         }
         }
     }

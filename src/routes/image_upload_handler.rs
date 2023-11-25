@@ -8,7 +8,7 @@ pub struct ImageForm {
     images: Vec<TempFile>,
 }
 
-#[tracing::instrument(name = "Upload images", skip(form, s3_client))]
+#[tracing::instrument(skip(form, s3_client))]
 #[post("/")]
 async fn post_images(
     form: MultipartForm<ImageForm>,
@@ -17,27 +17,22 @@ async fn post_images(
     let images = form.into_inner().images;
     if images.is_empty() {
         tracing::error!("No images provided: {:#?}", images);
-        return HttpResponse::BadRequest()
-            .json(serde_json::json!({"status": "fail", "data": "No images provided"}));
+        return HttpResponse::BadRequest().json("No images provided");
     }
 
     let mut uploaded_files = Vec::new();
     for mut image in images {
         image.file_name = Some(uuid::Uuid::new_v4().to_string());
-        tracing::info!("Uploading file: {:#?}", image);
+        tracing::info!("Uploading image: {:#?}", image);
         match s3_client.upload(&image, "images/").await {
             Ok(uploaded_file) => uploaded_files.push(uploaded_file.s3_url),
             Err(e) => {
-                return HttpResponse::InternalServerError().json(serde_json::json!({
-                    "status": "fail", "data": e.to_string()
-                }))
+                tracing::error!("Failed to upload image: {:#?}", e);
+                return HttpResponse::InternalServerError().json("Failed to upload image");
             }
         };
     }
 
     tracing::info!("Uploaded files: {:#?}", uploaded_files);
-    HttpResponse::Ok().json(serde_json::json!({
-        "status": "success",
-        "data": uploaded_files
-    }))
+    HttpResponse::Ok().json(uploaded_files)
 }

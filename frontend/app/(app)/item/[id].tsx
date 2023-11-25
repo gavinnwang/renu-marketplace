@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import Colors from "../../../constants/Colors";
 import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
-import { ChatId, Item, User } from "../../../types/types";
+import { Item, User } from "../../../types/types";
 import { FlatList } from "react-native-gesture-handler";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
@@ -53,13 +53,6 @@ export default function ItemPage() {
       ) as Promise<ApiResponse<Item>>,
     queryKey: ["item", itemId],
     enabled: !!itemId,
-    onSuccess(data) {
-      if (data.status === "success") {
-        setItem(data.data);
-      } else {
-        console.error(data);
-      }
-    },
   });
 
   const [seller, setSeller] = useState<User>();
@@ -74,13 +67,13 @@ export default function ItemPage() {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
-      }).then((x) => x.json()) as Promise<ApiResponse<ChatId>>,
+      }).then((x) => x.json()) as Promise<ApiResponse<number>>,
     queryKey: ["chat_item", itemId],
     enabled: !!session && !!itemId,
     onSuccess(data) {
       if (data.status === "success") {
         console.log("set chatid", data.data);
-        setChatId(data.data.chat_id);
+        setChatId(data.data);
       } else {
         console.error(data);
       }

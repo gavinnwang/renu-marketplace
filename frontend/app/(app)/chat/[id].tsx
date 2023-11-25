@@ -12,7 +12,7 @@ import Colors from "../../../constants/Colors";
 import React, { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiResponse } from "../../../types/api";
-import { ChatId, ChatMessage, Item } from "../../../types/types";
+import { ChatMessage, Item } from "../../../types/types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
@@ -52,13 +52,13 @@ export default function ChatScreen() {
       }).then((x) => {
         console.log("fetching chat id because not given in param");
         return x.json();
-      }) as Promise<ApiResponse<ChatId>>,
+      }) as Promise<ApiResponse<number>>,
     queryKey: ["chat_id", itemId],
     enabled: !!itemId && !chatIdParam && !!session?.token && !newChat,
     onSuccess(data) {
       if (data.status === "success") {
-        if (data.data.chat_id) {
-          setChatId(data.data.chat_id);
+        if (data.data) {
+          setChatId(data.data);
         } else {
           console.log("new chat as this chat doesn't exist");
         }
@@ -303,9 +303,9 @@ export default function ChatScreen() {
                     }
                   ).then((x) => {
                     x.json()
-                      .then((data: ApiResponse<ChatId>) => {
+                      .then((data: ApiResponse<number>) => {
                         if (data.status === "success") {
-                          sendMessage(`/join ${data.data.chat_id}`);
+                          sendMessage(`/join ${data.data}`);
                           console.log("JOINING CHAT ID AFTER CREATING");
                           // console.log("sending message")
                           // sendMessage(
@@ -329,7 +329,7 @@ export default function ChatScreen() {
                             } as ChatMessage,
                           ]);
                           setOffset(1);
-                          setChatId(data.data.chat_id);
+                          setChatId(data.data);
                           console.log("invalidating:", ["chats", sellOrBuy]);
                           queryClient.invalidateQueries(["chats", sellOrBuy]);
                         } else {

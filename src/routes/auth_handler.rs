@@ -13,40 +13,37 @@ use crate::{
         jwt::{AuthenticationGuard, TokenClaims},
     },
     config::Config,
-    model::user_model::NewUser,
+    // model::user_model::NewUser,
     repository::user_repository,
 };
 
+#[tracing::instrument(skip(config, pool))]
 #[get("/callback")]
 async fn google_oauth_handler(
     query: web::Query<QueryCode>,
     config: web::Data<Config>,
     pool: web::Data<PgPool>,
 ) -> impl Responder {
-    tracing::info!("query: {:#?}\n", query);
     let code = &query.code;
     let state = &query.state;
 
-    tracing::info!("Api: code = {}\n", code);
-
     if code.is_empty() {
-        return HttpResponse::Unauthorized().json(
-            serde_json::json!({"status": "fail", "data": "Authorization code not provided!"}),
-        );
+        tracing::error!("Google OAuth: Authorization code not provided!");
+        return HttpResponse::Unauthorized().json("Authorization code not provided!");
     }
 
     if state.is_empty() {
-        return HttpResponse::Unauthorized()
-            .json(serde_json::json!({"status": "fail", "data": "State not provided!"}));
+        tracing::error!("Google OAuth: State not provided!");
+        return HttpResponse::Unauthorized().json("State not provided!");
     }
 
     let token_response = request_token(code.as_str(), &config).await;
 
     let token_response = match token_response {
         Err(message) => {
-            let message = message.to_string();
+            tracing::error!("Failed to request token from Google OAuth {}", message);
             return HttpResponse::BadGateway()
-                .json(serde_json::json!({"status": "fail", "data": message}));
+                .json("Failed to request token from Google OAuth API");
         }
         Ok(token_response) => token_response,
     };
@@ -55,8 +52,7 @@ async fn google_oauth_handler(
         match get_google_user(&token_response.access_token, &token_response.id_token).await {
             Err(message) => {
                 let message = message.to_string();
-                return HttpResponse::BadGateway()
-                    .json(serde_json::json!({"status": "fail", "data": message}));
+                return HttpResponse::BadGateway().json(message);
             }
             Ok(google_user) => google_user,
         };
@@ -65,11 +61,11 @@ async fn google_oauth_handler(
 
     // if !google_user.email.ends_with("northwestern.edu") {
     //     tracing::warn!(
-    //         "API: User email is not northwestern edu email: {}\n",
+    //         "User email is not northwestern edu email: {}\n",
     //         google_user.email
     //     );
 
-    //     return HttpResponse::InternalServerError().json(serde_json::json!({"status": "fail", "data": "User email is not northwestern.edu email"}));
+    //     return HttpResponse::InternalServerError().json("User email is not northwestern.edu email"}));
     // }
 
     let user_id =
@@ -80,40 +76,31 @@ async fn google_oauth_handler(
             crate::error::DbError::NotFound => {
                 // if user doesn't exist, create new user
                 tracing::info!(
-                    "API: User with email {} not found, creating new user\n",
+                    "User with email {} not found, creating new user",
                     google_user.email
                 );
-                let user_id = user_repository::add_user(
-                    pool.as_ref(),
-                    &NewUser {
-                        name: google_user.name.clone(),
-                        email: google_user.email.clone(),
-                    },
-                )
-                .await;
+                let user_id =
+                    user_repository::add_user(pool.as_ref(), &google_user.name, &google_user.email)
+                        .await;
                 match user_id {
                     Err(err) => {
-                        let err_msg = err.to_string();
-                        tracing::error!("Failed to add user: {}", err_msg);
-                        return HttpResponse::InternalServerError()
-                            .json(serde_json::json!({"status": "fail", "data": err_msg}));
+                        tracing::error!("Failed to add user: {err}");
+                        return HttpResponse::InternalServerError().json("Failed to add user");
                     }
                     Ok(user_id) => user_id,
                 }
             }
 
             _ => {
-                // if error, return error
-                let err_msg = err.to_string();
-                tracing::error!("Failed to fetch user: {}", err_msg);
+                tracing::error!("Failed to fetch user id by email: {err}");
                 return HttpResponse::InternalServerError()
-                    .json(serde_json::json!({"status": "fail", "data": err_msg}));
+                    .json("Failed to fetch user id by email");
             }
         },
         Ok(user_id) => user_id,
     };
 
-    tracing::info!("API: User id authenticating: {}\n", user_id);
+    tracing::info!("generating jwt token for user with id {}", user_id);
 
     let jwt_secret = config.jwt_secret.to_owned();
     let now = Utc::now();
@@ -131,10 +118,9 @@ async fn google_oauth_handler(
         &EncodingKey::from_secret(jwt_secret.as_ref()),
     ) {
         Err(err) => {
-            let err_msg = err.to_string();
-            tracing::error!("Failed to encode token: {}", err_msg);
+            tracing::error!("Failed to encode token: {err}");
             return HttpResponse::BadGateway()
-                .json(serde_json::json!({"status": "fail", "data": err_msg}));
+                .json("Failed to encode token, please try again later");
         }
         Ok(token) => token,
     };
@@ -150,15 +136,15 @@ async fn google_oauth_handler(
         "{state}?email={}&name={}&token={}&user_id={}",
         google_user.email, google_user.name, token, user_id
     );
-    tracing::info!("API: Redirecting to {}\n", redirect_url);
+    tracing::info!("Redirecting to {}\n", redirect_url);
     response.append_header((LOCATION, redirect_url));
-    // response.cookie(cookie);
     response.finish()
 }
 
+#[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
 #[get("/logout")]
-async fn logout_handler(auth_gaurd: AuthenticationGuard) -> impl Responder {
-    tracing::info!("API: User with id {} logging out\n", auth_gaurd.user_id);
+async fn logout_handler(auth_guard: AuthenticationGuard) -> impl Responder {
+    tracing::info!("User logged out");
     let cookie = Cookie::build("token", "")
         .path("/")
         .max_age(ActixWebDuration::new(-1, 0))
@@ -167,5 +153,5 @@ async fn logout_handler(auth_gaurd: AuthenticationGuard) -> impl Responder {
 
     HttpResponse::Ok()
         .cookie(cookie)
-        .json(serde_json::json!({"status": "success"}))
+        .json("Successfully logged out")
 }

@@ -1,9 +1,11 @@
+import { GOOGLE_OAUTH_CLIENT_ID, REDIRECT_URL } from "../api";
+
 export const getGoogleUrl = (from: string) => {
   const rootUrl = `https://accounts.google.com/o/oauth2/v2/auth`;
 
   const options = {
-    redirect_uri: process.env.EXPO_PUBLIC_GOOGLE_OAUTH_REDIRECT_URL as string,
-    client_id: process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID as string,
+    redirect_uri: REDIRECT_URL,
+    client_id: GOOGLE_OAUTH_CLIENT_ID,
     access_type: "offline",
     response_type: "code",
     prompt: "consent",

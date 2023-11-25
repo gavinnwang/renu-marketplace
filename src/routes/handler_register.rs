@@ -2,10 +2,8 @@ use actix_web::web;
 
 use super::auth_handler::google_oauth_handler;
 use super::auth_handler::logout_handler;
-use super::health_handler::health_check_handler;
 
 pub fn handlers(conf: &mut web::ServiceConfig) {
-    conf.service(health_check_handler);
     conf.service(super::health_handler::index_handler);
 
     conf.service(
@@ -41,8 +39,7 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::chat_handler::get_chat_groups_by_buyer_id)
             .service(super::chat_handler::get_chat_messages_by_chat_id)
             .service(super::chat_handler::get_chat_id_by_item_id)
-            // .service(super::chat_handler::get_chat_window_by_chat_id)
-            .service(super::chat_handler::post_chat_message)
+            // .service(super::chat_handler::post_chat_message)
             .service(super::chat_handler::post_chat_room_and_send_first_message),
     );
 

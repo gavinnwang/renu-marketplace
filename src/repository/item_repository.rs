@@ -5,7 +5,7 @@ use crate::{
     error::DbError,
     model::item_model::{Category, Item, ItemStatus},
 };
-
+ 
 pub async fn fetch_items_by_status(
     status: ItemStatus,
     limit: i32,
@@ -194,7 +194,7 @@ pub async fn insert_item(
     name: String,
     price: f64,
     category: Category,
-    description: String,
+    description: Option<String>,
     images: Vec<String>,
     conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<i32, DbError> {

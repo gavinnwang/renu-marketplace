@@ -1,5 +1,5 @@
-use actix_web::ResponseError;
-use reqwest::StatusCode;
+// use actix_web::ResponseError;
+// use reqwest::StatusCode;
 use sqlx::postgres::PgDatabaseError;
 use thiserror::Error;
 
@@ -16,24 +16,24 @@ pub enum DbError {
     #[error("could not connect to database")]
     ConnectionError,
     /// Connection error.
-    #[error("mysql error: {0}")]
+    #[error("postgres error: {0}")]
     PgDatabaseError(Box<PgDatabaseError>),
     /// Other error.
     #[error("{0}")]
     Other(sqlx::Error),
 }
 
-impl ResponseError for DbError {
-    fn status_code(&self) -> actix_http::StatusCode {
-        match self {
-            DbError::NotFound => StatusCode::NOT_FOUND,
-            DbError::Conflict => StatusCode::CONFLICT,
-            DbError::ConnectionError => StatusCode::INTERNAL_SERVER_ERROR,
-            DbError::PgDatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            DbError::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        }
-    }
-}
+// impl ResponseError for DbError {
+//     fn status_code(&self) -> actix_http::StatusCode {
+//         match self {
+//             DbError::NotFound => StatusCode::NOT_FOUND,
+//             DbError::Conflict => StatusCode::CONFLICT,
+//             DbError::ConnectionError => StatusCode::INTERNAL_SERVER_ERROR,
+//             DbError::PgDatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+//             DbError::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
+//         }
+//     }
+// }
 
 impl From<sqlx::Error> for DbError {
     fn from(error: sqlx::Error) -> Self {
@@ -41,9 +41,9 @@ impl From<sqlx::Error> for DbError {
             sqlx::Error::RowNotFound => DbError::NotFound,
             sqlx::Error::Io(_) => DbError::ConnectionError,
             sqlx::Error::Database(e) => {
-                let mysql_error = e.try_downcast::<PgDatabaseError>();
-                match mysql_error {
-                    Ok(mysql_error) => DbError::PgDatabaseError(mysql_error),
+                let postgres_error = e.try_downcast::<PgDatabaseError>();
+                match postgres_error {
+                    Ok(postgres_error) => DbError::PgDatabaseError(postgres_error),
                     Err(e) => DbError::Other(sqlx::Error::Database(e)),
                 }
             }

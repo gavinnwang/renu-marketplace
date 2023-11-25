@@ -51,8 +51,7 @@ pub async fn request_token(
         Ok(oauth_response)
     } else {
         tracing::error!("Error requesting token: {}", response.text().await?);
-        let message = "An error occurred while trying to retrieve access token.";
-        Err(From::from(message))
+        Err("An error occurred while trying to retrieve access token.".into())
     }
 }
 
@@ -72,7 +71,7 @@ pub async fn get_google_user(
         let user_info = response.json::<GoogleUserResult>().await?;
         Ok(user_info)
     } else {
-        let message = "An error occurred while trying to retrieve user information.";
-        Err(From::from(message))
+        tracing::error!("Error requesting user information: {}", response.text().await?);
+        Err("An error occurred while trying to retrieve user information.".into())
     }
 }

@@ -10,6 +10,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
 #[get("/me")]
 async fn get_me_handler(
     auth_guard: AuthenticationGuard,
@@ -20,44 +21,34 @@ async fn get_me_handler(
 
     match user {
         Err(err) => {
-            tracing::error!(
-                "API: Failed to fetch user with id: {} with error message {}",
-                user_id,
-                err
-            );
-            HttpResponse::NotFound()
-                .json(serde_json::json!({"status": "fail", "data": "User not found"}))
+            tracing::error!("Failed to fetch user {err}");
+            HttpResponse::NotFound().json("User not found")
         }
-        Ok(user) => {
-            tracing::info!("API: User with id {} successfully fetched", user_id);
-            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": user}))
-        }
+        Ok(user) => HttpResponse::Ok().json(user),
     }
 }
 
+#[tracing::instrument(skip(pool))]
 #[get("/{id}")]
 async fn get_user_by_id_handler(path: web::Path<i32>, pool: web::Data<PgPool>) -> impl Responder {
     let user_id = path.into_inner();
     let user = user_repository::fetch_user_by_id(pool.as_ref(), user_id).await;
 
     match user {
-        Err(_) => {
-            tracing::error!("API: Failed to fetch user with id: {}", user_id);
-            HttpResponse::NotFound()
-                .json(serde_json::json!({"status": "fail", "data": "User not found"}))
+        Err(err) => {
+            tracing::error!("Failed to fetch user {err}");
+            HttpResponse::NotFound().json("User not found")
         }
-        Ok(user) => {
-            tracing::info!("API: User with id {} successfully fetched", user_id);
-            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": user}))
-        }
+        Ok(user) => HttpResponse::Ok().json(user),
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Debug)]
 struct StatusQuery {
     status: String,
 }
 
+#[tracing::instrument(skip(pool))]
 #[get("/{id}/items")]
 async fn get_items_by_user_id_and_status_handler(
     path: web::Path<i32>,
@@ -67,13 +58,9 @@ async fn get_items_by_user_id_and_status_handler(
     let user_id = path.into_inner();
 
     match user_repository::fetch_user_by_id(pool.as_ref(), user_id).await {
-        Err(_) => {
-            tracing::error!(
-                "API: Failed to fetch user with id: {} when getting items by user id",
-                user_id
-            );
-            return HttpResponse::NotFound()
-                .json(serde_json::json!({"status": "fail", "data": "User not found"}));
+        Err(err) => {
+            tracing::error!("Failed to fetch user {err}");
+            return HttpResponse::NotFound().json("User not found");
         }
         Ok(_) => {}
     }
@@ -83,9 +70,7 @@ async fn get_items_by_user_id_and_status_handler(
             let status = match ItemStatus::from_str(&query.status) {
                 Ok(status) => status,
                 Err(_) => {
-                    return HttpResponse::BadRequest().json(
-                        serde_json::json!({"status": "fail", "data": "API: Invalid status"}),
-                    )
+                    return HttpResponse::BadRequest().json("Invalid status");
                 }
             };
 
@@ -95,18 +80,15 @@ async fn get_items_by_user_id_and_status_handler(
     };
 
     match items {
-        Ok(items) => {
-            tracing::info!("API: Items with user_id {} successfully fetched", user_id);
-            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
-        }
-        Err(_) => {
-            tracing::error!("API: Failed to fetch items with user_id {}", user_id);
-            HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
+        Ok(items) => HttpResponse::Ok().json(items),
+        Err(err) => {
+            tracing::error!("Failed to fetch items: {err}");
+            HttpResponse::InternalServerError().json("Something went wrong")
         }
     }
 }
 
+#[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
 #[get("/me/items")]
 async fn get_items_by_me_by_status_handler(
     auth_guard: AuthenticationGuard,
@@ -119,11 +101,7 @@ async fn get_items_by_me_by_status_handler(
         Some(query) => {
             let status = match ItemStatus::from_str(&query.status) {
                 Ok(status) => status,
-                Err(_) => {
-                    return HttpResponse::BadRequest().json(
-                        serde_json::json!({"status": "fail", "data": "API: Invalid status"}),
-                    )
-                }
+                Err(_) => return HttpResponse::BadRequest().json("Invalid status"),
             };
 
             item_repository::fetch_items_by_user_id_and_status(user_id, status, pool.as_ref()).await
@@ -133,13 +111,11 @@ async fn get_items_by_me_by_status_handler(
 
     match items {
         Ok(items) => {
-            tracing::info!("API: Items with user_id {} successfully fetched", user_id);
-            HttpResponse::Ok().json(serde_json::json!({"status": "success", "data": items}))
+            HttpResponse::Ok().json(items)
         }
-        Err(_) => {
-            tracing::error!("API: Failed to fetch items with  user id {}", user_id);
-            HttpResponse::InternalServerError()
-                .json(serde_json::json!({"status": "fail", "data": "API: Something went wrong"}))
+        Err(err) => {
+            tracing::error!("Failed to fetch items: {err}");
+            HttpResponse::InternalServerError().json("Something went wrong")
         }
     }
 }

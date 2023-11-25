@@ -72,4 +72,3 @@ export type ChatMessage = {
   from_me: number;
 };
 
-export type ChatId = { chat_id: number };

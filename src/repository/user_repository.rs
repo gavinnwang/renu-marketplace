@@ -1,23 +1,22 @@
 use sqlx::{Executor, Postgres};
 
-use crate::{
-    error::DbError,
-    model::user_model::{NewUser, PartialUser},
-};
+use crate::{error::DbError, model::user_model::User};
 
 pub async fn fetch_user_by_id(
     conn: impl Executor<'_, Database = Postgres>,
     id: i32,
-) -> Result<PartialUser, DbError> {
-    let user = sqlx::query!(
+) -> Result<User, DbError> {
+    let user = sqlx::query_as!(
+        User,
         r#"SELECT 
             u.id, 
             u.name, 
             u.email, 
             u.profile_image,
-            COUNT(*) FILTER (WHERE i.status = 'active') AS active_listing_count,
-            COUNT(*) FILTER (WHERE i.status = 'inactive') AS sales_done_count
-                FROM "user" u
+            u.role::TEXT AS "role!",
+            u.created_at, 
+            u.updated_at
+        FROM "user" u
         LEFT JOIN "item" i ON u.id = i.user_id
         WHERE u.id = $1
         GROUP BY u.id;"#,
@@ -26,14 +25,14 @@ pub async fn fetch_user_by_id(
     .fetch_one(conn)
     .await?;
 
-    let user = PartialUser {
-        id: user.id as i32,
-        name: user.name,
-        email: user.email,
-        profile_image: user.profile_image,
-        active_listing_count: user.active_listing_count.unwrap_or(0),
-        sales_done_count: user.sales_done_count.unwrap_or(0),
-    };
+    // let user = PartialUser {
+    //     id: user.id as i32,
+    //     name: user.name,
+    //     email: user.email,
+    //     profile_image: user.profile_image,
+    //     active_listing_count: user.active_listing_count.unwrap_or(0),
+    //     sales_done_count: user.sales_done_count.unwrap_or(0),
+    // };
 
     Ok(user)
 }
@@ -51,17 +50,13 @@ pub async fn fetch_user_id_by_email(
 
 pub async fn add_user(
     conn: impl Executor<'_, Database = Postgres>,
-    new_user: &NewUser,
+    name: &String,
+    email: &String,
 ) -> Result<i32, DbError> {
-    tracing::info!(
-        "User repository: Adding user with name {}\n",
-        &new_user.name
-    );
-
     let record = sqlx::query!(
         r#"INSERT INTO "user" (name, email) VALUES ($1, $2) RETURNING id"#,
-        new_user.name,
-        new_user.email,
+        name,
+        email,
     )
     .fetch_one(conn)
     .await?;

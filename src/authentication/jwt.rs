@@ -24,7 +24,8 @@ pub struct AuthenticationGuard {
 
 impl FromRequest for AuthenticationGuard {
     type Error = ActixWebError;
-    // type Future = Ready<Result<Self, Self::Error>>;
+    // type Future = dyn Future<Output = Result<Self, Self::Error>>;
+
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
@@ -45,10 +46,10 @@ impl FromRequest for AuthenticationGuard {
 
         let token = match token {
             Some(token) if token.len() < 7 => {
-                tracing::error!("Auth gaurd error: token too short");
+                tracing::error!("Auth guar error: token too short");
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "data": "Invalid token: token too short"}),
+                        json!("Invalid token: token too short"),
                     ))
                 });
             }
@@ -57,7 +58,7 @@ impl FromRequest for AuthenticationGuard {
                 tracing::warn!("Auth guard error: User token not found.");
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "data": "You are not logged in. Please provide a token"}),
+                        json!("You are not logged in. Please provide a token"),
                     ))
                 });
             }
@@ -69,7 +70,7 @@ impl FromRequest for AuthenticationGuard {
                 tracing::error!("Internal Server error: JWT secret not found");
                 return Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "data": "Internal Server error: JWT secret not found"}),
+                        json!("Internal Server error: JWT secret not found"),
                     ))
                 });
             }
@@ -80,31 +81,10 @@ impl FromRequest for AuthenticationGuard {
             &DecodingKey::from_secret(jwt_secret.as_ref()),
             &Validation::new(Algorithm::HS256),
         );
-
-        // let pool = match req.app_data::<web::Data<DbPool>>() {
-        //     Some(pool) => pool.clone(),
-        //     None => {
-        //         tracing::error!("Internal Server error: Database connection failed");
-        //         return Box::pin(async {
-        //             Err(ErrorUnauthorized(
-        //                 json!({"status": "fail", "data": "Internal Server error: Database connection failed"}),
-        //             ))
-        //         });
-        //     }
-        // };
-
+        
         match decode {
             Ok(decoded_token) => {
-                // let user_id = decoded_token.claims.sub.clone();
                 Box::pin(async move {
-                    // let user_result =
-                    //     user_repository::fetch_user_by_id(pool.as_ref(), user_id).await;
-
-                    // if user_result.is_err() {
-                    //     return Err(ErrorUnauthorized(
-                    //         json!({"status": "fail", "data": "User belonging to this token no longer exists"}),
-                    //     ));
-                    // };
 
                     let user_id = decoded_token.claims.sub;
                     Ok(AuthenticationGuard { user_id })
@@ -114,7 +94,7 @@ impl FromRequest for AuthenticationGuard {
                 tracing::error!("token decoding error: {:?}", err);
                 Box::pin(async {
                     Err(ErrorUnauthorized(
-                        json!({"status": "fail", "data": "Invalid token or user doesn't exist"}),
+                        json!("Invalid token or user doesn't exist"),
                     ))
                 })
             }
