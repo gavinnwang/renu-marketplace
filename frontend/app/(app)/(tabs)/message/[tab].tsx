@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useSession } from "../../../../hooks/useSession";
 import { getChatGroups } from "../../../../api";
+import { FlashList } from "@shopify/flash-list";
 
 const TABS = ["Buy", "Sell"];
 const data = TABS.map((i) => ({
@@ -66,19 +67,20 @@ export default function MessageScreen() {
           </Pressable>
         </>
       ) : (
-        <FlatList
+        <FlashList
           data={chats}
-          renderItem={({ item }) => <ChatRow chat={item} />}
+          renderItem={ChatRow}
           keyExtractor={(item) => item.chat_id.toString()}
           onRefresh={() => refetch()}
           refreshing={isLoadingChats}
+          estimatedItemSize={chats.length}
         />
       )}
     </View>
   );
 }
 
-const ChatRow = ({ chat }: { chat: ChatGroup }) => {
+const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
   const param = useLocalSearchParams();
   const selectedTabInt = parseInt(param.tab as string);

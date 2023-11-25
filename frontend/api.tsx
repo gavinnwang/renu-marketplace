@@ -1,13 +1,13 @@
 import { ChatGroup, Item, User } from "./types";
 
-const API_URL = "https://api.gavinwang.dev";
+export const API_URL = "https://api.gavinwang.dev";
 
 export const REDIRECT_URL = "https://api.gavinwang.dev/auth/callback";
 
 export const GOOGLE_OAUTH_CLIENT_ID =
   "479411838275-kpsk3vagvubv429vnhu85hsviahv8ed7.apps.googleusercontent.com";
 
-async function parseOrThrowResponse<T>(res: Response): Promise<T> {
+export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     try {
       const errMsg = await res.json();
@@ -80,3 +80,4 @@ export async function getItem(itemId: string): Promise<Item> {
   const res = await fetch(`${API_URL}/items/${itemId}`);
   return parseOrThrowResponse<Item>(res);
 }
+

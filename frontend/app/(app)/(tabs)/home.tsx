@@ -1,21 +1,15 @@
-import {
-  Animated,
-  FlatList,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
-import { useQuery } from "@tanstack/react-query";
+import { Animated, Pressable, ScrollView, Text, View } from "react-native";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useState } from "react";
-import { ApiResponse } from "../../../types/api";
 import { ItemListing } from "../../../components/ItemListing";
 import { LogoWithText } from "../../../components/Logo";
-import { Item, Measure, RefAndKey } from "../../../types";
+import { Item, Measure } from "../../../types";
 import React from "react";
 import Colors from "../../../constants/Colors";
 import PagerView from "react-native-pager-view";
+import { API_URL, parseOrThrowResponse } from "../../../api";
+import { FlashList } from "@shopify/flash-list";
 
 export const CATEGORIES: Record<string, string> = {
   all: "All",
@@ -105,51 +99,52 @@ const CategoryView = ({
   index: number;
   selectedSection: number;
 }) => {
-  const [offset, setOffset] = React.useState(0);
-  const limit = 8;
-  const [endReached, setEndReached] = React.useState(false);
-  const [items, setItems] = React.useState<Item[]>([]);
-  const [isErrorAPI, setIsErrorAPI] = React.useState(false);
+  // async function getItemsByCategory({
+  //   pageParam = 0,
+  // }: {
+  //   pageParam: number;
+  // }): Promise<Item[]> {
+  //   console.log("fetching with pageParam", pageParam);
+  //   const res = await fetch(
+  //     `${API_URL}/items/?category=${category}&limit=${pageParam}`
+  //   );
+  //   return await parseOrThrowResponse<Item[]>(res);
+  // }
+  const getItemsByCategory = async ({ pageParam = 0 }) => {
+    console.log("fetching with pageParam and category", pageParam, category);
+    const res = await fetch(
+      `${API_URL}/items/?category=${category}&offset=${pageParam}&limit=6`
+    );
+    return parseOrThrowResponse<Item[]>(res);
+  }
+
+
+  // const [offset, setOffset] = React.useState(0);
+  // const limit = 8;
+  // const [endReached, setEndReached] = React.useState(false);
+  // const [items, setItems] = React.useState<Item[]>([]);
+  // const [isErrorAPI, setIsErrorAPI] = React.useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const {
+    data: items,
     isLoading: isLoadingItems,
-    isError: isErrorFetch,
+    isError: isErrorItems,
     refetch: refetchItems,
-  } = useQuery({
-    queryFn: async () =>
-      fetch(
-        `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/?category=${category}&offset=${offset}&limit=${limit}`
-      ).then((x) => x.json()) as Promise<ApiResponse<Item[]>>,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryFn: getItemsByCategory,
     queryKey: ["item", category],
-    enabled: !endReached && Math.abs(selectedSection - index) < 2,
-    onSuccess: (data) => {
-      if (data.status === "success") {
-        console.log(
-          "fetching category",
-          category,
-          " at offset ",
-          offset,
-          " at limit ",
-          limit
-        );
-        if (data.data.length < limit) {
-          console.log("end reached");
-          setEndReached(true);
-        }
-        setItems((prev) => [...prev, ...data.data]);
-        setOffset((prev) => prev + data.data.length);
-      } else {
-        console.error(data.data);
-        setIsErrorAPI(true);
-      }
-    },
+    enabled: Math.abs(selectedSection - index) <= 1,
+
   });
 
   return (
     <View key={index} className="h-full flex flex-grow">
-      {isLoadingItems || refreshing ? (
-        <View className="bg-grayLight h-full w-full" />
-      ) : isErrorFetch || isErrorAPI ? (
+      {isLoadingItems ? (
+        <View className="bg-grayLight h-full w-full">
+          <Text>loading</Text>
+        </View>
+      ) : isErrorItems ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
           refreshControl={
@@ -164,11 +159,12 @@ const CategoryView = ({
           <View className="flex flex-col gap-y-2 items-center">
             <LogoWithText />
             <Text className="font-Poppins_600SemiBold text-lg">
-              Something went wrong. 
+              Something went wrong.
             </Text>
           </View>
         </ScrollView>
-      ) : !refreshing && items.length === 0 ? (
+      ) : items.pages[items.pages.length ? items.pages.length - 1 : 0]
+          .length === 0 ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
           refreshControl={
@@ -188,39 +184,30 @@ const CategoryView = ({
           </View>
         </ScrollView>
       ) : (
-        <FlatList
+        <FlashList
           className="bg-grayLight h-full"
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => {
-                setItems([]);
-                setOffset(0);
-                setEndReached(false);
-                setRefreshing(true);
                 refetchItems();
               }}
             />
           }
-          data={items}
+          data={items.pages.flatMap((page) => page)}
           numColumns={2}
-          columnWrapperStyle={{
-            justifyContent: "flex-start",
-            marginTop: 12,
-            paddingHorizontal: 10,
-          }}
           contentContainerStyle={{
             paddingBottom: 10,
+            paddingTop: 10,
+            paddingLeft: 10,
           }}
-          keyExtractor={(item) => `${selectedSection}-${item.id}`}
+          keyExtractor={(_, index) => index.toString()}
           renderItem={ItemListing}
           onEndReached={() => {
-            if (!endReached && !isLoadingItems) {
-              console.log("fetching more items");
-              refetchItems();
-            }
+            fetchNextPage();
           }}
+          estimatedItemSize={200}
         />
       )}
     </View>

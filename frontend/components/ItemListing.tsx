@@ -10,12 +10,12 @@ dayjs.extend(relativeTime);
 const horizontalGapPx = 10;
 const imageWidth = (Dimensions.get("window").width - horizontalGapPx * 3) / 2;
 
-export function ItemListing(props: { item: Item }) {
-  // console.log(props.item);
+export function ItemListing({ item, index}: { item: Item, index: number }) {
+  // console.log(item);
   return (
     <Link
-      href={`/item/${props.item.id}`}
-      className="flex flex-col px-[5px] shadow-sm"
+      href={`/item/${item.id}`}
+      className="flex flex-col px-[5px] shadow-sm pt-3"
     >
       <View className="flex flex-col">
         <Image
@@ -24,7 +24,7 @@ export function ItemListing(props: { item: Item }) {
             duration: 150,
           }}
           placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
-          source={{ uri: props.item.images[0] }}
+          source={{ uri: item.images[0] }}
           className="object-cover rounded-t"
           style={{
             width: imageWidth,
@@ -34,13 +34,13 @@ export function ItemListing(props: { item: Item }) {
         />
         <View className="h-fit py-2 px-2.5 bg-white rounded-b flex flex-col">
           <Text className="font-Manrope_600SemiBold text-base">
-            {props.item.name}
+            {item.name}
           </Text>
           <Text className="font-Manrope_500Medium text-xs">
-            {dayjs(props.item.created_at).fromNow()}
+            {dayjs(item.created_at).fromNow()}
           </Text>
           <Text className="text-purplePrimary font-Manrope_600SemiBold text-xl">
-            ${props.item.price}
+            ${item.price}
           </Text>
         </View>
       </View>

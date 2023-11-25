@@ -11,8 +11,8 @@ use crate::{
 #[derive(Deserialize, Debug, Default)]
 pub struct GetItemQuery {
     pub category: Option<String>,
-    pub offset: Option<i32>,
-    pub limit: Option<i32>,
+    pub offset: i32,
+    // pub limit: Option<i32>,
 }
 
 #[tracing::instrument(skip(pool))]
@@ -21,8 +21,11 @@ async fn get_items_handler(
     pool: web::Data<PgPool>,
     query: web::Query<GetItemQuery>,
 ) -> impl Responder {
-    let offset = query.offset.unwrap_or(0);
-    let limit = query.limit.unwrap_or(25);
+    // let offset = query.offset.unwrap_or(0);
+    // let limit = query.limit.unwrap_or(25);
+
+    let limit = 4;
+    let offset = query.offset;
 
     let items = match &query.category {
         Some(category) if category == "all" => {
@@ -46,7 +49,7 @@ async fn get_items_handler(
     };
 
     match items {
-        Ok(items) => HttpResponse::Ok().json(items),
+        Ok(items) => HttpResponse::Ok().json(serde_json::json!({ "items": items, "next_offset": offset + limit })),
         Err(err) => {
             tracing::error!("Failed to fetch items: {err}");
             HttpResponse::InternalServerError().json(err.to_string())
@@ -102,7 +105,9 @@ async fn update_item_status_handler(
         Err(err) => {
             tracing::error!("Failed to fetch item by id when checking if user is authorized to update the item: {err}");
             match err {
-                crate::error::DbError::NotFound => return HttpResponse::NotFound().json("Item not found"),
+                crate::error::DbError::NotFound => {
+                    return HttpResponse::NotFound().json("Item not found")
+                }
                 _ => return HttpResponse::InternalServerError().json("Something went wrong"),
             };
         }
@@ -112,8 +117,7 @@ async fn update_item_status_handler(
         Ok(status) => status,
         Err(_) => {
             tracing::error!("Failed to parse status");
-            return HttpResponse::BadRequest()
-                .json("Invalid status");
+            return HttpResponse::BadRequest().json("Invalid status");
         }
     };
 
@@ -152,29 +156,25 @@ async fn post_item_handler(
     let item = data.into_inner();
 
     if item.name.is_empty() {
-        return HttpResponse::BadRequest()
-            .json("Missing item name field");
+        return HttpResponse::BadRequest().json("Missing item name field");
     }
 
     let category = match Category::from_str(&item.category) {
         Ok(category) => category,
         Err(_) => {
             tracing::error!("Failed to parse category");
-            return HttpResponse::BadRequest()
-                .json("Invalid category");
+            return HttpResponse::BadRequest().json("Invalid category");
         }
     };
 
     if item.price <= 0.0 {
         tracing::error!("Invalid price");
-        return HttpResponse::BadRequest()
-            .json("Invalid price");
+        return HttpResponse::BadRequest().json("Invalid price");
     }
 
     if item.images.is_empty() {
         tracing::error!("Missing images");
-        return HttpResponse::BadRequest()
-            .json("Missing images");
+        return HttpResponse::BadRequest().json("Missing images");
     }
 
     let item_price = (item.price * 100.0).round() / 100.0;
@@ -193,13 +193,11 @@ async fn post_item_handler(
     match response {
         Ok(item_id) => {
             tracing::info!("Created item");
-            return HttpResponse::Ok()
-                .json(item_id);
+            return HttpResponse::Ok().json(item_id);
         }
         Err(err) => {
             tracing::error!("Failed to create item: {err}");
-            HttpResponse::InternalServerError()
-                .json("Something went wrong")
+            HttpResponse::InternalServerError().json("Something went wrong")
         }
     }
 }
