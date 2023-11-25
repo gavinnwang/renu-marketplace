@@ -6,12 +6,15 @@ import {
   Pressable,
   FlatList,
 } from "react-native";
-import { Link, router, useLocalSearchParams } from "expo-router";
-import { ChatGroup, Measure, RefAndKey } from "../../../../types/types";
+import { router, useLocalSearchParams } from "expo-router";
+import { ChatGroup, Measure, RefAndKey } from "../../../../types";
 import Colors from "../../../../constants/Colors";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ApiResponse } from "../../../../types/api";
+import dayjs from "dayjs";
+import { Image } from "expo-image";
+import { useSession } from "../../../../hooks/useSession";
+import { getChatGroups } from "../../../../api";
 
 const TABS = ["Buy", "Sell"];
 const data = TABS.map((i) => ({
@@ -26,36 +29,16 @@ export default function MessageScreen() {
 
   const { session } = useSession();
 
-  const [chats, setChats] = React.useState<ChatGroup[] | undefined>(undefined);
   const {
+    data: chats,
     isError: isErrorChats,
     isLoading: isLoadingChats,
     refetch,
   } = useQuery({
     queryFn: async () =>
-      fetch(
-        `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${
-          selectedTabInt ? "seller" : "buyer" // chats with seller or buyer info
-        }`,
-        {
-          headers: {
-            authorization: `Bearer ${session?.token}`,
-          },
-        }
-      ).then((x) => x.json()) as Promise<ApiResponse<ChatGroup[]>>,
+      getChatGroups(session!.token, TABS[selectedTabInt] ? "seller" : "buyer"),
     queryKey: ["chats", TABS[selectedTabInt]],
     enabled: !!session && !!session.token,
-    onError(err) {
-      console.error("error", err);
-    },
-    onSuccess(data) {
-      // console.log(data);
-      if (data.status === "success") {
-        setChats(data.data);
-      } else {
-        console.error(data);
-      }
-    },
   });
 
   return (
@@ -94,10 +77,6 @@ export default function MessageScreen() {
     </View>
   );
 }
-
-import dayjs from "dayjs";
-import { Image } from "expo-image";
-import { useSession } from "../../../../hooks/useSession";
 
 const ChatRow = ({ chat }: { chat: ChatGroup }) => {
   const width = (Dimensions.get("window").width - 200) / 2;

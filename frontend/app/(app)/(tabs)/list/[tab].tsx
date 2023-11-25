@@ -3,17 +3,15 @@ import React from "react";
 import {
   Animated,
   Dimensions,
-  FlatList,
   Pressable,
   RefreshControl,
   Text,
   View,
 } from "react-native";
 import Colors from "../../../../constants/Colors";
-import { Item, Measure, RefAndKey } from "../../../../types/types";
+import { Item, Measure, RefAndKey } from "../../../../types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { ApiResponse } from "../../../../types/api";
 import { Image } from "expo-image";
 
 const TABS = ["Listings", "Sold"];
@@ -32,32 +30,15 @@ export default function ListScreen() {
 
   const { session } = useSession();
 
-  const [items, setItems] = React.useState<Item[]>([]);
-
   const {
+    data: items,
     isError: isErrorItem,
     isLoading: isLoadingItem,
     refetch,
   } = useQuery({
-    queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/me/items`, {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }).then((x) => x.json()) as Promise<ApiResponse<Item[]>>,
     queryKey: ["list"],
+    queryFn: () => getUserMeItems(session!.token),
     enabled: !!session && !!session.token,
-    onError(err) {
-      console.error("error", err);
-    },
-    onSuccess(data) {
-      console.log(data);
-      if (data.status === "success") {
-        setItems(data.data);
-      } else {
-        console.error(data);
-      }
-    },
   });
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -67,7 +48,11 @@ export default function ListScreen() {
       <Text className="ml-2.5 mt-4 font-Poppins_600SemiBold text-xl text-blackPrimary ">
         {tabDisplay}
       </Text>
-      <Tabs data={data} selectedTabInt={selectedTabInt} itemData={items} />
+      <Tabs
+        data={data}
+        selectedTabInt={selectedTabInt}
+        itemData={items ?? []}
+      />
       {isErrorItem ? (
         <View className="flex flex-grow">
           <Text className=" mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
@@ -143,6 +128,7 @@ dayjs.extend(relativeTime);
 import { CATEGORIES } from "../home";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
+import { getUserMeItems } from "../../../../api";
 
 const ListingPageItem = ({
   item,
@@ -241,11 +227,11 @@ const Tab = React.forwardRef(
     {
       selectedTabInt,
       sectionIndex,
-      data,
+      dataCount,
     }: {
       selectedTabInt: number;
       sectionIndex: number;
-      data: Item[];
+      dataCount: number;
     },
     ref: any
   ) => {
@@ -271,12 +257,7 @@ const Tab = React.forwardRef(
           >
             {TABS[sectionIndex]}{" "}
             <Text className="font-Poppins_500Medium text-sm">
-              (
-              {
-                data.filter((item) => item.status === STATUS[sectionIndex])
-                  .length
-              }
-              )
+              ({dataCount})
             </Text>
           </Text>
         </View>
@@ -342,7 +323,9 @@ const Tabs = ({
             selectedTabInt={selectedTabInt}
             sectionIndex={i}
             ref={section.ref}
-            data={itemData}
+            dataCount={
+              itemData.filter((item) => item.status === STATUS[i]).length
+            }
           />
         );
       })}

@@ -11,13 +11,14 @@ import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
 import React, { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ApiResponse } from "../../../types/api";
-import { ChatMessage, Item } from "../../../types/types";
+import { ChatMessage, Item } from "../../../types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../hooks/useSession";
+import { getChatIdFromItemId, getItem } from "../../../api";
+import { parse } from "expo-linking";
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -36,81 +37,35 @@ export default function ChatScreen() {
 
   const [chatId, setChatId] = React.useState<number | undefined>(undefined);
 
-  useEffect(() => {
-    if (chatIdParam) {
-      setChatId(parseInt(chatIdParam as string));
-      console.log("set chat id to param", chatIdParam);
-    }
-  }, [chatIdParam]);
+  // useEffect(() => {
+  //   if (chatIdParam) {
+  //     setChatId(parseInt(chatIdParam as string));
+  //     console.log("set chat id to param", chatIdParam);
+  //   }
+  // }, [chatIdParam]);
 
-  const { isError: isErrorChatId } = useQuery({
-    queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/id/${itemId}`, {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }).then((x) => {
-        console.log("fetching chat id because not given in param");
-        return x.json();
-      }) as Promise<ApiResponse<number>>,
+  const {
+    isSuccess: isSuccessChatId,
+    data: chatIdData,
+    isError: isErrorChatId,
+  } = useQuery({
+    queryFn: async () => getChatIdFromItemId(session!.token, itemId as string),
     queryKey: ["chat_id", itemId],
-    enabled: !!itemId && !chatIdParam && !!session?.token && !newChat,
-    onSuccess(data) {
-      if (data.status === "success") {
-        if (data.data) {
-          setChatId(data.data);
-        } else {
-          console.log("new chat as this chat doesn't exist");
-        }
-      } else {
-        console.error("get chat id error", data);
-      }
-    },
-    onError(err) {
-      console.error("error getting chat id", err);
-    },
+    enabled: !!itemId && !chatIdParam && !!session && !newChat, // run the query if there is no chat id param and is not a new chat
+    placeholderData: parseInt(chatIdParam as string),
   });
+  // useEffect(() => {
+  //   if (!chatIdParam && isSuccessChatId && chatIdData) {
+  //     setChatId(chatIdData);
+  //     console.log("set chat id to data", chatIdData);
+  //   }
+  // }, [isSuccessChatId, chatIdData]);
 
-  const [item, setItem] = React.useState<Item>();
-  useQuery({
-    queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
-        (x) => x.json()
-      ) as Promise<ApiResponse<Item>>,
+  const { data: item, isError: isErrorData } = useQuery({
+    queryFn: () => getItem(itemId as string),
     queryKey: ["item", itemId],
     enabled: !!itemId,
-    onSuccess(data) {
-      if (data.status === "success") {
-        setItem(data.data);
-      } else {
-        console.error(data);
-      }
-    },
-    onError(err) {
-      console.error("error getting item", err);
-    },
   });
-
-  // const [seller, setSeller] = React.useState<User>();
-
-  // useQuery({
-  //   queryFn: async () =>
-  //     fetch(
-  //       `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.user_id}`
-  //     ).then((x) => x.json()) as Promise<ApiResponse<User>>,
-  //   queryKey: ["user", item?.user_id],
-  //   enabled: !!item && !!item.user_id,
-  //   onSuccess(data) {
-  //     if (data.status === "success") {
-  //       setSeller(data.data);
-  //     } else {
-  //       console.error(data);
-  //     }
-  //   },
-  //   onError(err) {
-  //     console.error("error getting user", err);
-  //   },
-  // });
 
   const [offset, setOffset] = React.useState(0);
   const limit = 25;
@@ -125,23 +80,18 @@ export default function ChatScreen() {
             authorization: `Bearer ${session?.token}`,
           },
         }
-      ).then((x) => x.json()) as Promise<ApiResponse<ChatMessage[]>>,
+      ).then((x) => x.json()) as Promise<ChatMessage[]>,
     queryKey: ["messages", chatId],
     enabled: !!chatId && !endReached,
     onSuccess(data) {
-      if (data.status === "success") {
-        // console.log("fetched messages", data.data);
-        if (data.data.length < limit) {
-          console.log("end reached");
-          setEndReached(true);
-        }
-        setChatMessages((prev) => [...prev, ...data.data]);
-        console.log("fetching at offet:", offset);
-        console.log("fetched messages:", data.data.length);
-        setOffset((prev) => prev + data.data.length);
-      } else {
-        console.error(data.data);
+      if (data.length < limit) {
+        console.log("end reached");
+        setEndReached(true);
       }
+      setChatMessages((prev) => [...prev, ...data]);
+      console.log("fetching at offet:", offset);
+      console.log("fetched messages:", data.length);
+      setOffset((prev) => prev + data.length);
     },
     onError(err) {
       console.error("error getting messages", err);
@@ -181,12 +131,6 @@ export default function ChatScreen() {
       setOffset((prev) => prev + 1);
     }
   }, [lastMessage]);
-
-  // React.useEffect(() => {
-  //   if (!chatId) return;
-  //   console.log("joining chat");
-  //   sendMessage(`/join ${chatId}`);
-  // }, [chatId]);
 
   const queryClient = useQueryClient();
 
@@ -285,7 +229,7 @@ export default function ChatScreen() {
               className="px-4 py-2 mx-2 border rounded-full border-gray-400"
               value={inputText}
               onChangeText={setInputText}
-              onSubmitEditing={() => {
+              onSubmitEditing={async () => {
                 if (!inputText.trim()) return;
                 if (!chatId && item) {
                   console.log("no chat id so create one");
@@ -303,38 +247,24 @@ export default function ChatScreen() {
                     }
                   ).then((x) => {
                     x.json()
-                      .then((data: ApiResponse<number>) => {
-                        if (data.status === "success") {
-                          sendMessage(`/join ${data.data}`);
-                          console.log("JOINING CHAT ID AFTER CREATING");
-                          // console.log("sending message")
-                          // sendMessage(
-                          //   `/message ${data.data.chat_id} ${inputText}`
-                          // );
-                          setInputText("");
-                          // console.log("invalidating:", [
-                          //   "messages",
-                          //   data.data.chat_id,
-                          // ]);
-                          // queryClient.invalidateQueries([
-                          //   "messages",
-                          //   data.data.chat_id,
-                          // ]);
-                          setChatMessages([
-                            {
-                              id: 1,
-                              content: inputText,
-                              from_me: 1,
-                              sent_at: new Date(),
-                            } as ChatMessage,
-                          ]);
-                          setOffset(1);
-                          setChatId(data.data);
-                          console.log("invalidating:", ["chats", sellOrBuy]);
-                          queryClient.invalidateQueries(["chats", sellOrBuy]);
-                        } else {
-                          console.error(data);
-                        }
+                      .then((data: number) => {
+                        sendMessage(`/join ${data}`);
+                        console.log("JOINING CHAT ID AFTER CREATING");
+
+                        setInputText("");
+
+                        setChatMessages([
+                          {
+                            id: 1,
+                            content: inputText,
+                            from_me: 1,
+                            sent_at: new Date(),
+                          } as ChatMessage,
+                        ]);
+                        setOffset(1);
+                        setChatId(data);
+                        console.log("invalidating:", ["chats", sellOrBuy]);
+                        queryClient.invalidateQueries(["chats", sellOrBuy]);
                       })
                       .catch((err) => {
                         console.error("parse post messgae", err);

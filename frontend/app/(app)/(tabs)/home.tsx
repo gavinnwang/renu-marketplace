@@ -12,7 +12,7 @@ import { useState } from "react";
 import { ApiResponse } from "../../../types/api";
 import { ItemListing } from "../../../components/ItemListing";
 import { LogoWithText } from "../../../components/Logo";
-import { Item, Measure, RefAndKey } from "../../../types/types";
+import { Item, Measure, RefAndKey } from "../../../types";
 import React from "react";
 import Colors from "../../../constants/Colors";
 import PagerView from "react-native-pager-view";

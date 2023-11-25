@@ -10,9 +10,7 @@ import {
 import Svg, { Path } from "react-native-svg";
 import { useQuery } from "@tanstack/react-query";
 import Colors from "../../../constants/Colors";
-import { ApiResponse } from "../../../types/api";
 import { Image } from "expo-image";
-import { Item, User } from "../../../types/types";
 import { FlatList } from "react-native-gesture-handler";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
@@ -21,6 +19,7 @@ import { CATEGORIES } from "../(tabs)/home";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useSession } from "../../../hooks/useSession";
+import { getChatIdFromItemId, getItem, getUserInfo } from "../../../api";
 dayjs.extend(relativeTime);
 
 const CloseIcon = () => (
@@ -43,57 +42,24 @@ const CloseIcon = () => (
 export default function ItemPage() {
   const param = useLocalSearchParams();
   const itemId = param.id;
+  const { session } = useSession();
 
-  const [item, setItem] = useState<Item>();
-
-  useQuery({
-    queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`).then(
-        (x) => x.json()
-      ) as Promise<ApiResponse<Item>>,
+  const { data: item, isError } = useQuery({
+    queryFn: () => getItem(itemId as string),
     queryKey: ["item", itemId],
     enabled: !!itemId,
   });
 
-  const [seller, setSeller] = useState<User>();
-
-  const { session } = useSession();
-
-  const [chatId, setChatId] = useState<number | undefined>(undefined);
-
-  const { isError: isErrorChatId } = useQuery({
-    queryFn: async () =>
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/id/${itemId}`, {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }).then((x) => x.json()) as Promise<ApiResponse<number>>,
+  const { data: chatId, isError: isErrorChatId } = useQuery({
+    queryFn: () => getChatIdFromItemId(session!.token, itemId as string),
     queryKey: ["chat_item", itemId],
     enabled: !!session && !!itemId,
-    onSuccess(data) {
-      if (data.status === "success") {
-        console.log("set chatid", data.data);
-        setChatId(data.data);
-      } else {
-        console.error(data);
-      }
-    },
   });
 
-  useQuery({
-    queryFn: async () =>
-      fetch(
-        `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${item?.user_id}`
-      ).then((x) => x.json()) as Promise<ApiResponse<User>>,
+  const { data: seller } = useQuery({
+    queryFn: () => getUserInfo(item!.user_id),
     queryKey: ["user", item?.user_id],
     enabled: !!item && !!item.user_id,
-    onSuccess(data) {
-      if (data.status === "success") {
-        setSeller(data.data);
-      } else {
-        console.error("cannot find seller");
-      }
-    },
   });
 
   const [index, setIndex] = useState(0);
@@ -103,7 +69,7 @@ export default function ItemPage() {
 
   return (
     <>
-      <SafeAreaView className="bg-bgLight"></SafeAreaView>
+      <SafeAreaView className="bg-bgLight" />
       <View className="bg-bgLight h-full">
         <Pressable onPress={router.back} className="p-3">
           <CloseIcon />
@@ -296,7 +262,6 @@ export default function ItemPage() {
             </Text> */}
           </>
         )}
-
       </View>
     </>
   );

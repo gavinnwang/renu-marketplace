@@ -3,12 +3,10 @@ import { Pressable, FlatList, Text, View, ScrollView } from "react-native";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
-import { ApiResponse } from "../../../types/api";
-import { Item, User } from "../../../types/types";
 import { ItemListing } from "../../../components/ItemListing";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
-import { getSavedItems, getUserInfo } from "../../../api";
+import { getSavedItems, getUserMeInfo } from "../../../api";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -16,7 +14,7 @@ export default function AccountScreen() {
 
   const { data: user, isError } = useQuery({
     queryKey: ["me"],
-    queryFn: () => getUserInfo(session?.token ?? ""),
+    queryFn: () => getUserMeInfo(session!.token),
     enabled: !!session && !!session.token,
   });
 
@@ -26,7 +24,7 @@ export default function AccountScreen() {
     isLoading: isLoadingSavedItem,
   } = useQuery({
     queryKey: ["savedItems"],
-    queryFn: () => getSavedItems(session?.token ?? ""),
+    queryFn: () => getSavedItems(session!.token),
     enabled: !!session && !!session.token,
   });
 

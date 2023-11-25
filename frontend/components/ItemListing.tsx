@@ -3,7 +3,7 @@ import { Link } from "expo-router";
 
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Image } from "expo-image";
-import { Item } from "../types/types";
+import { Item } from "../types";
 import dayjs from "dayjs";
 dayjs.extend(relativeTime);
 

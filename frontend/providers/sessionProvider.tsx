@@ -5,7 +5,7 @@ import * as SecureStore from "expo-secure-store";
 import "react-native-url-polyfill/auto";
 import { router } from "expo-router";
 
-import { Session } from "../types/types";
+import { Session } from "../types";
 import { AuthContext } from "../context/authContext";
 import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
 
