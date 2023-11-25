@@ -8,28 +8,16 @@ import { Item, User } from "../../../types/types";
 import { ItemListing } from "../../../components/ItemListing";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
+import { getSavedItems, getUserInfo } from "../../../api";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
   console.log(session);
-  const [user, setUser] = useState<User | null>(null);
 
-  const { isError: isErrorUser } = useQuery({
-    queryFn: async () =>
-      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/users/me", {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }).then((x) => x.json()) as Promise<ApiResponse<User>>,
+  const { data: user, isError } = useQuery({
     queryKey: ["me"],
+    queryFn: () => getUserInfo(session?.token ?? ""),
     enabled: !!session && !!session.token,
-    onSuccess: (data) => {
-      if (data.status === "success") {
-        setUser(data.data);
-      } else {
-        console.error(data);
-      }
-    },
   });
 
   const {
@@ -37,17 +25,9 @@ export default function AccountScreen() {
     isError: isErrorSavedItem,
     isLoading: isLoadingSavedItem,
   } = useQuery({
-    queryFn: async () =>
-      fetch(process.env.EXPO_PUBLIC_BACKEND_URL + "/saved/", {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }).then((x) => x.json()) as Promise<ApiResponse<Item[]>>,
-    queryKey: ["saved"],
+    queryKey: ["savedItems"],
+    queryFn: () => getSavedItems(session?.token ?? ""),
     enabled: !!session && !!session.token,
-    onSuccess(data) {
-      console.log(data);
-    },
   });
 
   const [refreshing, _] = useState(false);
@@ -116,18 +96,18 @@ export default function AccountScreen() {
           Saved Items
           <Text className="font-Poppins_500Medium text-sm">
             {" "}
-            ({savedItemData?.data?.length ?? 0})
+            ({savedItemData?.length ?? 0})
           </Text>
         </Text>
 
         <View className="bg-greyLight h-full">
           {isLoadingSavedItem ? (
             <></>
-          ) : isErrorSavedItem || savedItemData.status === "fail" ? (
+          ) : isErrorSavedItem ? (
             <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">
-              Something went wrong...
+              Something went wrong.
             </Text>
-          ) : savedItemData?.data?.length === 0 ? (
+          ) : savedItemData.length === 0 ? (
             <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">
               No items found.
             </Text>
@@ -135,7 +115,7 @@ export default function AccountScreen() {
             <FlatList
               showsVerticalScrollIndicator={false}
               scrollEnabled={false}
-              data={savedItemData?.data}
+              data={savedItemData}
               numColumns={2}
               columnWrapperStyle={{
                 justifyContent: "flex-start",

@@ -77,13 +77,6 @@ export default function HomePage() {
         ref={pagerViewRef}
         onPageScroll={(e) => {
           const idx = e.nativeEvent.position;
-          // const section = data[idx].value;
-          // if (section === selectedSection) {
-          //   return;
-          // }
-          // console.log("onPageScroll", idx);
-          // setCurrentPage(idx);
-          // void router.replace(`/home/${section}`);
           setSelectedSection(idx);
         }}
         className="flex-1"
@@ -171,7 +164,7 @@ const CategoryView = ({
           <View className="flex flex-col gap-y-2 items-center">
             <LogoWithText />
             <Text className="font-Poppins_600SemiBold text-lg">
-              Something went wrong. Please try again later.
+              Something went wrong. 
             </Text>
           </View>
         </ScrollView>

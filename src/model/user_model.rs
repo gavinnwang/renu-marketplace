@@ -12,6 +12,8 @@ pub struct User {
     pub profile_image: Option<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub active_listing_count: i64,
+    pub sales_done_count: i64,
 }
 
 // #[derive(Debug, Deserialize, Serialize)]

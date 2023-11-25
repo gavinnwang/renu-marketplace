@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT \n            u.id, \n            u.name, \n            u.email, \n            u.profile_image,\n            u.role::TEXT AS \"role!\",\n            u.created_at, \n            u.updated_at\n        FROM \"user\" u\n        LEFT JOIN \"item\" i ON u.id = i.user_id\n        WHERE u.id = $1\n        GROUP BY u.id;",
+  "query": "SELECT \n            u.id, \n            u.name, \n            u.email, \n            u.profile_image,\n            u.role::TEXT AS \"role!\",\n            u.created_at, \n            u.updated_at,\n            COUNT(*) FILTER (WHERE i.status = 'active') AS \"active_listing_count!\",\n            COUNT(*) FILTER (WHERE i.status = 'inactive') AS \"sales_done_count!\"\n        FROM \"user\" u\n        LEFT JOIN \"item\" i ON u.id = i.user_id\n        WHERE u.id = $1\n        GROUP BY u.id;",
   "describe": {
     "columns": [
       {
@@ -37,6 +37,16 @@
         "ordinal": 6,
         "name": "updated_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "active_listing_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "sales_done_count!",
+        "type_info": "Int8"
       }
     ],
     "parameters": {
@@ -51,8 +61,10 @@
       true,
       null,
       false,
-      false
+      false,
+      null,
+      null
     ]
   },
-  "hash": "f841b0785e67ee21b1075331b0b877a7fe61d88d76eed6cd47fb437ec1adf2bf"
+  "hash": "15b54427612e377407b215de640377e48b92fee51986bf9731df611f9381d1a1"
 }

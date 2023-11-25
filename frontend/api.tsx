@@ -1,4 +1,4 @@
-import { Item } from "./types/types";
+import { Item, User } from "./types/types";
 
 const API_URL = "https://api.gavinwang.dev";
 
@@ -14,3 +14,20 @@ async function parseOrThrowResponse<T>(res: Response): Promise<T> {
   return res.json();
 }
 
+export async function getUserInfo(sessionToken: string): Promise<User> {
+  const res = await fetch(`${API_URL}/users/me`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  return parseOrThrowResponse<User>(res);
+}
+
+export async function getSavedItems(sessionToken: string): Promise<Item[]> {
+  const res = await fetch(`${API_URL}/saved/`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  return parseOrThrowResponse<Item[]>(res);
+}

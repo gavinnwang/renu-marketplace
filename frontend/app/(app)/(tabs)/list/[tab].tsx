@@ -71,7 +71,7 @@ export default function ListScreen() {
       {isErrorItem ? (
         <View className="flex flex-grow">
           <Text className=" mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
-            Something went wrong...
+            Something went wrong.
           </Text>
           <Pressable
             onPress={() => refetch()}

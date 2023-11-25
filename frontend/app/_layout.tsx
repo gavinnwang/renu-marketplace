@@ -22,7 +22,7 @@ import {
   Manrope_600SemiBold,
 } from "@expo-google-fonts/manrope";
 import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
-import  SecureStore from "expo-secure-store";
+import * as SecureStore from "expo-secure-store";
 import { useSession } from "../hooks/useSession";
 
 export {
