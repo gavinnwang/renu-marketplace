@@ -101,7 +101,7 @@ export default function ChatScreen() {
     onOpen: () => {
       console.debug("opened");
       if (chatId) {
-        console.debug("joining chat after openning");
+        console.debug("joining chat after openning", chatId);
         sendMessage(`/join ${chatId}`);
       }
     },
@@ -260,36 +260,33 @@ export default function ChatScreen() {
               onChangeText={setInputText}
               onSubmitEditing={async () => {
                 if (!inputText.trim()) return;
-                if (chatMessages === undefined) {
-                  console.debug("chat messages undefined");
-                  return;
-                }
                 if (!chatId && item) {
                   console.debug("no chat id so create one");
-                  createChatRoomMutation.mutate(inputText);
+                  createChatRoomAndFirstMessageMutation.mutate(inputText);
                   setInputText("");
                   return;
                 }
                 sendMessage(`/message ${chatId} ${inputText}`);
                 setInputText("");
-                const lastPageArray =
-                  chatMessages.pages[Math.max(0, chatMessages.pages.length - 1)]
-                    .data;
-                const newMessage: ChatMessage = {
-                  id:
-                    lastPageArray.length > 0
-                      ? lastPageArray[lastPageArray.length - 1].id + 1
-                      : 1,
-                  content: inputText,
-                  from_me: 1,
-                  sent_at: new Date(),
-                } as ChatMessage;
+                queryClient.invalidateQueries(["messages", chatId]);
+                // const lastPageArray =
+                //   chatMessages.pages[Math.max(0, chatMessages.pages.length - 1)]
+                //     .data;
+                // const newMessage: ChatMessage = {
+                //   id:
+                //     lastPageArray.length > 0
+                //       ? lastPageArray[lastPageArray.length - 1].id + 1
+                //       : 1,
+                //   content: inputText,
+                //   from_me: 1,
+                //   sent_at: new Date(),
+                // } as ChatMessage;
 
-                const newPageArray = [...lastPageArray, newMessage];
-                queryClient.setQueryData(["messages", chatId], (data: any) => ({
-                  pages: data.pages.slice(0, -1).concat([newPageArray]),
-                  pageParams: data.pageParams,
-                }));
+                // const newPageArray = [...lastPageArray, newMessage];
+                // queryClient.setQueryData(["messages", chatId], (data: any) => ({
+                //   pages: data.pages.slice(0, -1).concat([newPageArray]),
+                //   pageParams: data.pageParams,
+                // }));
                 // queryClient.invalidateQueries(["messages", chatId]);
                 //   fetch(
                 //     `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${item.id}`,

@@ -112,8 +112,17 @@ async fn get_chat_messages_by_chat_id(
     .await;
 
     match messages {
-        Ok(messages) => HttpResponse::Ok()
-            .json(serde_json::json!({ "data": messages, "next_offset": offset + limit })),
+        Ok(messages) => {
+            let next_offset = if messages.len() < limit as usize {
+                None
+            } else {
+                Some(offset + limit)
+            };
+
+            HttpResponse::Ok()
+                .json(serde_json::json!({ "data": messages, "next_offset": next_offset }))
+        }
+
         Err(err) => {
             tracing::error!("failed to fetch chat messages: {err}");
             HttpResponse::InternalServerError().json("Failed to fetch chat messages")
