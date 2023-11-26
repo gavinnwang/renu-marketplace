@@ -48,16 +48,7 @@ async fn get_items_handler(
     };
 
     match items {
-        Ok(items) => {
-            let next_offset = if items.len() < limit as usize {
-                None
-            } else {
-                Some(offset + limit)
-            };
-
-            HttpResponse::Ok()
-                .json(serde_json::json!({ "data": items, "next_offset": next_offset }))
-        }
+        Ok(items) => HttpResponse::Ok().json(items),
         Err(err) => {
             tracing::error!("Failed to fetch items: {err}");
             HttpResponse::InternalServerError().json(err.to_string())

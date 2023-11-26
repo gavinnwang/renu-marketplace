@@ -123,7 +123,7 @@ const CategoryView = ({
     queryKey: ["item", category],
     enabled: Math.abs(selectedSection - index) <= 1,
     getNextPageParam: (lastPage) => {
-      return lastPage.next_offset;
+      return lastPage.length === LIMIT ? allPages.length + 1 : undefined;
     },
   });
 

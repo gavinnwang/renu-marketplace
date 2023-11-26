@@ -66,7 +66,6 @@ async fn get_chat_id_by_item_id(
 #[derive(Deserialize, Debug)]
 pub struct GetChatMessageQuery {
     pub offset: i32,
-    // pub limit: Option<i32>,
 }
 
 #[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
@@ -97,8 +96,6 @@ async fn get_chat_messages_by_chat_id(
         }
     }
 
-    // let offset = query.offset.unwrap_or(0);
-    // let limit = query.limit.unwrap_or(25);
     let limit = 25;
     let offset = query.offset;
 
@@ -112,17 +109,8 @@ async fn get_chat_messages_by_chat_id(
     .await;
 
     match messages {
-        Ok(messages) => {
-            let next_offset = if messages.len() < limit as usize {
-                None
-            } else {
-                Some(offset + limit)
-            };
-
-            HttpResponse::Ok()
-                .json(serde_json::json!({ "data": messages, "next_offset": next_offset }))
-        }
-
+        Ok(messages) => HttpResponse::Ok()
+            .json(serde_json::json!({ "data": messages, "next_offset": offset + limit })),
         Err(err) => {
             tracing::error!("failed to fetch chat messages: {err}");
             HttpResponse::InternalServerError().json("Failed to fetch chat messages")
