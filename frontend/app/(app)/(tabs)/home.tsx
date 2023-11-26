@@ -131,10 +131,10 @@ const CategoryView = ({
   return (
     <View key={index} className="h-full flex flex-grow">
       {isLoadingItems ? (
-        <View className="bg-grayLight h-full w-full"></View>
+        <View className="bg-bgLight h-full w-full"></View>
       ) : isErrorItems ? (
         <ScrollView
-          className="bg-grayLight h-full py-[70%]"
+          className="bg-bgLight h-full py-[70%]"
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -151,16 +151,11 @@ const CategoryView = ({
             </Text>
           </View>
         </ScrollView>
-      ) : !hasNextPage ? (
+      ) : items.pages.length <= 1 && items.pages[0].length === 0 ? (
         <ScrollView
-          className="bg-grayLight h-full py-[70%]"
+          className="bg-bgLight h-full py-[70%]"
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => {
-                refetchItems();
-              }}
-            />
+            <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
           }
         >
           <View className="flex flex-col gap-y-2 items-center">
@@ -172,7 +167,7 @@ const CategoryView = ({
         </ScrollView>
       ) : (
         <FlashList
-          className="bg-grayLight h-full"
+          className="bg-bgLight h-full"
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl

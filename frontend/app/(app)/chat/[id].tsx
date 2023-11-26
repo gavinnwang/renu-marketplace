@@ -41,7 +41,6 @@ export default function ChatScreen() {
   } = useLocalSearchParams();
 
   const { session } = useSession();
-
   const queryClient = useQueryClient();
 
   const { data: chatId, isError: isErrorChatId } = useQuery({
@@ -57,11 +56,7 @@ export default function ChatScreen() {
     enabled: !!itemId,
   });
 
-  // const [offset, setOffset] = React.useState(0);
-  // const [endReached, setEndReached] = React.useState(false);
-
   const getChatMessages = async ({ pageParam = 0 }) => {
-    // console.debug("fetching messages with offset", pageParam);
     const res = await fetch(
       `${API_URL}/chats/messages/${chatId}?offset=${pageParam}`,
       {
@@ -275,85 +270,11 @@ export default function ChatScreen() {
                   createChatRoomAndFirstMessageMutation.mutate(inputText);
                   setInputText("");
                 } else {
-                  // optimisticallyMutateChatMessages.mutate(inputText);
                   sendMessage(`/message ${chatId} ${inputText}`);
                   setInputText("");
                   queryClient.invalidateQueries(["messages", chatId]);
                   queryClient.invalidateQueries(["chats", sellOrBuy]);
                 }
-
-                // const lastPageArray =
-                //   chatMessages.pages[Math.max(0, chatMessages.pages.length - 1)]
-                //     .data;
-                // const newMessage: ChatMessage = {
-                //   id:
-                //     lastPageArray.length > 0
-                //       ? lastPageArray[lastPageArray.length - 1].id + 1
-                //       : 1,
-                //   content: inputText,
-                //   from_me: 1,
-                //   sent_at: new Date(),
-                // } as ChatMessage;
-
-                // const newPageArray = [...lastPageArray, newMessage];
-                // queryClient.setQueryData(["messages", chatId], (data: any) => ({
-                //   pages: data.pages.slice(0, -1).concat([newPageArray]),
-                //   pageParams: data.pageParams,
-                // }));
-                // queryClient.invalidateQueries(["messages", chatId]);
-                //   fetch(
-                //     `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${item.id}`,
-                //     {
-                //       headers: {
-                //         authorization: `Bearer ${session?.token}`,
-                //         "content-type": "application/json",
-                //       },
-                //       method: "POST",
-                //       body: JSON.stringify({
-                //         first_message_content: inputText,
-                //       }),
-                //     }
-                //   ).then((x) => {
-                //     x.json()
-                //       .then((data: number) => {
-                //         sendMessage(`/join ${data}`);
-                //         console.debug("JOINING CHAT ID AFTER CREATING");
-
-                //         setInputText("");
-
-                //         setChatMessages([
-                //           {
-                //             id: 1,
-                //             content: inputText,
-                //             from_me: 1,
-                //             sent_at: new Date(),
-                //           } as ChatMessage,
-                //         ]);
-                //         setOffset(1);
-                //         setChatId(data);
-                //         console.debug("invalidating:", ["chats", sellOrBuy]);
-                //         queryClient.invalidateQueries(["chats", sellOrBuy]);
-                //       })
-                //       .catch((err) => {
-                //         console.error("parse post messgae", err);
-                //       });
-                //   });
-                //   return;
-                // }
-                // sendMessage(`/message ${chatId} ${inputText}`);
-                // setInputText("");
-                // queryClient.invalidateQueries(["chats", sellOrBuy]);
-
-                // setChatMessages((prev) => [
-                //   {
-                //     id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
-                //     content: inputText,
-                //     from_me: 1,
-                //     sent_at: new Date(),
-                //   } as ChatMessage,
-                //   ...prev,
-                // ]);
-                // setOffset((prev) => prev + 1);
               }}
             />
           </View>
