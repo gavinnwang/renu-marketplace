@@ -49,7 +49,7 @@ async fn get_items_handler(
     };
 
     match items {
-        Ok(items) => HttpResponse::Ok().json(serde_json::json!({ "items": items, "next_offset": offset + limit })),
+        Ok(items) => HttpResponse::Ok().json(serde_json::json!({ "data": items, "next_offset": offset + limit })),
         Err(err) => {
             tracing::error!("Failed to fetch items: {err}");
             HttpResponse::InternalServerError().json(err.to_string())

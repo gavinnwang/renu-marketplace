@@ -99,31 +99,17 @@ const CategoryView = ({
   index: number;
   selectedSection: number;
 }) => {
-  // async function getItemsByCategory({
-  //   pageParam = 0,
-  // }: {
-  //   pageParam: number;
-  // }): Promise<Item[]> {
-  //   console.log("fetching with pageParam", pageParam);
-  //   const res = await fetch(
-  //     `${API_URL}/items/?category=${category}&limit=${pageParam}`
-  //   );
-  //   return await parseOrThrowResponse<Item[]>(res);
-  // }
   const getItemsByCategory = async ({ pageParam = 0 }) => {
     console.log("fetching with pageParam and category", pageParam, category);
     const res = await fetch(
       `${API_URL}/items/?category=${category}&offset=${pageParam}&limit=6`
     );
-    return parseOrThrowResponse<Item[]>(res);
-  }
+    return parseOrThrowResponse<{
+      data: Item[];
+      next_offset: number;
+    }>(res);
+  };
 
-
-  // const [offset, setOffset] = React.useState(0);
-  // const limit = 8;
-  // const [endReached, setEndReached] = React.useState(false);
-  // const [items, setItems] = React.useState<Item[]>([]);
-  // const [isErrorAPI, setIsErrorAPI] = React.useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const {
     data: items,
@@ -131,19 +117,20 @@ const CategoryView = ({
     isError: isErrorItems,
     refetch: refetchItems,
     fetchNextPage,
+    hasNextPage,
   } = useInfiniteQuery({
     queryFn: getItemsByCategory,
     queryKey: ["item", category],
     enabled: Math.abs(selectedSection - index) <= 1,
-
+    getNextPageParam: (lastPage) => {
+      return lastPage.next_offset;
+    },
   });
 
   return (
     <View key={index} className="h-full flex flex-grow">
       {isLoadingItems ? (
-        <View className="bg-grayLight h-full w-full">
-          <Text>loading</Text>
-        </View>
+        <View className="bg-grayLight h-full w-full"></View>
       ) : isErrorItems ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
@@ -163,8 +150,7 @@ const CategoryView = ({
             </Text>
           </View>
         </ScrollView>
-      ) : items.pages[items.pages.length ? items.pages.length - 1 : 0]
-          .length === 0 ? (
+      ) : !hasNextPage ? (
         <ScrollView
           className="bg-grayLight h-full py-[70%]"
           refreshControl={
@@ -195,10 +181,9 @@ const CategoryView = ({
               }}
             />
           }
-          data={items.pages.flatMap((page) => page)}
+          data={items.pages.flatMap((page) => page.data)}
           numColumns={2}
           contentContainerStyle={{
-            paddingBottom: 10,
             paddingTop: 10,
             paddingLeft: 10,
           }}

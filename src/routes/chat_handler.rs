@@ -65,8 +65,8 @@ async fn get_chat_id_by_item_id(
 
 #[derive(Deserialize, Debug)]
 pub struct GetChatMessageQuery {
-    pub offset: Option<i32>,
-    pub limit: Option<i32>,
+    pub offset: i32,
+    // pub limit: Option<i32>,
 }
 
 #[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
@@ -97,8 +97,10 @@ async fn get_chat_messages_by_chat_id(
         }
     }
 
-    let offset = query.offset.unwrap_or(0);
-    let limit = query.limit.unwrap_or(25);
+    // let offset = query.offset.unwrap_or(0);
+    // let limit = query.limit.unwrap_or(25);
+    let limit = 4;
+    let offset = query.offset;
 
     let messages = chat_repository::fetch_chat_messages_by_chat_id(
         user_id,
@@ -110,7 +112,8 @@ async fn get_chat_messages_by_chat_id(
     .await;
 
     match messages {
-        Ok(messages) => HttpResponse::Ok().json(messages),
+        Ok(messages) => HttpResponse::Ok()
+            .json(serde_json::json!({ "data": messages, "next_offset": offset + limit })),
         Err(err) => {
             tracing::error!("failed to fetch chat messages: {err}");
             HttpResponse::InternalServerError().json("Failed to fetch chat messages")
@@ -205,12 +208,10 @@ async fn post_chat_room_and_send_first_message(
             .await;
 
             match send_message_result {
-                Ok(_) => HttpResponse::Ok()
-                    .json(chat_id),
+                Ok(_) => HttpResponse::Ok().json(chat_id),
                 Err(err) => {
                     tracing::error!("Failed to send first message: {err}");
-                    HttpResponse::InternalServerError()
-                        .json("Failed to send first message")
+                    HttpResponse::InternalServerError().json("Failed to send first message")
                 }
             }
         }
