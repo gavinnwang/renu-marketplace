@@ -76,6 +76,8 @@ async fn get_chat_messages_by_chat_id(
     pool: web::Data<PgPool>,
     query: web::Query<GetChatMessageQuery>,
 ) -> impl Responder {
+    tracing::info!("called");
+
     let user_id = auth_guard.user_id;
     let chat_id = path.into_inner();
 

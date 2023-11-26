@@ -39,6 +39,7 @@ export default function ChatScreen() {
     newChat,
     otherUserName,
   } = useLocalSearchParams();
+
   const { session } = useSession();
 
   const queryClient = useQueryClient();
@@ -60,7 +61,7 @@ export default function ChatScreen() {
   // const [endReached, setEndReached] = React.useState(false);
 
   const getChatMessages = async ({ pageParam = 0 }) => {
-    console.debug("fetching messages with offset", pageParam);
+    // console.debug("fetching messages with offset", pageParam);
     const res = await fetch(
       `${API_URL}/chats/messages/${chatId}?offset=${pageParam}`,
       {
@@ -86,27 +87,36 @@ export default function ChatScreen() {
     queryFn: getChatMessages,
     queryKey: ["messages", chatId],
     enabled: !!chatId,
-    getNextPageParam: (lastPage) => lastPage.next_offset,
+    getNextPageParam: (lastPage) => {
+      const nextPage =
+        lastPage.data.length === 25 ? lastPage.next_offset : undefined;
+      return nextPage;
+    },
   });
 
   const width = Dimensions.get("window").width / 7;
   const [inputText, setInputText] = React.useState("");
 
-  let socketUrl = "wss://api.gavinwang.dev/ws";
-  const { sendMessage, lastMessage } = useWebSocket(socketUrl, {
-    queryParams: {
-      authorization: `Bearer_${session?.token}`,
-    },
-    shouldReconnect: () => true,
-    onOpen: () => {
-      console.debug("opened");
-      if (chatId) {
-        console.debug("joining chat after openning", chatId);
-        sendMessage(`/join ${chatId}`);
-      }
-    },
-    reconnectInterval: 5,
-  });
+  const { sendMessage, lastMessage } = useWebSocket(
+    "wss://api.gavinwang.dev/ws",
+    {
+      queryParams: {
+        authorization: `Bearer_${session?.token}`,
+      },
+      shouldReconnect: () => true,
+      onOpen: () => {
+        console.debug("opened");
+        if (chatId) {
+          console.debug("joining chat after openning", chatId);
+          sendMessage(`/join ${chatId}`);
+        }
+      },
+      reconnectInterval: 5,
+      onMessage: (e) => {
+        queryClient.invalidateQueries(["messages", chatId]);
+      },
+    }
+  );
 
   const createChatRoomAndFirstMessageMutation = useMutation({
     mutationFn: (firstMessage: string) =>
@@ -123,40 +133,40 @@ export default function ChatScreen() {
     },
   });
 
-  const optimisticallyMutateChatMessages = useMutation({
-    mutationFn: async (newMessage: ChatMessage) => {
-      if (!chatId) return;
-      sendMessage(`/message ${chatId} ${newMessage.content}`);
-    },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["messages", chatId] });
-      // const previousState = queryClient.getQueryData(["messages", chatId]);
-      const lastPageArray =
-        chatMessages?.pages[Math.max(0, chatMessages.pages.length - 1)].data ??
-        [];
-      const newMessage: ChatMessage = {
-        id:
-          lastPageArray.length > 0
-            ? lastPageArray[lastPageArray.length - 1].id + 1
-            : 1,
-        content: inputText,
-        from_me: 1,
-        sent_at: new Date(),
-      } as ChatMessage;
-      queryClient.setQueryData(["messages", chatId], (data: any) => ({
-        pages: data.pages
-          .slice(0, -1)
-          .concat([data.pages[-1].concat([newMessage])]),
-        pageParams: data.pageParams,
-      }));
-
-      // return { previousState };
-    },
-    onSettled: () => {
-      // queryClient.invalidateQueries(["messages", chatId]);
-      queryClient.invalidateQueries(["chats", sellOrBuy]);
-    },
-  });
+  // const optimisticallyMutateChatMessages = useMutation({
+  //   mutationFn: async (newMessage: string) => {
+  //     if (!chatId) return;
+  //     sendMessage(`/message ${chatId} ${newMessage}`);
+  //   },
+  //   onMutate: async () => {
+  //     await queryClient.cancelQueries({ queryKey: ["messages", chatId] });
+  //     const lastPageArray =
+  //       chatMessages?.pages[Math.max(0, chatMessages.pages.length - 1)].data ??
+  //       [];
+  //     const newMessage: ChatMessage = {
+  //       id:
+  //         lastPageArray.length > 0
+  //           ? lastPageArray[lastPageArray.length - 1].id + 1
+  //           : 1,
+  //       content: inputText,
+  //       from_me: 1,
+  //       sent_at: new Date(),
+  //     };
+  //     const newPageArray = [...lastPageArray, newMessage];
+  //     queryClient.setQueryData(["messages", chatId], (oldData: any) => {
+  //       const newPages = oldData ? [...oldData.pages] : [];
+  //       if (newPages.length === 0) {
+  //         newPages.push({ data: [newMessage] });
+  //       } else {
+  //         newPages[newPages.length - 1].data = newPageArray;
+  //       }
+  //       return {
+  //         pages: newPages,
+  //         pageParams: oldData.pageParams,
+  //       };
+  //     });
+  //   },
+  // });
 
   return (
     <SafeAreaView className="bg-bgLight">
@@ -260,15 +270,18 @@ export default function ChatScreen() {
               onChangeText={setInputText}
               onSubmitEditing={async () => {
                 if (!inputText.trim()) return;
-                if (!chatId && item) {
+                if (!chatId) {
                   console.debug("no chat id so create one");
                   createChatRoomAndFirstMessageMutation.mutate(inputText);
                   setInputText("");
-                  return;
+                } else {
+                  // optimisticallyMutateChatMessages.mutate(inputText);
+                  sendMessage(`/message ${chatId} ${inputText}`);
+                  setInputText("");
+                  queryClient.invalidateQueries(["messages", chatId]);
+                  queryClient.invalidateQueries(["chats", sellOrBuy]);
                 }
-                sendMessage(`/message ${chatId} ${inputText}`);
-                setInputText("");
-                queryClient.invalidateQueries(["messages", chatId]);
+
                 // const lastPageArray =
                 //   chatMessages.pages[Math.max(0, chatMessages.pages.length - 1)]
                 //     .data;

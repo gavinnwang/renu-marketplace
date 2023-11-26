@@ -104,11 +104,10 @@ const CategoryView = ({
     const res = await fetch(
       `${API_URL}/items/?category=${category}&offset=${pageParam}&limit=6`
     );
-    return parseOrThrowResponse<{
-      data: Item[];
-      next_offset: number;
-    }>(res);
+    return parseOrThrowResponse<Item[]>(res);
   };
+
+  const LIMIT = 8;
 
   const [refreshing, setRefreshing] = useState(false);
   const {
@@ -122,8 +121,10 @@ const CategoryView = ({
     queryFn: getItemsByCategory,
     queryKey: ["item", category],
     enabled: Math.abs(selectedSection - index) <= 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage.length === LIMIT ? allPages.length + 1 : undefined;
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.length === LIMIT
+        ? (allPages.length + 1) * LIMIT
+        : undefined;
     },
   });
 
@@ -181,7 +182,7 @@ const CategoryView = ({
               }}
             />
           }
-          data={items.pages.flatMap((page) => page.data)}
+          data={items.pages.flatMap((page) => page)}
           numColumns={2}
           contentContainerStyle={{
             paddingTop: 10,
@@ -194,7 +195,6 @@ const CategoryView = ({
           }}
           estimatedItemSize={200}
           removeClippedSubviews={true}
-
         />
       )}
     </View>

@@ -4,7 +4,6 @@ import {
   Dimensions,
   Animated,
   Pressable,
-  RefreshControl,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { ChatGroup, Measure, RefAndKey } from "../../../../types";
@@ -70,7 +69,7 @@ export default function MessageScreen() {
           </Pressable>
         </>
       ) : (
-        <FlatList
+        <FlashList
           data={chats}
           renderItem={({ item }) => <ChatRow item={item} />}
           keyExtractor={(item) => item.chat_id.toString()}
@@ -82,7 +81,7 @@ export default function MessageScreen() {
           //     }}
           //   />
           // }
-          // estimatedItemSize={100}
+          estimatedItemSize={100}
         />
       )}
     </View>
