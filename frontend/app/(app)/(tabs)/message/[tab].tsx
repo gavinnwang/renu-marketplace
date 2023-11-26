@@ -4,7 +4,7 @@ import {
   Dimensions,
   Animated,
   Pressable,
-  FlatList,
+  RefreshControl,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { ChatGroup, Measure, RefAndKey } from "../../../../types";
@@ -16,6 +16,7 @@ import { Image } from "expo-image";
 import { useSession } from "../../../../hooks/useSession";
 import { getChatGroups } from "../../../../api";
 import { FlashList } from "@shopify/flash-list";
+import { FlatList } from "react-native-gesture-handler";
 
 const TABS = ["Buy", "Sell"];
 const data = TABS.map((i) => ({
@@ -36,11 +37,13 @@ export default function MessageScreen() {
     isLoading: isLoadingChats,
     refetch,
   } = useQuery({
-    queryFn: async () =>
-      getChatGroups(session!.token, TABS[selectedTabInt] ? "seller" : "buyer"),
+    queryFn: () =>
+      getChatGroups(session!.token, selectedTabInt ? "seller" : "buyer"),
     queryKey: ["chats", TABS[selectedTabInt]],
-    enabled: !!session && !!session.token,
+    enabled: !!session,
   });
+
+  const [refreshing, setRefreshing] = React.useState(false);
 
   return (
     <View className="bg-bgLight h-full">
@@ -54,7 +57,7 @@ export default function MessageScreen() {
         </Text>
       ) : isLoadingChats ? (
         <></>
-      ) : chats && chats.length <= 0 ? (
+      ) : chats.length <= 0 ? (
         <>
           <Text className="mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
             You have no messages.
@@ -67,13 +70,19 @@ export default function MessageScreen() {
           </Pressable>
         </>
       ) : (
-        <FlashList
+        <FlatList
           data={chats}
-          renderItem={ChatRow}
+          renderItem={({ item }) => <ChatRow item={item} />}
           keyExtractor={(item) => item.chat_id.toString()}
-          onRefresh={() => refetch()}
-          refreshing={isLoadingChats}
-          estimatedItemSize={chats.length}
+          // refreshControl={
+          //   <RefreshControl
+          //     refreshing={refreshing}
+          //     onRefresh={() => {
+          //       refetch();
+          //     }}
+          //   />
+          // }
+          // estimatedItemSize={100}
         />
       )}
     </View>

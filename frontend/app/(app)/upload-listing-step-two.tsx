@@ -15,7 +15,6 @@ import Colors from "../../constants/Colors";
 import React, { useState } from "react";
 import { Image } from "expo-image";
 import { Picker, PickerIOS } from "@react-native-picker/picker";
-import { ApiResponse } from "../../types/api";
 import { useSession } from "../../hooks/useSession";
 
 const ItemCategory: Record<string, string> = {
@@ -52,7 +51,7 @@ export default function UploadListingStepTwo() {
   const param = useLocalSearchParams();
   const imagesString = param.images as string;
   const images = imagesString.split(",");
-  console.log(images);
+  console.debug(images);
   const imageWidth = Dimensions.get("window").width / 3 - 16;
   const imageHeight = (imageWidth * 4) / 2.5;
 
@@ -201,9 +200,9 @@ export default function UploadListingStepTwo() {
                   for (let i = 0; i < images.length; i++) {
                     const uri = images[i];
                     const fileName = uri.split("/").pop();
-                    console.log(fileName);
+                    console.debug(fileName);
                     const fileType = fileName?.split(".").pop() || "image/png";
-                    console.log(fileType);
+                    console.debug(fileType);
                     formData.append("images", {
                       uri: images[i],
                       name: fileName,
@@ -211,7 +210,7 @@ export default function UploadListingStepTwo() {
                     } as any);
                   }
 
-                  console.log("form data: ", formData);
+                  console.debug("form data: ", formData);
                   const postImageResponse = await fetch(
                     `${process.env.EXPO_PUBLIC_BACKEND_URL}/images/`,
                     {
@@ -222,13 +221,13 @@ export default function UploadListingStepTwo() {
                       body: formData,
                     }
                   );
-
-                  const s3UrlsResponse: ApiResponse<String[]> =
-                    await postImageResponse.json();
-                  if (s3UrlsResponse.status !== "success") {
-                    throw new Error(s3UrlsResponse.data);
+                  if (!postImageResponse.ok) {
+                    throw new Error("Failed to post images");
                   }
-                  console.log(s3UrlsResponse);
+
+                  const s3UrlsResponse: String[] =
+                    await postImageResponse.json();
+                  console.debug(s3UrlsResponse);
 
                   if (!session?.token) {
                     throw new Error("No session token");
@@ -247,19 +246,17 @@ export default function UploadListingStepTwo() {
                         price: Number(price),
                         description,
                         category,
-                        images: s3UrlsResponse.data,
+                        images: s3UrlsResponse,
                       }),
                     }
                   );
-
-                  const itemData: ApiResponse<number> =
-                    await postItemResponse.json();
-                  if (itemData.status !== "success") {
-                    throw new Error(itemData.data);
-                  } else {
-                    console.log("replace to: ", `/item/${itemData.data}`);
-                    router.replace(`/item/${itemData.data}`);
+                  if (!postItemResponse.ok) {
+                    throw new Error("Failed to post item");
                   }
+
+                  const itemData: number = await postItemResponse.json();
+                  console.debug("replace to: ", `/item/${itemData}`);
+                  router.replace(`/item/${itemData}`);
                 } catch (e) {
                   console.error(e);
                 }

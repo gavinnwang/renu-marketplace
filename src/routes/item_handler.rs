@@ -21,10 +21,9 @@ async fn get_items_handler(
     pool: web::Data<PgPool>,
     query: web::Query<GetItemQuery>,
 ) -> impl Responder {
-    // let offset = query.offset.unwrap_or(0);
-    // let limit = query.limit.unwrap_or(25);
+    tracing::info!("called");
 
-    let limit = 4;
+    let limit = 8;
     let offset = query.offset;
 
     let items = match &query.category {
@@ -49,7 +48,8 @@ async fn get_items_handler(
     };
 
     match items {
-        Ok(items) => HttpResponse::Ok().json(serde_json::json!({ "data": items, "next_offset": offset + limit })),
+        Ok(items) => HttpResponse::Ok()
+            .json(serde_json::json!({ "data": items, "next_offset": offset + limit })),
         Err(err) => {
             tracing::error!("Failed to fetch items: {err}");
             HttpResponse::InternalServerError().json(err.to_string())

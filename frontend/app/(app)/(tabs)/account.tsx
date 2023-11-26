@@ -10,7 +10,7 @@ import { getSavedItems, getUserMeInfo } from "../../../api";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
-  console.log(session);
+  console.debug(session);
 
   const { data: user, isError } = useQuery({
     queryKey: ["me"],

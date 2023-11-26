@@ -1,4 +1,4 @@
-import { ChatGroup, Item, User } from "./types";
+import { ChatGroup, ChatMessage, Item, User } from "./types";
 
 export const API_URL = "https://api.gavinwang.dev";
 
@@ -9,18 +9,14 @@ export const GOOGLE_OAUTH_CLIENT_ID =
 
 export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    try {
-      const errMsg = await res.json();
-      throw new Error(errMsg);
-    } catch (e) {
-      const errText = await res.text();
-      throw new Error(errText);
-    }
+    const errMsg = await res.text();
+    throw new Error(errMsg);
   }
   return res.json();
 }
 
 export async function getUserMeInfo(sessionToken: string): Promise<User> {
+  console.debug("fetching me");
   const res = await fetch(`${API_URL}/users/me`, {
     headers: {
       authorization: `Bearer ${sessionToken}`,
@@ -80,4 +76,3 @@ export async function getItem(itemId: string): Promise<Item> {
   const res = await fetch(`${API_URL}/items/${itemId}`);
   return parseOrThrowResponse<Item>(res);
 }
-

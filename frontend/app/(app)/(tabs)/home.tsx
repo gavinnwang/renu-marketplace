@@ -100,7 +100,7 @@ const CategoryView = ({
   selectedSection: number;
 }) => {
   const getItemsByCategory = async ({ pageParam = 0 }) => {
-    console.log("fetching with pageParam and category", pageParam, category);
+    // console.debug("fetching with pageParam and category", pageParam, category);
     const res = await fetch(
       `${API_URL}/items/?category=${category}&offset=${pageParam}&limit=6`
     );
@@ -193,6 +193,8 @@ const CategoryView = ({
             fetchNextPage();
           }}
           estimatedItemSize={200}
+          removeClippedSubviews={true}
+
         />
       )}
     </View>

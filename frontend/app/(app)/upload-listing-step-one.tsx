@@ -54,7 +54,7 @@ export default function UploadListingStepOne() {
         ]);
       }
     } else {
-      console.log("cancelled");
+      console.debug("cancelled");
     }
   };
 

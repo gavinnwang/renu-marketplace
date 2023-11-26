@@ -179,7 +179,7 @@ export default function ItemPage() {
               <Text className="font-Poppins_600SemiBold text-base">Seller</Text>
               <Pressable
                 onPress={() => {
-                  console.log("seller", item.user_id);
+                  console.debug("seller", item.user_id);
                   if (seller?.id === session?.user_id) {
                     router.push("/account");
                   } else {

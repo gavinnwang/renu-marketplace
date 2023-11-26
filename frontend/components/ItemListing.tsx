@@ -11,7 +11,7 @@ const horizontalGapPx = 10;
 const imageWidth = (Dimensions.get("window").width - horizontalGapPx * 3) / 2;
 
 export function ItemListing({ item, index}: { item: Item, index: number }) {
-  // console.log(item);
+  // console.debug(item);
   return (
     <Link
       href={`/item/${item.id}`}
