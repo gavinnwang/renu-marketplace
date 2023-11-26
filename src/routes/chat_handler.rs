@@ -99,7 +99,7 @@ async fn get_chat_messages_by_chat_id(
 
     // let offset = query.offset.unwrap_or(0);
     // let limit = query.limit.unwrap_or(25);
-    let limit = 4;
+    let limit = 25;
     let offset = query.offset;
 
     let messages = chat_repository::fetch_chat_messages_by_chat_id(

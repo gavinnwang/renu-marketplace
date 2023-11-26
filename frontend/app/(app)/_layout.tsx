@@ -17,8 +17,6 @@ export default function AppLayout() {
     return <Redirect href="/" />;
   }
 
-  queryClient.prefetchQuery(["me"], () => getUserMeInfo(session.token));
-
   return (
     <QueryClientProvider client={queryClient}>
       <Stack

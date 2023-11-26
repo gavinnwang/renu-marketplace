@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Pressable, FlatList, Text, View, ScrollView } from "react-native";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
@@ -28,7 +28,7 @@ export default function AccountScreen() {
     enabled: !!session && !!session.token,
   });
 
-  const [refreshing, _] = useState(false);
+  const [refreshing, _] = React.useState(false);
 
   return (
     <View className="bg-bgLight h-full">
@@ -81,8 +81,8 @@ export default function AccountScreen() {
               onPress={signOut}
               className="font-Manrope_400Regular bg-purplePrimary p-2"
             >
-              <Text className="text-white text-center font-Manrope_600SemiBold">
-                Sign out
+              <Text className="text-white text-center font-SecularOne_400Regular">
+                SIGN OUT
               </Text>
             </Pressable>
           </View>
@@ -106,8 +106,8 @@ export default function AccountScreen() {
               Something went wrong.
             </Text>
           ) : savedItemData.length === 0 ? (
-            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">
-              No items found.
+            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-base">
+              You have no saved items.
             </Text>
           ) : (
             <FlatList

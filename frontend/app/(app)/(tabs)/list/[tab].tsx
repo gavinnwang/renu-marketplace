@@ -6,15 +6,16 @@ import {
   Pressable,
   RefreshControl,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import Colors from "../../../../constants/Colors";
 import { Item, Measure, RefAndKey } from "../../../../types";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Image } from "expo-image";
 
-const TABS = ["Listings", "Sold"];
+const TABS = ["Active", "Sold"];
 const STATUS = ["active", "inactive"];
 
 const data = TABS.map((i) => ({
@@ -70,7 +71,7 @@ export default function ListScreen() {
       ) : items.filter((item) => item.status === STATUS[selectedTabInt])
           .length > 0 ? (
         <FlashList
-          estimatedItemSize={items.length}
+          estimatedItemSize={40}
           data={items.filter((item) => item.status === STATUS[selectedTabInt])}
           numColumns={1}
           keyExtractor={(item) => item.id.toString()}
@@ -85,7 +86,7 @@ export default function ListScreen() {
           renderItem={(object) => (
             <ListingPageItem
               item={object.item}
-              token={session?.token}
+              token={session?.token ?? ""}
               refetch={refetch}
             />
           )}
@@ -128,7 +129,7 @@ dayjs.extend(relativeTime);
 import { CATEGORIES } from "../home";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
-import { getUserMeItems } from "../../../../api";
+import { getUserMeItems, mutateItemStatus } from "../../../../api";
 
 const ListingPageItem = ({
   item,
@@ -136,13 +137,55 @@ const ListingPageItem = ({
   refetch,
 }: {
   item: Item;
-  token: string | undefined;
+  token: string;
   refetch: any;
 }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
   const [isSold, setIsSold] = React.useState<boolean>(false);
+  const { session } = useSession();
 
   const queryClient = useQueryClient();
+  const mutation = useMutation(
+    (newStatus: string) => mutateItemStatus(session!.token, item.id, newStatus),
+    {
+      onMutate: async () => {
+        await queryClient.cancelQueries({ queryKey: ["list"] });
+        const previousState = queryClient.getQueryData(["list"]);
+
+        // Optimistically update to the new value
+        queryClient.setQueryData(["list"], (oldData: any) => {
+          if (!oldData) {
+            return [];
+          }
+          return oldData.map((i: Item) => {
+            if (i.id === item.id) {
+              return {
+                ...i,
+                status: item.status === "active" ? "inactive" : "active",
+              };
+            }
+            return i;
+          });
+        });
+
+        return { previousState };
+      },
+      // If the mutation fails,
+      // use the context returned from onMutate to roll back
+      onError: (err, _, context: any) => {
+        console.error(err);
+        queryClient.setQueryData(["list"], context.previousState);
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries(["list"]);
+      },
+    }
+  );
+  const onPressHandler = () => {
+    const newStatus = item.status === "active" ? "inactive" : "active";
+    mutation.mutate(newStatus);
+  };
+
   const [touching, setTouching] = React.useState(false);
   return (
     <Pressable
@@ -185,29 +228,9 @@ const ListingPageItem = ({
             {CATEGORIES[item.category]}{" "}
           </Text>
         </View>
-        <Pressable
-          onPressIn={() => {
-            setIsSold(true);
-          }}
-          onPressOut={() => {
-            setIsSold(false);
-          }}
-          onPress={() => {
-            fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${item.id}`, {
-              method: "POST",
-              headers: {
-                authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                status: item.status === "active" ? "inactive" : "active",
-              }),
-            }).then(() => {
-              refetch();
-              queryClient.invalidateQueries(["me"]); // revalidate account because num of listing or sold items changed
-            });
-          }}
-          className="border-[1.5px] h-[35px] flex-grow-0 flex items-center justify-center"
+        <TouchableOpacity
+          onPress={onPressHandler}
+          className="border-[1.5px] h-[32px] flex-grow-0 flex items-center justify-center"
         >
           <Text
             className={`font-SecularOne_400Regular text-sm ${
@@ -216,7 +239,7 @@ const ListingPageItem = ({
           >
             {item.status === "active" ? "MARK AS SOLD" : "RELIST"}
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </Pressable>
   );

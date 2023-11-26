@@ -12,10 +12,11 @@ import {
 } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 import Colors from "../../constants/Colors";
-import React, { useState } from "react";
+import React from "react";
 import { Image } from "expo-image";
 import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { useSession } from "../../hooks/useSession";
+import { FlashList } from "@shopify/flash-list";
 
 const ItemCategory: Record<string, string> = {
   picking: "Pick a category",
@@ -50,17 +51,20 @@ const CloseIcon = () => (
 export default function UploadListingStepTwo() {
   const param = useLocalSearchParams();
   const imagesString = param.images as string;
-  const images = imagesString.split(",");
-  console.debug(images);
+  const images = React.useMemo(() => {
+    return imagesString.split(",");
+  }, [imagesString]);
   const imageWidth = Dimensions.get("window").width / 3 - 16;
   const imageHeight = (imageWidth * 4) / 2.5;
 
-  const [category, setCategory] = useState("");
-  const [title, setTitle] = useState("");
-  const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
+  const [category, setCategory] = React.useState("");
+  const [title, setTitle] = React.useState("");
+  const [price, setPrice] = React.useState("");
+  const [description, setDescription] = React.useState("");
 
   const { session } = useSession();
+
+  const [uploading, setUploading] = React.useState(false);
 
   return (
     <>
@@ -83,28 +87,35 @@ export default function UploadListingStepTwo() {
               <Text className="w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary ">
                 Photos ({images.length})
               </Text>
-              <FlatList
-                className="border-b border-b-stone-200 pb-5"
-                scrollEnabled={false}
-                showsVerticalScrollIndicator={false}
-                data={images}
-                renderItem={({ item }) => (
-                  <Image
-                    source={{ uri: item }}
-                    style={{
-                      width: imageWidth,
-                      height: imageHeight,
-                      borderRadius: 2,
-                    }}
-                  />
-                )}
-                numColumns={2}
-                keyExtractor={(item) => item}
-                columnWrapperStyle={{
-                  justifyContent: "space-between",
-                  marginTop: 12,
-                }}
-              />
+              <View style={{ minHeight: imageHeight }}>
+                <FlashList
+                  className="border-b border-b-stone-200 pb-5"
+                  scrollEnabled={false}
+                  showsVerticalScrollIndicator={false}
+                  data={images}
+                  renderItem={({ item }) => (
+                    <Image
+                      source={{ uri: item }}
+                      style={{
+                        width: imageWidth,
+                        height: imageHeight,
+                        borderRadius: 2,
+                        marginTop: 12,
+                      }}
+                    />
+                  )}
+                  numColumns={3}
+                  keyExtractor={(item) => item}
+                  // contentContainerStyle={{
+                  //   paddingTop: 12,
+                  // }}
+                  estimatedItemSize={80}
+                  // columnWrapperStyle={{
+                  //   justifyContent: "space-between",
+                  //   marginTop: 12,
+                  // }}
+                />
+              </View>
               <View className="pb-5 border-b border-b-stone-200">
                 <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary ">
                   Title
@@ -179,12 +190,19 @@ export default function UploadListingStepTwo() {
           <View className="fixed bottom-0 h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
             <Pressable
               onPress={async () => {
+                if (uploading) {
+                  return;
+                }
                 if (title === "") {
                   alert("Please enter a title");
                   return;
                 }
                 if (price === "") {
                   alert("Please enter a price");
+                  return;
+                }
+                if (isNaN(Number(price))) {
+                  alert("Please enter a valid price");
                   return;
                 }
                 if (category === "picking") {
@@ -195,6 +213,8 @@ export default function UploadListingStepTwo() {
                   alert("Please enter a description");
                   return;
                 }
+                setUploading(true);
+
                 try {
                   const formData = new FormData();
                   for (let i = 0; i < images.length; i++) {
@@ -251,7 +271,7 @@ export default function UploadListingStepTwo() {
                     }
                   );
                   if (!postItemResponse.ok) {
-                    throw new Error("Failed to post item");
+                    throw new Error("Failed to upload item to server.");
                   }
 
                   const itemData: number = await postItemResponse.json();
@@ -260,6 +280,7 @@ export default function UploadListingStepTwo() {
                 } catch (e) {
                   console.error(e);
                 }
+                setUploading(false);
               }}
               className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"
             >

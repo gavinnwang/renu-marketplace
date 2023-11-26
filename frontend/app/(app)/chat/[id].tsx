@@ -9,13 +9,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../../constants/Colors";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   useInfiniteQuery,
+  useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ChatMessage, Item } from "../../../types";
+import { ChatMessage } from "../../../types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
@@ -26,6 +27,7 @@ import {
   getChatIdFromItemId,
   getItem,
   parseOrThrowResponse,
+  postChatRoomWithFirstMessage,
 } from "../../../api";
 
 export default function ChatScreen() {
@@ -39,7 +41,6 @@ export default function ChatScreen() {
   } = useLocalSearchParams();
   const { session } = useSession();
 
-  const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
   const queryClient = useQueryClient();
 
   const { data: chatId, isError: isErrorChatId } = useQuery({
@@ -56,7 +57,6 @@ export default function ChatScreen() {
   });
 
   // const [offset, setOffset] = React.useState(0);
-  // const limit = 25;
   // const [endReached, setEndReached] = React.useState(false);
 
   const getChatMessages = async ({ pageParam = 0 }) => {
@@ -76,7 +76,7 @@ export default function ChatScreen() {
   };
 
   const {
-    data: chatMessagesData,
+    data: chatMessages,
     isLoading: isLoadingChatMessages,
     isError: isErrorChatMessages,
     fetchNextPage,
@@ -108,20 +108,55 @@ export default function ChatScreen() {
     reconnectInterval: 5,
   });
 
-  // useEffect(() => {
-  //   if (lastMessage !== null) {
-  //     setChatMessages((prev) => [
-  //       {
-  //         id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
-  //         content: lastMessage.data,
-  //         from_me: 0,
-  //         sent_at: new Date(),
-  //       } as ChatMessage,
-  //       ...prev,
-  //     ]);
-  //     setOffset((prev) => prev + 1);
-  //   }
-  // }, [lastMessage]);
+  const createChatRoomAndFirstMessageMutation = useMutation({
+    mutationFn: (firstMessage: string) =>
+      postChatRoomWithFirstMessage(
+        session!.token,
+        firstMessage,
+        itemId as string
+      ),
+    onSuccess: (data) => {
+      sendMessage(`/join ${data}`);
+      queryClient.setQueryData(["chat_id", itemId], data);
+      queryClient.invalidateQueries(["chats", sellOrBuy]);
+      queryClient.invalidateQueries(["messages", data]);
+    },
+  });
+
+  const optimisticallyMutateChatMessages = useMutation({
+    mutationFn: async (newMessage: ChatMessage) => {
+      if (!chatId) return;
+      sendMessage(`/message ${chatId} ${newMessage.content}`);
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["messages", chatId] });
+      // const previousState = queryClient.getQueryData(["messages", chatId]);
+      const lastPageArray =
+        chatMessages?.pages[Math.max(0, chatMessages.pages.length - 1)].data ??
+        [];
+      const newMessage: ChatMessage = {
+        id:
+          lastPageArray.length > 0
+            ? lastPageArray[lastPageArray.length - 1].id + 1
+            : 1,
+        content: inputText,
+        from_me: 1,
+        sent_at: new Date(),
+      } as ChatMessage;
+      queryClient.setQueryData(["messages", chatId], (data: any) => ({
+        pages: data.pages
+          .slice(0, -1)
+          .concat([data.pages[-1].concat([newMessage])]),
+        pageParams: data.pageParams,
+      }));
+
+      // return { previousState };
+    },
+    onSettled: () => {
+      // queryClient.invalidateQueries(["messages", chatId]);
+      queryClient.invalidateQueries(["chats", sellOrBuy]);
+    },
+  });
 
   return (
     <SafeAreaView className="bg-bgLight">
@@ -193,7 +228,7 @@ export default function ChatScreen() {
           keyboardVerticalOffset={64}
         >
           <FlashList
-            data={chatMessages}
+            data={chatMessages?.pages.flatMap((x) => x.data) ?? []}
             renderItem={Message}
             keyExtractor={(_, index) => index.toString()}
             maintainVisibleContentPosition={{
@@ -231,58 +266,30 @@ export default function ChatScreen() {
                 }
                 if (!chatId && item) {
                   console.debug("no chat id so create one");
-                  try {
-                    const res = await fetch(`${API_URL}/chats/${item.id}`, {
-                      headers: {
-                        authorization: `Bearer ${session?.token}`,
-                        "content-type": "application/json",
-                      },
-                      method: "POST",
-                      body: JSON.stringify({
-                        first_message_content: inputText,
-                      }),
-                    }); // TODO use mutation
-                    setInputText("");
-                    const createdChatId: number = await res.json();
-                    sendMessage(`/join ${createdChatId}`);
-                    console.debug(
-                      "joining chat id ",
-                      createdChatId,
-                      "after creating"
-                    );
-                    console.debug("set chat id to new chat id", createdChatId);
-                    queryClient.setQueryData(
-                      ["chat_id", itemId],
-                      createdChatId
-                    );
-                    console.debug("invalidating:", ["chats", sellOrBuy]);
-                    queryClient.invalidateQueries(["chats", sellOrBuy]);
-                  } catch (err) {
-                    console.error("parse post messgae", err);
-                  }
+                  createChatRoomMutation.mutate(inputText);
+                  setInputText("");
                   return;
                 }
                 sendMessage(`/message ${chatId} ${inputText}`);
                 setInputText("");
-                queryClient.invalidateQueries(["chats", sellOrBuy]);
-                // const lastPageArray =
-                //   chatMessages.pages[Math.max(0, chatMessages.pages.length - 1)]
-                //     .data;
-                // const newMessage: ChatMessage = {
-                //   id:
-                //     lastPageArray.length > 0
-                //       ? lastPageArray[lastPageArray.length - 1].id + 1
-                //       : 1,
-                //   content: inputText,
-                //   from_me: 1,
-                //   sent_at: new Date(),
-                // } as ChatMessage;
+                const lastPageArray =
+                  chatMessages.pages[Math.max(0, chatMessages.pages.length - 1)]
+                    .data;
+                const newMessage: ChatMessage = {
+                  id:
+                    lastPageArray.length > 0
+                      ? lastPageArray[lastPageArray.length - 1].id + 1
+                      : 1,
+                  content: inputText,
+                  from_me: 1,
+                  sent_at: new Date(),
+                } as ChatMessage;
 
-                // const newPageArray = [...lastPageArray, newMessage];
-                // queryClient.setQueryData(["messages", chatId], (data: any) => ({
-                //   pages: newPageArray,
-                //   pageParams: data.pageParams,
-                // }));
+                const newPageArray = [...lastPageArray, newMessage];
+                queryClient.setQueryData(["messages", chatId], (data: any) => ({
+                  pages: data.pages.slice(0, -1).concat([newPageArray]),
+                  pageParams: data.pageParams,
+                }));
                 // queryClient.invalidateQueries(["messages", chatId]);
                 //   fetch(
                 //     `${process.env.EXPO_PUBLIC_BACKEND_URL}/chats/${item.id}`,

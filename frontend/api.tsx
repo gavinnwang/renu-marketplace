@@ -76,3 +76,40 @@ export async function getItem(itemId: string): Promise<Item> {
   const res = await fetch(`${API_URL}/items/${itemId}`);
   return parseOrThrowResponse<Item>(res);
 }
+
+export async function mutateItemStatus(
+  sessionToken: string,
+  itemId: number,
+  status: string
+) {
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${sessionToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    }
+  );
+  return parseOrThrowResponse(response);
+}
+
+export async function postChatRoomWithFirstMessage(
+  sessionToken: string,
+  message: string,
+  itemId: string
+): Promise<number> {
+  const res = await fetch(`${API_URL}/chats/${itemId}`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+      "content-type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({
+      first_message_content: message,
+    }),
+  });
+  return parseOrThrowResponse<number>(res);
+}

@@ -2,8 +2,8 @@ import { router } from "expo-router";
 import { SafeAreaView, View, Text, Pressable, Dimensions } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 import Colors from "../../constants/Colors";
-import ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
+import React from "react";
 import { Image } from "expo-image";
 import { FlatList } from "react-native-gesture-handler";
 
@@ -27,7 +27,7 @@ const CloseIcon = () => (
 const MAX_IMAGES = 6;
 
 export default function UploadListingStepOne() {
-  const [images, setImages] = useState<string[]>(["picker"]);
+  const [images, setImages] = React.useState<string[]>(["picker"]);
   const [_, requestPermission] = ImagePicker.useCameraPermissions();
 
   const pickImage = async () => {
