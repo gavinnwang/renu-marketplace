@@ -104,7 +104,12 @@ export default function ChatScreen() {
       },
       reconnectInterval: 5,
       onMessage: (e) => {
-        queryClient.invalidateQueries(["messages", chatId]);
+        console.log(e.data)
+        if ((e.data as string).endsWith("send success") || (e.data as string).endsWith("receive success")) {
+          console.debug("message sent successfully and invalidating");
+          queryClient.invalidateQueries(["messages", chatId]);
+          queryClient.invalidateQueries(["chats", sellOrBuy]);
+        }
       },
     }
   );
@@ -128,14 +133,14 @@ export default function ChatScreen() {
     if (!chatMessages?.pages) {
       return [];
     }
-    let lastDisplyTime: Date | null = null;
+    let lastDisplyTime: Date = new Date();;
     const curTime = new Date();
     return chatMessages.pages.flatMap((page) =>
       page.data.map((message) => {
-        if (lastDisplyTime === null) {
-          lastDisplyTime = new Date(message.sent_at);
-          return message as ChatMessageProcessed;
-        } else {
+        // if (lastDisplyTime === null) {
+        //   lastDisplyTime = new Date(message.sent_at);
+        //   return message as ChatMessageProcessed;
+        // } else {
           const sentAtDate = new Date(message.sent_at);
           const timeDiff = lastDisplyTime.getTime() - sentAtDate.getTime();
           const timeDiffFromCur = curTime.getTime() - sentAtDate.getTime();
@@ -157,10 +162,15 @@ export default function ChatScreen() {
               sent_at: null,
             } as ChatMessageProcessed;
           }
-        }
+        // }
       })
     );
   }, [chatMessages]);
+
+  const nanoid = React.useMemo(
+    () => customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 10),
+    []
+  );
   return (
     <SafeAreaView className="bg-bgLight">
       <View className="bg-bgLight h-full">
@@ -274,11 +284,15 @@ export default function ChatScreen() {
                   createChatRoomAndFirstMessageMutation.mutate(inputText);
                   setInputText("");
                 } else {
-                  const correlationId = nanoid() 
-                  sendMessage(`/message ${chatId} ${correlationId} ${inputText}`);
+                  const correlationId = nanoid();
+                  console.debug(
+                    "sending message with correlation id",
+                    correlationId
+                  );
+                  sendMessage(
+                    `/message ${chatId} ${correlationId} ${inputText}`
+                  );
                   setInputText("");
-                  queryClient.invalidateQueries(["messages", chatId]);
-                  queryClient.invalidateQueries(["chats", sellOrBuy]);
                 }
               }}
             />
@@ -292,40 +306,48 @@ export default function ChatScreen() {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
-import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid/non-secure";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessageProcessed }) => {
   return (
-    <View
-      className={`flex flex-row items-center ${
-        message.from_me ? "ml-auto" : "mr-auto"
-      }`}
-    >
-      {message.sent_at !== null && message.from_me ? (
-        <Text className="mr-2 text-xs font-Manrope_500Medium text-grayPrimary">
+    <View className="flex flex-col items-center">
+      {message.sent_at !== null ? (
+        <Text className="mt-3 mb-1 mr-2 text-xs font-Manrope_500Medium text-grayPrimary">
           {dayjs(message.sent_at).fromNow()}
         </Text>
       ) : null}
+
       <View
-        className={`flex flex-row rounded-xl p-2 w-fit my-1.5 ${
-          message.from_me
-            ? " bg-purplePrimary"
-            : " bg-grayLight border border-stone-300"
+        className={`flex flex-row items-center ${
+          message.from_me ? "ml-auto" : "mr-auto"
         }`}
       >
-        <Text
-          className={`font-Manrope_400Regular ${
-            message.from_me ? "text-white" : "text-black"
+        {/* {message.sent_at !== null && message.from_me ? (
+          <Text className="mr-2 text-xs font-Manrope_500Medium text-grayPrimary">
+            {dayjs(message.sent_at).fromNow()}
+          </Text>
+        ) : null} */}
+        <View
+          className={`flex flex-row rounded-xl p-2 w-fit my-1.5 ${
+            message.from_me
+              ? " bg-purplePrimary"
+              : " bg-grayLight border border-stone-300"
           }`}
         >
-          {message.content}
-        </Text>
+          <Text
+            className={`font-Manrope_400Regular ${
+              message.from_me ? "text-white" : "text-black"
+            }`}
+          >
+            {message.content}
+          </Text>
+        </View>
+        {/* {message.from_me || !message.sent_at ? null : (
+          <Text className="ml-2 text-xs font-Manrope_500Medium text-grayPrimary">
+            {dayjs(message.sent_at).fromNow()}
+          </Text>
+        )} */}
       </View>
-      {message.from_me || !message.sent_at ? null : (
-        <Text className="ml-2 text-xs font-Manrope_500Medium text-grayPrimary">
-          {dayjs(message.sent_at).fromNow()}
-        </Text>
-      )}
     </View>
   );
 };

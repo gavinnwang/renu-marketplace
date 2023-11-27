@@ -25,7 +25,7 @@ export function ItemListing({ item, index }: { item: Item; index: number }) {
         <Image
           transition={{
             effect: "cross-dissolve",
-            duration: 150,
+            duration: 200,
           }}
           placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
           source={{ uri: item.images[0] }}

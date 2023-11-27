@@ -111,7 +111,7 @@ impl Handler<ChatMessageToClient> for WsChatSession {
     type Result = ();
 
     fn handle(&mut self, msg: ChatMessageToClient, ctx: &mut Self::Context) {
-        ctx.text(msg.0);
+        ctx.text(format!("{} receive success", msg.0));
     }
 }
 
@@ -255,7 +255,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                                     "User id {} sent message to chat id {chat_id}",
                                                     act.user_id
                                                 );
-                                                ctx.text(format!("{} Success", correlation_id));
+                                                ctx.text(format!("{} send success", correlation_id));
                                             }
                                             Err(err) => {
                                                 tracing::error!(
