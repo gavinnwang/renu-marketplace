@@ -9,6 +9,7 @@ import { useSession } from "../../../hooks/useSession";
 import { getSavedItems, getUserMeInfo } from "../../../api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import RefreshScreen from "../../../components/RefreshScreen";
+import { FlashList } from "@shopify/flash-list";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -117,21 +118,19 @@ export default function AccountScreen() {
               marginTop="30%"
             />
           ) : (
-            <FlatList
+            <FlashList
               showsVerticalScrollIndicator={false}
               scrollEnabled={false}
               data={savedItemData}
               numColumns={2}
-              columnWrapperStyle={{
-                justifyContent: "flex-start",
-                marginTop: 12,
-                paddingHorizontal: 10,
-              }}
               contentContainerStyle={{
-                paddingBottom: 10,
+                paddingTop: 10,
+                paddingLeft: 10,
               }}
               keyExtractor={(item) => item.id.toString()}
               renderItem={ItemListing}
+              estimatedItemSize={200}
+              removeClippedSubviews={true}
             />
           )}
         </View>
