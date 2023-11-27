@@ -245,7 +245,7 @@ export default function ChatScreen() {
               minIndexForVisible: 0,
             }}
             inverted
-            estimatedItemSize={20}
+            estimatedItemSize={50}
             onEndReached={() => {
               if (!hasNextPage) {
                 console.debug("no next page");
@@ -266,6 +266,7 @@ export default function ChatScreen() {
               className="px-4 py-2 mx-2 border rounded-full border-gray-400"
               value={inputText}
               onChangeText={setInputText}
+              blurOnSubmit={false}
               onSubmitEditing={async () => {
                 if (!inputText.trim()) return;
                 if (!chatId) {

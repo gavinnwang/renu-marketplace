@@ -70,7 +70,7 @@ export default function MessageScreen() {
               }}
             />
           }
-          estimatedItemSize={100}
+          estimatedItemSize={160}
         />
       )}
     </View>

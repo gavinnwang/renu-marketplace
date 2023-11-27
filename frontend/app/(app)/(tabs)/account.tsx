@@ -129,7 +129,7 @@ export default function AccountScreen() {
               }}
               keyExtractor={(item) => item.id.toString()}
               renderItem={ItemListing}
-              estimatedItemSize={200}
+              estimatedItemSize={320}
               removeClippedSubviews={true}
             />
           )}

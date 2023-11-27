@@ -188,7 +188,7 @@ const CategoryView = ({
           onEndReached={() => {
             fetchNextPage();
           }}
-          estimatedItemSize={200}
+          estimatedItemSize={320}
           removeClippedSubviews={true}
         />
       )}

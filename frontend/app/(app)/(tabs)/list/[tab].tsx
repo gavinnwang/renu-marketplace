@@ -64,7 +64,7 @@ export default function ListScreen() {
       ) : items.filter((item) => item.status === STATUS[selectedTabInt])
           .length > 0 ? (
         <FlashList
-          estimatedItemSize={40}
+          estimatedItemSize={160}
           data={items.filter((item) => item.status === STATUS[selectedTabInt])}
           numColumns={1}
           keyExtractor={(item) => item.id.toString()}

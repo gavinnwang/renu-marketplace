@@ -229,6 +229,15 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     }
                                 };
 
+                                let correlation_id = match v.get(3) {
+                                    Some(correlation_id) => (*correlation_id).to_string(),
+                                    None => {
+                                        ctx.text("Message command requires correlation id");
+                                        tracing::error!("Message command requires correlation id");
+                                        return;
+                                    }
+                                };
+
                                 self.server_addr
                                     .send(server::ChatMessageToServer {
                                         sender_id: self.user_id,
@@ -244,6 +253,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                                     "User id {} sent message to chat id {chat_id}",
                                                     act.user_id
                                                 );
+                                                ctx.text(format!("{} Success", correlation_id));
                                             }
                                             Err(err) => {
                                                 tracing::error!(
