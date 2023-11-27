@@ -3,6 +3,7 @@ use sqlx::PgPool;
 
 use crate::{
     authentication::jwt::AuthenticationGuard,
+    error::DbError,
     repository::saved_item_repository::{
         delete_saved_item, fetch_saved_items_by_user_id, get_saved_item_status_by_item_id,
         insert_saved_item,
@@ -24,7 +25,7 @@ async fn get_saved_items_handler(
         Err(err) => {
             tracing::error!("Failed to fetch saved items: {err}");
             match err {
-                crate::error::DbError::NotFound => {
+                DbError::NotFound => {
                     HttpResponse::NotFound().json("Could not find saved items for user")
                 }
                 _ => HttpResponse::InternalServerError().json("Something went wrong"),
@@ -81,7 +82,10 @@ async fn post_saved_item_handler(
     };
 
     match result {
-        Ok(_) => HttpResponse::Ok().json("Saved item successfully"),
+        Ok(_) => HttpResponse::Ok().json(match data.new_status {
+            true => "Item saved successfully",
+            false => "Item unsaved successfully",
+        }),
         Err(err) => {
             tracing::error!("Failed to save item: {err}");
             match err {

@@ -10,12 +10,12 @@ dayjs.extend(relativeTime);
 const horizontalGapPx = 10;
 const imageWidth = (Dimensions.get("window").width - horizontalGapPx * 3) / 2;
 
-export function ItemListing({ item, index}: { item: Item, index: number }) {
+export function ItemListing({ item, index }: { item: Item; index: number }) {
   // console.debug(item);
   return (
     <Link
       href={`/item/${item.id}`}
-      className="flex flex-col px-[5px] shadow-sm pt-3"
+      className="flex flex-col shadow-sm px-[5px] pt-3"
     >
       <View className="flex flex-col">
         <Image

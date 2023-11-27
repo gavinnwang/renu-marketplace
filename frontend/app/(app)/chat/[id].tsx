@@ -178,7 +178,7 @@ export default function ChatScreen() {
           <View className="w-10 p-3" />
         </View>
 
-        <View className="border-y border-y-stone-400">
+        <View className="border-y border-y-stone-200">
           <Pressable
             onPress={() => router.push(`/item/${item?.id}`)}
             className="p-3.5 flex-row justify-between items-center bg-stone-50"
@@ -288,11 +288,17 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
   return (
     <>
       <View
-        className={`flex flex-row border border-stone-300 rounded-lg p-2.5 w-fit mb-3 ${
-          message.from_me ? "ml-auto bg-stone-100" : "mr-auto bg-stone-100"
+        className={`flex flex-row  rounded-lg p-2.5 w-fit mb-3 ${
+          message.from_me ? "ml-auto bg-purplePrimary" : "mr-auto bg-white"
         }`}
       >
-        <Text>{message.content}</Text>
+        <Text
+          className={`font-Manrope_400Regular ${
+            message.from_me ? "text-white" : "text-black"
+          }`}
+        >
+          {message.content}
+        </Text>
       </View>
     </>
   );
@@ -309,8 +315,7 @@ const CloseIcon = () => (
     <Path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth={1.7}
-      d="M6 18L18 6M6 6l12 12"
+      d="M15.75 19.5L8.25 12l7.5-7.5"
     />
   </Svg>
 );

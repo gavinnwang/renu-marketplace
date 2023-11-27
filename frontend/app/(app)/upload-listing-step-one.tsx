@@ -18,8 +18,7 @@ const CloseIcon = () => (
     <Path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth={1.7}
-      d="M6 18L18 6M6 6l12 12"
+      d="M15.75 19.5L8.25 12l7.5-7.5"
     />
   </Svg>
 );

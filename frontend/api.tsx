@@ -122,6 +122,7 @@ export async function postChangeSavedItemStatus(
   const res = await fetch(`${API_URL}/saved/${itemId}`, {
     headers: {
       authorization: `Bearer ${sessionToken}`,
+      "content-type": "application/json",
     },
     method: "POST",
     body: JSON.stringify({
