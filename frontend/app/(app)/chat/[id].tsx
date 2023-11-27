@@ -126,40 +126,6 @@ export default function ChatScreen() {
     },
   });
 
-  // const optimisticallyMutateChatMessages = useMutation({
-  //   mutationFn: async (newMessage: string) => {
-  //     if (!chatId) return;
-  //     sendMessage(`/message ${chatId} ${newMessage}`);
-  //   },
-  //   onMutate: async () => {
-  //     await queryClient.cancelQueries({ queryKey: ["messages", chatId] });
-  //     const lastPageArray =
-  //       chatMessages?.pages[Math.max(0, chatMessages.pages.length - 1)].data ??
-  //       [];
-  //     const newMessage: ChatMessage = {
-  //       id:
-  //         lastPageArray.length > 0
-  //           ? lastPageArray[lastPageArray.length - 1].id + 1
-  //           : 1,
-  //       content: inputText,
-  //       from_me: 1,
-  //       sent_at: new Date(),
-  //     };
-  //     const newPageArray = [...lastPageArray, newMessage];
-  //     queryClient.setQueryData(["messages", chatId], (oldData: any) => {
-  //       const newPages = oldData ? [...oldData.pages] : [];
-  //       if (newPages.length === 0) {
-  //         newPages.push({ data: [newMessage] });
-  //       } else {
-  //         newPages[newPages.length - 1].data = newPageArray;
-  //       }
-  //       return {
-  //         pages: newPages,
-  //         pageParams: oldData.pageParams,
-  //       };
-  //     });
-  //   },
-  // });
   const chatMessagesData = React.useMemo(() => {
     if (!chatMessages?.pages) {
       return [];
@@ -182,7 +148,8 @@ export default function ChatScreen() {
           const dispayTime: boolean =
             (timeDiffFromCur < 1000 * 60 * 60 && timeDiff > 1000 * 60) ||
             (timeDiffFromCur > 1000 * 60 * 60 && timeDiff > 1000 * 60 * 60) ||
-            (timeDiffFromCur > 1000 * 60 * 60 * 24 && timeDiff > 1000 * 60 * 60 * 24);
+            (timeDiffFromCur > 1000 * 60 * 60 * 24 &&
+              timeDiff > 1000 * 60 * 60 * 24);
           if (dispayTime) {
             lastDisplyTime = sentAtDate;
             return message as ChatMessageProcessed;
