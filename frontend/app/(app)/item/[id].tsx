@@ -17,17 +17,18 @@ import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
 import { CATEGORIES } from "../(tabs)/home";
 
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { useSession } from "../../../hooks/useSession";
 import {
   getChatIdFromItemId,
+  getItem,
   getSavedItemStatus,
   getUserInfo,
   postChangeSavedItemStatus,
 } from "../../../api";
 import { Item } from "../../../types";
 import React from "react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 const CloseIcon = () => (
@@ -65,21 +66,14 @@ const HeartIcon = ({ filled }: { filled: boolean }) => (
 export default function ItemPage() {
   const { id: itemId, itemString } = useLocalSearchParams();
 
-  const item = React.useMemo(() => {
-    if (itemString) {
-      return JSON.parse(itemString as string) as Item;
-    } else {
-      return undefined;
-    }
-  }, [itemString]);
-
   const { session } = useSession();
 
-  // const { data: item, isError } = useQuery({
-  //   queryFn: () => getItem(itemId as string),
-  //   queryKey: ["item", itemId],
-  //   enabled: !!itemId,
-  // });
+  const { data: item, isError } = useQuery({
+    queryFn: () => getItem(itemId as string),
+    queryKey: ["item", itemId],
+    enabled: !!itemId,
+    initialData: JSON.parse(itemString as string),
+  });
 
   const { data: chatId, isError: isErrorChatId } = useQuery({
     queryFn: () => getChatIdFromItemId(session!.token, itemId as string),
@@ -121,6 +115,7 @@ export default function ItemPage() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["saved", itemId] });
+      queryClient.invalidateQueries({ queryKey: ["savedItems"] });
     },
   });
 

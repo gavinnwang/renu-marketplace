@@ -2,7 +2,7 @@ import React from "react";
 import { Session } from "../types";
 
 type AuthContextType = {
-  signIn: (from: string) => Promise<void>;
+  signIn: () => Promise<void>;
   signOut: () => void;
   session: Session | null;
   isLoading: boolean;

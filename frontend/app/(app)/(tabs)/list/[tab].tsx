@@ -55,17 +55,10 @@ export default function ListScreen() {
         itemData={items ?? []}
       />
       {isErrorItem ? (
-        <View className="flex flex-grow">
-          <Text className=" mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
-            Something went wrong.
-          </Text>
-          <Pressable
-            onPress={() => refetch()}
-            className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center"
-          >
-            <Text className="font-Poppins_500Medium">Refresh</Text>
-          </Pressable>
-        </View>
+        <RefreshScreen
+          displayText={"Something went wrong."}
+          refetch={refetch}
+        />
       ) : isLoadingItem ? (
         <View className="flex flex-grow"></View>
       ) : items.filter((item) => item.status === STATUS[selectedTabInt])
@@ -92,17 +85,10 @@ export default function ListScreen() {
           )}
         />
       ) : (
-        <View className="flex flex-grow">
-          <Text className=" mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
-            You have no {tabDisplay ? "sold items." : "listings."}
-          </Text>
-          <Pressable
-            onPress={() => refetch()}
-            className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center"
-          >
-            <Text className="font-Poppins_500Medium">Refresh</Text>
-          </Pressable>
-        </View>
+        <RefreshScreen
+          displayText={`You have no ${tabDisplay} items.`}
+          refetch={refetch}
+        />
       )}
 
       <View className="h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
@@ -112,7 +98,7 @@ export default function ListScreen() {
               pathname: "/upload-listing-step-one",
             });
           }}
-          className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"
+          className="w-full h-full bg-purplePrimary rounded-sm flex shadow-lg items-center justify-center"
         >
           <Text className="font-SecularOne_400Regular text-xl text-white">
             ADD NEW LISTING
@@ -130,6 +116,7 @@ import { CATEGORIES } from "../home";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
 import { getUserMeItems, postItemStatus } from "../../../../api";
+import RefreshScreen from "../../../../components/RefreshScreen";
 
 const ListingPageItem = ({
   item,
@@ -196,7 +183,13 @@ const ListingPageItem = ({
         setTouching(false);
       }}
       onPress={() => {
-        void router.push({ pathname: `/item/${item.id}` });
+        console.log(item);
+        void router.push({
+          pathname: `/item/${item.id}`,
+          params: {
+            itemString: JSON.stringify(item),
+          },
+        });
       }}
       className={`flex flex-row py-4 px-4 border-b border-b-grayPrimary  ${
         touching ? "bg-gray-100" : ""
@@ -230,7 +223,7 @@ const ListingPageItem = ({
         </View>
         <TouchableOpacity
           onPress={onPressHandler}
-          className="border-[1.5px] h-[32px] flex-grow-0 flex items-center justify-center"
+          className="border-[1.5px] h-[32px] flex-grow-0 flex items-center justify-center rounded-sm"
         >
           <Text
             className={`font-SecularOne_400Regular text-sm ${

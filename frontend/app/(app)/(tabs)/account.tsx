@@ -7,6 +7,8 @@ import { ItemListing } from "../../../components/ItemListing";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
 import { getSavedItems, getUserMeInfo } from "../../../api";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import RefreshScreen from "../../../components/RefreshScreen";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -22,6 +24,7 @@ export default function AccountScreen() {
     data: savedItemData,
     isError: isErrorSavedItem,
     isLoading: isLoadingSavedItem,
+    refetch,
   } = useQuery({
     queryKey: ["savedItems"],
     queryFn: () => getSavedItems(session!.token),
@@ -77,14 +80,14 @@ export default function AccountScreen() {
           </View>
 
           <View className="flex flex-col w-[100px] gap-y-0.5">
-            <Pressable
+            <TouchableOpacity
               onPress={signOut}
-              className="font-Manrope_400Regular bg-purplePrimary p-2"
+              className="font-Manrope_400Regular bg-purplePrimary p-2 rounded-sm"
             >
               <Text className="text-white text-center font-SecularOne_400Regular">
                 SIGN OUT
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -102,13 +105,17 @@ export default function AccountScreen() {
           {isLoadingSavedItem ? (
             <></>
           ) : isErrorSavedItem ? (
-            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-lg">
-              Something went wrong.
-            </Text>
+            <RefreshScreen
+              displayText="Something went wrong."
+              refetch={refetch}
+              marginTop="30%"
+            />
           ) : savedItemData.length === 0 ? (
-            <Text className="mx-auto my-[30%] font-Poppins_600SemiBold text-base">
-              You have no saved items.
-            </Text>
+            <RefreshScreen
+              displayText="You have no saved items."
+              refetch={refetch}
+              marginTop="30%"
+            />
           ) : (
             <FlatList
               showsVerticalScrollIndicator={false}

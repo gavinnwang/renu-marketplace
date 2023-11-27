@@ -5,9 +5,9 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Slot, SplashScreen, Stack } from "expo-router";
+import { Slot, SplashScreen } from "expo-router";
 import { useEffect } from "react";
-import { SafeAreaView, View, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
 import { SessionProvider } from "../providers/sessionProvider";
 import {
   Poppins_300Light,

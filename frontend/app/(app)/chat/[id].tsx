@@ -16,7 +16,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ChatMessage } from "../../../types";
+import { ChatMessage, ChatMessageProcessed } from "../../../types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
@@ -47,7 +47,7 @@ export default function ChatScreen() {
     queryFn: async () => getChatIdFromItemId(session!.token, itemId as string),
     queryKey: ["chat_id", itemId],
     enabled: !!itemId && !chatIdParam && !!session && !newChat, // run the query if there is no chat id param and is not a new chat
-    placeholderData: parseInt(chatIdParam as string),
+    initialData: parseInt(chatIdParam as string),
   });
 
   const { data: item, isError: isErrorData } = useQuery({
@@ -100,9 +100,7 @@ export default function ChatScreen() {
       },
       shouldReconnect: () => true,
       onOpen: () => {
-        console.debug("opened");
         if (chatId) {
-          console.debug("joining chat after openning", chatId);
           sendMessage(`/join ${chatId}`);
         }
       },
@@ -162,7 +160,33 @@ export default function ChatScreen() {
   //     });
   //   },
   // });
-
+  const chatMessagesData = React.useMemo(() => {
+    if (!chatMessages?.pages) {
+      return [];
+    }
+    let lastDisplyTime: Date | null = null;
+    return chatMessages.pages.flatMap((page) =>
+      page.data.map((message) => {
+        if (lastDisplyTime === null) {
+          lastDisplyTime = new Date(message.sent_at);
+          return message as ChatMessageProcessed;
+        } else {
+          const sentAtDate = new Date(message.sent_at);
+          const timeDiff = lastDisplyTime.getTime() - sentAtDate.getTime();
+          if (timeDiff > 1000 * 60 * 5) {
+            // if more than 5 mins
+            lastDisplyTime = sentAtDate;
+            return message as ChatMessageProcessed;
+          } else {
+            return {
+              ...message,
+              sent_at: null,
+            } as ChatMessageProcessed;
+          }
+        }
+      })
+    );
+  }, [chatMessages]);
   return (
     <SafeAreaView className="bg-bgLight">
       <View className="bg-bgLight h-full">
@@ -180,7 +204,14 @@ export default function ChatScreen() {
 
         <View className="border-y border-y-stone-200">
           <Pressable
-            onPress={() => router.push(`/item/${item?.id}`)}
+            onPress={() =>
+              router.push({
+                pathname: `/item/${item!.id}`,
+                params: {
+                  itemString: JSON.stringify(item),
+                },
+              })
+            }
             className="p-3.5 flex-row justify-between items-center bg-stone-50"
             style={{
               height: (width * 4) / 3 + 28,
@@ -233,7 +264,7 @@ export default function ChatScreen() {
           keyboardVerticalOffset={64}
         >
           <FlashList
-            data={chatMessages?.pages.flatMap((x) => x.data) ?? []}
+            data={chatMessagesData}
             renderItem={Message}
             keyExtractor={(_, index) => index.toString()}
             maintainVisibleContentPosition={{
@@ -242,14 +273,12 @@ export default function ChatScreen() {
             inverted
             estimatedItemSize={20}
             onEndReached={() => {
-              // if ( !chatId) return;
               if (!hasNextPage) {
                 console.debug("no next page");
                 return;
               }
               console.debug("refetching messages");
               fetchNextPage();
-              // refetch();
             }}
             showsVerticalScrollIndicator={true}
             contentContainerStyle={{
@@ -284,12 +313,26 @@ export default function ChatScreen() {
   );
 }
 
-const Message = ({ item: message }: { item: ChatMessage }) => {
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+const Message = ({ item: message }: { item: ChatMessageProcessed }) => {
   return (
-    <>
+    <View
+      className={`flex flex-row items-center ${
+        message.from_me ? "ml-auto" : "mr-auto"
+      }`}
+    >
+      {message.sent_at !== null && message.from_me ? (
+        <Text className="mr-2 text-xs font-Manrope_500Medium text-grayPrimary">
+          {dayjs(message.sent_at).fromNow()}
+        </Text>
+      ) : null}
       <View
-        className={`flex flex-row  rounded-lg p-2.5 w-fit mb-3 ${
-          message.from_me ? "ml-auto bg-purplePrimary" : "mr-auto bg-white"
+        className={`flex flex-row rounded-xl p-2 w-fit my-1.5 ${
+          message.from_me
+            ? " bg-purplePrimary"
+            : " bg-grayLight border border-stone-300"
         }`}
       >
         <Text
@@ -300,7 +343,12 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
           {message.content}
         </Text>
       </View>
-    </>
+      {message.from_me || !message.sent_at ? null : (
+        <Text className="ml-2 text-xs font-Manrope_500Medium text-grayPrimary">
+          {dayjs(message.sent_at).fromNow()}
+        </Text>
+      )}
+    </View>
   );
 };
 

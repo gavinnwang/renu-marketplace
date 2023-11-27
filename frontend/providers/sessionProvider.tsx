@@ -14,8 +14,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [loadedFromStorage, setLoadedFromStorage] = React.useState(false);
 
-  const signIn = async (from: string) => {
-    const callbackUrl = Linking.createURL("App") + from;
+  const signIn = async () => {
+    const callbackUrl = Linking.createURL("App");
     const link = getGoogleUrl(callbackUrl);
 
     const result: WebBrowser.WebBrowserAuthSessionResult =
@@ -41,7 +41,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signOut = () => {
+  const signOut = async () => {
+    await SecureStore.setItemAsync("session", "");
     setSession(null);
   };
 

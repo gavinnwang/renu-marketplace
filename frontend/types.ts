@@ -68,7 +68,13 @@ export type ChatGroup = {
 export type ChatMessage = {
   id: number;
   content: string;
-  sent_at: Date;
+  sent_at: string;
   from_me: number;
 };
 
+export type ChatMessageProcessed = {
+  id: number;
+  content: string;
+  sent_at: string | null;
+  from_me: number;
+};

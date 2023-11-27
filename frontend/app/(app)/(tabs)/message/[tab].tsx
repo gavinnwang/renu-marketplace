@@ -4,6 +4,7 @@ import {
   Dimensions,
   Animated,
   Pressable,
+  RefreshControl,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { ChatGroup, Measure, RefAndKey } from "../../../../types";
@@ -16,6 +17,7 @@ import { useSession } from "../../../../hooks/useSession";
 import { getChatGroups } from "../../../../api";
 import { FlashList } from "@shopify/flash-list";
 import { FlatList } from "react-native-gesture-handler";
+import RefreshScreen from "../../../../components/RefreshScreen";
 
 const TABS = ["Buy", "Sell"];
 const data = TABS.map((i) => ({
@@ -51,36 +53,24 @@ export default function MessageScreen() {
       </Text>
       <Tabs data={data} selectedTabInt={selectedTabInt} />
       {isErrorChats ? (
-        <Text className="mx-auto my-[50%] font-Poppins_600SemiBold text-lg">
-          Something wrong happened...
-        </Text>
+        <RefreshScreen displayText="Something went wrong." refetch={refetch} />
       ) : isLoadingChats ? (
         <></>
-      ) : chats.length <= 0 ? (
-        <>
-          <Text className="mx-auto mt-[50%] font-Poppins_600SemiBold text-lg">
-            You have no messages.
-          </Text>
-          <Pressable
-            onPress={() => refetch()}
-            className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center"
-          >
-            <Text className="font-Poppins_500Medium">Refresh</Text>
-          </Pressable>
-        </>
+      ) : chats.length === 0 ? (
+        <RefreshScreen displayText="No messages yet." refetch={refetch} />
       ) : (
         <FlashList
           data={chats}
           renderItem={({ item }) => <ChatRow item={item} />}
           keyExtractor={(item) => item.chat_id.toString()}
-          // refreshControl={
-          //   <RefreshControl
-          //     refreshing={refreshing}
-          //     onRefresh={() => {
-          //       refetch();
-          //     }}
-          //   />
-          // }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                refetch();
+              }}
+            />
+          }
           estimatedItemSize={100}
         />
       )}
