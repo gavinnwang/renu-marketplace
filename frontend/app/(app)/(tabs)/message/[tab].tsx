@@ -16,7 +16,6 @@ import { Image } from "expo-image";
 import { useSession } from "../../../../hooks/useSession";
 import { getChatGroups } from "../../../../api";
 import { FlashList } from "@shopify/flash-list";
-import { FlatList } from "react-native-gesture-handler";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
 const TABS = ["Buy", "Sell"];

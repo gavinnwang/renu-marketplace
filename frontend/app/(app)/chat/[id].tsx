@@ -7,8 +7,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Svg, { Path } from "react-native-svg";
-import Colors from "../../../constants/Colors";
 import React from "react";
 import {
   useInfiniteQuery,

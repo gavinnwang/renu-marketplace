@@ -1,7 +1,6 @@
 import { router } from "expo-router";
 import { SafeAreaView, View, Text, Pressable, Dimensions } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
-import Colors from "../../constants/Colors";
 import * as ImagePicker from "expo-image-picker";
 import React from "react";
 import { Image } from "expo-image";

@@ -12,7 +12,6 @@ import Svg, { Path } from "react-native-svg";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
-import { FlatList } from "react-native-gesture-handler";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
 import { CATEGORIES } from "../(tabs)/home";
@@ -30,6 +29,7 @@ import React from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
+import { FlashList } from "@shopify/flash-list";
 dayjs.extend(relativeTime);
 
 const HeartIcon = ({ filled }: { filled: boolean }) => (
@@ -79,7 +79,9 @@ export default function ItemPage() {
   });
 
   const [index, setIndex] = useState(0);
+
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+    if (viewableItems.length === 0) return;
     setIndex(viewableItems[0].index);
   }).current;
 
@@ -120,7 +122,8 @@ export default function ItemPage() {
 
         {item ? (
           <ScrollView>
-            <FlatList
+            <FlashList
+              estimatedItemSize={300}
               data={item.images}
               renderItem={({ item }) => (
                 <Image
@@ -130,8 +133,9 @@ export default function ItemPage() {
                   }}
                   placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
                   style={{
-                    height: "100%",
+                    height: Dimensions.get("window").width,
                     width: Dimensions.get("window").width,
+                    maxHeight: Dimensions.get("window").width,
                   }}
                   source={{
                     uri: item,
@@ -146,9 +150,9 @@ export default function ItemPage() {
               viewabilityConfig={{
                 itemVisiblePercentThreshold: 50,
               }}
-              style={{
-                height: Dimensions.get("window").width,
-              }}
+              // contentContainerStyle={{
+              //   height: Dimensions.get("window").width,
+              // }}
             />
             <View className="relative">
               {item.images.length > 1 && (

@@ -6,12 +6,10 @@ import {
   Pressable,
   Dimensions,
   ScrollView,
-  FlatList,
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
-import Colors from "../../constants/Colors";
 import React from "react";
 import { Image } from "expo-image";
 import { Picker, PickerIOS } from "@react-native-picker/picker";

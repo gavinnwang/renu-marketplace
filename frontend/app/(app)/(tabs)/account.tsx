@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, FlatList, Text, View, ScrollView } from "react-native";
+import { Text, View, ScrollView } from "react-native";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
