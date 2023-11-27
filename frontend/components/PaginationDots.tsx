@@ -11,7 +11,7 @@ export default function PaginationDots(props: {
           key={i}
           className={`w-[7px] h-[7px] rounded-full mx-1 ${
             i === props.currentIndex
-              ? "bg-blackPrimary"
+              ? "bg-purplePrimary"
               : "bg-gray-200 opacity-30"
           }`}
         />
