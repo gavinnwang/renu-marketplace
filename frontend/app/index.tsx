@@ -46,7 +46,7 @@ export default function Index() {
         </Text>
       </View>
       <Text className="mt-1 font-Poppins_600SemiBold text-black text-base w-[300px] mx-auto text-center leading-6">
-        Shop and sell with ease within people in your college area!
+        Shop and sell with ease with people within your college area!
       </Text>
 
       <TouchableOpacity onPress={signIn}>
