@@ -133,6 +133,7 @@ export default function ChatScreen() {
     if (!chatMessages?.pages) {
       return [];
     }
+    console.debug("processing messages")
     let lastDisplyTime: Date = new Date();;
     const curTime = new Date();
     return chatMessages.pages.flatMap((page) =>
@@ -144,6 +145,7 @@ export default function ChatScreen() {
           const sentAtDate = new Date(message.sent_at);
           const timeDiff = lastDisplyTime.getTime() - sentAtDate.getTime();
           const timeDiffFromCur = curTime.getTime() - sentAtDate.getTime();
+          // console.log(timeDiff, timeDiffFromCur, message.content);
 
           // display if the time from now is less than an hour and time from last display is more than 1 mins
           // or if the time from now is more than an hour and time from last display is more than 1 hour
