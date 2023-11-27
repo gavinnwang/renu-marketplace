@@ -23,6 +23,7 @@ pub async fn fetch_saved_items_by_user_id(
         FROM saved_item 
         INNER JOIN item ON saved_item.item_id = item.id
         WHERE saved_item.user_id = $1
+        ORDER BY saved_item.created_at DESC
         "#,
         user_id
     )

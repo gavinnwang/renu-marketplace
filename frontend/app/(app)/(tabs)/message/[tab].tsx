@@ -140,7 +140,7 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
           <Text className="font-Poppins_400Regular">
             {chat.other_user_name}
           </Text>
-          <Text className="font-Poppins_400Regular text-sm">
+          <Text className="font-Manrope_600SemiBold text-sm text-purplePrimary">
             {chat.item_status === "inactive"
               ? "Item is no longer available."
               : ""}

@@ -215,7 +215,7 @@ export default function ItemPage() {
 
               <View>
                 <Text className="font-Manrope_400Regular text-sm mb-1">
-                  {item.description ?? "No description provided."}
+                  {!(item.description && item.description.trim()) ? "No description provided." : item.description.trim()}
                 </Text>
               </View>
               <Text className="font-Manrope_400Regular text-xs">

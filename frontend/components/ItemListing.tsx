@@ -37,7 +37,7 @@ export function ItemListing({ item, index }: { item: Item; index: number }) {
           }}
         />
         <View className="h-fit py-2 px-2.5 bg-white rounded-b flex flex-col">
-          <Text className="font-Manrope_600SemiBold text-base">
+          <Text className="font-Manrope_600SemiBold text-base max-h-[25px]">
             {item.name}
           </Text>
           <Text className="font-Manrope_500Medium text-xs">

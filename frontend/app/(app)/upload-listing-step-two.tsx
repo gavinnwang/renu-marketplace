@@ -191,10 +191,7 @@ export default function UploadListingStepTwo() {
                   alert("Please pick a category");
                   return;
                 }
-                if (description === "") {
-                  alert("Please enter a description");
-                  return;
-                }
+                
                 setUploading(true);
 
                 try {

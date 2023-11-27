@@ -218,7 +218,7 @@ export default function ChatScreen() {
                   <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
                     {item.description}
                   </Text>
-                  <Text className="font-Manrope_600SemiBold text-sm text-blackPrimary">
+                  <Text className="font-Manrope_600SemiBold text-sm text-purplePrimary">
                     {item.status === "inactive"
                       ? "Item is no longer available."
                       : ""}
