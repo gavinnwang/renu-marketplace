@@ -165,6 +165,7 @@ export default function ChatScreen() {
       return [];
     }
     let lastDisplyTime: Date | null = null;
+    const curTime = new Date();
     return chatMessages.pages.flatMap((page) =>
       page.data.map((message) => {
         if (lastDisplyTime === null) {
@@ -173,8 +174,16 @@ export default function ChatScreen() {
         } else {
           const sentAtDate = new Date(message.sent_at);
           const timeDiff = lastDisplyTime.getTime() - sentAtDate.getTime();
-          if (timeDiff > 1000 * 60 * 5) {
-            // if more than 5 mins
+          const timeDiffFromCur = curTime.getTime() - sentAtDate.getTime();
+
+          // display if the time from now is less than an hour and time from last display is more than 1 mins
+          // or if the time from now is more than an hour and time from last display is more than 1 hour
+          // or if the time from now is more than a day and time from last display is more than 1 day
+          const dispayTime: boolean =
+            (timeDiffFromCur < 1000 * 60 * 60 && timeDiff > 1000 * 60) ||
+            (timeDiffFromCur > 1000 * 60 * 60 && timeDiff > 1000 * 60 * 60) ||
+            (timeDiffFromCur > 1000 * 60 * 60 * 24 && timeDiff > 1000 * 60 * 60 * 24);
+          if (dispayTime) {
             lastDisplyTime = sentAtDate;
             return message as ChatMessageProcessed;
           } else {
@@ -192,7 +201,7 @@ export default function ChatScreen() {
       <View className="bg-bgLight h-full">
         <View className="flex flex-row items-center justify-between ">
           <Pressable onPress={router.back} className="w-10 p-3">
-          <LeftChevron />
+            <LeftChevron />
           </Pressable>
           {otherUserName && (
             <Text className="font-Poppins_600SemiBold text-base text-blackPrimary ">
