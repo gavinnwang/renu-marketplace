@@ -22,11 +22,12 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { useSession } from "../../../hooks/useSession";
 import {
   getChatIdFromItemId,
-  getItem,
   getSavedItemStatus,
   getUserInfo,
   postChangeSavedItemStatus,
 } from "../../../api";
+import { Item } from "../../../types";
+import React from "react";
 dayjs.extend(relativeTime);
 
 const CloseIcon = () => (
@@ -62,15 +63,23 @@ const HeartIcon = ({ filled }: { filled: boolean }) => (
 );
 
 export default function ItemPage() {
-  const param = useLocalSearchParams();
-  const itemId = param.id;
+  const { id: itemId, itemString } = useLocalSearchParams();
+
+  const item = React.useMemo(() => {
+    if (itemString) {
+      return JSON.parse(itemString as string) as Item;
+    } else {
+      return undefined;
+    }
+  }, [itemString]);
+
   const { session } = useSession();
 
-  const { data: item, isError } = useQuery({
-    queryFn: () => getItem(itemId as string),
-    queryKey: ["item", itemId],
-    enabled: !!itemId,
-  });
+  // const { data: item, isError } = useQuery({
+  //   queryFn: () => getItem(itemId as string),
+  //   queryKey: ["item", itemId],
+  //   enabled: !!itemId,
+  // });
 
   const { data: chatId, isError: isErrorChatId } = useQuery({
     queryFn: () => getChatIdFromItemId(session!.token, itemId as string),
