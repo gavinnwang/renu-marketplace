@@ -274,7 +274,8 @@ export default function ChatScreen() {
                   createChatRoomAndFirstMessageMutation.mutate(inputText);
                   setInputText("");
                 } else {
-                  sendMessage(`/message ${chatId} ${inputText}`);
+                  const correlationId = nanoid() 
+                  sendMessage(`/message ${chatId} ${correlationId} ${inputText}`);
                   setInputText("");
                   queryClient.invalidateQueries(["messages", chatId]);
                   queryClient.invalidateQueries(["chats", sellOrBuy]);
@@ -291,6 +292,7 @@ export default function ChatScreen() {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
+import { nanoid } from "nanoid";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessageProcessed }) => {
   return (

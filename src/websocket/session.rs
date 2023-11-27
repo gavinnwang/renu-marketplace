@@ -139,7 +139,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 tracing::info!("WS text: {:?}", text);
                 let m = text.trim();
                 if m.starts_with('/') {
-                    let v: Vec<&str> = m.splitn(3, ' ').collect();
+                    let v: Vec<&str> = m.splitn(4, ' ').collect();
                     match v[0] {
                         "/join" => {
                             let user_id = self.user_id as i32;
@@ -220,7 +220,17 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                         return;
                                     }
                                 };
-                                let content = match v.get(2) {
+                                let correlation_id = match v.get(2) {
+                                    Some(correlation_id) => (*correlation_id).to_string(),
+                                    None => {
+                                        ctx.text("Message command requires correlation id");
+                                        tracing::error!("Message command requires correlation id");
+                                        return;
+                                    }
+                                };
+                                tracing::info!("Received correlation id: {}", correlation_id);
+
+                                let content = match v.get(3) {
                                     Some(content) => (*content).to_string(),
                                     None => {
                                         ctx.text("Message command requires content");
@@ -229,14 +239,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     }
                                 };
 
-                                let correlation_id = match v.get(3) {
-                                    Some(correlation_id) => (*correlation_id).to_string(),
-                                    None => {
-                                        ctx.text("Message command requires correlation id");
-                                        tracing::error!("Message command requires correlation id");
-                                        return;
-                                    }
-                                };
 
                                 self.server_addr
                                     .send(server::ChatMessageToServer {
