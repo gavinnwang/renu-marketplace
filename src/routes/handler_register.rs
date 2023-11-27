@@ -29,8 +29,9 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
 
     conf.service(
         web::scope("/saved")
-            .service(super::saved_item_handler::get_saved_items_by_user_id)
-            .service(super::saved_item_handler::post_saved_item),
+            .service(super::saved_item_handler::get_saved_items_handler)
+            .service(super::saved_item_handler::get_saved_item_status_handler)
+            .service(super::saved_item_handler::post_saved_item_handler),
     );
 
     conf.service(
@@ -39,12 +40,8 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::chat_handler::get_chat_groups_by_buyer_id)
             .service(super::chat_handler::get_chat_messages_by_chat_id)
             .service(super::chat_handler::get_chat_id_by_item_id)
-            // .service(super::chat_handler::post_chat_message)
             .service(super::chat_handler::post_chat_room_and_send_first_message),
     );
 
-    conf.service(
-        web::scope("/images")
-            .service(super::image_upload_handler::post_images),
-    );
+    conf.service(web::scope("/images").service(super::image_upload_handler::post_images));
 }

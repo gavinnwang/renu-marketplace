@@ -47,7 +47,7 @@ export default function ListScreen() {
   return (
     <View className="bg-bgLight h-full">
       <Text className="ml-2.5 mt-4 font-Poppins_600SemiBold text-xl text-blackPrimary ">
-        {tabDisplay}
+        Listings
       </Text>
       <Tabs
         data={data}
@@ -129,7 +129,7 @@ dayjs.extend(relativeTime);
 import { CATEGORIES } from "../home";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
-import { getUserMeItems, mutateItemStatus } from "../../../../api";
+import { getUserMeItems, postItemStatus } from "../../../../api";
 
 const ListingPageItem = ({
   item,
@@ -146,7 +146,7 @@ const ListingPageItem = ({
 
   const queryClient = useQueryClient();
   const mutation = useMutation(
-    (newStatus: string) => mutateItemStatus(session!.token, item.id, newStatus),
+    (newStatus: string) => postItemStatus(session!.token, item.id, newStatus),
     {
       onMutate: async () => {
         await queryClient.cancelQueries({ queryKey: ["list"] });

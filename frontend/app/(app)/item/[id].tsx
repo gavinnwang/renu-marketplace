@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Colors from "../../../constants/Colors";
 import { Image } from "expo-image";
 import { FlatList } from "react-native-gesture-handler";
@@ -19,7 +19,12 @@ import { CATEGORIES } from "../(tabs)/home";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useSession } from "../../../hooks/useSession";
-import { getChatIdFromItemId, getItem, getUserInfo } from "../../../api";
+import {
+  getChatIdFromItemId,
+  getItem,
+  getUserInfo,
+  postChangeSavedItemStatus,
+} from "../../../api";
 dayjs.extend(relativeTime);
 
 const CloseIcon = () => (
@@ -66,6 +71,16 @@ export default function ItemPage() {
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
     setIndex(viewableItems[0].index);
   }).current;
+
+  const queryClient = useQueryClient();
+
+  const saveItemMutation = useMutation({
+    mutationFn: (newStatus: boolean) =>
+      postChangeSavedItemStatus(session!.token, itemId as string, newStatus),
+    onMutate: async (newStatus: boolean) => {
+      const previousStatus = queryClient.getQueryData([""]);
+    },
+  });
 
   return (
     <>
@@ -215,42 +230,43 @@ export default function ItemPage() {
                     </Text>
                   </View>
                 </View>
-
-                <View className="ml-auto flex flex-col w-[100px] gap-y-0.5">
-                  <Pressable
-                    onPress={() => {
-                      if (item.user_id === session?.user_id) {
-                        router.push("/account");
-                      } else if (seller) {
-                        if (chatId) {
-                          router.push({
-                            pathname: `/chat/${item.id}`,
-                            params: {
-                              chatIdParam: chatId?.toString(),
-                              sellOrBuy: "Buy",
-                              newChat: "false",
-                              otherUserName: seller.name,
-                            },
-                          });
-                        } else {
-                          router.push({
-                            pathname: `/chat/${item.id}`,
-                            params: {
-                              sellOrBuy: "Buy",
-                              newChat: "true",
-                              otherUserName: seller.name,
-                            },
-                          });
+                {item.user_id !== session?.user_id && (
+                  <View className="ml-auto flex flex-col w-[100px] gap-y-0.5">
+                    <Pressable
+                      onPress={() => {
+                        if (item.user_id === session?.user_id) {
+                          router.push("/account");
+                        } else if (seller) {
+                          if (chatId) {
+                            router.push({
+                              pathname: `/chat/${item.id}`,
+                              params: {
+                                chatIdParam: chatId?.toString(),
+                                sellOrBuy: "Buy",
+                                newChat: "false",
+                                otherUserName: seller.name,
+                              },
+                            });
+                          } else {
+                            router.push({
+                              pathname: `/chat/${item.id}`,
+                              params: {
+                                sellOrBuy: "Buy",
+                                newChat: "true",
+                                otherUserName: seller.name,
+                              },
+                            });
+                          }
                         }
-                      }
-                    }}
-                    className="font-Manrope_400Regular bg-purplePrimary p-2"
-                  >
-                    <Text className="text-white text-center font-Manrope_600SemiBold">
-                      {item.user_id === session?.user_id ? "Edit" : "Message"}
-                    </Text>
-                  </Pressable>
-                </View>
+                      }}
+                      className="font-Manrope_400Regular bg-purplePrimary p-2"
+                    >
+                      <Text className="text-white text-center font-Manrope_600SemiBold">
+                        {item.user_id === session?.user_id ? "Edit" : "Message"}
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
               </Pressable>
             </View>
             <View className="h-16" />

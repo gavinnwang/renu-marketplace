@@ -77,7 +77,7 @@ export async function getItem(itemId: string): Promise<Item> {
   return parseOrThrowResponse<Item>(res);
 }
 
-export async function mutateItemStatus(
+export async function postItemStatus(
   sessionToken: string,
   itemId: number,
   status: string
@@ -112,4 +112,33 @@ export async function postChatRoomWithFirstMessage(
     }),
   });
   return parseOrThrowResponse<number>(res);
+}
+
+export async function postChangeSavedItemStatus(
+  sessionToken: string,
+  itemId: string,
+  newStatus: boolean
+): Promise<string> {
+  const res = await fetch(`${API_URL}/saved/${itemId}`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+    },
+    method: "POST",
+    body: JSON.stringify({
+      new_status: newStatus,
+    }),
+  });
+  return parseOrThrowResponse(res);
+}
+
+export async function getSavedItemStatus(
+  sessionToken: string,
+  itemId: string
+): Promise<boolean> {
+  const res = await fetch(`${API_URL}/saved/${itemId}`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  return parseOrThrowResponse<boolean>(res);
 }

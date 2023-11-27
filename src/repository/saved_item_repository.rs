@@ -50,3 +50,44 @@ pub async fn insert_saved_item(
 
     Ok(())
 }
+
+pub async fn delete_saved_item(
+    user_id: i32,
+    item_id: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<(), DbError> {
+    sqlx::query!(
+        r#"
+        DELETE FROM saved_item
+        WHERE user_id = $1 AND item_id = $2
+        "#,
+        user_id,
+        item_id
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(())
+}
+
+pub async fn get_saved_item_status_by_item_id(
+    user_id: i32,
+    item_id: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<bool, DbError> {
+    let saved_item = sqlx::query!(
+        r#"
+        SELECT item_id FROM saved_item
+        WHERE user_id = $1 AND item_id = $2
+        "#,
+        user_id,
+        item_id
+    )
+    .fetch_optional(conn)
+    .await?;
+
+    match saved_item {
+        Some(_) => Ok(true),
+        None => Ok(false),
+    }
+}
