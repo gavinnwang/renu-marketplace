@@ -192,7 +192,7 @@ export default function ChatScreen() {
       <View className="bg-bgLight h-full">
         <View className="flex flex-row items-center justify-between ">
           <Pressable onPress={router.back} className="w-10 p-3">
-            <CloseIcon />
+          <LeftChevron />
           </Pressable>
           {otherUserName && (
             <Text className="font-Poppins_600SemiBold text-base text-blackPrimary ">
@@ -315,6 +315,7 @@ export default function ChatScreen() {
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import LeftChevron from "../../../components/LeftChevron";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessageProcessed }) => {
   return (
@@ -351,19 +352,3 @@ const Message = ({ item: message }: { item: ChatMessageProcessed }) => {
     </View>
   );
 };
-
-const CloseIcon = () => (
-  <Svg
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke={Colors.grayPrimary}
-    className="w-6 h-6"
-  >
-    <Path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 19.5L8.25 12l7.5-7.5"
-    />
-  </Svg>
-);

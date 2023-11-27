@@ -6,22 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import React from "react";
 import { Image } from "expo-image";
 import { FlatList } from "react-native-gesture-handler";
-
-const CloseIcon = () => (
-  <Svg
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke={Colors.grayPrimary}
-    className="w-6 h-6"
-  >
-    <Path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 19.5L8.25 12l7.5-7.5"
-    />
-  </Svg>
-);
+import LeftChevron from "../../components/LeftChevron";
 
 const MAX_IMAGES = 6;
 
@@ -65,7 +50,7 @@ export default function UploadListingStepOne() {
         <View className="bg-bgLight h-full">
           <View className="flex flex-row items-center justify-between border-b border-b-stone-300">
             <Pressable onPress={router.back} className="w-10 p-3">
-              <CloseIcon />
+              <LeftChevron />
             </Pressable>
             <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary ">
               ADD PHOTOS

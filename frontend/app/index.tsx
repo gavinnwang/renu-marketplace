@@ -2,16 +2,31 @@ import { Pressable, SafeAreaView, Text, View } from "react-native";
 import { useSession } from "../hooks/useSession";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { Circle, Path, Svg } from "react-native-svg";
+import { Circle, G, Path, Svg } from "react-native-svg";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { BigLogo } from "../components/Logo";
 
-const BigLogo = () => (
-  <Svg width="56" height="55" viewBox="0 0 56 55" fill="none">
-    <Circle cx="27.1991" cy="27.1991" r="27.1991" fill="black" />
-    <Path
-      d="M20.2448 18.198C20.9486 19.1681 20.7099 20.5121 19.9076 21.4023C16.6992 24.9622 16.3111 30.4153 19.2556 34.474C22.6321 39.1283 29.1293 40.1885 33.7607 36.8285C38.3922 33.4685 39.4053 26.9695 36.0242 22.3089L34.0476 23.7428C33.2196 24.3435 32.0765 23.6534 32.2224 22.6409L33.4286 14.2696C33.5216 13.6238 34.1299 13.1825 34.7728 13.2945L43.105 14.7459C44.1128 14.9214 44.4141 16.2222 43.5861 16.8229L41.6095 18.2569C47.2401 26.0182 45.551 36.8535 37.8382 42.449C30.1254 48.0444 19.3009 46.2874 13.6702 38.526C9.00533 32.0959 9.36467 23.5557 14.0112 17.6334C15.6387 15.5591 18.6966 16.064 20.2448 18.198Z"
-      fill="white"
-    />
+const GoogleLogo = ({ className }: { className?: string }) => (
+  <Svg viewBox="0 0 48 48" width="28" height="28" className={className}>
+    <G>
+      <Path
+        fill="#EA4335"
+        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+      ></Path>
+      <Path
+        fill="#4285F4"
+        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+      ></Path>
+      <Path
+        fill="#FBBC05"
+        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+      ></Path>
+      <Path
+        fill="#34A853"
+        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+      ></Path>
+      <Path fill="none" d="M0 0h48v48H0z"></Path>
+    </G>
   </Svg>
 );
 export default function Index() {
@@ -35,9 +50,10 @@ export default function Index() {
       </Text>
 
       <TouchableOpacity onPress={signIn}>
-        <View className="mt-[40%] h-[45px] rounded-sm border w-[80vw] flex justify-center">
-          <Text className="mx-auto font-Poppins_600SemiBold text-base">
-            Login with Google
+        <View className="items-center flex-row mt-[40%] h-[45px] rounded-sm border-[1.5px] w-[80vw] flex justify-center">
+          <GoogleLogo />
+          <Text className="ml-2 font-Poppins_600SemiBold text-base">
+            Continue with Google
           </Text>
         </View>
       </TouchableOpacity>

@@ -17,6 +17,7 @@ import { Image } from "expo-image";
 import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { useSession } from "../../hooks/useSession";
 import { FlashList } from "@shopify/flash-list";
+import LeftChevron from "../../components/LeftChevron";
 
 const ItemCategory: Record<string, string> = {
   picking: "Pick a category",
@@ -30,22 +31,6 @@ const ItemCategory: Record<string, string> = {
   general: "General",
   free: "Free",
 };
-
-const CloseIcon = () => (
-  <Svg
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke={Colors.grayPrimary}
-    className="w-6 h-6"
-  >
-    <Path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 19.5L8.25 12l7.5-7.5"
-    />
-  </Svg>
-);
 
 export default function UploadListingStepTwo() {
   const param = useLocalSearchParams();
@@ -75,7 +60,7 @@ export default function UploadListingStepTwo() {
           >
             <View className="flex flex-row bg-bgLight items-center justify-between border-b border-b-stone-300">
               <Pressable onPress={router.back} className="w-10 p-3">
-                <CloseIcon />
+                <LeftChevron />
               </Pressable>
               <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary ">
                 ADD DESCRIPTIONS

@@ -29,23 +29,8 @@ import { Item } from "../../../types";
 import React from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import LeftChevron from "../../../components/LeftChevron";
 dayjs.extend(relativeTime);
-
-const CloseIcon = () => (
-  <Svg
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke={Colors.grayPrimary}
-    className="w-6 h-6"
-  >
-    <Path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 19.5L8.25 12l7.5-7.5"
-    />
-  </Svg>
-);
 
 const HeartIcon = ({ filled }: { filled: boolean }) => (
   <Svg
@@ -72,7 +57,13 @@ export default function ItemPage() {
     queryFn: () => getItem(itemId as string),
     queryKey: ["item", itemId],
     enabled: !!itemId,
-    initialData: JSON.parse(itemString as string),
+    initialData: () => {
+      if (itemString) {
+        return JSON.parse(itemString as string) as Item;
+      } else {
+        return undefined;
+      }
+    },
   });
 
   const { data: chatId, isError: isErrorChatId } = useQuery({
@@ -124,7 +115,7 @@ export default function ItemPage() {
       <SafeAreaView className="bg-bgLight" />
       <View className="bg-bgLight h-full">
         <Pressable onPress={router.back} className="p-3">
-          <CloseIcon />
+          <LeftChevron />
         </Pressable>
 
         {item ? (
