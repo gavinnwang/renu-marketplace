@@ -26,14 +26,8 @@ import * as SecureStore from "expo-secure-store";
 import { useSession } from "../hooks/useSession";
 
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
-};
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -78,18 +72,23 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
-  const { setSession } = useSession();
-
-  async function getToken() {
-    const session = await SecureStore.getItemAsync("session");
-    if (session) {
-      setSession(JSON.parse(session));
-    }
-  }
-
+  const { setSession, setLoadedFromStorage, loadedFromStorage } = useSession();
   useEffect(() => {
-    getToken();
-  }, []);
+   const getToken = async () => {
+      const session = await SecureStore.getItemAsync("session");
+      if (session) {
+        setSession(JSON.parse(session));
+        setTimeout(() => {
+          setLoadedFromStorage(true);
+        }, 750);
+      }
+    };
+  
+    if (!loadedFromStorage) {
+      getToken();
+    }
+  }, [loadedFromStorage]); 
+
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

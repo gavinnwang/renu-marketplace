@@ -1,17 +1,12 @@
-import { Redirect, Stack, useLocalSearchParams } from "expo-router";
-import { Text } from "react-native";
+import { Redirect, Stack} from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSession } from "../../hooks/useSession";
-import { getUserMeInfo } from "../../api";
 
 const queryClient = new QueryClient();
 
 export default function AppLayout() {
-  const { isLoading, session } = useSession();
-  if (isLoading) {
-    return <Text>Loading...</Text>;
-  }
 
+  const { session } = useSession();
   if (!session) {
     console.debug("redirecting back to home to sign in");
     return <Redirect href="/" />;

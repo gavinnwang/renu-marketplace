@@ -104,8 +104,11 @@ export default function ChatScreen() {
       },
       reconnectInterval: 5,
       onMessage: (e) => {
-        console.log(e.data)
-        if ((e.data as string).endsWith("send success") || (e.data as string).endsWith("receive success")) {
+        console.log(e.data);
+        if (
+          (e.data as string).endsWith("send success") ||
+          (e.data as string).endsWith("receive success")
+        ) {
           console.debug("message sent successfully and invalidating");
           queryClient.invalidateQueries(["messages", chatId]);
           queryClient.invalidateQueries(["chats", sellOrBuy]);
@@ -133,8 +136,8 @@ export default function ChatScreen() {
     if (!chatMessages?.pages) {
       return [];
     }
-    console.debug("processing messages")
-    let lastDisplyTime: Date = new Date();;
+    console.debug("processing messages");
+    let lastDisplyTime: Date = new Date();
     const curTime = new Date();
     return chatMessages.pages.flatMap((page) =>
       page.data.map((message) => {
@@ -142,28 +145,27 @@ export default function ChatScreen() {
         //   lastDisplyTime = new Date(message.sent_at);
         //   return message as ChatMessageProcessed;
         // } else {
-          const sentAtDate = new Date(message.sent_at);
-          const timeDiff = lastDisplyTime.getTime() - sentAtDate.getTime();
-          const timeDiffFromCur = curTime.getTime() - sentAtDate.getTime();
-          // console.log(timeDiff, timeDiffFromCur, message.content);
+        const sentAtDate = new Date(message.sent_at);
+        const timeDiff = lastDisplyTime.getTime() - sentAtDate.getTime();
+        const timeDiffFromCur = curTime.getTime() - sentAtDate.getTime();
+        console.log(timeDiff, timeDiffFromCur, message.content);
 
-          // display if the time from now is less than an hour and time from last display is more than 1 mins
-          // or if the time from now is more than an hour and time from last display is more than 1 hour
-          // or if the time from now is more than a day and time from last display is more than 1 day
-          const dispayTime: boolean =
-            (timeDiffFromCur < 1000 * 60 * 60 && timeDiff > 1000 * 60) ||
-            (timeDiffFromCur > 1000 * 60 * 60 && timeDiff > 1000 * 60 * 60) ||
-            (timeDiffFromCur > 1000 * 60 * 60 * 24 &&
-              timeDiff > 1000 * 60 * 60 * 24);
-          if (dispayTime) {
-            lastDisplyTime = sentAtDate;
-            return message as ChatMessageProcessed;
-          } else {
-            return {
-              ...message,
-              sent_at: null,
-            } as ChatMessageProcessed;
-          }
+        // display if the time from now is less than an hour and time from last display is more than 1 mins
+        // or if the time from now is more than an hour and time from last display is more than 1 hour
+        // or if the time from now is more than a day and time from last display is more than 1 day
+        const dispayTime: boolean =
+          (timeDiffFromCur < 1000 * 60 * 60 && timeDiff > 1000 * 60) ||
+          (timeDiffFromCur > 1000 * 60 * 60 && timeDiff > 1000 * 60 * 60) ||
+          (timeDiffFromCur > 1000 * 60 * 60 * 24 && timeDiff > 1000 * 60 * 60 * 24);
+        if (dispayTime) {
+          lastDisplyTime = sentAtDate;
+          return message as ChatMessageProcessed;
+        } else {
+          return {
+            ...message,
+            sent_at: null,
+          } as ChatMessageProcessed;
+        }
         // }
       })
     );

@@ -4,8 +4,8 @@ import { Circle, Path, Svg } from "react-native-svg";
 import * as ImagePicker from "expo-image-picker";
 import React from "react";
 import { Image } from "expo-image";
-import { FlatList } from "react-native-gesture-handler";
 import LeftChevron from "../../components/LeftChevron";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 
 const MAX_IMAGES = 6;
 
@@ -23,7 +23,7 @@ export default function UploadListingStepOne() {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [9, 16],
+      aspect: [1, 1],
       quality: 1,
     });
 
@@ -41,8 +41,8 @@ export default function UploadListingStepOne() {
     }
   };
 
-  const imageWidth = Dimensions.get("window").width / 2 - 16;
-  const imageHeight = (imageWidth * 4) / 2.5;
+  const imageWidth = Dimensions.get("window").width / 2 - 15;
+  const imageHeight = imageWidth;
   return (
     <>
       <SafeAreaView className="bg-bgLight">
@@ -65,8 +65,12 @@ export default function UploadListingStepOne() {
             data={images}
             renderItem={({ item, index }) => {
               return index === images.length - 1 ? (
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
+                    if (images.length > MAX_IMAGES) {
+                      alert(`You can only upload ${MAX_IMAGES} images`);
+                      return;
+                    }
                     requestPermission().then((status) => {
                       if (status.granted) {
                         pickImage();
@@ -83,14 +87,14 @@ export default function UploadListingStepOne() {
                   className="border border-dashed flex items-center justify-center"
                 >
                   <Plus />
-                </Pressable>
+                </TouchableOpacity>
               ) : (
                 <Image
                   source={{ uri: item }}
                   style={{
                     width: imageWidth,
                     height: imageHeight,
-                    borderRadius: 2,
+                    borderRadius: 3,
                   }}
                 />
               );
@@ -121,7 +125,7 @@ export default function UploadListingStepOne() {
               }}
               className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"
             >
-              <Text className="font-SecularOne_400Regular text-xl text-white">
+              <Text className="font-SecularOne_400Regular text-xl text-white rounded-sm">
                 NEXT
               </Text>
             </Pressable>

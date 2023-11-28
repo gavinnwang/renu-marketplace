@@ -11,7 +11,6 @@ import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
   const [loadedFromStorage, setLoadedFromStorage] = React.useState(false);
 
   const signIn = async () => {
@@ -36,7 +35,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         setSession(s);
         await SecureStore.setItemAsync("session", JSON.stringify(s));
       } else {
-        router.replace("/failed-sign-in");
+        router.replace("/");
       }
     }
   };
@@ -44,6 +43,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     await SecureStore.setItemAsync("session", "");
     setSession(null);
+    router.replace("/");
   };
 
   return (
@@ -52,8 +52,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signOut,
         session,
-        isLoading,
-        setIsLoading,
         setSession,
         loadedFromStorage,
         setLoadedFromStorage,

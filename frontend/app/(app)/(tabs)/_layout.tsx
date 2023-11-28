@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native";
 export default function TabsLayout() {
   return (
     <>
-      <SafeAreaView className="bg-bgLight"/>
+      <SafeAreaView className="bg-bgLight" />
       <Tabs
         screenOptions={{
           tabBarStyle: {

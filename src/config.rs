@@ -15,6 +15,8 @@ pub struct Config {
     pub s3_region: String,
     pub s3_key: String,
     pub s3_key_secret: String,
+
+    pub openai_api_key: String
 }
 
 impl Config {
@@ -36,6 +38,8 @@ impl Config {
         let s3_key = std::env::var("S3_KEY").expect("S3_KEY must be set");
         let s3_key_secret = std::env::var("S3_KEY_SECRET").expect("S3_KEY_SECRET must be set");
 
+        let openai_api_key = std::env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
+
         Config {
             jwt_secret,
             jwt_max_age: jwt_max_age.parse::<i64>().expect("TOKEN_MAXAGE must be an integer"),
@@ -49,6 +53,7 @@ impl Config {
             s3_region,
             s3_key,
             s3_key_secret,
+            openai_api_key
         }
     }
 }

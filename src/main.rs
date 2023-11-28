@@ -6,6 +6,7 @@ pub mod repository;
 pub mod routes;
 pub mod uploads;
 pub mod websocket;
+pub mod openai;
 
 use actix::Actor;
 use actix_cors::Cors;

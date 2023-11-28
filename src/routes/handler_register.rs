@@ -44,4 +44,6 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
     );
 
     conf.service(web::scope("/images").service(super::image_upload_handler::post_images));
+
+    conf.service(web::scope("/openai").service(super::openai_handler::chat_complete_handler));
 }

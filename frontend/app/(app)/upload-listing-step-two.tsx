@@ -187,11 +187,15 @@ export default function UploadListingStepTwo() {
                   alert("Please enter a valid price");
                   return;
                 }
+                if (Number(price) > 999) {
+                  alert("Please enter a price less than $999");
+                  return;
+                }
                 if (category === "picking") {
                   alert("Please pick a category");
                   return;
                 }
-                
+
                 setUploading(true);
 
                 try {
@@ -263,7 +267,7 @@ export default function UploadListingStepTwo() {
               }}
               className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"
             >
-              <Text className="font-SecularOne_400Regular text-xl text-white">
+              <Text className="font-SecularOne_400Regular text-xl text-white rounded-sm">
                 PUBLISH ITEM
               </Text>
             </Pressable>

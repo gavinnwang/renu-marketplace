@@ -6,3 +6,4 @@ pub mod user_handler;
 pub mod saved_item_handler;
 pub mod chat_handler;
 pub mod image_upload_handler;
+pub mod openai_handler;
