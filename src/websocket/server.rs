@@ -13,6 +13,7 @@ use crate::repository::chat_repository::{
 
 use super::session;
 
+
 // chat server manages chat rooms and responsible for coordinating chat session
 #[derive(Debug, Clone)]
 pub struct ChatServer {
