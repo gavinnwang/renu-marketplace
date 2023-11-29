@@ -78,3 +78,9 @@ export type ChatMessageProcessed = {
   sent_at: string | null;
   from_me: number;
 };
+
+export type AICompleteResponse = {
+  price: number;
+  title: string;
+  description: string;
+};

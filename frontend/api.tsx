@@ -1,4 +1,10 @@
-import { ChatGroup, ChatMessage, Item, User } from "./types";
+import {
+  AICompleteResponse,
+  ChatGroup,
+  ChatMessage,
+  Item,
+  User,
+} from "./types";
 
 export const API_URL = "https://api.gavinwang.dev";
 
@@ -142,4 +148,20 @@ export async function getSavedItemStatus(
     },
   });
   return parseOrThrowResponse<boolean>(res);
+}
+
+export async function postAIComplete(
+  sessionToken: string,
+  imageUri: string
+): Promise<AICompleteResponse> {
+  const res = await fetch(`${API_URL}/openai/complete`, {
+    headers: {
+      "content-type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({
+      image: imageUri,
+    }),
+  });
+  return parseOrThrowResponse<AICompleteResponse>(res);
 }
