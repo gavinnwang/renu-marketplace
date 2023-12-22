@@ -25,9 +25,7 @@ import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
 import * as SecureStore from "expo-secure-store";
 import { useSession } from "../hooks/useSession";
 
-export {
-  ErrorBoundary,
-} from "expo-router";
+export { ErrorBoundary } from "expo-router";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -74,21 +72,21 @@ function RootLayoutNav() {
 
   const { setSession, setLoadedFromStorage, loadedFromStorage } = useSession();
   useEffect(() => {
-   const getToken = async () => {
+    const getToken = async () => {
       const session = await SecureStore.getItemAsync("session");
       if (session) {
         setSession(JSON.parse(session));
-        setTimeout(() => {
-          setLoadedFromStorage(true);
-        }, 750);
       }
+      setTimeout(() => {
+        console.log("loaded from storage to true");
+        setLoadedFromStorage(true);
+      }, 750);
     };
-  
+
     if (!loadedFromStorage) {
       getToken();
     }
-  }, [loadedFromStorage]); 
-
+  }, [loadedFromStorage]);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

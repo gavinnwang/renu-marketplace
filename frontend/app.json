@@ -12,6 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#F9F9F9"
     },
+    "owner": "renu_marketplace",
     "assetBundlePatterns": [
       "**/*"
     ],
