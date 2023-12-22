@@ -129,8 +129,9 @@ export default function ItemPage() {
                 <Image
                   transition={{
                     effect: "cross-dissolve",
-                    duration: 300,
+                    duration: 200,
                   }}
+                  recyclingKey={item}
                   placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
                   style={{
                     height: Dimensions.get("window").width,

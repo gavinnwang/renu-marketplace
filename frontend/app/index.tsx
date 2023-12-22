@@ -16,7 +16,7 @@ export default function Index() {
       router.replace(`/home`);
     } else {
       console.debug("No session found, redirecting to login");
-      router.replace(`/login`);
+      router.replace("/login");
     }
   }, [session, loadedFromStorage]);
 

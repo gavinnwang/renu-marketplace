@@ -29,13 +29,14 @@ const GoogleLogo = ({ className }: { className?: string }) => (
     </G>
   </Svg>
 );
+
 export default function LoginPage() {
   const { signIn, session } = useSession();
 
   useEffect(() => {
     if (session) {
       console.debug("Session found, redirecting to home");
-      router.replace(`/home`);
+      router.replace(`/`);
     }
   }, [session]);
 

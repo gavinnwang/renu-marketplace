@@ -79,8 +79,6 @@ export default function ListScreen() {
           renderItem={(object) => (
             <ListingPageItem
               item={object.item}
-              token={session?.token ?? ""}
-              refetch={refetch}
             />
           )}
         />
@@ -120,12 +118,8 @@ import RefreshScreen from "../../../../components/RefreshScreen";
 
 const ListingPageItem = ({
   item,
-  token,
-  refetch,
 }: {
   item: Item;
-  token: string;
-  refetch: any;
 }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
   const [isSold, setIsSold] = React.useState<boolean>(false);
@@ -199,8 +193,9 @@ const ListingPageItem = ({
         source={{ uri: item.images[0] }}
         transition={{
           effect: "cross-dissolve",
-          duration: 300,
+          duration: 100,
         }}
+        recyclingKey={item.images[0]}
         placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
         className="object-cover rounded-sm"
         style={{
