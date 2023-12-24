@@ -240,6 +240,7 @@ pub async fn search_items(
         fuzzy_fields => 'description,name',
         distance => 1
         ) AS item
+        WHERE item.status = 'active'
         LIMIT 10;
         "#,
         search_string

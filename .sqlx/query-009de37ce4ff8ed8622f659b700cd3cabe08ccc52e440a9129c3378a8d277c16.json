@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            item.id as \"id!\", \n            item.name as \"name!\", \n            item.price as \"price!\", \n            item.user_id as \"user_id!\", \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at as \"created_at!\", \n            item.description as \"description!\",\n            item.updated_at as \"updated_at!\",\n            item.images as \"images!\"\n        FROM search_item_idx.search(\n        $1,\n        fuzzy_fields => 'description,name',\n        distance => 1\n        ) AS item\n        LIMIT 10;\n        ",
+  "query": "\n        SELECT\n            item.id as \"id!\", \n            item.name as \"name!\", \n            item.price as \"price!\", \n            item.user_id as \"user_id!\", \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at as \"created_at!\", \n            item.description as \"description!\",\n            item.updated_at as \"updated_at!\",\n            item.images as \"images!\"\n        FROM search_item_idx.search(\n        $1,\n        fuzzy_fields => 'description,name',\n        distance => 1\n        ) AS item\n        WHERE item.status = 'active'\n        LIMIT 10;\n        ",
   "describe": {
     "columns": [
       {
@@ -72,5 +72,5 @@
       null
     ]
   },
-  "hash": "39d2a70bdde77380c217738d8d32ac7cf69be647160b8aa4e51c893e0fc5917d"
+  "hash": "009de37ce4ff8ed8622f659b700cd3cabe08ccc52e440a9129c3378a8d277c16"
 }
