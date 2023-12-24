@@ -216,3 +216,36 @@ pub async fn insert_item(
 
     Ok(result.id)
 }
+
+pub async fn search_items(
+    search_string: &str,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<Vec<Item>, DbError> {
+    let items = sqlx::query_as!(
+        Item,
+        r#"
+        SELECT
+            item.id as "id!", 
+            item.name as "name!", 
+            item.price as "price!", 
+            item.user_id as "user_id!", 
+            item.category::TEXT AS "category!",
+            item.status::TEXT AS "status!",
+            item.created_at as "created_at!", 
+            item.description as "description!",
+            item.updated_at as "updated_at!",
+            item.images as "images!"
+        FROM search_item_idx.search(
+        $1,
+        fuzzy_fields => 'description,name',
+        distance => 1
+        ) AS item
+        LIMIT 10;
+        "#,
+        search_string
+    )
+    .fetch_all(conn)
+    .await?;
+
+    Ok(items)
+}

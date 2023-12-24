@@ -220,11 +220,7 @@ const ListingPageItem = ({
           onPress={onPressHandler}
           className="border-[1.5px] h-[32px] flex-grow-0 flex items-center justify-center rounded-sm"
         >
-          <Text
-            className={`font-SecularOne_400Regular text-sm ${
-              isSold ? "text-gray-500" : "text-blackPrimary"
-            }`}
-          >
+          <Text className="font-SecularOne_400Regular text-sm text-blackPrimary">
             {item.status === "active" ? "MARK AS SOLD" : "RELIST"}
           </Text>
         </TouchableOpacity>

@@ -43,6 +43,8 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::chat_handler::post_chat_room_and_send_first_message),
     );
 
+    conf.service(web::scope("/search").service(super::item_search_handler::search_items_handler));
+
     conf.service(web::scope("/images").service(super::image_upload_handler::post_images));
 
     conf.service(web::scope("/openai").service(super::openai_handler::chat_complete_handler));

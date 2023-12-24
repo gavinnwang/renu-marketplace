@@ -1,9 +1,10 @@
-pub mod auth_handler;
 pub mod handler_register;
-pub mod health_handler;
-pub mod item_handler;
-pub mod user_handler;
-pub mod saved_item_handler;
-pub mod chat_handler;
-pub mod image_upload_handler;
-pub mod openai_handler;
+mod auth_handler;
+mod health_handler;
+mod item_handler;
+mod user_handler;
+mod saved_item_handler;
+mod chat_handler;
+mod image_upload_handler;
+mod openai_handler;
+mod item_search_handler;

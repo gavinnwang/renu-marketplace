@@ -6,7 +6,7 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Slot, SplashScreen } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import { useColorScheme } from "react-native";
 import { SessionProvider } from "../providers/sessionProvider";
 import {
@@ -24,6 +24,7 @@ import {
 import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
 import * as SecureStore from "expo-secure-store";
 import { useSession } from "../hooks/useSession";
+import useRetrieveSession from "../hooks/useLoadSession";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -70,23 +71,7 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
-  const { setSession, setLoadedFromStorage, loadedFromStorage } = useSession();
-  useEffect(() => {
-    const getToken = async () => {
-      const session = await SecureStore.getItemAsync("session");
-      if (session) {
-        setSession(JSON.parse(session));
-      }
-      setTimeout(() => {
-        console.log("loaded from storage to true");
-        setLoadedFromStorage(true);
-      }, 750);
-    };
-
-    if (!loadedFromStorage) {
-      getToken();
-    }
-  }, [loadedFromStorage]);
+  useRetrieveSession();
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
