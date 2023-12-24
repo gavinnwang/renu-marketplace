@@ -35,3 +35,12 @@ jobs:
             -e S3_REGION=${{ secrets.S3_REGION }} \
             -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
             wry0313/renu:latest 
+          
+          sleep 5
+
+          # Check if the container is still running
+          if ! docker container inspect -f '{{.State.Running}}' renu; then
+            echo "Container has stopped unexpectedly."
+            docker logs renu
+            exit 1
+          fi
