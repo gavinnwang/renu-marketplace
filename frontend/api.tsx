@@ -165,3 +165,8 @@ export async function postAIComplete(
   });
   return parseOrThrowResponse<AICompleteResponse>(res);
 }
+
+export async function getSearchItems(query: string): Promise<Item[]> {
+  const res = await fetch(`${API_URL}/search/items/?query=${query}`);
+  return parseOrThrowResponse<Item[]>(res);
+}

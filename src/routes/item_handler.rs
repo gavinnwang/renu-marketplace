@@ -12,7 +12,6 @@ use crate::{
 pub struct GetItemQuery {
     pub category: Option<String>,
     pub offset: i32,
-    // pub limit: Option<i32>,
 }
 
 #[tracing::instrument(skip(pool))]
@@ -23,7 +22,7 @@ async fn get_items_handler(
 ) -> impl Responder {
     tracing::info!("called");
 
-    let limit = 8;
+    let limit = 12;
     let offset = query.offset;
 
     let items = match &query.category {

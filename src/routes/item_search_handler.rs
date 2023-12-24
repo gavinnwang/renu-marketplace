@@ -5,18 +5,18 @@ use sqlx::PgPool;
 use crate::repository::item_repository;
 
 #[derive(Deserialize, Debug)]
-pub struct SearchItemsRequest {
-    search: String,
+pub struct SearchItemsQuery {
+    query: String,
 }
 
 #[tracing::instrument(skip(pool))]
 #[get("/items")]
 async fn search_items_handler(
     pool: web::Data<PgPool>,
-    data: web::Json<SearchItemsRequest>,
+    query: web::Query<SearchItemsQuery>,
 ) -> impl Responder {
     tracing::info!("search_items_handler called");
-    let items = item_repository::search_items(data.search.as_str(), pool.as_ref()).await;
+    let items = item_repository::search_items(&query.query, pool.as_ref()).await;
 
     match items {
         Ok(items) => HttpResponse::Ok().json(items),
