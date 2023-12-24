@@ -167,6 +167,6 @@ export async function postAIComplete(
 }
 
 export async function getSearchItems(query: string): Promise<Item[]> {
-  const res = await fetch(`${API_URL}/search/items/?query=${query}`);
+  const res = await fetch(`${API_URL}/search/items?query=${query}`);
   return parseOrThrowResponse<Item[]>(res);
 }
