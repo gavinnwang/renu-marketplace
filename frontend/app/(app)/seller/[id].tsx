@@ -1,10 +1,9 @@
-import { Text } from "react-native";
-import { View } from "../../../components/Themed";
+import { Text, View } from "react-native";
 
 export default function SellerPage() {
-    return (
-        <View>
-            <Text>Seller</Text>
-        </View>
-    )
+  return (
+    <View>
+      <Text>Seller</Text>
+    </View>
+  );
 }

@@ -1,4 +1,4 @@
-import { Redirect, Stack} from "expo-router";
+import { Redirect, Stack, } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSession } from "../../hooks/useSession";
 

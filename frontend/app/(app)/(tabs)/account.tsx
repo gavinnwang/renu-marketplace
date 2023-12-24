@@ -32,15 +32,12 @@ export default function AccountScreen() {
     enabled: !!session && !!session.token,
   });
 
-  const [refreshing, _] = React.useState(false);
-
   return (
     <View className="bg-bgLight h-full">
       <View className="border-b border-grayMedium flex-row items-center  ">
-        <Text className="m-2.5 my-4 font-Poppins_600SemiBold text-xl ">
+        <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
           My Profile
         </Text>
-        <DownArrowIcon />
       </View>
       <ScrollView>
         <View className="flex items-start">

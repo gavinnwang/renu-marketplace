@@ -1,7 +1,6 @@
 import { Animated, Pressable, ScrollView, Text, View } from "react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
-import { useState } from "react";
 import { ItemListing } from "../../../components/ItemListing";
 import { LogoWithText } from "../../../components/Logo";
 import { Item, Measure } from "../../../types";
@@ -50,17 +49,13 @@ const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
 //   </Svg>
 // );
 
-export default function HomePage() {
-  const [selectedSection, setSelectedSection] = useState(0);
+export default function HomeScreen() {
+  const [selectedSection, setSelectedSection] = React.useState(0);
   const pagerViewRef = React.useRef<PagerView>(null);
   return (
     <View className="bg-bgLight h-full">
       <View className="flex flex-row items-center justify-start pl-4 pr-6 pb-2.5 min-h-[43px]">
         <LogoWithText />
-        {/* <View className="flex justify-center bg-grayLight items-center rounded-md flex-grow ml-2.5">
-          <TextInput placeholder="Search here" className="p-2.5 w-full" />
-        </View> */}
-        {/* <MagnifyingGlassIc150on /> */}
       </View>
       <Tabs
         data={data}
@@ -109,7 +104,7 @@ const CategoryView = ({
 
   const LIMIT = 8;
 
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
   const {
     data: items,
     isLoading: isLoadingItems,

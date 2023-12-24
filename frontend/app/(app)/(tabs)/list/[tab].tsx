@@ -46,7 +46,7 @@ export default function ListScreen() {
 
   return (
     <View className="bg-bgLight h-full">
-      <Text className="ml-2.5 mt-4 font-Poppins_600SemiBold text-xl text-blackPrimary ">
+      <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
         Listings
       </Text>
       <Tabs
@@ -76,11 +76,7 @@ export default function ListScreen() {
               }}
             />
           }
-          renderItem={(object) => (
-            <ListingPageItem
-              item={object.item}
-            />
-          )}
+          renderItem={(object) => <ListingPageItem item={object.item} />}
         />
       ) : (
         <RefreshScreen
@@ -116,13 +112,8 @@ import { useSession } from "../../../../hooks/useSession";
 import { getUserMeItems, postItemStatus } from "../../../../api";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
-const ListingPageItem = ({
-  item,
-}: {
-  item: Item;
-}) => {
+const ListingPageItem = ({ item }: { item: Item }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
-  const [isSold, setIsSold] = React.useState<boolean>(false);
   const { session } = useSession();
 
   const queryClient = useQueryClient();
@@ -256,7 +247,7 @@ const Tab = React.forwardRef(
       >
         <View>
           <Text
-            className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
+            className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
               sectionIndex === selectedTabInt
                 ? "text-blackPrimary border-b border-grayPrimary"
                 : "text-grayPrimary"

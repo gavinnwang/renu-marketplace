@@ -6,7 +6,7 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Slot, SplashScreen } from "expo-router";
-import { useEffect, useReducer } from "react";
+import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 import { SessionProvider } from "../providers/sessionProvider";
 import {
@@ -22,8 +22,6 @@ import {
   Manrope_600SemiBold,
 } from "@expo-google-fonts/manrope";
 import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
-import * as SecureStore from "expo-secure-store";
-import { useSession } from "../hooks/useSession";
 import useRetrieveSession from "../hooks/useLoadSession";
 
 export { ErrorBoundary } from "expo-router";

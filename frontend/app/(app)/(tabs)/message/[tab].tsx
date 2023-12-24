@@ -24,7 +24,7 @@ const data = TABS.map((i) => ({
   ref: React.createRef(),
 }));
 
-export default function MessageScreen() {
+export default function MessagePage() {
   const param = useLocalSearchParams();
   const selectedTab = param.tab as string;
   const selectedTabInt = parseInt(selectedTab);
@@ -47,7 +47,7 @@ export default function MessageScreen() {
 
   return (
     <View className="bg-bgLight h-full">
-      <Text className="ml-2.5 mt-4 font-Poppins_600SemiBold text-xl text-blackPrimary ">
+      <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
         Messages
       </Text>
       <Tabs data={data} selectedTabInt={selectedTabInt} />
@@ -178,7 +178,7 @@ const Tab = React.forwardRef(
       >
         <View>
           <Text
-            className={`ml-2.5 mt-6 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
+            className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
               sectionIndex === selectedTabInt
                 ? "text-blackPrimary border-b-[1px] border-b-grayLight"
                 : "text-grayPrimary"

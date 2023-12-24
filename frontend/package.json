@@ -20,6 +20,7 @@
     "@expo/vector-icons": "^13.0.0",
     "@react-native-picker/picker": "2.4.10",
     "@react-navigation/native": "^6.0.2",
+    "@react-navigation/native-stack": "^6.9.17",
     "@shopify/flash-list": "1.4.3",
     "@tanstack/react-query": "^4.36.1",
     "expo": "~49.0.13",
