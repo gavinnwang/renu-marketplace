@@ -157,11 +157,10 @@ const Tab = React.forwardRef(
     {
       selectedTabInt,
       sectionIndex,
-    }: // data,
+    }: 
     {
       selectedTabInt: number;
       sectionIndex: number;
-      // data: Item[];
     },
     ref: any
   ) => {
@@ -196,11 +195,10 @@ const Tab = React.forwardRef(
 const Tabs = ({
   data,
   selectedTabInt,
-}: // itemData,
+}: 
 {
   data: RefAndKey[];
   selectedTabInt: number;
-  // itemData: Item[];
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();
@@ -250,7 +248,6 @@ const Tabs = ({
             selectedTabInt={selectedTabInt}
             sectionIndex={i}
             ref={section.ref}
-            // data={itemData}
           />
         );
       })}

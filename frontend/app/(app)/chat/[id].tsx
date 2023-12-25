@@ -14,7 +14,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ChatMessage, ChatMessageProcessed } from "../../../types";
+import { ChatMessage } from "../../../types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
@@ -104,7 +104,7 @@ export default function ChatScreen() {
       },
       reconnectInterval: 5,
       onMessage: (e) => {
-        console.log(e.data);
+        console.debug(e.data);
         if (
           (e.data as string).endsWith("send success") ||
           (e.data as string).endsWith("receive success")
@@ -137,38 +137,44 @@ export default function ChatScreen() {
       return [];
     }
     console.debug("processing messages");
-    let lastDisplyTime: Date = new Date();
+    let lastDisplayString = "";
     const curTime = new Date();
-    return chatMessages.pages.flatMap((page) =>
+    const messages = chatMessages.pages.flatMap((page) =>
       page.data.map((message) => {
-        // if (lastDisplyTime === null) {
-        //   lastDisplyTime = new Date(message.sent_at);
-        //   return message as ChatMessageProcessed;
-        // } else {
-        const sentAtDate = new Date(message.sent_at);
-        const timeDiff = lastDisplyTime.getTime() - sentAtDate.getTime();
-        const timeDiffFromCur = curTime.getTime() - sentAtDate.getTime();
-        console.log(timeDiff, timeDiffFromCur, message.content);
-
-        // display if the time from now is less than an hour and time from last display is more than 1 mins
-        // or if the time from now is more than an hour and time from last display is more than 1 hour
-        // or if the time from now is more than a day and time from last display is more than 1 day
-        const dispayTime: boolean =
-          (timeDiffFromCur < 1000 * 60 * 60 && timeDiff > 1000 * 60) ||
-          (timeDiffFromCur > 1000 * 60 * 60 && timeDiff > 1000 * 60 * 60) ||
-          (timeDiffFromCur > 1000 * 60 * 60 * 24 && timeDiff > 1000 * 60 * 60 * 24);
-        if (dispayTime) {
-          lastDisplyTime = sentAtDate;
-          return message as ChatMessageProcessed;
-        } else {
-          return {
-            ...message,
-            sent_at: null,
-          } as ChatMessageProcessed;
-        }
-        // }
+        return message;
       })
     );
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const message = messages[i];
+      if (!message.sent_at) {
+        continue;
+      }
+      const sentAtDate = new Date(message.sent_at);
+      const timeDiffFromCur = curTime.getTime() - sentAtDate.getTime();
+
+      const dispayTime: boolean = timeDiffFromCur < 1000 * 60 * 60; // less than an hour
+      const displayExactTime: boolean = timeDiffFromCur > 1000 * 60 * 60 * 24; // more than a day
+
+      let sentAtString;
+
+      if (dispayTime) {
+        sentAtString = dayjs(message.sent_at).fromNow();
+      } else if (displayExactTime) {
+        sentAtString = dayjs(message.sent_at).format("MMM D, h:mm A");
+      } else {
+        message.sent_at = null;
+        continue;
+      }
+
+      if (sentAtString === lastDisplayString) {
+        message.sent_at = null;
+        continue;
+      }
+
+      message.sent_at = sentAtString;
+      lastDisplayString = sentAtString;
+    }
+    return messages;
   }, [chatMessages]);
 
   const nanoid = React.useMemo(
@@ -313,12 +319,12 @@ import LeftChevron from "../../../components/LeftChevron";
 import { customAlphabet } from "nanoid/non-secure";
 import { BlurhashPlaceholder } from "../../../constants/Placeholder";
 dayjs.extend(relativeTime);
-const Message = ({ item: message }: { item: ChatMessageProcessed }) => {
+const Message = ({ item: message }: { item: ChatMessage }) => {
   return (
     <View className="flex flex-col items-center">
       {message.sent_at !== null ? (
         <Text className="mt-3 mb-1 mr-2 text-xs font-Manrope_500Medium text-grayPrimary">
-          {dayjs(message.sent_at).fromNow()}
+          {message.sent_at}
         </Text>
       ) : null}
 
