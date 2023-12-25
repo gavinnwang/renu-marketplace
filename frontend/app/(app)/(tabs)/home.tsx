@@ -9,6 +9,8 @@ import Colors from "../../../constants/Colors";
 import PagerView from "react-native-pager-view";
 import { API_URL, parseOrThrowResponse } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
+import { useFocusEffect } from "expo-router";
+import { useScrollToTop } from "@react-navigation/native";
 
 export const CATEGORIES: Record<string, string> = {
   all: "All",
@@ -28,6 +30,7 @@ type CategoryTabData = {
   value: string;
   display: string;
   ref: React.RefObject<any>;
+  flashListRef: React.RefObject<any>;
 };
 
 const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
@@ -35,6 +38,7 @@ const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
   value: i,
   display: CATEGORIES[i],
   ref: React.createRef(),
+  flashListRef: React.createRef(),
 }));
 
 // const MagnifyingGlassIcon = () => (
@@ -52,6 +56,9 @@ const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
 export default function HomeScreen() {
   const [selectedSection, setSelectedSection] = React.useState(0);
   const pagerViewRef = React.useRef<PagerView>(null);
+
+  useScrollToTop(data[selectedSection].flashListRef);
+
   return (
     <View className="bg-bgLight h-full">
       <View className="flex flex-row items-center justify-start pl-4 pr-6 pb-2.5 min-h-[43px]">
@@ -78,6 +85,7 @@ export default function HomeScreen() {
             category={item.value}
             index={index}
             selectedSection={selectedSection}
+            flashListRef={item.flashListRef}
           />
         ))}
       </PagerView>
@@ -89,10 +97,12 @@ const CategoryView = ({
   category,
   index,
   selectedSection,
+  flashListRef,
 }: {
   category: string;
   index: number;
   selectedSection: number;
+  flashListRef: React.RefObject<any>;
 }) => {
   const getItemsByCategory = async ({ pageParam = 0 }) => {
     console.debug("fetching with pageParam and category", pageParam, category);
@@ -158,6 +168,7 @@ const CategoryView = ({
         </ScrollView>
       ) : (
         <FlashList
+          ref={flashListRef}
           className="bg-bgLight h-full"
           showsVerticalScrollIndicator={false}
           refreshControl={
