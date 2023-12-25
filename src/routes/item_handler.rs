@@ -11,7 +11,7 @@ use crate::{
 #[derive(Deserialize, Debug, Default)]
 pub struct GetItemQuery {
     pub category: Option<String>,
-    pub offset: i32,
+    pub page: i32,
 }
 
 #[tracing::instrument(skip(pool))]
@@ -23,7 +23,7 @@ async fn get_items_handler(
     tracing::info!("called");
 
     let limit = 12;
-    let offset = query.offset;
+    let offset = query.page * limit;
 
     let items = match &query.category {
         Some(category) if category == "all" => {
@@ -38,7 +38,8 @@ async fn get_items_handler(
                     return HttpResponse::BadRequest().json("Invalid category");
                 }
             };
-            item_repository::fetch_active_items_by_category(category, limit, offset, pool.as_ref()).await
+            item_repository::fetch_active_items_by_category(category, limit, offset, pool.as_ref())
+                .await
         }
         None => {
             item_repository::fetch_items_by_status(ItemStatus::Active, limit, offset, pool.as_ref())
