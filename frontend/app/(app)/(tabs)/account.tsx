@@ -34,7 +34,7 @@ export default function AccountScreen() {
 
   return (
     <View className="bg-bgLight h-full">
-      <View className="border-b border-grayMedium flex-row items-center  ">
+      <View className="flex-row items-center  ">
         <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
           My Profile
         </Text>

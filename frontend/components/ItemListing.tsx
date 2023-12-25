@@ -5,7 +5,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { Image } from "expo-image";
 import { Item } from "../types";
 import dayjs from "dayjs";
-import { BlurhashPlaceholder } from "../constants/Placeholder";
+import Colors from "../constants/Colors";
 dayjs.extend(relativeTime);
 
 const horizontalGapPx = 10;
@@ -29,13 +29,13 @@ export function ItemListing({ item, index }: { item: Item; index: number }) {
             duration: 100,
           }}
           recyclingKey={item.images[0]}
-          placeholder={BlurhashPlaceholder}
           source={{ uri: item.images[0] }}
           className="object-cover rounded-t"
           style={{
             width: imageWidth,
             maxWidth: imageWidth,
             height: (imageWidth * 4) / 3,
+            backgroundColor: Colors.grayLight,
           }}
         />
         <View className="h-fit py-2 px-2.5 bg-white rounded-b flex flex-col">

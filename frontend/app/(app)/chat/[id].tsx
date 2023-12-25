@@ -218,7 +218,6 @@ export default function ChatScreen() {
                   effect: "cross-dissolve",
                   duration: 250,
                 }}
-                placeholder={BlurhashPlaceholder}
                 source={{ uri: item.images[0] }}
                 className="object-cover rounded-sm"
                 style={{
@@ -226,6 +225,7 @@ export default function ChatScreen() {
                   minHeight: (width * 4) / 3,
                   width: width,
                   height: (width * 4) / 3,
+                  backgroundColor: Colors.grayLight,
                 }}
               />
             )}
@@ -324,7 +324,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
 import { customAlphabet } from "nanoid/non-secure";
-import { BlurhashPlaceholder } from "../../../constants/Placeholder";
+import Colors from "../../../constants/Colors";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessage }) => {
   return (

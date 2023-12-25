@@ -17,7 +17,6 @@ import { useSession } from "../../../../hooks/useSession";
 import { getChatGroups } from "../../../../api";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../../components/RefreshScreen";
-import { BlurhashPlaceholder } from "../../../../constants/Placeholder";
 
 const TABS = ["Buy", "Sell"];
 const data = TABS.map((i) => ({
@@ -108,13 +107,13 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
           effect: "cross-dissolve",
           duration: 250,
         }}
-        placeholder={BlurhashPlaceholder}
         source={{ uri: chat.item_images[0] }}
         className="object-cover rounded-sm"
         style={{
           width: width,
           maxWidth: width,
           height: (width * 4) / 3,
+          backgroundColor: Colors.grayLight,
         }}
       />
       <View className="flex flex-col px-4 pt-2 flex-grow justify-between ">

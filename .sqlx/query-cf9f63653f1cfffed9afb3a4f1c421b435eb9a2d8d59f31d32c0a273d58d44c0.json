@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        WITH recent_message AS (\n            SELECT\n                m.chat_id,\n                m.content AS last_message_content,\n                m.created_at AS last_message_sent_at,\n                ROW_NUMBER() OVER (PARTITION BY m.chat_id ORDER BY m.created_at DESC) AS rn\n            FROM\n                Message m\n        )\n        SELECT \n            ic.id AS chat_id, \n            ic.item_id, \n            i.name AS item_name, \n            u.id AS other_user_id,\n            u.name AS other_user_name,\n            i.price AS item_price, \n            i.images AS item_images,\n            rm.last_message_content,\n            rm.last_message_sent_at,\n            i.category::TEXT AS \"item_category!\", \n            i.description AS item_description,\n            i.status::TEXT AS \"item_status!\"\n        FROM \n            item_chat ic\n        JOIN \n            \"item\" i ON ic.item_id = i.id\n        JOIN \n            \"user\" u ON u.id = i.user_id\n        LEFT JOIN\n            recent_message rm ON ic.id = rm.chat_id AND rm.rn = 1\n        WHERE \n            i.user_id = $1;\n        ",
+  "query": "\n        WITH recent_message AS (\n            SELECT\n                m.chat_id,\n                m.content AS last_message_content,\n                m.created_at AS last_message_sent_at,\n                ROW_NUMBER() OVER (PARTITION BY m.chat_id ORDER BY m.created_at DESC) AS rn\n            FROM\n                Message m\n        )\n        SELECT \n            ic.id AS chat_id, \n            ic.item_id, \n            i.name AS item_name, \n            u.id AS other_user_id,\n            u.name AS other_user_name,\n            i.price AS item_price, \n            i.images AS item_images,\n            rm.last_message_content,\n            rm.last_message_sent_at,\n            i.category::TEXT AS \"item_category!\", \n            i.description AS item_description,\n            i.status::TEXT AS \"item_status!\"\n        FROM \n            item_chat ic\n        JOIN \n            \"item\" i ON ic.item_id = i.id\n        JOIN \n            \"user\" u ON u.id = i.user_id\n        LEFT JOIN\n            recent_message rm ON ic.id = rm.chat_id AND rm.rn = 1\n        WHERE \n            i.user_id = $1\n        ORDER BY rm.last_message_sent_at DESC;\n        ",
   "describe": {
     "columns": [
       {
@@ -84,5 +84,5 @@
       null
     ]
   },
-  "hash": "033d0d229434a8b16b1d81756289d04f02ad9aefce90c6f20b8a17fe9a875405"
+  "hash": "cf9f63653f1cfffed9afb3a4f1c421b435eb9a2d8d59f31d32c0a273d58d44c0"
 }

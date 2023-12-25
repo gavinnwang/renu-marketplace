@@ -43,7 +43,8 @@ pub async fn fetch_chat_groups_by_seller_id(
         LEFT JOIN
             recent_message rm ON ic.id = rm.chat_id AND rm.rn = 1
         WHERE 
-            i.user_id = $1;
+            i.user_id = $1
+        ORDER BY rm.last_message_sent_at DESC;
         "#,
         user_id
     )
@@ -92,7 +93,8 @@ pub async fn fetch_chat_groups_by_buyer_id(
             LEFT JOIN
                 recent_message rm ON ic.id = rm.chat_id AND rm.rn = 1
             WHERE 
-                ic.buyer_id = $1;
+                ic.buyer_id = $1
+            ORDER BY rm.last_message_sent_at DESC;
         "#,
         user_id
     )

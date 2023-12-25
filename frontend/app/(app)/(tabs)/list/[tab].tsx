@@ -111,7 +111,6 @@ import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
 import { getUserMeItems, postItemStatus } from "../../../../api";
 import RefreshScreen from "../../../../components/RefreshScreen";
-import { BlurhashPlaceholder } from "../../../../constants/Placeholder";
 
 const ListingPageItem = ({ item }: { item: Item }) => {
   const width = (Dimensions.get("window").width - 200) / 2;
@@ -188,12 +187,12 @@ const ListingPageItem = ({ item }: { item: Item }) => {
           duration: 100,
         }}
         recyclingKey={item.images[0]}
-        placeholder={BlurhashPlaceholder}
         className="object-cover rounded-sm"
         style={{
           width: width,
           maxWidth: width,
           height: (width * 4) / 3,
+          backgroundColor: Colors.grayLight,
         }}
       />
       <View className="flex flex-col flex-grow justify-between px-4 pt-2">
