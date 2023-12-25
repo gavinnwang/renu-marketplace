@@ -251,34 +251,41 @@ export default function ChatScreen() {
             </Text>
           </Pressable>
         </View>
-
         <KeyboardAvoidingView
           behavior="padding"
           style={{ flex: 1 }}
           keyboardVerticalOffset={64}
         >
-          <FlashList
-            data={chatMessagesData}
-            renderItem={Message}
-            keyExtractor={(_, index) => index.toString()}
-            maintainVisibleContentPosition={{
-              minIndexForVisible: 0,
-            }}
-            inverted
-            estimatedItemSize={50}
-            onEndReached={() => {
-              if (!hasNextPage) {
-                console.debug("no next page");
-                return;
-              }
-              console.debug("refetching messages");
-              fetchNextPage();
-            }}
-            showsVerticalScrollIndicator={true}
-            contentContainerStyle={{
-              padding: 10,
-            }}
-          />
+          {chatMessagesData.length === 0 ? (
+            <View className="flex-grow flex flex-col justify-center items-center w-full">
+              <Text className="font-Manrope_500Medium text-gray-500">
+                start by sending some messages to seller.
+              </Text>
+            </View>
+          ) : (
+            <FlashList
+              data={chatMessagesData}
+              renderItem={Message}
+              keyExtractor={(_, index) => index.toString()}
+              maintainVisibleContentPosition={{
+                minIndexForVisible: 0,
+              }}
+              inverted
+              estimatedItemSize={50}
+              onEndReached={() => {
+                if (!hasNextPage) {
+                  console.debug("no next page");
+                  return;
+                }
+                console.debug("refetching messages");
+                fetchNextPage();
+              }}
+              showsVerticalScrollIndicator={true}
+              contentContainerStyle={{
+                padding: 10,
+              }}
+            />
+          )}
 
           <View>
             <TextInput

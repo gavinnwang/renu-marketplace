@@ -97,12 +97,12 @@ const CategoryView = ({
   const getItemsByCategory = async ({ pageParam = 0 }) => {
     // console.debug("fetching with pageParam and category", pageParam, category);
     const res = await fetch(
-      `${API_URL}/items/?category=${category}&offset=${pageParam}&limit=6`
+      `${API_URL}/items/?category=${category}&offset=${pageParam}`
     );
     return parseOrThrowResponse<Item[]>(res);
   };
 
-  const LIMIT = 8;
+  const LIMIT = 12;
 
   const [refreshing, setRefreshing] = React.useState(false);
   const {

@@ -42,7 +42,7 @@ pub async fn fetch_items_by_status(
     Ok(items)
 }
 
-pub async fn fetch_items_by_category(
+pub async fn fetch_active_items_by_category(
     category: Category,
     limit: i32,
     offset: i32,

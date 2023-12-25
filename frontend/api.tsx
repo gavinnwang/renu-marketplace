@@ -1,10 +1,4 @@
-import {
-  AICompleteResponse,
-  ChatGroup,
-  ChatMessage,
-  Item,
-  User,
-} from "./types";
+import { AICompleteResponse, ChatGroup, Item, User } from "./types";
 
 export const API_URL = "https://api.gavinwang.dev";
 
@@ -170,4 +164,59 @@ export async function postAIComplete(
 export async function getSearchItems(query: string): Promise<Item[]> {
   const res = await fetch(`${API_URL}/search/items?query=${query}`);
   return parseOrThrowResponse<Item[]>(res);
+}
+
+export async function uploadImages(images: string[]): Promise<string[]> {
+  const formData = new FormData();
+  for (let i = 0; i < images.length; i++) {
+    const uri = images[i];
+    const fileName = uri.split("/").pop();
+    console.debug(fileName);
+    const fileType = fileName?.split(".").pop() || "image/png";
+    console.debug(fileType);
+    formData.append("images", {
+      uri: images[i],
+      name: fileName,
+      type: fileType,
+    } as any);
+  }
+
+  console.debug("form data: ", formData);
+  const postImageResponse = await fetch(`${API_URL}/images/`, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    method: "POST",
+    body: formData,
+  });
+  if (!postImageResponse.ok) {
+    throw new Error("Failed to post images");
+  }
+
+  return postImageResponse.json();
+}
+
+export async function postNewItem(
+  sessionToken: string,
+  name: string,
+  price: number,
+  description: string,
+  category: string,
+  images: string[]
+): Promise<number> {
+  const postItemResponse = await fetch(`${API_URL}/items/`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      price: Number(price),
+      description,
+      category,
+      images,
+    }),
+  });
+  return parseOrThrowResponse<number>(postItemResponse);
 }

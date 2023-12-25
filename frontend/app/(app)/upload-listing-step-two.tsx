@@ -16,6 +16,7 @@ import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { useSession } from "../../hooks/useSession";
 import { FlashList } from "@shopify/flash-list";
 import LeftChevron from "../../components/LeftChevron";
+import { API_URL, postNewItem, uploadImages } from "../../api";
 
 const ItemCategory: Record<string, string> = {
   picking: "Pick a category",
@@ -197,69 +198,19 @@ export default function UploadListingStepTwo() {
                 }
 
                 setUploading(true);
-
                 try {
-                  const formData = new FormData();
-                  for (let i = 0; i < images.length; i++) {
-                    const uri = images[i];
-                    const fileName = uri.split("/").pop();
-                    console.debug(fileName);
-                    const fileType = fileName?.split(".").pop() || "image/png";
-                    console.debug(fileType);
-                    formData.append("images", {
-                      uri: images[i],
-                      name: fileName,
-                      type: fileType,
-                    } as any);
-                  }
+                  const s3UrlsResponse = await uploadImages(images);
 
-                  console.debug("form data: ", formData);
-                  const postImageResponse = await fetch(
-                    `${process.env.EXPO_PUBLIC_BACKEND_URL}/images/`,
-                    {
-                      headers: {
-                        "Content-Type": "multipart/form-data",
-                      },
-                      method: "POST",
-                      body: formData,
-                    }
+                  const itemId = await postNewItem(
+                    session?.token || "",
+                    title,
+                    Number(price),
+                    description,
+                    category,
+                    s3UrlsResponse
                   );
-                  if (!postImageResponse.ok) {
-                    throw new Error("Failed to post images");
-                  }
-
-                  const s3UrlsResponse: String[] =
-                    await postImageResponse.json();
-                  console.debug(s3UrlsResponse);
-
-                  if (!session?.token) {
-                    throw new Error("No session token");
-                  }
-
-                  const postItemResponse = await fetch(
-                    `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/`,
-                    {
-                      method: "POST",
-                      headers: {
-                        authorization: `Bearer ${session?.token}`,
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        name: title,
-                        price: Number(price),
-                        description,
-                        category,
-                        images: s3UrlsResponse,
-                      }),
-                    }
-                  );
-                  if (!postItemResponse.ok) {
-                    throw new Error("Failed to upload item to server.");
-                  }
-
-                  const itemData: number = await postItemResponse.json();
-                  console.debug("replace to: ", `/item/${itemData}`);
-                  router.replace(`/item/${itemData}`);
+                  console.debug("replace to: ", `/item/${itemId}`);
+                  router.replace(`/item/${itemId}`);
                 } catch (e) {
                   console.error(e);
                 }

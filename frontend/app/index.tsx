@@ -21,8 +21,8 @@ export default function Index() {
   }, [session, loadedFromStorage]);
 
   return (
-    <SafeAreaView className="flex h-full w-full pt-4 items-center bg-bgLight flex-col justify-between">
-      <View className="flex flex-row items-center mt-[50%]">
+    <SafeAreaView className="flex h-full w-full flex-grow items-center justify-center">
+      <View className="flex flex-row items-center">
         <BigLogo />
         <Text className="pl-1 text-black font-Poppins_600SemiBold text-[45px] tracking-tighter">
           Renu

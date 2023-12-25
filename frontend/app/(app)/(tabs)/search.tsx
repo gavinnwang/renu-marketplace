@@ -8,7 +8,7 @@ import { getSearchItems } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
 import { ItemListing } from "../../../components/ItemListing";
 
-const Stack = createNativeStackNavigator(); 
+const Stack = createNativeStackNavigator();
 export default function MyStack() {
   return (
     <Stack.Navigator>
@@ -67,12 +67,10 @@ export function SearchPage() {
     <View className="bg-bgLight h-full">
       <View className="h-[54px]"></View>
       {searchQuery.length === 0 ? (
-        <View className="bg-bgLight h-full mt-[70%]">
-          <View className="flex flex-col items-center">
-            <Text className="font-Poppins_600SemiBold text-lg">
-              Search for items!
-            </Text>
-          </View>
+        <View className="flex-grow flex flex-col justify-center items-center w-full">
+          <Text className="font-Poppins_600SemiBold text-lg">
+            Search for items!
+          </Text>
         </View>
       ) : searchItems && searchItems.length > 0 ? (
         <FlashList
@@ -90,21 +88,15 @@ export function SearchPage() {
           removeClippedSubviews={true}
         />
       ) : isSearchItemsLoading ? (
-        <View className="bg-bgLight h-full mt-[70%]">
-          <View className="flex flex-col items-center">
-            <Text className="font-Poppins_600SemiBold text-lg">...</Text>
-          </View>
-        </View>
+        <></>
       ) : (
         !!searchQuery &&
         searchItems &&
         searchItems.length === 0 && (
-          <View className="bg-bgLight h-full mt-[70%]">
-            <View className="flex flex-col items-center">
-              <Text className="font-Poppins_600SemiBold text-lg">
-                No results found.
-              </Text>
-            </View>
+          <View className="flex-grow flex flex-col justify-center items-center w-full">
+            <Text className="font-Poppins_600SemiBold text-lg">
+              No items found!
+            </Text>
           </View>
         )
       )}

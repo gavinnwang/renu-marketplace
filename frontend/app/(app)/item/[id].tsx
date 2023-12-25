@@ -263,7 +263,7 @@ export default function ItemPage() {
                   }}
                   placeholder={BlurhashPlaceholder}
                   source={{
-                    uri: seller?.name,
+                    uri: seller?.profile_image,
                   }}
                   style={{
                     borderColor: Colors.whitePrimary,

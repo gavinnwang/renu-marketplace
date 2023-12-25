@@ -38,7 +38,7 @@ async fn get_items_handler(
                     return HttpResponse::BadRequest().json("Invalid category");
                 }
             };
-            item_repository::fetch_items_by_category(category, limit, offset, pool.as_ref()).await
+            item_repository::fetch_active_items_by_category(category, limit, offset, pool.as_ref()).await
         }
         None => {
             item_repository::fetch_items_by_status(ItemStatus::Active, limit, offset, pool.as_ref())
