@@ -22,7 +22,6 @@ export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
 }
 
 export async function getUserMeInfo(sessionToken: string): Promise<User> {
-  console.debug("fetching me");
   const res = await fetch(`${API_URL}/users/me`, {
     headers: {
       authorization: `Bearer ${sessionToken}`,
@@ -31,9 +30,14 @@ export async function getUserMeInfo(sessionToken: string): Promise<User> {
   return parseOrThrowResponse<User>(res);
 }
 
-export async function getUserInfo(userId: number): Promise<User> {
+export async function getUserInfo(userId: string): Promise<User> {
   const res = await fetch(`${API_URL}/users/${userId}`);
   return parseOrThrowResponse<User>(res);
+}
+
+export async function getUserItems(userId: string): Promise<Item[]> {
+  const res = await fetch(`${API_URL}/users/${userId}/items`);
+  return parseOrThrowResponse<Item[]>(res);
 }
 
 export async function getSavedItems(sessionToken: string): Promise<Item[]> {
@@ -88,29 +92,15 @@ export async function postItemStatus(
   itemId: number,
   status: string
 ) {
-  console.log("posting item status", status);
-  try {
-    const res = await fetch(
-      `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${sessionToken}`,
-        },
-        method: "POST",
-        body: JSON.stringify({ status: status }),
-      }
-    );
-    console.log("res", res)
-    if (!res.ok) {
-      const errMsg = await res.text();
-      throw new Error(errMsg);
-    }
-    return res.json();
-  } catch (e) {
-    console.log(sessionToken, itemId, status);
-    console.log(e);
-  }
+  const res = await fetch(`${API_URL}/items/${itemId}`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+      "content-type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({ new_status: status }),
+  });
+  return parseOrThrowResponse<Item>(res);
 }
 
 export async function postChatRoomWithFirstMessage(

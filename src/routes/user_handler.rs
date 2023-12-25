@@ -50,9 +50,8 @@ struct StatusQuery {
 
 #[tracing::instrument(skip(pool))]
 #[get("/{id}/items")]
-async fn get_items_by_user_id_and_status_handler(
+async fn get_active_items_by_user_id(
     path: web::Path<i32>,
-    query: Option<web::Query<StatusQuery>>,
     pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = path.into_inner();
@@ -65,19 +64,12 @@ async fn get_items_by_user_id_and_status_handler(
         Ok(_) => {}
     }
 
-    let items = match query {
-        Some(query) => {
-            let status = match ItemStatus::from_str(&query.status) {
-                Ok(status) => status,
-                Err(_) => {
-                    return HttpResponse::BadRequest().json("Invalid status");
-                }
-            };
-
-            item_repository::fetch_items_by_user_id_and_status(user_id, status, pool.as_ref()).await
-        }
-        None => item_repository::fetch_items_by_user_id(user_id, pool.as_ref()).await,
-    };
+    let items = item_repository::fetch_items_by_user_id_and_status(
+        user_id,
+        ItemStatus::Active,
+        pool.as_ref(),
+    )
+    .await;
 
     match items {
         Ok(items) => HttpResponse::Ok().json(items),
@@ -110,9 +102,7 @@ async fn get_items_by_me_by_status_handler(
     };
 
     match items {
-        Ok(items) => {
-            HttpResponse::Ok().json(items)
-        }
+        Ok(items) => HttpResponse::Ok().json(items),
         Err(err) => {
             tracing::error!("Failed to fetch items: {err}");
             HttpResponse::InternalServerError().json("Something went wrong")

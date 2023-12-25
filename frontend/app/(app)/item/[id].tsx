@@ -73,7 +73,7 @@ export default function ItemPage() {
   });
 
   const { data: seller } = useQuery({
-    queryFn: () => getUserInfo(item!.user_id),
+    queryFn: () => getUserInfo(item!.user_id.toString()),
     queryKey: ["user", item?.user_id],
     enabled: !!item && !!item.user_id,
   });
@@ -216,7 +216,9 @@ export default function ItemPage() {
 
               <View>
                 <Text className="font-Manrope_400Regular text-sm mb-1">
-                  {!(item.description && item.description.trim()) ? "No description provided." : item.description.trim()}
+                  {!(item.description && item.description.trim())
+                    ? "No description provided."
+                    : item.description.trim()}
                 </Text>
               </View>
               <Text className="font-Manrope_400Regular text-xs">
@@ -236,11 +238,19 @@ export default function ItemPage() {
               <Text className="font-Poppins_600SemiBold text-base">Seller</Text>
               <Pressable
                 onPress={() => {
+                  if (!seller) return;
+                  if (!session) return;
                   console.debug("seller", item.user_id);
-                  if (seller?.id === session?.user_id) {
+                  if (seller.id === session.user_id) {
                     router.push("/account");
                   } else {
-                    router.push(`/seller/${seller?.id}`);
+                    router.push({
+                      pathname: `/seller/${seller.id}`,
+                      params: {
+                        sellerString: JSON.stringify(seller),
+                        sellerId: seller.id.toString(),
+                      },
+                    });
                   }
                 }}
                 className="flex flex-row items-center"
