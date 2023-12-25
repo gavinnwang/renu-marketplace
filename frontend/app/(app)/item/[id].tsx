@@ -30,6 +30,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
 import { FlashList } from "@shopify/flash-list";
+import { BlurhashPlaceholder } from "../../../constants/Placeholder";
 dayjs.extend(relativeTime);
 
 const HeartIcon = ({ filled }: { filled: boolean }) => (
@@ -132,7 +133,7 @@ export default function ItemPage() {
                     duration: 200,
                   }}
                   recyclingKey={item}
-                  placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
+                  placeholder={BlurhashPlaceholder}
                   style={{
                     height: Dimensions.get("window").width,
                     width: Dimensions.get("window").width,
@@ -260,7 +261,7 @@ export default function ItemPage() {
                     effect: "cross-dissolve",
                     duration: 250,
                   }}
-                  placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
+                  placeholder={BlurhashPlaceholder}
                   source={{
                     uri: seller?.name,
                   }}

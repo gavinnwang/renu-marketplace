@@ -1,10 +1,11 @@
-import { Dimensions, View, Text, Pressable } from "react-native";
+import { Dimensions, View, Text } from "react-native";
 import { Link } from "expo-router";
 
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Image } from "expo-image";
 import { Item } from "../types";
 import dayjs from "dayjs";
+import { BlurhashPlaceholder } from "../constants/Placeholder";
 dayjs.extend(relativeTime);
 
 const horizontalGapPx = 10;
@@ -28,7 +29,7 @@ export function ItemListing({ item, index }: { item: Item; index: number }) {
             duration: 100,
           }}
           recyclingKey={item.images[0]}
-          placeholder={"TCLqY200RSDlM{_24o4n-:~p?b9F"}
+          placeholder={BlurhashPlaceholder}
           source={{ uri: item.images[0] }}
           className="object-cover rounded-t"
           style={{
