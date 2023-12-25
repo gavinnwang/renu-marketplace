@@ -65,7 +65,7 @@ async fn get_chat_id_by_item_id(
 
 #[derive(Deserialize, Debug)]
 pub struct GetChatMessageQuery {
-    pub offset: i32,
+    pub page: i32,
 }
 
 #[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
@@ -99,7 +99,7 @@ async fn get_chat_messages_by_chat_id(
     }
 
     let limit = 25;
-    let offset = query.offset;
+    let offset = query.page * limit;
 
     let messages = chat_repository::fetch_chat_messages_by_chat_id(
         user_id,

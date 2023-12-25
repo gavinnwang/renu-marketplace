@@ -9,12 +9,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import {
+  InfiniteData,
   useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ChatMessage } from "../../../types";
+import { ChatMessage, MessageInfiniteData } from "../../../types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
@@ -64,10 +65,7 @@ export default function ChatScreen() {
         },
       }
     );
-    return parseOrThrowResponse<{
-      data: ChatMessage[];
-      next_offset: number;
-    }>(res);
+    return parseOrThrowResponse<MessageInfiniteData>(res);
   };
 
   const {
@@ -91,7 +89,7 @@ export default function ChatScreen() {
   const width = Dimensions.get("window").width / 7;
   const [inputText, setInputText] = React.useState("");
 
-  const { sendMessage, lastMessage } = useWebSocket(
+  const { sendMessage } = useWebSocket(
     "wss://api.gavinwang.dev/ws",
     {
       queryParams: {
@@ -111,8 +109,8 @@ export default function ChatScreen() {
           (e.data as string).endsWith("receive success")
         ) {
           console.debug("message sent successfully and invalidating");
-          queryClient.invalidateQueries(["messages", chatId]);
-          queryClient.invalidateQueries(["chats", sellOrBuy]);
+          // queryClient.invalidateQueries(["messages", chatId]);
+          // queryClient.invalidateQueries(["chats", sellOrBuy]);
         }
       },
     }
@@ -312,6 +310,8 @@ export default function ChatScreen() {
                   sendMessage(
                     `/message ${chatId} ${correlationId} ${inputText}`
                   );
+
+
                   setInputText("");
                 }
               }}
