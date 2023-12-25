@@ -3,9 +3,8 @@ todo:
 1. notification for chats
 2. num of unread chats
 3. ai completetion
-
 4. aws centralized logging
-5. check home icon to scroll to top
+5. check home icon to scroll to top [*]
 
 backlog:
 

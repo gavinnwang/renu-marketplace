@@ -9,7 +9,6 @@ import Colors from "../../../constants/Colors";
 import PagerView from "react-native-pager-view";
 import { API_URL, parseOrThrowResponse } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
-import { useFocusEffect } from "expo-router";
 import { useScrollToTop } from "@react-navigation/native";
 
 export const CATEGORIES: Record<string, string> = {
