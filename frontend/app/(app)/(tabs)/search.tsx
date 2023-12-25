@@ -30,8 +30,22 @@ export default function MyStack() {
     </Stack.Navigator>
   );
 }
+import * as SecureStore from "expo-secure-store";
 
 export function SearchPage() {
+  const [searchHistory, setSearchHistory] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    const loadSearchHistory = async () => {
+      console.debug("loading search history");
+      const searchHistoryString = await SecureStore.getItemAsync(
+        "searchHistory"
+      );
+      if (searchHistoryString) {
+        setSearchHistory(JSON.parse(searchHistoryString));
+      }
+    };
+    loadSearchHistory();
+  }, []);
   const [searchQuery, setSearchQuery] = React.useState("");
   const {
     data: searchItems,
@@ -49,7 +63,15 @@ export function SearchPage() {
       headerSearchBarOptions: {
         placeholder: "Search",
         onSearchButtonPress: (event: any) => {
-          setSearchQuery(event.nativeEvent.text.trim());
+          const searchQuery = event.nativeEvent.text.trim() as string;
+          setSearchQuery(searchQuery);
+          if (!searchQuery) {
+            return;
+          }
+          setSearchHistory((searchHistory) => {
+            const newSearchHistory = [searchQuery, ...searchHistory];
+            return newSearchHistory;
+          });
         },
         onCancelButtonPress: () => {
           setSearchQuery("");
@@ -63,15 +85,42 @@ export function SearchPage() {
     });
   }, [navigation]);
 
+  React.useEffect(() => {
+    const saveSearchHistory = async () => {
+      await SecureStore.setItemAsync(
+        "searchHistory",
+        JSON.stringify(searchHistory)
+      );
+    };
+    saveSearchHistory();
+  }, [searchHistory]);
   return (
     <View className="bg-bgLight h-full">
       <View className="h-[54px]"></View>
       {searchQuery.length === 0 ? (
-        <View className="flex-grow flex flex-col justify-center items-center w-full">
-          <Text className="font-Poppins_600SemiBold text-lg">
-            Search for items!
-          </Text>
-        </View>
+        searchHistory.length === 0 ? (
+          <View className="flex-grow flex flex-col justify-center items-center w-full">
+            <Text className="font-Poppins_600SemiBold text-lg">
+              Search for items!
+            </Text>
+          </View>
+        ) : (
+          <View className="flex-grow flex flex-col mt-[16%] items-center w-full">
+            <Text className="font-Poppins_600SemiBold text-lg">
+              Recent searches
+            </Text>
+            <View className="flex flex-row flex-wrap justify-center items-center w-full">
+              {searchHistory.map((searchQuery, index) => (
+                <View
+                  className="px-2 py-1 m-1 rounded-md bg-bgLighter"
+                  key={index}
+                >
+                  <Text>{searchQuery}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )
       ) : searchItems && searchItems.length > 0 ? (
         <FlashList
           className="bg-bgLight h-full"

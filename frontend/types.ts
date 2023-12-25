@@ -78,3 +78,8 @@ export type AICompleteResponse = {
   title: string;
   description: string;
 };
+
+export type SearchHistory = {
+  created_at: Date;
+  query: string;
+}[]
