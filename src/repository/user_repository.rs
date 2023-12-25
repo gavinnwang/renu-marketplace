@@ -41,7 +41,7 @@ pub async fn fetch_user_by_id(
 
 pub async fn fetch_user_id_by_email(
     conn: impl Executor<'_, Database = Postgres>,
-    email: String,
+    email: &String,
 ) -> Result<i32, DbError> {
     let user_id = sqlx::query!(r#"SELECT id FROM "user" WHERE email = $1"#, email)
         .fetch_one(conn)

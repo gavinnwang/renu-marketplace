@@ -69,7 +69,7 @@ async fn google_oauth_handler(
     // }
 
     let user_id =
-        user_repository::fetch_user_id_by_email(pool.as_ref(), google_user.email.clone()).await;
+        user_repository::fetch_user_id_by_email(pool.as_ref(), &google_user.email).await;
 
     let user_id = match user_id {
         Err(err) => match err {
