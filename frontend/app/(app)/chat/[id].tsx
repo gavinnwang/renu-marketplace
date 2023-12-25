@@ -158,7 +158,7 @@ export default function ChatScreen() {
       let sentAtString;
 
       if (dispayTime) {
-        sentAtString = dayjs(message.sent_at).fromNow();
+        sentAtString = dayjs(message.sent_at).format("h:mm A");
       } else if (displayExactTime) {
         sentAtString = dayjs(message.sent_at).format("MMM D, h:mm A");
       } else {
@@ -323,7 +323,7 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
   return (
     <View className="flex flex-col items-center">
       {message.sent_at !== null ? (
-        <Text className="mt-3 mb-1 mr-2 text-xs font-Manrope_500Medium text-grayPrimary">
+        <Text className="mt-3 mb-1 mr-2 text-sm font-Manrope_500Medium text-grayPrimary">
           {message.sent_at}
         </Text>
       ) : null}
@@ -333,11 +333,6 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
           message.from_me ? "ml-auto" : "mr-auto"
         }`}
       >
-        {/* {message.sent_at !== null && message.from_me ? (
-          <Text className="mr-2 text-xs font-Manrope_500Medium text-grayPrimary">
-            {dayjs(message.sent_at).fromNow()}
-          </Text>
-        ) : null} */}
         <View
           className={`flex flex-row rounded-xl p-2 w-fit my-1.5 ${
             message.from_me
@@ -346,18 +341,13 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
           }`}
         >
           <Text
-            className={`font-Manrope_400Regular ${
+            className={`font-Manrope_500Medium text-[15.5px] ${
               message.from_me ? "text-white" : "text-black"
             }`}
           >
             {message.content}
           </Text>
         </View>
-        {/* {message.from_me || !message.sent_at ? null : (
-          <Text className="ml-2 text-xs font-Manrope_500Medium text-grayPrimary">
-            {dayjs(message.sent_at).fromNow()}
-          </Text>
-        )} */}
       </View>
     </View>
   );

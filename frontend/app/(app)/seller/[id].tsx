@@ -53,10 +53,7 @@ export default function SellerPage() {
                   user?.profile_image ||
                   "../../../assets/images/placeholder-profile.webp",
               }}
-              style={{
-                borderColor: Colors.whitePrimary,
-              }}
-              className="w-[74px] h-[74px] rounded-full -mt-10 border ml-2.5 bg-blackPrimary"
+              className="w-[74px] h-[74px] rounded-full -mt-10 border border-white ml-2.5 bg-blackPrimary"
             />
           </View>
 

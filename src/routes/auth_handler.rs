@@ -80,7 +80,7 @@ async fn google_oauth_handler(
                     google_user.email
                 );
                 let user_id =
-                    user_repository::add_user(pool.as_ref(), &google_user.name, &google_user.email)
+                    user_repository::add_user(pool.as_ref(), &google_user.name, &google_user.email, &google_user.picture)
                         .await;
                 match user_id {
                     Err(err) => {
@@ -100,7 +100,7 @@ async fn google_oauth_handler(
         Ok(user_id) => user_id,
     };
 
-    tracing::info!("generating jwt token for user with id {}", user_id);
+    tracing::info!("generating jwt token for user with id {user_id}");
 
     let jwt_secret = config.jwt_secret.to_owned();
     let now = Utc::now();

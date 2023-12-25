@@ -54,11 +54,13 @@ pub async fn add_user(
     conn: impl Executor<'_, Database = Postgres>,
     name: &String,
     email: &String,
+    profile_image: &String,
 ) -> Result<i32, DbError> {
     let record = sqlx::query!(
-        r#"INSERT INTO "user" (name, email) VALUES ($1, $2) RETURNING id"#,
+        r#"INSERT INTO "user" (name, email, profile_image) VALUES ($1, $2, $3) RETURNING id"#,
         name,
         email,
+        profile_image
     )
     .fetch_one(conn)
     .await?;
