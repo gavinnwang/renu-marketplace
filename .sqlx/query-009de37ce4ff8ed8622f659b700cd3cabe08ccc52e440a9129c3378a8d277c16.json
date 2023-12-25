@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            item.id as \"id!\", \n            item.name as \"name!\", \n            item.price as \"price!\", \n            item.user_id as \"user_id!\", \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at as \"created_at!\", \n            item.description as \"description!\",\n            item.updated_at as \"updated_at!\",\n            item.images as \"images!\"\n        FROM search_item_idx.search(\n        $1,\n        fuzzy_fields => 'description,name',\n        distance => 1\n        ) AS item\n        WHERE item.status = 'active'\n        LIMIT 10;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "price!",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 3,
+        "name": "user_id!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "category!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "description!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "updated_at!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "images!",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "009de37ce4ff8ed8622f659b700cd3cabe08ccc52e440a9129c3378a8d277c16"
+}

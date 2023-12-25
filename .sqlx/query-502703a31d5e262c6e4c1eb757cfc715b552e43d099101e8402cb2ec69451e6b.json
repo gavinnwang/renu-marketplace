@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE Item\n        SET status = $1, updated_at = NOW()\n        WHERE id = $2\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        {
+          "Custom": {
+            "name": "item_status",
+            "kind": {
+              "Enum": [
+                "active",
+                "inactive"
+              ]
+            }
+          }
+        },
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "502703a31d5e262c6e4c1eb757cfc715b552e43d099101e8402cb2ec69451e6b"
+}
