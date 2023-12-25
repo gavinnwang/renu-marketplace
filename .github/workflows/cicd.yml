@@ -60,5 +60,6 @@ jobs:
             -e S3_KEY=${{ secrets.S3_KEY }} \
             -e S3_KEY_SECRET=${{ secrets.S3_KEY_SECRET }} \
             -e S3_REGION=${{ secrets.S3_REGION }} \
+            -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
             wry0313/renu:latest 
 
