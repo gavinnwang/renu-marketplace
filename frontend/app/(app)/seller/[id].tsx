@@ -3,11 +3,12 @@ import LeftChevron from "../../../components/LeftChevron";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
-import { getUserInfo } from "../../../api";
+import { getUserActiveItems, getUserInfo } from "../../../api";
 import { User } from "../../../types";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../components/RefreshScreen";
+import { ItemListing } from "../../../components/ItemListing";
 
 export default function SellerPage() {
   const { sellerString, sellerId } = useLocalSearchParams();
@@ -25,13 +26,13 @@ export default function SellerPage() {
   });
 
   const {
-    data: savedItemData,
-    isError: isErrorSavedItem,
-    isLoading: isLoadingSavedItem,
+    data: activeItems,
+    isError: isErrorActiveItem,
+    isLoading: isLoadingActiveItem,
     refetch,
   } = useQuery({
     queryKey: ["user_items", sellerId],
-    queryFn: () => getUserInfo(sellerId as string),
+    queryFn: () => getUserActiveItems(sellerId as string),
     enabled: !!sellerId,
   });
 
@@ -80,17 +81,6 @@ export default function SellerPage() {
                 </Text>
               </View>
             </View>
-
-            {/* <View className="flex flex-col w-[100px] gap-y-0.5">
-              <TouchableOpacity
-                onPress={signOut}
-                className="font-Manrope_400Regular bg-purplePrimary p-2 rounded-sm"
-              >
-                <Text className="text-white text-center font-SecularOne_400Regular">
-                  SIGN OUT
-                </Text>
-              </TouchableOpacity>
-            </View> */}
           </View>
 
           <View className="w-full h-2 bg-grayLight mt-2" />
@@ -99,22 +89,22 @@ export default function SellerPage() {
             Listed Items
             <Text className="font-Poppins_500Medium text-sm">
               {" "}
-              ({items?.length ?? 0})
+              ({activeItems?.length ?? 0})
             </Text>
           </Text>
 
           <View className="bg-greyLight h-full">
-            {isLoadingSavedItem ? (
+            {isLoadingActiveItem ? (
               <></>
-            ) : isErrorSavedItem ? (
+            ) : isErrorActiveItem ? (
               <RefreshScreen
                 displayText="Something went wrong."
                 refetch={refetch}
                 marginTop="30%"
               />
-            ) : savedItemData.length === 0 ? (
+            ) : activeItems.length === 0 ? (
               <RefreshScreen
-                displayText="You have no saved items."
+                displayText="You have no Active items."
                 refetch={refetch}
                 marginTop="30%"
               />
@@ -122,7 +112,7 @@ export default function SellerPage() {
               <FlashList
                 showsVerticalScrollIndicator={false}
                 scrollEnabled={false}
-                data={savedItemData}
+                data={activeItems}
                 numColumns={2}
                 contentContainerStyle={{
                   paddingTop: 10,

@@ -35,7 +35,7 @@ export async function getUserInfo(userId: string): Promise<User> {
   return parseOrThrowResponse<User>(res);
 }
 
-export async function getUserItems(userId: string): Promise<Item[]> {
+export async function getUserActiveItems(userId: string): Promise<Item[]> {
   const res = await fetch(`${API_URL}/users/${userId}/items`);
   return parseOrThrowResponse<Item[]>(res);
 }
