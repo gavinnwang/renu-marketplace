@@ -79,11 +79,7 @@ export default function ChatScreen() {
     queryFn: getChatMessages,
     queryKey: ["messages", chatId],
     enabled: !!chatId,
-    getNextPageParam: (lastPage) => {
-      const nextPage =
-        lastPage.data.length === 25 ? lastPage.next_offset : undefined;
-      return nextPage;
-    },
+    getNextPageParam: (lastPage, allPages) => lastPage.length > 0 ? allPages.length : undefined,
   });
 
   const width = Dimensions.get("window").width / 7;
@@ -310,7 +306,6 @@ export default function ChatScreen() {
                   sendMessage(
                     `/message ${chatId} ${correlationId} ${inputText}`
                   );
-
 
                   setInputText("");
                 }
