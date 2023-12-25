@@ -88,18 +88,29 @@ export async function postItemStatus(
   itemId: number,
   status: string
 ) {
-  const response = await fetch(
-    `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`,
-    {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${sessionToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
+  console.log("posting item status", status);
+  try {
+    const res = await fetch(
+      `${process.env.EXPO_PUBLIC_BACKEND_URL}/items/${itemId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${sessionToken}`,
+        },
+        method: "POST",
+        body: JSON.stringify({ status: status }),
+      }
+    );
+    console.log("res", res)
+    if (!res.ok) {
+      const errMsg = await res.text();
+      throw new Error(errMsg);
     }
-  );
-  return parseOrThrowResponse(response);
+    return res.json();
+  } catch (e) {
+    console.log(sessionToken, itemId, status);
+    console.log(e);
+  }
 }
 
 export async function postChatRoomWithFirstMessage(

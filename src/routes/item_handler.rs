@@ -76,19 +76,20 @@ async fn get_item_by_id_handler(path: web::Path<i32>, pool: web::Data<PgPool>) -
 
 #[derive(serde::Deserialize, Debug)]
 struct ItemUpdateBody {
-    status: String,
+    new_status: String,
 }
 
-#[tracing::instrument(skip(pool, auth_guar))]
+#[tracing::instrument(skip(pool, auth_guard), fields(user_id = %auth_guard.user_id))]
 #[post("/{id}")]
 async fn update_item_status_handler(
-    auth_guar: AuthenticationGuard,
+    auth_guard: AuthenticationGuard,
     path: web::Path<i32>,
     data: web::Json<ItemUpdateBody>,
     pool: web::Data<PgPool>,
 ) -> impl Responder {
+    tracing::info!("update_item_status_handler called");
     let item_id = path.into_inner();
-    let user_id = auth_guar.user_id;
+    let user_id = auth_guard.user_id;
 
     let item = item_repository::fetch_item_by_id(item_id, pool.as_ref()).await;
 
@@ -111,7 +112,7 @@ async fn update_item_status_handler(
         }
     };
 
-    let new_status = match ItemStatus::from_str(data.status.as_str()) {
+    let new_status = match ItemStatus::from_str(&data.new_status) {
         Ok(status) => status,
         Err(_) => {
             tracing::error!("Failed to parse status");

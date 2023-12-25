@@ -8,7 +8,7 @@ import { getSearchItems } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
 import { ItemListing } from "../../../components/ItemListing";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator(); 
 export default function MyStack() {
   return (
     <Stack.Navigator>

@@ -1,17 +1,20 @@
 use actix_web::{post, web, HttpResponse, Responder};
 
-use crate::{config::Config, openai::request::request_openai_api};
+use crate::{config::Config, openai::request::request_openai_api, authentication::jwt::AuthenticationGuard};
 
 #[derive(serde::Deserialize, Debug)]
 struct ChatCompleteRequest {
     image: String,
 }
 
+#[tracing::instrument(skip(config, auth_guard), fields(user_id = %auth_guard.user_id))]
 #[post("/complete")]
 async fn chat_complete_handler(
+    auth_guard: AuthenticationGuard,
     data: web::Json<ChatCompleteRequest>,
     config: web::Data<Config>,
 ) -> impl Responder {
+    tracing::info!("chat_complete_handler called");
     let res = request_openai_api(data.image.as_str(), &config).await;
 
     match res {
