@@ -290,6 +290,7 @@ export default function ItemPage() {
                           router.push("/account");
                         } else if (seller) {
                           if (chatId) {
+                            // chat room already exists
                             router.push({
                               pathname: `/chat/${item.id}`,
                               params: {
@@ -300,12 +301,14 @@ export default function ItemPage() {
                               },
                             });
                           } else {
+                            // chat room does not exist
                             router.push({
                               pathname: `/chat/${item.id}`,
                               params: {
                                 sellOrBuy: "Buy",
                                 newChat: "true",
                                 otherUserName: seller.name,
+                                showEncourageMessage: "true",
                               },
                             });
                           }

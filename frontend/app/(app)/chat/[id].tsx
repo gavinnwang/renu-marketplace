@@ -36,6 +36,7 @@ export default function ChatScreen() {
     sellOrBuy,
     newChat,
     otherUserName,
+    showEncourageMessage,
   } = useLocalSearchParams();
 
   const { session } = useSession();
@@ -236,7 +237,9 @@ export default function ChatScreen() {
                     {item.name}
                   </Text>
                   <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
-                    {item.description}
+                  {!(item.description && item.description.trim())
+                    ? "No description provided."
+                    : item.description.trim()}
                   </Text>
                   <Text className="font-Manrope_600SemiBold text-sm text-purplePrimary">
                     {item.status === "inactive"
@@ -256,7 +259,7 @@ export default function ChatScreen() {
           style={{ flex: 1 }}
           keyboardVerticalOffset={64}
         >
-          {chatMessagesData.length === 0 ? (
+          {chatMessagesData.length === 0 && showEncourageMessage === "true" ? (
             <View className="flex-grow flex flex-col justify-center items-center w-full">
               <Text className="font-Manrope_500Medium text-gray-500">
                 start by sending some messages to seller.

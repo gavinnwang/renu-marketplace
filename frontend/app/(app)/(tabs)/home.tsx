@@ -95,7 +95,7 @@ const CategoryView = ({
   selectedSection: number;
 }) => {
   const getItemsByCategory = async ({ pageParam = 0 }) => {
-    // console.debug("fetching with pageParam and category", pageParam, category);
+    console.debug("fetching with pageParam and category", pageParam, category);
     const res = await fetch(
       `${API_URL}/items/?category=${category}&offset=${pageParam}`
     );
@@ -117,9 +117,7 @@ const CategoryView = ({
     queryKey: ["item", category],
     enabled: Math.abs(selectedSection - index) <= 1,
     getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length === LIMIT
-        ? (allPages.length + 1) * LIMIT
-        : undefined;
+      return lastPage.length === LIMIT ? allPages.length * LIMIT : undefined;
     },
   });
 
