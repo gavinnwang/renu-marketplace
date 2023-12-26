@@ -108,6 +108,9 @@ export default function ChatScreen() {
         optimisticAddMessage(messageContent, 0);
         optimisticallyUpdateChatGroupData();
       }
+      if ((e.data as string).endsWith("send success")) {
+        setLastMessageSentSuccessfully(true);
+      }
     },
   });
 
@@ -261,6 +264,8 @@ export default function ChatScreen() {
     () => customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 10),
     []
   );
+  const [lastMessageSentSuccessfully, setLastMessageSentSuccessfully] =
+    React.useState(false);
   return (
     <SafeAreaView className="bg-bgLight">
       <View className="bg-bgLight h-full">
@@ -345,28 +350,37 @@ export default function ChatScreen() {
               </Text>
             </View>
           ) : (
-            <FlashList
-              data={chatMessagesData}
-              renderItem={Message}
-              keyExtractor={(_, index) => index.toString()}
-              maintainVisibleContentPosition={{
-                minIndexForVisible: 0,
-              }}
-              inverted
-              estimatedItemSize={50}
-              onEndReached={() => {
-                if (!hasNextPage) {
-                  console.debug("no next page");
-                  return;
-                }
-                console.debug("refetching messages");
-                fetchNextPage();
-              }}
-              showsVerticalScrollIndicator={true}
-              contentContainerStyle={{
-                padding: 10,
-              }}
-            />
+            <>
+              <FlashList
+                data={chatMessagesData}
+                renderItem={Message}
+                keyExtractor={(item) => item.id.toString()}
+                maintainVisibleContentPosition={{
+                  minIndexForVisible: 0,
+                }}
+                inverted
+                estimatedItemSize={50}
+                onEndReached={() => {
+                  if (!hasNextPage) {
+                    console.debug("no next page");
+                    return;
+                  }
+                  console.debug("refetching messages");
+                  fetchNextPage();
+                }}
+                showsVerticalScrollIndicator={true}
+                contentContainerStyle={{
+                  padding: 10,
+                }}
+              />
+              {lastMessageSentSuccessfully ? (
+                <View className="flex w-full -mt-5 flex-row items-center justify-end pr-2 py-1">
+                  <Text className="font-Manrope_500Medium text-gray-500 text-xs">
+                    delivered
+                  </Text>
+                </View>
+              ) : null}
+            </>
           )}
 
           <View>
@@ -391,6 +405,7 @@ export default function ChatScreen() {
                   sendMessage(
                     `/message ${chatId} ${correlationId} ${inputText}`
                   );
+                  setLastMessageSentSuccessfully(false);
                   console.debug("optimistically updating messages");
                   optimisticAddMessage(inputText, 1);
                   optimisticallyUpdateChatGroupData();
