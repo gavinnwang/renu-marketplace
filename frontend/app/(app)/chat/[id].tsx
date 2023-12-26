@@ -38,7 +38,9 @@ export default function ChatScreen() {
     newChat,
     otherUserName,
     showEncourageMessage,
+    unreadCount,
   } = useLocalSearchParams();
+  console.debug("chat room unread count", unreadCount);
 
   const { session } = useSession();
   const queryClient = useQueryClient();
@@ -145,6 +147,10 @@ export default function ChatScreen() {
   }, []);
 
   const optimisticallyUpdateChatGroupUnreadCount = () => {
+    if (unreadCount && Number(unreadCount) === 0) {
+      console.debug("unread count is zero so no need to update");
+      return;
+    }
     queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
       console.debug("optimistically updating chat group unread count");
       if (!oldData) {

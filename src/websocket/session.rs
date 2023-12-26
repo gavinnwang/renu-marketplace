@@ -29,7 +29,24 @@ pub struct WsChatSession {
 
     // chat server address to send message
     pub server_addr: Addr<server::ChatServer>,
-    // pool: Data<DbPool>,
+}
+
+#[derive(Debug)]
+pub enum ResponseType {
+    Success,
+    Error,
+}
+
+#[derive(Debug)]
+pub enum ResponseEventType {
+    Join,
+    Message,
+}
+#[derive(Debug)]
+pub struct Response {
+    pub success: ResponseType,
+    pub event: ResponseEventType,
+    pub message: String,
 }
 
 impl WsChatSession {
@@ -82,7 +99,6 @@ impl Actor for WsChatSession {
                             "Session with user id {} connected to chat server",
                             act.user_id
                         );
-                        // ctx.text("hello");
                     }
                     // something is wrong with chat server
                     Err(err) => {

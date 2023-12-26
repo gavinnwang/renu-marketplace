@@ -99,6 +99,7 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
             chatIdParam: chat.chat_id,
             sellOrBuy: TABS[selectedTabInt],
             otherUserName: chat.other_user_name,
+            unreadCount: chat.unread_count,
           },
         });
       }}
