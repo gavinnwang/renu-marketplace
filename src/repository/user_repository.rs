@@ -27,15 +27,6 @@ pub async fn fetch_user_by_id(
     .fetch_one(conn)
     .await?;
 
-    // let user = PartialUser {
-    //     id: user.id as i32,
-    //     name: user.name,
-    //     email: user.email,
-    //     profile_image: user.profile_image,
-    //     active_listing_count: user.active_listing_count.unwrap_or(0),
-    //     sales_done_count: user.sales_done_count.unwrap_or(0),
-    // };
-
     Ok(user)
 }
 

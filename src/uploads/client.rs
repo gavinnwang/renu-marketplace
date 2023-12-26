@@ -65,21 +65,39 @@ impl Client {
 
     async fn upload_and_remove(&self, file: TempFile, key_prefix: &str) -> UploadedFile {
         let uploaded_file = self.upload(&file, key_prefix).await;
-        tokio::fs::remove_file(file.file.path()).await.unwrap();
+        match tokio::fs::remove_file(file.file.path()).await {
+            Ok(_) => {}
+            Err(e) => {
+                tracing::error!("Error removing file: {:#?}", e);
+            }
+        }
         uploaded_file
     }
 
     async fn upload(&self, file: &TempFile, key_prefix: &str) -> UploadedFile {
         let filename = uuid::Uuid::new_v4().to_string();
         let key = format!("{key_prefix}{filename}");
-        let s3_url = self
-            .put_object_from_file(file.file.path().to_str().unwrap(), &key)
-            .await;
+        let file_path = match file.file.path().to_str() {
+            Some(path) => path,
+            None => {
+                tracing::error!("Error getting file path");
+                return UploadedFile::new(filename, key, "".to_string());
+            }
+        };
+        let s3_url = match self.put_object_from_file(file_path, &key).await {
+            Ok(url) => url,
+            Err(_) => {
+                tracing::error!("Error uploading file");
+                return UploadedFile::new(filename, key, "".to_string());
+            }
+        };
         UploadedFile::new(filename, key, s3_url)
     }
 
-    async fn put_object_from_file(&self, local_path: &str, key: &str) -> String {
-        let mut file = fs::File::open(local_path).await.unwrap();
+    async fn put_object_from_file(&self, local_path: &str, key: &str) -> Result<String, ()> {
+        let mut file = fs::File::open(local_path).await.map_err(|e| {
+            tracing::error!("Error opening file: {:#?}", e);
+        })?;
 
         let size_estimate = file
             .metadata()
@@ -87,10 +105,14 @@ impl Client {
             .map(|md| md.len())
             .unwrap_or(1024)
             .try_into()
-            .expect("file too big");
+            .map_err(|e| {
+                tracing::error!("Error getting file size: {:#?}", e);
+            })?;
 
         let mut contents = Vec::with_capacity(size_estimate);
-        file.read_to_end(&mut contents).await.unwrap();
+        file.read_to_end(&mut contents).await.map_err(|e| {
+            tracing::error!("Error reading file: {:#?}", e);
+        })?;
 
         let _res = self
             .s3
@@ -100,9 +122,11 @@ impl Client {
             .body(ByteStream::from(contents))
             .send()
             .await
-            .expect("Failed to put object");
+            .map_err(|e| {
+                tracing::error!("Error uploading file: {:#?}", e);
+            })?;
 
-        self.url(key)
+        Ok(self.url(key))
     }
 
     /// Attempts to deletes object from S3. Returns true if successful.
