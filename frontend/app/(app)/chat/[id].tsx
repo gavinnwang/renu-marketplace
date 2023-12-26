@@ -60,7 +60,7 @@ export default function ChatScreen() {
 
   const getChatMessages = async ({ pageParam = 0 }) => {
     const res = await fetch(
-      `${API_URL}/chats/messages/${chatId}?page=${pageParam}`,
+      `${API_URL}/chats/messages/${chatId}?offset=${pageParam}`,
       {
         headers: {
           authorization: `Bearer ${session?.token}`,
@@ -69,6 +69,10 @@ export default function ChatScreen() {
     );
     return parseOrThrowResponse<ChatMessage[]>(res);
   };
+
+  const LIMIT = 25;
+
+  const [extraOffset, setExtraOffset] = React.useState(0);
 
   const {
     data: chatMessages,
@@ -82,8 +86,9 @@ export default function ChatScreen() {
     queryKey: ["messages", chatId],
     enabled: !!chatId,
     getNextPageParam: (lastPage, allPages) =>
-      lastPage.length > 0 ? allPages.length : undefined,
+      lastPage.length > 0 ? (allPages.length - 1) * LIMIT + lastPage.length + extraOffset : undefined,
   });
+
 
   const width = Dimensions.get("window").width / 7;
   const [inputText, setInputText] = React.useState("");
@@ -107,9 +112,11 @@ export default function ChatScreen() {
         const messageContent = (e.data as string).slice(0, -15);
         optimisticAddMessage(messageContent, 0);
         optimisticallyUpdateChatGroupData();
+        setExtraOffset((prev) => prev + 1);
       }
       if ((e.data as string).endsWith("send success")) {
         setLastMessageSentSuccessfully(true);
+        setExtraOffset((prev) => prev + 1);
       }
     },
   });
@@ -354,7 +361,7 @@ export default function ChatScreen() {
               <FlashList
                 data={chatMessagesData}
                 renderItem={Message}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item, index) => index.toString()}
                 maintainVisibleContentPosition={{
                   minIndexForVisible: 0,
                 }}
@@ -452,6 +459,7 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
               message.from_me ? "text-white" : "text-black"
             }`}
           >
+            {message.id } { "  "}
             {message.content}
           </Text>
         </View>
