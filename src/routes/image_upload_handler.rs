@@ -20,20 +20,13 @@ async fn post_images(
         return HttpResponse::BadRequest().json("No images provided");
     }
 
-    let mut uploaded_files = Vec::new();
-    for mut image in images {
-        image.file_name = Some(uuid::Uuid::new_v4().to_string());
-        tracing::info!("Uploading image: {:#?}", image);
-
-        match s3_client.upload(&image, "images/").await {
-            Ok(uploaded_file) => uploaded_files.push(uploaded_file.s3_url),
-            Err(e) => {
-                tracing::error!("Failed to upload image: {:#?}", e);
-                return HttpResponse::InternalServerError().json("Failed to upload image");
-            }
-        };
-    }
-
+    let uploaded_files = match s3_client.upload_files(images, "/images").await {
+        Ok(files) => files,
+        Err(e) => {
+            tracing::error!("Error uploading files: {:#?}", e);
+            return HttpResponse::InternalServerError().json("Error uploading files");
+        }
+    };
     tracing::info!("Uploaded files: {:#?}", uploaded_files);
     HttpResponse::Ok().json(uploaded_files)
 }

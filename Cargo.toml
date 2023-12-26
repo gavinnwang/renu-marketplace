@@ -33,6 +33,7 @@ aws-config = "0.57.1"
 aws-sdk-s3 = "0.35.0"
 actix-multipart = "0.6.1"
 anyhow = "1.0.75"
+futures-util = "0.3.30"
 
 [dependencies.uuid]
 version = "1.5.0"

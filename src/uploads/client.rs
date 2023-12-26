@@ -1,5 +1,8 @@
 use super::types::UploadedFile;
-use tokio::io::AsyncReadExt as _;
+use actix_multipart::form::tempfile::TempFile;
+use aws_sdk_s3::primitives::ByteStream;
+use futures_util::{stream, StreamExt as _};
+use tokio::{fs, io::AsyncReadExt as _};
 
 /// S3 client wrapper to expose semantic upload operations.
 #[derive(Debug, Clone)]
@@ -25,27 +28,58 @@ impl Client {
             self.bucket_name, self.region,
         )
     }
+    pub async fn fetch_file(&self, key: &str) -> Option<(u64, ByteStream)> {
+        let object = self
+            .s3
+            .get_object()
+            .bucket(&self.bucket_name)
+            .key(key)
+            .send()
+            .await
+            .ok()?;
 
-    /// Facilitate the upload of file to s3.
-    pub async fn upload(
+        Some((
+            object
+                .content_length()
+                .try_into()
+                .ok()
+                .expect("file has invalid size"),
+            object.body,
+        ))
+    }
+
+    pub async fn upload_files(
         &self,
-        file: &actix_multipart::form::tempfile::TempFile,
+        temp_files: Vec<TempFile>,
         key_prefix: &str,
-    ) -> Result<UploadedFile, String> {
-        let filename = match file.file_name.as_deref() {
-            Some(filename) => filename.to_string(),
-            None => return Err("No filename provided".to_string()),
-        };
+    ) -> actix_web::Result<Vec<UploadedFile>> {
+        let uploaded_files = stream::iter(temp_files)
+            .map(|file| self.upload_and_remove(file, key_prefix))
+            // upload files concurrently, up to 3 at a time
+            .buffer_unordered(3)
+            .collect()
+            .await;
+
+        Ok(uploaded_files)
+    }
+
+    async fn upload_and_remove(&self, file: TempFile, key_prefix: &str) -> UploadedFile {
+        let uploaded_file = self.upload(&file, key_prefix).await;
+        tokio::fs::remove_file(file.file.path()).await.unwrap();
+        uploaded_file
+    }
+
+    async fn upload(&self, file: &TempFile, key_prefix: &str) -> UploadedFile {
+        let filename = uuid::Uuid::new_v4().to_string();
         let key = format!("{key_prefix}{filename}");
         let s3_url = self
             .put_object_from_file(file.file.path().to_str().unwrap(), &key)
             .await;
-        Ok(UploadedFile::new(filename, key, s3_url))
+        UploadedFile::new(filename, key, s3_url)
     }
 
-    /// Real upload of file to S3
     async fn put_object_from_file(&self, local_path: &str, key: &str) -> String {
-        let mut file = tokio::fs::File::open(local_path).await.unwrap();
+        let mut file = fs::File::open(local_path).await.unwrap();
 
         let size_estimate = file
             .metadata()
@@ -63,7 +97,7 @@ impl Client {
             .put_object()
             .bucket(&self.bucket_name)
             .key(key)
-            .body(aws_sdk_s3::primitives::ByteStream::from(contents))
+            .body(ByteStream::from(contents))
             .send()
             .await
             .expect("Failed to put object");
@@ -71,7 +105,7 @@ impl Client {
         self.url(key)
     }
 
-    /// Attempts to delete object from S3. Returns true if successful.
+    /// Attempts to deletes object from S3. Returns true if successful.
     pub async fn delete_file(&self, key: &str) -> bool {
         self.s3
             .delete_object()
