@@ -20,13 +20,18 @@ async fn post_images(
         return HttpResponse::BadRequest().json("No images provided");
     }
 
-    let uploaded_files = match s3_client.upload_files(images, "/images").await {
+    let uploaded_files = match s3_client.upload_files(images, "images/").await {
         Ok(files) => files,
         Err(e) => {
             tracing::error!("Error uploading files: {:#?}", e);
             return HttpResponse::InternalServerError().json("Error uploading files");
         }
     };
+
+    let uploaded_files: Vec<String> = uploaded_files
+        .into_iter()
+        .map(|file| file.url)
+        .collect();
     tracing::info!("Uploaded files: {:#?}", uploaded_files);
     HttpResponse::Ok().json(uploaded_files)
 }

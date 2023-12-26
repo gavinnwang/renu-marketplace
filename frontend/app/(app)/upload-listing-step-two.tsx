@@ -8,6 +8,7 @@ import {
   ScrollView,
   TextInput,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 import React from "react";
@@ -211,9 +212,13 @@ export default function UploadListingStepTwo() {
               }}
               className="w-full h-full bg-purplePrimary flex shadow-lg items-center justify-center"
             >
-              <Text className="font-SecularOne_400Regular text-xl text-white rounded-sm">
-                PUBLISH ITEM
-              </Text>
+              {!uploading ? (
+                <Text className="font-SecularOne_400Regular text-xl text-white rounded-sm">
+                  PUBLISH ITEM
+                </Text>
+              ) : (
+                <ActivityIndicator size="small" />
+              )}
             </Pressable>
           </View>
         </View>
