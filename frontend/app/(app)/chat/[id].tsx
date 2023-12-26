@@ -203,7 +203,7 @@ export default function ChatScreen() {
       const sentAtDate = new Date(message.sent_at);
       const timeDiffFromCur = curTime.getTime() - sentAtDate.getTime();
 
-      const dispayTime: boolean = timeDiffFromCur < 1000 * 60 * 60; // less than an hour
+      const dispayTime: boolean = timeDiffFromCur < 1000 * 60 * 60 * 24; // less than an hour
       const displayExactTime: boolean = timeDiffFromCur > 1000 * 60 * 60 * 24; // more than a day
 
       let sentAtString;
