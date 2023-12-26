@@ -30,7 +30,7 @@ async fn post_images(
 
     let uploaded_files: Vec<String> = uploaded_files
         .into_iter()
-        .map(|file| file.url)
+        .map(|file| file.s3_url)
         .collect();
     tracing::info!("Uploaded files: {:#?}", uploaded_files);
     HttpResponse::Ok().json(uploaded_files)

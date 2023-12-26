@@ -163,6 +163,7 @@ export async function postAIComplete(
   const res = await fetch(`${API_URL}/openai/complete`, {
     headers: {
       "content-type": "application/json",
+      "authorization": `Bearer ${sessionToken}`,
     },
     method: "POST",
     body: JSON.stringify({
