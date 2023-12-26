@@ -83,8 +83,3 @@ export type SearchHistory = {
   created_at: Date;
   query: string;
 }[]
-
-export type MessageInfiniteData={
-  data: ChatMessage[];
-  next_offset: number;
-}

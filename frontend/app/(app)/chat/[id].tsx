@@ -15,7 +15,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ChatMessage, MessageInfiniteData } from "../../../types";
+import { ChatGroup, ChatMessage } from "../../../types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
@@ -58,14 +58,14 @@ export default function ChatScreen() {
 
   const getChatMessages = async ({ pageParam = 0 }) => {
     const res = await fetch(
-      `${API_URL}/chats/messages/${chatId}?offset=${pageParam}`,
+      `${API_URL}/chats/messages/${chatId}?page=${pageParam}`,
       {
         headers: {
           authorization: `Bearer ${session?.token}`,
         },
       }
     );
-    return parseOrThrowResponse<MessageInfiniteData>(res);
+    return parseOrThrowResponse<ChatMessage[]>(res);
   };
 
   const {
@@ -79,38 +79,89 @@ export default function ChatScreen() {
     queryFn: getChatMessages,
     queryKey: ["messages", chatId],
     enabled: !!chatId,
-    getNextPageParam: (lastPage, allPages) => lastPage.length > 0 ? allPages.length : undefined,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length > 0 ? allPages.length : undefined,
   });
 
   const width = Dimensions.get("window").width / 7;
   const [inputText, setInputText] = React.useState("");
 
-  const { sendMessage } = useWebSocket(
-    "wss://api.gavinwang.dev/ws",
-    {
-      queryParams: {
-        authorization: `Bearer_${session?.token}`,
-      },
-      shouldReconnect: () => true,
-      onOpen: () => {
-        if (chatId) {
-          sendMessage(`/join ${chatId}`);
-        }
-      },
-      reconnectInterval: 5,
-      onMessage: (e) => {
-        console.debug(e.data);
-        if (
-          (e.data as string).endsWith("send success") ||
-          (e.data as string).endsWith("receive success")
-        ) {
-          console.debug("message sent successfully and invalidating");
-          // queryClient.invalidateQueries(["messages", chatId]);
-          // queryClient.invalidateQueries(["chats", sellOrBuy]);
-        }
-      },
-    }
+  const { sendMessage } = useWebSocket("wss://api.gavinwang.dev/ws", {
+    queryParams: {
+      authorization: `Bearer_${session?.token}`,
+    },
+    shouldReconnect: () => true,
+    onOpen: () => {
+      if (chatId) {
+        sendMessage(`/join ${chatId}`);
+      }
+    },
+    reconnectInterval: 5,
+    onMessage: (e) => {
+      console.debug(e.data);
+      if ((e.data as string).endsWith("receive success")) {
+        console.debug("message sent successfully and invalidating");
+        // remove receive success from the end of the message
+        const messageContent = (e.data as string).slice(0, -15);
+        optimisticAddMessage(messageContent, 0);
+        optimisticallyUpdateChatGrouopData();
+      }
+    },
+  });
+
+  const nanoidNumber = React.useMemo(
+    () => customAlphabet("0123456789", 10),
+    []
   );
+
+  const optimisticAddMessage = (content: string, from_me: number) => {
+    queryClient.setQueryData<InfiniteData<ChatMessage[]>>(
+      ["messages", chatId],
+      (oldData) => {
+        console.log("optimistically updating messages")
+        if (!oldData) {
+          return;
+        }
+        const newData = oldData.pages.map((page) =>
+          page.map((message) => message)
+        );
+        newData[0].unshift({
+          id: Number(nanoidNumber()),
+          content,
+          from_me,
+          sent_at: new Date().toISOString(),
+        });
+        return {
+          ...oldData,
+          pages: newData,
+        };
+      }
+    );
+  };
+
+  const optimisticallyUpdateChatGrouopData = () => {
+    queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], 
+    (oldData) => {
+      console.log("optimistically updating chat group data")
+      if (!oldData) {
+        return;
+      }
+      const newData = oldData.map((chatGroup) => {
+        if (chatGroup.chat_id === chatId) {
+          return {
+            ...chatGroup,
+            last_message_content: inputText,
+            last_message_sent_at: new Date(),
+          };
+        }
+        return chatGroup;
+      }
+      );
+      return newData;
+    }
+    );
+
+  };
 
   const createChatRoomAndFirstMessageMutation = useMutation({
     mutationFn: (firstMessage: string) =>
@@ -127,16 +178,21 @@ export default function ChatScreen() {
     },
   });
 
+  React.useEffect(() => {
+    console.log("changed");
+  }, [chatMessages?.pages]);
+
   const chatMessagesData = React.useMemo(() => {
     if (!chatMessages?.pages) {
+      console.debug("no messages");
       return [];
     }
-    console.debug("processing messages");
+    console.debug("PROCESSING mESSAGES DATE");
     let lastDisplayString = "";
     const curTime = new Date();
     const messages = chatMessages.pages.flatMap((page) =>
-      page.data.map((message) => {
-        return message;
+      page.map((message) => {
+        return { ...message };
       })
     );
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -170,7 +226,7 @@ export default function ChatScreen() {
       lastDisplayString = sentAtString;
     }
     return messages;
-  }, [chatMessages]);
+  }, [chatMessages?.pages]);
 
   const nanoid = React.useMemo(
     () => customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 10),
@@ -231,9 +287,9 @@ export default function ChatScreen() {
                     {item.name}
                   </Text>
                   <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
-                  {!(item.description && item.description.trim())
-                    ? "No description provided."
-                    : item.description.trim()}
+                    {!(item.description && item.description.trim())
+                      ? "No description provided."
+                      : item.description.trim()}
                   </Text>
                   <Text className="font-Manrope_600SemiBold text-sm text-purplePrimary">
                     {item.status === "inactive"
@@ -306,7 +362,9 @@ export default function ChatScreen() {
                   sendMessage(
                     `/message ${chatId} ${correlationId} ${inputText}`
                   );
-
+                  console.debug("optimistically updating messages");
+                  optimisticAddMessage(inputText, 1); 
+                  optimisticallyUpdateChatGrouopData();
                   setInputText("");
                 }
               }}
