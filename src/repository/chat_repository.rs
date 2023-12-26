@@ -246,13 +246,13 @@ pub async fn clear_unread_count_by_user_id(
         r#"
         UPDATE item_chat
         SET 
-            seller_unread_count = CASE
-                WHEN buyer_id = $1 THEN 0
-                ELSE seller_unread_count
-            END,
             buyer_unread_count = CASE
+                WHEN buyer_id = $1 THEN 0
+                ELSE buyer_unread_count 
+            END,
+            seller_unread_count = CASE
                 WHEN buyer_id != $2 THEN 0
-                ELSE buyer_unread_count
+                ELSE seller_unread_count
             END
         WHERE id = $3;
         "#,

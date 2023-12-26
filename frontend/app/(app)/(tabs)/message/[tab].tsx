@@ -116,6 +116,11 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
           backgroundColor: Colors.grayLight,
         }}
       />
+      <View>
+        <Text>
+          {chat.unread_count}
+        </Text>
+      </View>
       <View className="flex flex-col px-4 pt-2 flex-grow justify-between ">
         <View>
           <View className="flex flex-row gap-y-1 justify-between">
