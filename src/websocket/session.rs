@@ -84,8 +84,8 @@ impl Actor for WsChatSession {
                         // ctx.text("hello");
                     }
                     // something is wrong with chat server
-                    _ => {
-                        tracing::error!("Session actor failed to start: Can not connect to server");
+                    Err(err) => {
+                        tracing::error!("Session actor failed to start: Can not connect to server {}", err);
                         ctx.stop();
                     }
                 }

@@ -104,7 +104,7 @@ export default function ChatScreen() {
         // remove receive success from the end of the message
         const messageContent = (e.data as string).slice(0, -15);
         optimisticAddMessage(messageContent, 0);
-        optimisticallyUpdateChatGrouopData();
+        optimisticallyUpdateChatGroupData();
       }
     },
   });
@@ -118,7 +118,7 @@ export default function ChatScreen() {
     queryClient.setQueryData<InfiniteData<ChatMessage[]>>(
       ["messages", chatId],
       (oldData) => {
-        console.debug("optimistically updating messages")
+        console.debug("optimistically updating messages");
         if (!oldData) {
           return;
         }
@@ -139,10 +139,33 @@ export default function ChatScreen() {
     );
   };
 
-  const optimisticallyUpdateChatGrouopData = () => {
-    queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], 
-    (oldData) => {
-      console.debug("optimistically updating chat group data")
+  React.useEffect(() => {
+    console.debug("optimistically updating chat group unread count to zero");
+    optimisticallyUpdateChatGroupUnreadCount();
+  }, []);
+
+  const optimisticallyUpdateChatGroupUnreadCount = () => {
+    queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
+      console.debug("optimistically updating chat group unread count");
+      if (!oldData) {
+        return;
+      }
+      const newData = oldData.map((chatGroup) => {
+        if (chatGroup.chat_id === chatId) {
+          return {
+            ...chatGroup,
+            unread_count: 0,
+          };
+        }
+        return chatGroup;
+      });
+      return newData;
+    });
+  };
+
+  const optimisticallyUpdateChatGroupData = () => {
+    queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
+      console.debug("optimistically updating chat group data");
       if (!oldData) {
         return;
       }
@@ -155,12 +178,9 @@ export default function ChatScreen() {
           };
         }
         return chatGroup;
-      }
-      );
+      });
       return newData;
-    }
-    );
-
+    });
   };
 
   const createChatRoomAndFirstMessageMutation = useMutation({
@@ -363,8 +383,8 @@ export default function ChatScreen() {
                     `/message ${chatId} ${correlationId} ${inputText}`
                   );
                   console.debug("optimistically updating messages");
-                  optimisticAddMessage(inputText, 1); 
-                  optimisticallyUpdateChatGrouopData();
+                  optimisticAddMessage(inputText, 1);
+                  optimisticallyUpdateChatGroupData();
                   setInputText("");
                 }
               }}
