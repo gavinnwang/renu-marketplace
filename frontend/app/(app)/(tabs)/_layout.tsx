@@ -91,7 +91,7 @@ const MessageIcon = ({ color }: { color: string }) => {
   return (
     <View className="relative">
       {unreadCount && unreadCount > 0 ? (
-        <View className="flex items-center rounded-full justify-center h-4 w-4 absolute bg-purplePrimary -right-2.5 -top-0.5 z-50">
+        <View className="flex items-center rounded-full justify-center h-4 w-4 absolute bg-purplePrimary -right-2.5 -top- z-50">
           <Text className="text-white font-Manrope_500Medium text-xs">
             {unreadCount}
           </Text>

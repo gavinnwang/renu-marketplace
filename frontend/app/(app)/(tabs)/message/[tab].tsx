@@ -10,11 +10,11 @@ import { router, useLocalSearchParams } from "expo-router";
 import { ChatGroup, Measure, RefAndKey } from "../../../../types";
 import Colors from "../../../../constants/Colors";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useSession } from "../../../../hooks/useSession";
-import { getChatGroups } from "../../../../api";
+import { getChatGroupUnreadCount, getChatGroups } from "../../../../api";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
@@ -45,12 +45,14 @@ export default function MessagePage() {
 
   const [refreshing, setRefreshing] = React.useState(false);
 
+  const queryClient = useQueryClient();
+
   return (
     <View className="bg-bgLight h-full">
       <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
         Messages
       </Text>
-      <Tabs data={data} selectedTabInt={selectedTabInt} />
+      <Tabs data={data} selectedTabInt={selectedTabInt} chats={chats} />
       {isErrorChats ? (
         <RefreshScreen displayText="Something went wrong." refetch={refetch} />
       ) : isLoadingChats ? (
@@ -66,7 +68,9 @@ export default function MessagePage() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => {
+                console.log("refreshing");
                 refetch();
+                queryClient.invalidateQueries(["unreadCount"]);
               }}
             />
           }
@@ -165,9 +169,11 @@ const Tab = React.forwardRef(
     {
       selectedTabInt,
       sectionIndex,
+      unreadCount,
     }: {
       selectedTabInt: number;
       sectionIndex: number;
+      unreadCount: number;
     },
     ref: any
   ) => {
@@ -183,17 +189,18 @@ const Tab = React.forwardRef(
         className="w-[50%] justify-center items-center"
         ref={ref}
       >
-        <View>
-          <Text
-            className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
-              sectionIndex === selectedTabInt
-                ? "text-blackPrimary border-b-[1px] border-b-grayLight"
-                : "text-grayPrimary"
-            }`}
-          >
-            {TABS[sectionIndex]}
+        <Text
+          className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
+            sectionIndex === selectedTabInt
+              ? "text-blackPrimary border-b-[1px] border-b-grayLight"
+              : "text-grayPrimary"
+          }`}
+        >
+          {TABS[sectionIndex]}{" "}
+          <Text className="font-Poppins_500Medium text-sm">
+            ({unreadCount})
           </Text>
-        </View>
+        </Text>
       </Pressable>
     );
   }
@@ -202,9 +209,11 @@ const Tab = React.forwardRef(
 const Tabs = ({
   data,
   selectedTabInt,
+  chats,
 }: {
   data: RefAndKey[];
   selectedTabInt: number;
+  chats: ChatGroup[] | undefined;
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();
@@ -241,7 +250,12 @@ const Tabs = ({
       ]).start();
     }
   }, [selectedTabInt, measures]);
-
+  const { session } = useSession();
+  const { data: unreadCount } = useQuery(["unreadCount"], () =>
+    getChatGroupUnreadCount(session!.token)
+  );
+  const currentUnreadCount =
+    chats?.filter((c) => c.unread_count > 0).length ?? 0;
   return (
     <View
       ref={containerRef}
@@ -254,6 +268,11 @@ const Tabs = ({
             selectedTabInt={selectedTabInt}
             sectionIndex={i}
             ref={section.ref}
+            unreadCount={
+              i === selectedTabInt
+                ? currentUnreadCount ?? 0
+                : (unreadCount ?? 0) - currentUnreadCount
+            }
           />
         );
       })}
