@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import Colors from "../../../constants/Colors";
 import React from "react";
 import { useNavigation } from "expo-router";
@@ -111,12 +111,17 @@ export function SearchPage() {
             </Text>
             <View className="flex flex-row flex-wrap justify-center items-center w-full">
               {searchHistory.map((searchQuery, index) => (
-                <View
+                <TouchableOpacity
+                  onPress={() => {
+                    // focus search bar
+                    setSearchQuery(searchQuery);
+                    
+                  }}
                   className="px-2 py-1 m-1 rounded-md bg-bgLighter"
                   key={index}
                 >
                   <Text>{searchQuery}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </View>

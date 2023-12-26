@@ -7,12 +7,7 @@ use actix::{
 use actix_web::web::Data;
 use sqlx::PgPool;
 
-use crate::repository::chat_repository::{
-    check_if_user_id_is_part_of_chat_group, insert_chat_message,
-};
-
 use super::session;
-
 
 // chat server manages chat rooms and responsible for coordinating chat session
 #[derive(Debug, Clone)]
@@ -70,8 +65,8 @@ impl Handler<ChatMessageToServer> for ChatServer {
 
         let pool = self.pool.clone();
         async move {
-            let result = insert_chat_message(
-                msg.sender_id as i32,
+            let result = crate::repository::chat_repository::insert_chat_message(
+                 msg.sender_id as i32,
                 msg.chat_id as i32,
                 &msg.content,
                 pool.as_ref(),
@@ -81,6 +76,21 @@ impl Handler<ChatMessageToServer> for ChatServer {
             match result {
                 Ok(_) => {
                     tracing::info!("Message inserted to database successfully");
+                    match crate::repository::chat_repository::increment_unread_count_based_on_sender_id(
+                        msg.chat_id as i32,
+                        msg.sender_id as i32,
+                        pool.as_ref(),
+                    ).await {
+                        Ok(_) => {
+                            tracing::info!("Unread count incremented successfully");
+                        }
+                        Err(err) => {
+                            tracing::error!(
+                                "Failed to increment unread count. Error message: {}\n",
+                                err
+                            );
+                        }
+                    }
                 }
                 Err(err) => {
                     tracing::error!(
@@ -192,7 +202,7 @@ impl Handler<Join> for ChatServer {
 
         // do something async
         Box::pin(async move {
-            let is_part_of_chat_group = check_if_user_id_is_part_of_chat_group(
+            let is_part_of_chat_group = crate::repository::chat_repository::check_if_user_id_is_part_of_chat_group(
                 msg.user_id as i32,
                 msg.chat_id as i32,
                 pool.as_ref(),

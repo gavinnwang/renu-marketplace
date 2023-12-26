@@ -111,8 +111,7 @@ async fn get_chat_messages_by_chat_id(
     .await;
 
     match messages {
-        Ok(messages) => HttpResponse::Ok()
-            .json(messages),
+        Ok(messages) => HttpResponse::Ok().json(messages),
         Err(err) => {
             tracing::error!("failed to fetch chat messages: {err}");
             HttpResponse::InternalServerError().json("Failed to fetch chat messages")
@@ -207,7 +206,28 @@ async fn post_chat_room_and_send_first_message(
             .await;
 
             match send_message_result {
-                Ok(_) => HttpResponse::Ok().json(chat_id),
+                Ok(_) => {
+                    match chat_repository::increment_unread_count_based_on_sender_id(
+                        chat_id,
+                        user_id,
+                        pool.as_ref(),
+                    )
+                    .await
+                    {
+                        Ok(_) => {
+                            tracing::info!("Unread count incremented successfully");
+                            HttpResponse::Ok().json(chat_id)
+                        }
+                        Err(err) => {
+                            tracing::error!(
+                                "Failed to increment unread count. Error message: {}\n",
+                                err
+                            );
+                            HttpResponse::InternalServerError()
+                                .json("Failed to increment unread count")
+                        }
+                    }
+                }
                 Err(err) => {
                     tracing::error!("Failed to send first message: {err}");
                     HttpResponse::InternalServerError().json("Failed to send first message")

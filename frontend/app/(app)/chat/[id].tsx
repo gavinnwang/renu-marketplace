@@ -118,7 +118,7 @@ export default function ChatScreen() {
     queryClient.setQueryData<InfiniteData<ChatMessage[]>>(
       ["messages", chatId],
       (oldData) => {
-        console.log("optimistically updating messages")
+        console.debug("optimistically updating messages")
         if (!oldData) {
           return;
         }
@@ -142,7 +142,7 @@ export default function ChatScreen() {
   const optimisticallyUpdateChatGrouopData = () => {
     queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], 
     (oldData) => {
-      console.log("optimistically updating chat group data")
+      console.debug("optimistically updating chat group data")
       if (!oldData) {
         return;
       }
@@ -179,7 +179,7 @@ export default function ChatScreen() {
   });
 
   React.useEffect(() => {
-    console.log("changed");
+    console.debug("changed");
   }, [chatMessages?.pages]);
 
   const chatMessagesData = React.useMemo(() => {

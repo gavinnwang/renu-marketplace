@@ -52,7 +52,6 @@ pub async fn fetch_chat_groups_by_seller_id(
     .await?;
 
     Ok(chat_groups)
-  
 }
 
 pub async fn fetch_chat_groups_by_buyer_id(
@@ -205,6 +204,35 @@ pub async fn insert_chat_message(
     .await?;
 
     Ok(result.rows_affected() == 1)
+}
+
+pub async fn increment_unread_count_based_on_sender_id(
+    chat_id: i32,
+    sender_id: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<(), DbError> {
+    sqlx::query!(
+        r#"
+        UPDATE item_chat
+        SET 
+            seller_unread_count = CASE
+                WHEN buyer_id = $1 THEN seller_unread_count + 1
+                ELSE seller_unread_count
+            END,
+            buyer_unread_count = CASE
+                WHEN buyer_id != $2 THEN buyer_unread_count + 1
+                ELSE buyer_unread_count
+            END
+        WHERE id = $3;
+        "#,
+        sender_id,
+        sender_id,
+        chat_id
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(())
 }
 
 // fetch the item info by chat id and if there is a chat room between the user and other user regarding this item

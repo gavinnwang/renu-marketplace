@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE item_chat\n        SET \n            seller_unread_count = CASE\n                WHEN buyer_id = $1 THEN seller_unread_count + 1\n                ELSE seller_unread_count\n            END,\n            buyer_unread_count = CASE\n                WHEN buyer_id != $2 THEN buyer_unread_count + 1\n                ELSE buyer_unread_count\n            END\n        WHERE id = $3;\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "24a4630db81793fc2582d9bc3104e3bb1686225656c2e9b46925acd7d217662c"
+}
