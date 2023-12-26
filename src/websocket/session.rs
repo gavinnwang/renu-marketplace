@@ -68,6 +68,7 @@ impl Actor for WsChatSession {
 
         let addr = ctx.address(); // get address of this actor
 
+        tracing::info!("Session actor started with user id {}", self.user_id);
         self.server_addr
             .send(server::Connect {
                 user_id: self.user_id,
@@ -86,6 +87,7 @@ impl Actor for WsChatSession {
                     // something is wrong with chat server
                     Err(err) => {
                         tracing::error!("Session actor failed to start: Can not connect to server {}", err);
+                        ctx.text("Something went wrong");
                         ctx.stop();
                     }
                 }

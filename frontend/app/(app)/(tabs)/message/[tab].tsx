@@ -102,24 +102,28 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
         chat.item_status === "inactive" ? "opacity-70" : ""
       } ${touching ? "bg-gray-100" : ""}`}
     >
-      <Image
-        transition={{
-          effect: "cross-dissolve",
-          duration: 250,
-        }}
-        source={{ uri: chat.item_images[0] }}
-        className="object-cover rounded-sm"
-        style={{
-          width: width,
-          maxWidth: width,
-          height: (width * 4) / 3,
-          backgroundColor: Colors.grayLight,
-        }}
-      />
-      <View>
-        <Text>
-          {chat.unread_count}
-        </Text>
+      <View className="relative">
+        <Image
+          transition={{
+            effect: "cross-dissolve",
+            duration: 250,
+          }}
+          source={{ uri: chat.item_images[0] }}
+          className="object-cover rounded-sm"
+          style={{
+            width: width,
+            maxWidth: width,
+            height: (width * 4) / 3,
+            backgroundColor: Colors.grayLight,
+          }}
+        />
+        {chat.unread_count > 0 && (
+          <View className="flex items-center rounded-full justify-center h-6 w-6 absolute bg-purplePrimary -right-2 -top-2">
+            <Text className="text-white font-Manrope_600SemiBold">
+              {chat.unread_count}
+            </Text>
+          </View>
+        )}
       </View>
       <View className="flex flex-col px-4 pt-2 flex-grow justify-between ">
         <View>
@@ -161,8 +165,7 @@ const Tab = React.forwardRef(
     {
       selectedTabInt,
       sectionIndex,
-    }: 
-    {
+    }: {
       selectedTabInt: number;
       sectionIndex: number;
     },
@@ -199,8 +202,7 @@ const Tab = React.forwardRef(
 const Tabs = ({
   data,
   selectedTabInt,
-}: 
-{
+}: {
   data: RefAndKey[];
   selectedTabInt: number;
 }) => {
