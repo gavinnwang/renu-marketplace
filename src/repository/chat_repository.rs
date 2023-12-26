@@ -33,7 +33,8 @@ pub async fn fetch_chat_groups_by_seller_id(
             rm.last_message_sent_at,
             i.category::TEXT AS "item_category!", 
             i.description AS item_description,
-            i.status::TEXT AS "item_status!"
+            i.status::TEXT AS "item_status!",
+            ic.buyer_unread_count AS "unread_count!"
         FROM 
             item_chat ic
         JOIN 
@@ -82,7 +83,8 @@ pub async fn fetch_chat_groups_by_buyer_id(
                 rm.last_message_sent_at,
                 i.category::TEXT AS "item_category!", 
                 i.description AS item_description,
-                i.status::TEXT AS "item_status!"
+                i.status::TEXT AS "item_status!",
+                ic.seller_unread_count AS "unread_count!"
             FROM 
                 item_chat ic
             JOIN 

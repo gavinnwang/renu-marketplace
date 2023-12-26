@@ -31,6 +31,7 @@ pub struct ChatGroup {
     pub item_images: serde_json::Value,
     pub last_message_content: String,
     pub last_message_sent_at: DateTime<Utc>,
+    pub unread_count: i32,
 }
 
 // #[derive(Debug, sqlx::FromRow, Deserialize, Serialize)]
