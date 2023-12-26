@@ -78,7 +78,7 @@ export default function MessagePage() {
 }
 
 const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
-  const width = (Dimensions.get("window").width - 250) / 2;
+  const width = (Dimensions.get("window").width - 230) / 2;
   const param = useLocalSearchParams();
   const selectedTabInt = parseInt(param.tab as string);
 

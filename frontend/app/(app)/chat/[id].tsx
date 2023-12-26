@@ -161,6 +161,9 @@ export default function ChatScreen() {
       });
       return newData;
     });
+    queryClient.setQueryData<number>(["unreadCount"], (old) =>
+      old ? old - 1 : 0
+    );
   };
 
   const optimisticallyUpdateChatGroupData = () => {

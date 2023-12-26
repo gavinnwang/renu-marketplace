@@ -64,6 +64,17 @@ export async function getChatGroups(
   return parseOrThrowResponse<ChatGroup[]>(res);
 }
 
+export async function getChatGroupUnreadCount(
+  sessionToken: string
+): Promise<number> {
+  const res = await fetch(`${API_URL}/chats/unread-count`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  return parseOrThrowResponse<number>(res);
+}
+
 export async function getChatIdFromItemId(
   sessionToken: string,
   itemId: string

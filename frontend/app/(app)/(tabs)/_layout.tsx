@@ -2,7 +2,10 @@ import { Tabs } from "expo-router";
 import React from "react";
 import Colors from "../../../constants/Colors";
 import Svg, { Path } from "react-native-svg";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
+import { getChatGroupUnreadCount } from "../../../api";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "../../../hooks/useSession";
 
 export default function TabsLayout() {
   return (
@@ -65,7 +68,6 @@ export default function TabsLayout() {
 }
 
 const HomeIcon = ({ color }: { color: string }) => (
-
   <Svg
     width="20"
     height="23"
@@ -80,20 +82,36 @@ const HomeIcon = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const MessageIcon = ({ color }: { color: string }) => (
-  <Svg
-    width="23"
-    height="23"
-    viewBox="0 0 23 23"
-    fill="none"
-    className="mt-1.5"
-  >
-    <Path
-      d="M4.54453 13.3846H13.3445V11.1846H4.54453V13.3846ZM4.54453 10.0846H17.7445V7.88457H4.54453V10.0846ZM4.54453 6.78457H17.7445V4.58457H4.54453V6.78457ZM0.144531 22.1846V2.38457C0.144531 1.77957 0.360131 1.26147 0.791331 0.830272C1.22253 0.399072 1.74026 0.183839 2.34453 0.184572H19.9445C20.5495 0.184572 21.0676 0.400172 21.4988 0.831372C21.93 1.26257 22.1453 1.78031 22.1445 2.38457V15.5846C22.1445 16.1896 21.9289 16.7077 21.4977 17.1389C21.0665 17.5701 20.5488 17.7853 19.9445 17.7846H4.54453L0.144531 22.1846ZM3.60953 15.5846H19.9445V2.38457H2.34453V16.8221L3.60953 15.5846Z"
-      fill={color}
-    />
-  </Svg>
-);
+const MessageIcon = ({ color }: { color: string }) => {
+  const { session } = useSession();
+  const { data: unreadCount } = useQuery(["unreadCount"], () =>
+    getChatGroupUnreadCount(session!.token)
+  );
+  console.debug("unread count: ", unreadCount);
+  return (
+    <View className="relative">
+      {unreadCount && unreadCount > 0 ? (
+        <View className="flex items-center rounded-full justify-center h-4 w-4 absolute bg-purplePrimary -right-2.5 -top-0.5 z-50">
+          <Text className="text-white font-Manrope_500Medium text-xs">
+            {unreadCount}
+          </Text>
+        </View>
+      ) : null}
+      <Svg
+        width="23"
+        height="23"
+        viewBox="0 0 23 23"
+        fill="none"
+        className="mt-1.5"
+      >
+        <Path
+          d="M4.54453 13.3846H13.3445V11.1846H4.54453V13.3846ZM4.54453 10.0846H17.7445V7.88457H4.54453V10.0846ZM4.54453 6.78457H17.7445V4.58457H4.54453V6.78457ZM0.144531 22.1846V2.38457C0.144531 1.77957 0.360131 1.26147 0.791331 0.830272C1.22253 0.399072 1.74026 0.183839 2.34453 0.184572H19.9445C20.5495 0.184572 21.0676 0.400172 21.4988 0.831372C21.93 1.26257 22.1453 1.78031 22.1445 2.38457V15.5846C22.1445 16.1896 21.9289 16.7077 21.4977 17.1389C21.0665 17.5701 20.5488 17.7853 19.9445 17.7846H4.54453L0.144531 22.1846ZM3.60953 15.5846H19.9445V2.38457H2.34453V16.8221L3.60953 15.5846Z"
+          fill={color}
+        />
+      </Svg>
+    </View>
+  );
+};
 
 const ListIcon = ({ color }: { color: string }) => (
   <Svg
