@@ -86,9 +86,12 @@ export default function ChatScreen() {
     queryKey: ["messages", chatId],
     enabled: !!chatId,
     getNextPageParam: (lastPage, allPages) =>
-      lastPage.length > 0 ? (allPages.length - 1) * LIMIT + lastPage.length + extraOffset : undefined,
+      lastPage.length > 0
+        ? (allPages.length - 1) * LIMIT + lastPage.length + extraOffset
+        : undefined,
   });
 
+  console.debug("extra", extraOffset);
 
   const width = Dimensions.get("window").width / 7;
   const [inputText, setInputText] = React.useState("");
@@ -361,7 +364,7 @@ export default function ChatScreen() {
               <FlashList
                 data={chatMessagesData}
                 renderItem={Message}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => item.id.toString()}
                 maintainVisibleContentPosition={{
                   minIndexForVisible: 0,
                 }}
@@ -459,7 +462,7 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
               message.from_me ? "text-white" : "text-black"
             }`}
           >
-            {message.id } { "  "}
+            {/* {message.id} */}
             {message.content}
           </Text>
         </View>
