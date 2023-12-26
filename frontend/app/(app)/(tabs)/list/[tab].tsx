@@ -113,7 +113,7 @@ import { getUserMeItems, postItemStatus } from "../../../../api";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
 const ListingPageItem = ({ item }: { item: Item }) => {
-  const width = (Dimensions.get("window").width - 200) / 2;
+  const width = (Dimensions.get("window").width - 230) / 2;
   const { session } = useSession();
 
   const queryClient = useQueryClient();
@@ -195,7 +195,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
           backgroundColor: Colors.grayLight,
         }}
       />
-      <View className="flex flex-col flex-grow justify-between px-4 pt-2">
+      <View className="flex flex-col flex-grow justify-between px-4">
         <View className="flex flex-col flex-grow gap-y-1">
           <Text className="font-Manrope_600SemiBold text-base">
             {item.name}
@@ -209,7 +209,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
         </View>
         <TouchableOpacity
           onPress={onPressHandler}
-          className="border-[1.5px] h-[32px] flex-grow-0 flex items-center justify-center rounded-sm"
+          className="border-[1.5px] h-[28px] flex-grow-0 flex items-center justify-center rounded-sm"
         >
           <Text className="font-SecularOne_400Regular text-sm text-blackPrimary">
             {item.status === "active" ? "MARK AS SOLD" : "RELIST"}

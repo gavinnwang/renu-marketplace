@@ -65,6 +65,7 @@ export default function TabsLayout() {
 }
 
 const HomeIcon = ({ color }: { color: string }) => (
+
   <Svg
     width="20"
     height="23"

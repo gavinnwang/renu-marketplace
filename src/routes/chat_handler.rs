@@ -43,6 +43,26 @@ async fn get_chat_groups_by_buyer_id(
 }
 
 #[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
+#[get("/unread-count")]
+async fn get_unread_chat_group_count_by_user_id(
+    auth_guard: AuthenticationGuard,
+    pool: web::Data<PgPool>,
+) -> impl Responder {
+    let user_id = auth_guard.user_id;
+
+    let unread_count =
+        chat_repository::fetch_unread_chat_group_count_by_user_id(user_id, pool.as_ref()).await;
+
+    match unread_count {
+        Ok(unread_count) => HttpResponse::Ok().json(unread_count),
+        Err(err) => {
+            tracing::error!("failed to fetch unread count: {err}");
+            HttpResponse::InternalServerError().json("Failed to fetch unread count")
+        }
+    }
+}
+
+#[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
 #[get("/id/{item_id}")]
 async fn get_chat_id_by_item_id(
     auth_guard: AuthenticationGuard,

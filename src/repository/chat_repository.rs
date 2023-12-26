@@ -55,6 +55,28 @@ pub async fn fetch_chat_groups_by_seller_id(
     Ok(chat_groups)
 }
 
+pub async fn fetch_unread_chat_group_count_by_user_id(
+    user_id: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<i64, DbError> {
+    let record = sqlx::query!(
+        r#"
+        SELECT
+            COUNT(*) AS "count!"
+        FROM item_chat
+        WHERE
+            (item_chat.buyer_id = $1 AND item_chat.buyer_unread_count > 0) OR
+            (item_chat.item_id IN (SELECT id FROM item WHERE item.user_id = $2) AND item_chat.seller_unread_count > 0);
+        "#,
+        user_id,
+        user_id
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(record.count)
+}
+
 pub async fn fetch_chat_groups_by_buyer_id(
     user_id: i32,
     conn: impl Executor<'_, Database = Postgres>,
