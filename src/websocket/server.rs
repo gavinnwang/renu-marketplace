@@ -222,6 +222,26 @@ impl Handler<Join> for ChatServer {
                         match sessions.get_mut(&msg.user_id) {
                             Some((_, room_id)) => {
                                 *room_id = Some(msg.chat_id);
+                                match crate::repository::chat_repository::clear_unread_count_by_user_id(
+                                    msg.user_id as i32,
+                                    msg.chat_id as i32,
+                                    pool.as_ref(),
+                                ).await {
+                                    Ok(_) => {
+                                        tracing::info!("Unread count cleared successfully");
+                                    }
+                                    Err(err) => {
+                                        tracing::error!(
+                                            "Failed to clear unread count. Error message: {}\n",
+                                            err
+                                        );
+
+                                        Err(format!(
+                                            "Failed to clear unread count: {}\n",
+                                            err
+                                        ))?;
+                                    }
+                                }
                             }
                             None => {
                                 tracing::error!("Session with id {} does not exist", msg.user_id);

@@ -237,6 +237,35 @@ pub async fn increment_unread_count_based_on_sender_id(
     Ok(())
 }
 
+pub async fn clear_unread_count_by_user_id(
+    user_id: i32,
+    chat_id: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<(), DbError> {
+    sqlx::query!(
+        r#"
+        UPDATE item_chat
+        SET 
+            seller_unread_count = CASE
+                WHEN buyer_id = $1 THEN 0
+                ELSE seller_unread_count
+            END,
+            buyer_unread_count = CASE
+                WHEN buyer_id != $2 THEN 0
+                ELSE buyer_unread_count
+            END
+        WHERE id = $3;
+        "#,
+        user_id,
+        user_id,
+        chat_id
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(())
+}
+
 // fetch the item info by chat id and if there is a chat room between the user and other user regarding this item
 pub async fn fetch_chat_id_by_item_id(
     user_id: i32,

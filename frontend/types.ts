@@ -63,6 +63,7 @@ export type ChatGroup = {
   item_images: string[];
   last_message_content: string | null;
   last_message_sent_at: Date | null;
+  unread_count: number;
 };
 
 export type ChatMessage = {
