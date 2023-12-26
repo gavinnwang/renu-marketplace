@@ -65,8 +65,11 @@ impl Client {
 
     async fn upload_and_remove(&self, file: TempFile, key_prefix: &str) -> UploadedFile {
         let uploaded_file = self.upload(&file, key_prefix).await;
+
         match tokio::fs::remove_file(file.file.path()).await {
-            Ok(_) => {}
+            Ok(_) => {
+                tracing::info!("Removed file: {:#?}", file.file.path());
+            }
             Err(e) => {
                 tracing::error!("Error removing file: {:#?}", e);
             }
@@ -84,6 +87,7 @@ impl Client {
                 return UploadedFile::new(filename, key, "".to_string());
             }
         };
+        tracing::info!("Uploading file from path: {:#?}", file_path);
         let s3_url = match self.put_object_from_file(file_path, &key).await {
             Ok(url) => url,
             Err(_) => {

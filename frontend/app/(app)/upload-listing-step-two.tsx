@@ -16,7 +16,7 @@ import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { useSession } from "../../hooks/useSession";
 import { FlashList } from "@shopify/flash-list";
 import LeftChevron from "../../components/LeftChevron";
-import { API_URL, postNewItem, uploadImages } from "../../api";
+import { postNewItem, uploadImages } from "../../api";
 
 const ItemCategory: Record<string, string> = {
   picking: "Pick a category",
@@ -89,14 +89,7 @@ export default function UploadListingStepTwo() {
                   )}
                   numColumns={3}
                   keyExtractor={(item) => item}
-                  // contentContainerStyle={{
-                  //   paddingTop: 12,
-                  // }}
                   estimatedItemSize={80}
-                  // columnWrapperStyle={{
-                  //   justifyContent: "space-between",
-                  //   marginTop: 12,
-                  // }}
                 />
               </View>
               <View className="pb-5 border-b border-b-stone-200">
