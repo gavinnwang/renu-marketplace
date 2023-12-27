@@ -1,6 +1,10 @@
 import { AICompleteResponse, ChatGroup, Item, User } from "./types";
 
-export const API_URL = "https://api.gavinwang.dev";
+import Constants from "expo-constants";
+const config = Constants.expoConfig as any;
+
+export const API_URL = "http://" + config.hostUri.split(`:`).shift().concat(`:8080`) as string
+
 export const IMAGES_URL = "https://images.gavinwang.dev/";
 
 export const REDIRECT_URL = "https://api.gavinwang.dev/auth/callback";

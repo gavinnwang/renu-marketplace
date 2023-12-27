@@ -1,6 +1,8 @@
 use actix_web::{post, web, HttpResponse, Responder};
 
-use crate::{config::Config, openai::request::request_openai_api, authentication::jwt::AuthenticationGuard};
+use crate::{
+    authentication::jwt::AuthenticationGuard, config::Config, openai::request::request_openai_api,
+};
 
 #[derive(serde::Deserialize, Debug)]
 struct ChatCompleteRequest {

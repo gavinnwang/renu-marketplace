@@ -186,8 +186,12 @@ export default function UploadListingStepTwo() {
                   alert("Please enter a price less than $999");
                   return;
                 }
-                if (category === "picking") {
-                  alert("Please pick a category");
+                // if category is part of item category but not picking
+                if (
+                  !Object.keys(ItemCategory).includes(category) ||
+                  category === "picking"
+                ) {
+                  alert("Please select a valid category");
                   return;
                 }
 

@@ -1,7 +1,35 @@
-// use actix_web::ResponseError;
-// use reqwest::StatusCode;
+use actix_web::error;
+use reqwest::StatusCode;
 use sqlx::postgres::PgDatabaseError;
 use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum UserError {
+    #[error("An internal error occurred. Please try again later.")]
+    InternalError,
+    #[error("Invalid credentials.")]
+    AuthError,
+    #[error("An error occurred while creating account.")]
+    CreateUserError,
+}
+
+
+
+impl error::ResponseError for UserError {
+    // fn error_response(&self) -> actix_web::HttpResponse {
+    //     actix_web::HttpResponse::build(self.status_code())
+    //         .insert_header(actix_web::http::header::ContentType::plaintext())
+    //         .body(self.to_string())
+    // }
+
+    fn status_code(&self) -> StatusCode {
+        match *self {
+            UserError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
+            UserError::AuthError => StatusCode::UNAUTHORIZED,
+            UserError::CreateUserError => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+}
 
 /// Error representing a failure at the database layer.
 #[derive(Debug, Error)]
@@ -23,17 +51,23 @@ pub enum DbError {
     Other(sqlx::Error),
 }
 
-// impl ResponseError for DbError {
-//     fn status_code(&self) -> actix_http::StatusCode {
-//         match self {
-//             DbError::NotFound => StatusCode::NOT_FOUND,
-//             DbError::Conflict => StatusCode::CONFLICT,
-//             DbError::ConnectionError => StatusCode::INTERNAL_SERVER_ERROR,
-//             DbError::PgDatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-//             DbError::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
-//         }
-//     }
-// }
+impl error::ResponseError for DbError {
+    // fn error_response(&self) -> actix_web::HttpResponse {
+    //     actix_web::HttpResponse::build(self.status_code())
+    //         .insert_header(actix_web::http::header::ContentType::plaintext())
+    //         .body(self.to_string())
+    // }
+
+    fn status_code(&self) -> actix_http::StatusCode {
+        match self {
+            DbError::NotFound => StatusCode::NOT_FOUND,
+            DbError::Conflict => StatusCode::CONFLICT,
+            DbError::ConnectionError => StatusCode::INTERNAL_SERVER_ERROR,
+            DbError::PgDatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            DbError::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+}
 
 impl From<sqlx::Error> for DbError {
     fn from(error: sqlx::Error) -> Self {

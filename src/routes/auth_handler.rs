@@ -14,7 +14,7 @@ use crate::{
     },
     config::Config,
     // model::user_model::NewUser,
-    repository::user_repository,
+    repository::user_repository, error::DbError,
 };
 
 #[tracing::instrument(skip(config, pool))]
@@ -73,7 +73,7 @@ async fn google_oauth_handler(
 
     let user_id = match user_id {
         Err(err) => match err {
-            crate::error::DbError::NotFound => {
+            DbError::NotFound => {
                 // if user doesn't exist, create new user
                 tracing::info!(
                     "User with email {} not found, creating new user",
@@ -102,7 +102,7 @@ async fn google_oauth_handler(
 
     tracing::info!("generating jwt token for user with id {user_id}");
 
-    let jwt_secret = config.jwt_secret.to_owned();
+    let jwt_secret = &config.jwt_secret;
     let now = Utc::now();
     let iat = now.timestamp() as usize;
     let exp = (now + Duration::minutes(config.jwt_max_age)).timestamp() as usize;

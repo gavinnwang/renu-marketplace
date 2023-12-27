@@ -1,6 +1,5 @@
 use actix_web::web;
-use anyhow::{anyhow, Error, Result}; // Make sure to include anyhow at the top
-use reqwest::Client;
+use reqwest::{Client, Error};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -44,21 +43,34 @@ pub async fn request_openai_api(
         "max_tokens": 300
     });
 
-    // Set the headers
     let response = client
         .post(root_url)
         .bearer_auth(config.openai_api_key.as_str())
         .json(&payload)
         .send()
         .await?;
-
-    if response.status().is_success() {
-        let openai_response = response.json::<OpenAIResponse>().await?;
-        Ok(openai_response)
-    } else {
-        tracing::error!("Error requesting OpenAI API: {}", response.text().await?);
-        Err(anyhow!("Error requesting OpenAI API"))
+    match response.error_for_status() {
+        Ok(response) => {
+            let openai_response = response.json::<OpenAIResponse>().await?;
+            Ok(openai_response)
+        }
+        Err(err) => {
+            tracing::error!("Error requesting OpenAI API: {:#?}", err);
+            Err(err)
+        }
     }
+
+    // match response.status().is_success() {
+    //     true => {
+    //         let openai_response = response.json::<OpenAIResponse>().await?;
+    //         Ok(openai_response)
+    //     }
+    //     false => {
+    //         let openai_response = response.text().await?;
+    //         tracing::error!("Error requesting OpenAI API: {:#?}", openai_response);
+    //         Err(Error::status())
+    //     }
+    // }
 }
 
 #[derive(Deserialize, Debug)]

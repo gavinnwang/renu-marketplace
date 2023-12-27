@@ -1,8 +1,10 @@
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{get, post, web, Error, HttpResponse, Responder};
 use serde::Deserialize;
 use sqlx::PgPool;
 
-use crate::{authentication::jwt::AuthenticationGuard, repository::chat_repository};
+use crate::{
+    authentication::jwt::AuthenticationGuard, error::UserError, repository::chat_repository,
+};
 
 #[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
 #[get("/seller")]
@@ -210,53 +212,81 @@ async fn post_chat_room_and_send_first_message(
     path: web::Path<i32>,
     pool: web::Data<PgPool>,
     message: web::Json<ChatRoomRequest>,
-) -> impl Responder {
+) -> Result<HttpResponse, Error> {
     let user_id = auth_guard.user_id;
     let item_id = path.into_inner();
 
-    let chat_id = chat_repository::insert_chat_room(user_id, item_id, pool.as_ref()).await;
-    match chat_id {
-        Ok(chat_id) => {
-            let send_message_result = chat_repository::insert_chat_message(
-                user_id,
-                chat_id,
-                &message.first_message_content,
-                pool.as_ref(),
-            )
-            .await;
-
-            match send_message_result {
-                Ok(_) => {
-                    match chat_repository::increment_unread_count_based_on_sender_id(
-                        chat_id,
-                        user_id,
-                        pool.as_ref(),
-                    )
-                    .await
-                    {
-                        Ok(_) => {
-                            tracing::info!("Unread count incremented successfully");
-                            HttpResponse::Ok().json(chat_id)
-                        }
-                        Err(err) => {
-                            tracing::error!(
-                                "Failed to increment unread count. Error message: {}\n",
-                                err
-                            );
-                            HttpResponse::InternalServerError()
-                                .json("Failed to increment unread count")
-                        }
-                    }
-                }
-                Err(err) => {
-                    tracing::error!("Failed to send first message: {err}");
-                    HttpResponse::InternalServerError().json("Failed to send first message")
-                }
-            }
-        }
-        Err(err) => {
+    let chat_id = chat_repository::insert_chat_room(user_id, item_id, pool.as_ref())
+        .await
+        .map_err(|err| {
             tracing::error!("Failed to create chat room: {err}");
-            HttpResponse::InternalServerError().json("Failed to create chat room")
-        }
-    }
+            UserError::InternalError
+        })?;
+
+    chat_repository::insert_chat_message(
+        user_id,
+        chat_id,
+        &message.first_message_content,
+        pool.as_ref(),
+    )
+    .await
+    .map_err(|err| {
+        tracing::error!("Failed to send first message: {err}");
+        UserError::InternalError
+    })?;
+
+    chat_repository::increment_unread_count_based_on_sender_id(chat_id, user_id, pool.as_ref())
+        .await
+        .map_err(|err| {
+            tracing::error!("Failed to increment unread count: {err}");
+            UserError::InternalError
+        })?;
+
+    Ok(HttpResponse::Ok().json(chat_id))
+
+    // let chat_id = chat_repository::insert_chat_room(user_id, item_id, pool.as_ref()).await;
+    // match chat_id {
+    //     Ok(chat_id) => {
+    //         let send_message_result = chat_repository::insert_chat_message(
+    //             user_id,
+    //             chat_id,
+    //             &message.first_message_content,
+    //             pool.as_ref(),
+    //         )
+    //         .await;
+
+    //         match send_message_result {
+    //             Ok(_) => {
+    //                 match chat_repository::increment_unread_count_based_on_sender_id(
+    //                     chat_id,
+    //                     user_id,
+    //                     pool.as_ref(),
+    //                 )
+    //                 .await
+    //                 {
+    //                     Ok(_) => {
+    //                         tracing::info!("Unread count incremented successfully");
+    //                         HttpResponse::Ok().json(chat_id)
+    //                     }
+    //                     Err(err) => {
+    //                         tracing::error!(
+    //                             "Failed to increment unread count. Error message: {}\n",
+    //                             err
+    //                         );
+    //                         HttpResponse::InternalServerError()
+    //                             .json("Failed to increment unread count")
+    //                     }
+    //                 }
+    //             }
+    //             Err(err) => {
+    //                 tracing::error!("Failed to send first message: {err}");
+    //                 HttpResponse::InternalServerError().json("Failed to send first message")
+    //             }
+    //         }
+    //     }
+    //     Err(err) => {
+    //         tracing::error!("Failed to create chat room: {err}");
+    //         HttpResponse::InternalServerError().json("Failed to create chat room")
+    //     }
+    // }
 }

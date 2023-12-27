@@ -361,12 +361,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "anyhow"
-version = "1.0.75"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
-
-[[package]]
 name = "atoi"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1805,7 +1799,6 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-actors",
- "anyhow",
  "aws-config",
  "aws-sdk-s3",
  "chrono",
