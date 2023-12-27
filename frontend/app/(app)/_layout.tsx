@@ -18,14 +18,12 @@ export default function AppLayout() {
     },
   });
   React.useEffect(() => {
-    const subscription = Notifications.addPushTokenListener(
-      ({ data: newToken }) => {
-        console.debug("new token", newToken);
-        console.debug("UPLOADING TOKEN")
-        postPushTokenMutation.mutateAsync(newToken);
-      }
-    );
-    return () => subscription.remove();
+    const uploadTokenOnStartup = async () => {
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.debug("UPLOADING TOKEN", token);
+      postPushTokenMutation.mutateAsync(token);
+    };
+    uploadTokenOnStartup();
   }, []);
 
   if (!session) {

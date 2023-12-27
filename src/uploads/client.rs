@@ -1,7 +1,6 @@
 use super::types::UploadedFile;
 use actix_multipart::form::tempfile::TempFile;
 use aws_sdk_s3::primitives::ByteStream;
-use futures_util::{stream, StreamExt as _};
 use tokio::{fs, io::AsyncReadExt as _};
 
 /// S3 client wrapper to expose semantic upload operations.
@@ -48,43 +47,21 @@ impl Client {
         ))
     }
 
-    pub async fn upload_files(
-        &self,
-        temp_files: Vec<TempFile>,
-        key_prefix: &str,
-    ) -> actix_web::Result<Vec<UploadedFile>> {
-        let uploaded_files = stream::iter(temp_files)
-            .map(|file| self.upload_and_remove(file, key_prefix))
-            // upload files concurrently, up to 3 at a time
-            .buffer_unordered(3)
-            .collect()
-            .await;
-
-        Ok(uploaded_files)
-    }
-
-    async fn upload_and_remove(&self, file: TempFile, key_prefix: &str) -> UploadedFile {
-        let uploaded_file = self.upload(&file, key_prefix).await;
-
-        match tokio::fs::remove_file(file.file.path()).await {
-            Ok(_) => {
-                tracing::info!("Removed file: {:#?}", file.file.path());
+    pub async fn upload(&self, file: &TempFile, key_prefix: &str) -> Result<UploadedFile, ()> {
+        // let filename = uuid::Uuid::new_v4().to_string();
+        let filename = match &file.file_name {
+            Some(name) => name,
+            None => {
+                tracing::error!("Error getting file name");
+                return Err(());
             }
-            Err(e) => {
-                tracing::error!("Error removing file: {:#?}", e);
-            }
-        }
-        uploaded_file
-    }
-
-    async fn upload(&self, file: &TempFile, key_prefix: &str) -> UploadedFile {
-        let filename = uuid::Uuid::new_v4().to_string();
+        };
         let key = format!("{key_prefix}{filename}");
         let file_path = match file.file.path().to_str() {
             Some(path) => path,
             None => {
                 tracing::error!("Error getting file path");
-                return UploadedFile::new(filename, key, "".to_string());
+                return Err(());
             }
         };
         tracing::info!("Uploading file from path: {:#?}", file_path);
@@ -92,10 +69,10 @@ impl Client {
             Ok(url) => url,
             Err(_) => {
                 tracing::error!("Error uploading file");
-                return UploadedFile::new(filename, key, "".to_string());
+                return Err(());
             }
         };
-        UploadedFile::new(filename, key, s3_url)
+        Ok(UploadedFile::new(filename, key, s3_url))
     }
 
     async fn put_object_from_file(&self, local_path: &str, key: &str) -> Result<String, ()> {

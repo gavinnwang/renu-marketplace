@@ -24,6 +24,7 @@ import {
 import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
 import useRetrieveSession from "../hooks/useLoadSession";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import useNotificationObserver from "../hooks/useNotificationObserver";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -72,6 +73,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   useRetrieveSession();
+  useNotificationObserver();
 
   return (
     <QueryClientProvider client={queryClient}>

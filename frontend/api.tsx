@@ -198,7 +198,7 @@ export async function uploadImages(images: string[]): Promise<string[]> {
     const uri = images[i];
     const fileName = uri.split("/").pop();
     console.debug(fileName);
-    const fileType = fileName?.split(".").pop() || "image/png";
+    const fileType = fileName?.split(".").pop() || "image/jpg";
     console.debug(fileType);
     formData.append("images", {
       uri: images[i],

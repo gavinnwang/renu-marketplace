@@ -41,7 +41,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await SecureStore.setItemAsync("session", "");
+    await SecureStore.deleteItemAsync("session");
+    await SecureStore.deleteItemAsync("searchHistory");
     setSession(null);
     router.replace("/");
   };

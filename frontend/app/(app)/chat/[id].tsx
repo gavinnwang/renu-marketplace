@@ -91,7 +91,6 @@ export default function ChatScreen() {
         : undefined,
   });
 
-
   const width = Dimensions.get("window").width / 7;
   const [inputText, setInputText] = React.useState("");
 
@@ -411,12 +410,13 @@ export default function ChatScreen() {
                   sendMessage(
                     `/message ${chatId} ${correlationId} ${inputText}`
                   );
-                  await registerForPushNotificationsAsync();
                   setLastMessageSentSuccessfully(false);
                   console.debug("optimistically updating messages");
                   optimisticAddMessage(inputText, 1);
                   optimisticallyUpdateChatGroupData();
                   setInputText("");
+                  registerForPushNotificationsAsync()
+                  
                 }
               }}
             />
