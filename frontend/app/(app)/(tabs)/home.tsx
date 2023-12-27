@@ -122,7 +122,7 @@ const CategoryView = ({
   } = useInfiniteQuery({
     queryFn: getItemsByCategory,
     queryKey: ["item", category],
-    enabled: Math.abs(selectedSection - index) <= 1,
+    // enabled: Math.abs(selectedSection - index) <= 1,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length > 0 ? allPages.length : undefined;
     },

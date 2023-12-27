@@ -50,8 +50,7 @@ export default function SellerPage() {
             <Image
               source={{
                 uri:
-                  user?.profile_image ||
-                  "../../../assets/images/placeholder-profile.webp",
+                  user?.profile_image || ""
               }}
               className="w-[74px] h-[74px] rounded-full -mt-10 border border-white ml-2.5 bg-blackPrimary"
             />

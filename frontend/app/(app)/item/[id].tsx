@@ -18,6 +18,7 @@ import { CATEGORIES } from "../(tabs)/home";
 
 import { useSession } from "../../../hooks/useSession";
 import {
+  IMAGES_URL,
   getChatIdFromItemId,
   getItem,
   getSavedItemStatus,
@@ -139,7 +140,7 @@ export default function ItemPage() {
                     backgroundColor: Colors.grayLight,
                   }}
                   source={{
-                    uri: item,
+                    uri: `${IMAGES_URL}${item}`,
                   }}
                 />
               )}

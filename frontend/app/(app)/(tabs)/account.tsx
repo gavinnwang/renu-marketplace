@@ -55,9 +55,7 @@ export default function AccountScreen() {
           <View className="bg-blackPrimary w-full h-[80px]"></View>
           <Image
             source={{
-              uri:
-                user?.profile_image ||
-                "../../../assets/images/placeholder-profile.webp",
+              uri: user?.profile_image ?? "",
             }}
             style={{
               borderColor: Colors.whitePrimary,

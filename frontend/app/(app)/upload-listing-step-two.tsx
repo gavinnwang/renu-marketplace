@@ -17,7 +17,7 @@ import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { useSession } from "../../hooks/useSession";
 import { FlashList } from "@shopify/flash-list";
 import LeftChevron from "../../components/LeftChevron";
-import { postNewItem, uploadImages } from "../../api";
+import { postImages, postNewItem } from "../../api";
 
 const ItemCategory: Record<string, string> = {
   picking: "Pick a category",
@@ -193,7 +193,7 @@ export default function UploadListingStepTwo() {
 
                 setUploading(true);
                 try {
-                  const s3UrlsResponse = await uploadImages(images);
+                  const s3UrlsResponse = await postImages(images);
 
                   const itemId = await postNewItem(
                     session?.token || "",

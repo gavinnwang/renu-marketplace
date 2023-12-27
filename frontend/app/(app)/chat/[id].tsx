@@ -24,6 +24,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../hooks/useSession";
 import {
   API_URL,
+  IMAGES_URL,
   getChatIdFromItemId,
   getItem,
   parseOrThrowResponse,
@@ -308,7 +309,7 @@ export default function ChatScreen() {
                   effect: "cross-dissolve",
                   duration: 250,
                 }}
-                source={{ uri: item.images[0] }}
+                source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
                 className="object-cover rounded-sm"
                 style={{
                   minWidth: width,

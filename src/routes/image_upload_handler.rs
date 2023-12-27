@@ -4,7 +4,7 @@ use actix_web::{post, web, HttpResponse, Responder};
 
 #[derive(MultipartForm)]
 pub struct ImageForm {
-    #[multipart(limit = "50 MiB")]
+    // #[multipart(limit = "100 MiB")]
     images: Vec<TempFile>,
 }
 

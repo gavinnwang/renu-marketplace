@@ -14,7 +14,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useSession } from "../../../../hooks/useSession";
-import { getChatGroupUnreadCount, getChatGroups } from "../../../../api";
+import { IMAGES_URL, getChatGroupUnreadCount, getChatGroups } from "../../../../api";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
@@ -114,7 +114,7 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
             duration: 250,
           }}
           recyclingKey={chat.item_id.toString()}
-          source={{ uri: chat.item_images[0] }}
+          source={{ uri: `${IMAGES_URL}${chat.item_images[0]}` }}
           className="object-cover rounded-sm"
           style={{
             width: width,

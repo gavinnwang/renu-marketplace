@@ -109,7 +109,7 @@ dayjs.extend(relativeTime);
 import { CATEGORIES } from "../home";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
-import { getUserMeItems, postItemStatus } from "../../../../api";
+import { IMAGES_URL, getUserMeItems, postItemStatus } from "../../../../api";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
 const ListingPageItem = ({ item }: { item: Item }) => {
@@ -181,7 +181,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
       }`}
     >
       <Image
-        source={{ uri: item.images[0] }}
+        source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
         transition={{
           effect: "cross-dissolve",
           duration: 100,

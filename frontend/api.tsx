@@ -1,11 +1,13 @@
 import { AICompleteResponse, ChatGroup, Item, User } from "./types";
 
 export const API_URL = "https://api.gavinwang.dev";
+export const IMAGES_URL = "https://images.gavinwang.dev/";
 
 export const REDIRECT_URL = "https://api.gavinwang.dev/auth/callback";
 
 export const GOOGLE_OAUTH_CLIENT_ID =
   "479411838275-kpsk3vagvubv429vnhu85hsviahv8ed7.apps.googleusercontent.com";
+
 
 export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -53,6 +55,7 @@ export async function getUserMeItems(sessionToken: string): Promise<Item[]> {
 }
 
 export async function postPushToken(sessionToken: string, pushToken: string) {
+  console.log("posting push token", sessionToken)
   const res = await fetch(`${API_URL}/users/me/push-token`, {
     headers: {
       authorization: `Bearer ${sessionToken}`,
@@ -192,7 +195,7 @@ export async function getSearchItems(query: string): Promise<Item[]> {
   return parseOrThrowResponse<Item[]>(res);
 }
 
-export async function uploadImages(images: string[]): Promise<string[]> {
+export async function postImages(images: string[]): Promise<string[]> {
   const formData = new FormData();
   for (let i = 0; i < images.length; i++) {
     const uri = images[i];

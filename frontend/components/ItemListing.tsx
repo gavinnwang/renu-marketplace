@@ -6,6 +6,7 @@ import { Image } from "expo-image";
 import { Item } from "../types";
 import dayjs from "dayjs";
 import Colors from "../constants/Colors";
+import { IMAGES_URL } from "../api";
 dayjs.extend(relativeTime);
 
 const horizontalGapPx = 10;
@@ -30,7 +31,7 @@ export function ItemListing({ item }: { item: Item }) {
           }}
           recyclingKey={item.id.toString()}
           cachePolicy="memory-disk"
-          source={{ uri: item.images[0] }}
+          source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
           className="object-cover rounded-t"
           style={{
             width: imageWidth,
