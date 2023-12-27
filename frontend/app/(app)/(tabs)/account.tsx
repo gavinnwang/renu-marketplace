@@ -10,6 +10,7 @@ import { getSavedItems, getUserMeInfo } from "../../../api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import RefreshScreen from "../../../components/RefreshScreen";
 import { FlashList } from "@shopify/flash-list";
+import * as Linking from "expo-linking";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -31,6 +32,16 @@ export default function AccountScreen() {
     queryFn: () => getSavedItems(session!.token),
     enabled: !!session && !!session.token,
   });
+
+  const handleEmailLink = () => {
+    const email = "gavinwang313@gmail.com";
+    const subject = encodeURIComponent("[Renu Feedback]");
+    const body = encodeURIComponent("Hi, I have some feedbacks for you.");
+
+    const url = `mailto:${email}?subject=${subject}&body=${body}`;
+
+    Linking.openURL(url).catch((err) => console.error(err));
+  };
 
   return (
     <View className="bg-bgLight h-full">
@@ -88,6 +99,16 @@ export default function AccountScreen() {
             </TouchableOpacity>
           </View>
         </View>
+        <View className="w-full h-2 bg-grayLight mt-2" />
+
+        <TouchableOpacity
+          className="ml-2.5 mt-2 mb-1"
+          onPress={handleEmailLink}
+        >
+          <Text className="font-Poppins_600SemiBold text-base">
+            Give us feedbacks
+          </Text>
+        </TouchableOpacity>
 
         <View className="w-full h-2 bg-grayLight mt-2" />
 

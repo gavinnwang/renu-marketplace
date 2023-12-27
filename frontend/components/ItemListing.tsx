@@ -28,7 +28,7 @@ export function ItemListing({ item, index }: { item: Item; index: number }) {
             effect: "cross-dissolve",
             duration: 100,
           }}
-          recyclingKey={ item.images[0] }
+          recyclingKey={item.images[0]}
           source={{ uri: item.images[0] }}
           className="object-cover rounded-t"
           style={{

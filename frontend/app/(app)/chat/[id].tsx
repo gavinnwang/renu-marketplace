@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -293,14 +294,15 @@ export default function ChatScreen() {
 
         <View className="border-y border-y-stone-200">
           <Pressable
-            onPress={() =>
+            onPress={() => {
+              if (!item) return;
               router.push({
-                pathname: `/item/${item!.id}`,
+                pathname: `/item/${item.id}`,
                 params: {
                   itemString: JSON.stringify(item),
                 },
-              })
-            }
+              });
+            }}
             className="p-3.5 flex-row justify-between items-center bg-stone-50"
             style={{
               height: (width * 4) / 3 + 28,
@@ -344,7 +346,7 @@ export default function ChatScreen() {
               )}
             </View>
             <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
-              ${item && item.price}
+              {item && `$${item.price}`}
             </Text>
           </Pressable>
         </View>
@@ -393,10 +395,10 @@ export default function ChatScreen() {
             </>
           )}
 
-          <View>
+          <View className="flex flex-row w-full px-2">
             <TextInput
               placeholder="Message"
-              className="px-4 py-2 mx-2 border rounded-full border-gray-400"
+              className="px-4 py-2 border rounded-full border-gray-400 flex-grow"
               value={inputText}
               onChangeText={setInputText}
               blurOnSubmit={false}
