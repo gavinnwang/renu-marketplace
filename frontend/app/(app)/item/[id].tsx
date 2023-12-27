@@ -187,7 +187,7 @@ export default function ItemPage() {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    saveItemMutation.mutate(!isSaved);
+                    saveItemMutation.mutateAsync(!isSaved);
                   }}
                 >
                   <HeartIcon filled={isSaved ?? false} />

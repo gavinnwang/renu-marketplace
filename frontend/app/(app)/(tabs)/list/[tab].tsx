@@ -155,7 +155,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
   );
   const onPressHandler = () => {
     const newStatus = item.status === "active" ? "inactive" : "active";
-    mutation.mutate(newStatus);
+    mutation.mutateAsync(newStatus);
   };
 
   const [touching, setTouching] = React.useState(false);

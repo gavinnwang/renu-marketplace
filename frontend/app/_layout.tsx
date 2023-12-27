@@ -23,6 +23,7 @@ import {
 } from "@expo-google-fonts/manrope";
 import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
 import useRetrieveSession from "../hooks/useLoadSession";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -66,14 +67,17 @@ export default function RootLayout() {
   );
 }
 
+const queryClient = new QueryClient();
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   useRetrieveSession();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Slot />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Slot />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

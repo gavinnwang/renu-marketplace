@@ -52,6 +52,20 @@ export async function getUserMeItems(sessionToken: string): Promise<Item[]> {
   return parseOrThrowResponse<Item[]>(res);
 }
 
+export async function postPushToken(sessionToken: string, pushToken: string) {
+  const res = await fetch(`${API_URL}/users/me/push-token`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+      "content-type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({
+      token: pushToken,
+    }),
+  });
+  return parseOrThrowResponse(res);
+}
+
 export async function getChatGroups(
   sessionToken: string,
   buyerOrSeller: string
@@ -163,7 +177,7 @@ export async function postAIComplete(
   const res = await fetch(`${API_URL}/openai/complete`, {
     headers: {
       "content-type": "application/json",
-      "authorization": `Bearer ${sessionToken}`,
+      authorization: `Bearer ${sessionToken}`,
     },
     method: "POST",
     body: JSON.stringify({

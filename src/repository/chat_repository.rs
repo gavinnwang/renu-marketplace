@@ -214,7 +214,7 @@ pub async fn insert_chat_message(
     chat_id: i32,
     content: &str,
     conn: impl Executor<'_, Database = Postgres>,
-) -> Result<bool, DbError> {
+) -> Result<(), DbError> {
     let result = sqlx::query!(
         r#"
         INSERT INTO Message (chat_id, sender_id, content)
@@ -227,7 +227,10 @@ pub async fn insert_chat_message(
     .execute(conn)
     .await?;
 
-    Ok(result.rows_affected() == 1)
+    match result.rows_affected() {
+        0 => Err(DbError::NotFound),
+        _ => Ok(()),
+    }
 }
 
 pub async fn increment_unread_count_based_on_sender_id(
@@ -235,7 +238,7 @@ pub async fn increment_unread_count_based_on_sender_id(
     sender_id: i32,
     conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<(), DbError> {
-    sqlx::query!(
+    let result = sqlx::query!(
         r#"
         UPDATE item_chat
         SET 
@@ -256,7 +259,10 @@ pub async fn increment_unread_count_based_on_sender_id(
     .execute(conn)
     .await?;
 
-    Ok(())
+    match result.rows_affected() {
+        0 => Err(DbError::NotFound),
+        _ => Ok(()),
+    }
 }
 
 pub async fn clear_unread_count_by_user_id(
@@ -264,7 +270,7 @@ pub async fn clear_unread_count_by_user_id(
     chat_id: i32,
     conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<(), DbError> {
-    sqlx::query!(
+    let result = sqlx::query!(
         r#"
         UPDATE item_chat
         SET 
@@ -285,7 +291,10 @@ pub async fn clear_unread_count_by_user_id(
     .execute(conn)
     .await?;
 
-    Ok(())
+    match result.rows_affected() {
+        0 => Err(DbError::NotFound),
+        _ => Ok(()),
+    }
 }
 
 // fetch the item info by chat id and if there is a chat room between the user and other user regarding this item

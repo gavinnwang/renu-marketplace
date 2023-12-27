@@ -41,7 +41,6 @@ export default function ChatScreen() {
     showEncourageMessage,
     unreadCount,
   } = useLocalSearchParams();
-  console.debug("chat room unread count", unreadCount);
 
   const { session } = useSession();
   const queryClient = useQueryClient();
@@ -92,7 +91,6 @@ export default function ChatScreen() {
         : undefined,
   });
 
-  console.debug("extra", extraOffset);
 
   const width = Dimensions.get("window").width / 7;
   const [inputText, setInputText] = React.useState("");
@@ -220,10 +218,6 @@ export default function ChatScreen() {
       queryClient.invalidateQueries(["messages", data]);
     },
   });
-
-  React.useEffect(() => {
-    console.debug("changed");
-  }, [chatMessages?.pages]);
 
   const chatMessagesData = React.useMemo(() => {
     if (!chatMessages?.pages) {
@@ -406,7 +400,7 @@ export default function ChatScreen() {
                 if (!inputText.trim()) return;
                 if (!chatId) {
                   console.debug("no chat id so create one");
-                  createChatRoomAndFirstMessageMutation.mutate(inputText);
+                  createChatRoomAndFirstMessageMutation.mutateAsync(inputText);
                   setInputText("");
                 } else {
                   const correlationId = nanoid();
@@ -417,6 +411,7 @@ export default function ChatScreen() {
                   sendMessage(
                     `/message ${chatId} ${correlationId} ${inputText}`
                   );
+                  await registerForPushNotificationsAsync();
                   setLastMessageSentSuccessfully(false);
                   console.debug("optimistically updating messages");
                   optimisticAddMessage(inputText, 1);
@@ -437,6 +432,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
 import { customAlphabet } from "nanoid/non-secure";
 import Colors from "../../../constants/Colors";
+import { registerForPushNotificationsAsync } from "../../../utils/notification";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessage }) => {
   return (

@@ -64,7 +64,7 @@ pub async fn post_push_token(
     push_token: &String,
     conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<(), DbError> {
-    sqlx::query!(
+    let result = sqlx::query!(
         r#"UPDATE "user" SET push_token = $1 WHERE id = $2"#,
         push_token,
         user_id
@@ -72,5 +72,8 @@ pub async fn post_push_token(
     .execute(conn)
     .await?;
 
-    Ok(())
+    match result.rows_affected() {
+        0 => Err(DbError::NotFound),
+        _ => Ok(()),
+    }
 }
