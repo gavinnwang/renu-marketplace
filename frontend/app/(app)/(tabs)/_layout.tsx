@@ -87,7 +87,6 @@ const MessageIcon = ({ color }: { color: string }) => {
   const { data: unreadCount } = useQuery(["unreadCount"], () =>
     getChatGroupUnreadCount(session!.token)
   );
-  console.debug("unread count: ", unreadCount);
   return (
     <View className="relative">
       {unreadCount && unreadCount > 0 ? (

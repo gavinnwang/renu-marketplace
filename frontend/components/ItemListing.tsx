@@ -11,7 +11,7 @@ dayjs.extend(relativeTime);
 const horizontalGapPx = 10;
 const imageWidth = (Dimensions.get("window").width - horizontalGapPx * 3) / 2;
 
-export function ItemListing({ item, index }: { item: Item; index: number }) {
+export function ItemListing({ item }: { item: Item }) {
   return (
     <Link
       href={{
@@ -28,13 +28,14 @@ export function ItemListing({ item, index }: { item: Item; index: number }) {
             effect: "cross-dissolve",
             duration: 100,
           }}
-          recyclingKey={item.images[0]}
+          recyclingKey={item.id.toString()}
+          cachePolicy="memory-disk"
           source={{ uri: item.images[0] }}
           className="object-cover rounded-t"
           style={{
             width: imageWidth,
             maxWidth: imageWidth,
-            height: (imageWidth * 4) / 3,
+            height: (imageWidth ) * 1.3,
             backgroundColor: Colors.grayLight,
           }}
         />

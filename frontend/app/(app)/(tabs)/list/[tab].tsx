@@ -186,7 +186,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
           effect: "cross-dissolve",
           duration: 100,
         }}
-        recyclingKey={item.images[0]}
+        recyclingKey={item.id.toString()}
         className="object-cover rounded-sm"
         style={{
           width: width,

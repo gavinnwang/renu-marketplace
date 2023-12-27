@@ -176,7 +176,7 @@ const CategoryView = ({
               onRefresh={() => {
                 refetchItems();
               }}
-            />
+          />
           }
           data={items.pages.flatMap((page) => page)}
           numColumns={2}
@@ -184,7 +184,7 @@ const CategoryView = ({
             paddingTop: 10,
             paddingLeft: 10,
           }}
-          keyExtractor={(_, index) => index.toString()}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={ItemListing}
           onEndReached={() => {
             fetchNextPage();

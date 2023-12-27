@@ -113,6 +113,7 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
             effect: "cross-dissolve",
             duration: 250,
           }}
+          recyclingKey={chat.item_id.toString()}
           source={{ uri: chat.item_images[0] }}
           className="object-cover rounded-sm"
           style={{

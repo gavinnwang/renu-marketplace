@@ -15,7 +15,7 @@ async fn chat_complete_handler(
     config: web::Data<Config>,
 ) -> impl Responder {
     tracing::info!("chat_complete_handler called");
-    let res = request_openai_api(data.image.as_str(), &config).await;
+    let res = request_openai_api(&data.image, &config).await;
 
     match res {
         Ok(res) => {

@@ -1,4 +1,4 @@
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpResponse, Responder};
 use sqlx::PgPool;
 
 use crate::{
@@ -105,6 +105,29 @@ async fn get_items_by_me_by_status_handler(
         Ok(items) => HttpResponse::Ok().json(items),
         Err(err) => {
             tracing::error!("Failed to fetch items: {err}");
+            HttpResponse::InternalServerError().json("Something went wrong")
+        }
+    }
+}
+
+#[derive(serde::Deserialize, Debug)]
+struct PushTokenRequest {
+    token: String,
+}
+
+#[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
+#[post("/me/push-token")]
+async fn post_push_token_handler(
+    auth_guard: AuthenticationGuard,
+    data: web::Json<PushTokenRequest>,
+    pool: web::Data<PgPool>,
+) -> impl Responder {
+    let user_id = auth_guard.user_id;
+
+    match user_repository::post_push_token(user_id, &data.token, pool.as_ref()).await {
+        Ok(_) => HttpResponse::Ok().json("Push token updated"),
+        Err(err) => {
+            tracing::error!("Failed to add push token: {err}");
             HttpResponse::InternalServerError().json("Something went wrong")
         }
     }

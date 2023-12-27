@@ -58,3 +58,19 @@ pub async fn add_user(
 
     Ok(record.id as i32)
 }
+
+pub async fn post_push_token(
+    user_id: i32,
+    push_token: &String,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<(), DbError> {
+    sqlx::query!(
+        r#"UPDATE "user" SET push_token = $1 WHERE id = $2"#,
+        push_token,
+        user_id
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(())
+}
