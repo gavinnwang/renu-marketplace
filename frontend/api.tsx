@@ -219,6 +219,8 @@ export async function postImages(images: string[]): Promise<string[]> {
     body: formData,
   });
   if (!postImageResponse.ok) {
+    const errMsg = await postImageResponse.text();
+    console.error(errMsg);
     throw new Error("Failed to post images");
   }
 

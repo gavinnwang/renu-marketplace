@@ -46,9 +46,9 @@ async fn post_images(
                 return HttpResponse::InternalServerError().json("Error uploading file");
             }
         };
-        remove_files(&images).await;
         uploaded_file_keys.push(uploaded_file.s3_key);
     }
+    remove_files(&images).await;
 
     tracing::info!("Uploaded files: {:#?}", uploaded_file_keys);
     HttpResponse::Ok().json(uploaded_file_keys)
