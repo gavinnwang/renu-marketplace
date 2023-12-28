@@ -3,7 +3,8 @@ import { AICompleteResponse, ChatGroup, Item, User } from "./types";
 import Constants from "expo-constants";
 const config = Constants.expoConfig as any;
 
-export const API_URL = "http://" + config.hostUri.split(`:`).shift().concat(`:8080`) as string
+// export const API_URL = "http://" + config.hostUri.split(`:`).shift().concat(`:8080`) as string
+export const API_URL = "https://api.gavinwang.dev";
 
 export const IMAGES_URL = "https://images.gavinwang.dev/";
 

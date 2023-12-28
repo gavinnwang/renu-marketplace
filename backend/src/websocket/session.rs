@@ -17,15 +17,15 @@ const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 #[derive(Debug)]
 pub struct WsChatSession {
     // unique session id
-    // pub id: usize,
-    pub user_id: usize,
+    // pub id: i32,
+    pub user_id: i32,
 
     // Client must send ping at least once per 10 seconds (CLIENT_TIMEOUT),
     // otherwise we drop connection.
     pub hb: Instant,
 
     // joined room id and other user id in the room
-    pub chat_id_and_other_user_id: Option<(usize, usize)>,
+    pub chat_id_and_other_user_id: Option<(i32, i32)>,
 
     // chat server address to send message
     pub server_addr: Addr<server::ChatServer>,
@@ -160,7 +160,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                     let v: Vec<&str> = m.splitn(4, ' ').collect();
                     match v[0] {
                         "/join" => {
-                            let user_id = self.user_id as i32;
+                            let user_id = self.user_id;
                             // check for index out of bounds
 
                             let chat_id = match v.get(1) {
@@ -171,7 +171,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     return;
                                 }
                             };
-                            let chat_id = match chat_id.parse::<usize>() {
+                            let chat_id = match chat_id.parse::<i32>() {
                                 Ok(chat_id) => chat_id,
                                 Err(_) => {
                                     ctx.text(format!("Invalid chat id: {}", chat_id));

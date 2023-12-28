@@ -7,13 +7,15 @@ use actix::{
 use actix_web::web::Data;
 use sqlx::PgPool;
 
+use crate::{repository::chat_repository, notification};
+
 use super::session;
 
 // chat server manages chat rooms and responsible for coordinating chat session
 #[derive(Debug, Clone)]
 pub struct ChatServer {
-    sessions: Rc<RefCell<HashMap<usize, (Recipient<session::ChatMessageToClient>, Option<usize>)>>>, // maps session id to session address and the room id the session is in
-    // rooms: Rc<RefCell<HashMap<usize, HashSet<usize>>>>, // maps room id to set of session ids in the room
+    sessions: Rc<RefCell<HashMap<i32, (Recipient<session::ChatMessageToClient>, Option<i32>)>>>, // maps session id to session address and the room id the session is in
+    // rooms: Rc<RefCell<HashMap<i32, HashSet<i32>>>>, // maps room id to set of session ids in the room
     // we don't need rooms because we only have DM and no group chat
     pool: Data<PgPool>,
 }
@@ -39,9 +41,9 @@ impl ChatServer {
 #[derive(Message, Clone)]
 #[rtype(result = "()")]
 pub struct ChatMessageToServer {
-    pub sender_id: usize,
-    pub receiver_id: usize,
-    pub chat_id: usize,
+    pub sender_id: i32,
+    pub receiver_id: i32,
+    pub chat_id: i32,
     pub content: String,
 }
 
@@ -65,37 +67,65 @@ impl Handler<ChatMessageToServer> for ChatServer {
 
         let pool = self.pool.clone();
         async move {
-            let result = crate::repository::chat_repository::insert_chat_message(
-                 msg.sender_id as i32,
-                msg.chat_id as i32,
+            let result = chat_repository::insert_chat_message(
+                 msg.sender_id ,
+                msg.chat_id ,
                 &msg.content,
                 pool.as_ref(),
             )
-            .await;
+            .await;            
 
             match result {
                 Ok(_) => {
                     tracing::info!("Message inserted to database successfully");
-                    match crate::repository::chat_repository::increment_unread_count_based_on_sender_id(
-                        msg.chat_id as i32,
-                        msg.sender_id as i32,
+                    match chat_repository::increment_unread_count_based_on_sender_id(
+                        msg.chat_id ,
+                        msg.sender_id ,
                         pool.as_ref(),
                     ).await {
                         Ok(_) => {
                             tracing::info!("Unread count incremented successfully");
+                            match chat_repository::get_other_user_push_token(msg.sender_id , msg.chat_id , pool.as_ref()).await {
+                                Ok(Some(push_token)) => {
+                                    tracing::info!("Push token fetched successfully");
+                                    let request = notification::request::PostNotificationRequest {
+                                        to: push_token,
+                                        title: "New Message".to_string(),
+                                        body: msg.content,
+                                    };
+                                    match notification::request::request_send_notifcation(
+                                        &request,
+                                    )
+                                    .await
+                                    {
+                                        Ok(_) => {
+                                            tracing::info!("Push notification sent successfully");
+                                        }
+                                        Err(err) => {
+                                            tracing::error!(
+                                                "Failed to send push notification. Error message: {}\n",
+                                                err
+                                            );
+                                        }
+                                    }
+                                }
+                                Ok(None) => {
+                                    tracing::warn!("Push token not found");
+                                }
+                                Err(err) => {
+                                    tracing::error!("Failed to fetch push token. Error message: {err}");
+                                }
+                            }
+
                         }
                         Err(err) => {
-                            tracing::error!(
-                                "Failed to increment unread count. Error message: {}\n",
-                                err
-                            );
+                            tracing::error!("Failed to increment unread count. Error message: {err}");
                         }
                     }
                 }
                 Err(err) => {
                     tracing::error!(
-                        "Failed to insert message to databse. Error message: {}\n",
-                        err
+                        "Failed to insert message to databse. Error message: {err}"
                     );
                 }
             }
@@ -109,7 +139,7 @@ impl Handler<ChatMessageToServer> for ChatServer {
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Connect {
-    pub user_id: usize,
+    pub user_id: i32,
     pub addr: Recipient<session::ChatMessageToClient>,
 }
 
@@ -129,7 +159,7 @@ impl Handler<Connect> for ChatServer {
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Disconnect {
-    pub user_id: usize,
+    pub user_id: i32,
 }
 
 impl Handler<Disconnect> for ChatServer {
@@ -183,16 +213,16 @@ impl Handler<Disconnect> for ChatServer {
 //  session is disconnected #[derive(Message)]
 #[derive(Clone)]
 pub struct Join {
-    pub user_id: usize,
-    pub chat_id: usize,
+    pub user_id: i32,
+    pub chat_id: i32,
 }
 
 impl actix::Message for Join {
-    type Result = Result<usize, String>;
+    type Result = Result<i32, String>;
 }
 
 impl Handler<Join> for ChatServer {
-    type Result = ResponseFuture<Result<usize, String>>;
+    type Result = ResponseFuture<Result<i32, String>>;
 
     fn handle(&mut self, msg: Join, _: &mut Self::Context) -> Self::Result {
         let pool = self.pool.clone();
@@ -203,8 +233,8 @@ impl Handler<Join> for ChatServer {
         // do something async
         Box::pin(async move {
             let is_part_of_chat_group = crate::repository::chat_repository::check_if_user_id_is_part_of_chat_group(
-                msg.user_id as i32,
-                msg.chat_id as i32,
+                msg.user_id,
+                msg.chat_id,
                 pool.as_ref(),
             )
             .await;
@@ -223,8 +253,8 @@ impl Handler<Join> for ChatServer {
                             Some((_, room_id)) => {
                                 *room_id = Some(msg.chat_id);
                                 match crate::repository::chat_repository::clear_unread_count_by_user_id(
-                                    msg.user_id as i32,
-                                    msg.chat_id as i32,
+                                    msg.user_id ,
+                                    msg.chat_id ,
                                     pool.as_ref(),
                                 ).await {
                                     Ok(_) => {
@@ -250,7 +280,7 @@ impl Handler<Join> for ChatServer {
                             }
                         }
 
-                        Ok(other_user_id as usize)
+                        Ok(other_user_id )
                     }
 
                     None => {

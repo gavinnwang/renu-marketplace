@@ -15,7 +15,7 @@ async fn ws_route(
     auth_guard: AuthenticationGuard,
     srv: Data<Addr<server::ChatServer>>,
 ) -> Result<HttpResponse, Error> {
-    let user_id = auth_guard.user_id as usize;
+    let user_id = auth_guard.user_id;
     ws::start(
         session::WsChatSession {
             user_id,

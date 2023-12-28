@@ -349,3 +349,34 @@ pub async fn insert_chat_room(
 
     Ok(result.id)
 }
+
+// when calling this method you have to make sure that user_id passed in is part of chat_group
+pub async fn get_other_user_push_token(
+    user_id: i32,
+    chat_id: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<Option<String>, DbError> {
+    let record = sqlx::query!(
+        r#"
+        SELECT
+            u.push_token
+        FROM item_chat ic
+        JOIN "user" u ON 
+            CASE
+                WHEN ic.buyer_id = $1 THEN u.id = (SELECT user_id FROM item WHERE item.id = ic.item_id)
+                ELSE u.id = ic.buyer_id
+            END
+        WHERE ic.id = $2;
+        "#,
+        user_id,
+        chat_id,
+    )
+    .fetch_one(conn)
+    .await;
+
+    match record {
+        Err(sqlx::Error::RowNotFound) => Ok(None),
+        Err(err) => Err(err.into()),
+        Ok(record) => Ok(record.push_token),
+    }
+}

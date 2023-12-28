@@ -11,7 +11,7 @@ pub async fn request_send_notifcation(
 
     response.error_for_status().map_err(|err| {
         tracing::error!("Error requesting notification API: {:#?}", err);
-       err 
+        err
     })?;
 
     Ok(())
