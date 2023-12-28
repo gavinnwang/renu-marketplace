@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            u.push_token\n        FROM item_chat ic\n        JOIN \"user\" u ON \n            CASE\n                WHEN ic.buyer_id = $1 THEN u.id = (SELECT user_id FROM item WHERE item.id = ic.item_id)\n                ELSE u.id = ic.buyer_id\n            END\n        WHERE ic.id = $2;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "push_token",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "d2716e0699fb682f35ce7049502f9163a509aa91a9ed2492cbcefe0c047227d3"
+}
