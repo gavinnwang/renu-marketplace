@@ -68,7 +68,7 @@ export default function MessagePage() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => {
-                console.log("refreshing");
+                console.debug("refreshing");
                 refetch();
                 queryClient.invalidateQueries(["unreadCount"]);
               }}

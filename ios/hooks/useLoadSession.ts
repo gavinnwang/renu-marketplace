@@ -11,7 +11,7 @@ const useRetrieveSession = () => {
         setSession(JSON.parse(session));
       }
       setTimeout(() => {
-        console.log("loaded from storage to true");
+        console.debug("loaded from storage to true");
         setLoadedFromStorage(true);
       }, 750);
     };

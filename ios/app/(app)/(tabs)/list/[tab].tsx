@@ -168,7 +168,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
         setTouching(false);
       }}
       onPress={() => {
-        console.log(item);
+        console.debug(item);
         void router.push({
           pathname: `/item/${item.id}`,
           params: {

@@ -59,7 +59,7 @@ export async function getUserMeItems(sessionToken: string): Promise<Item[]> {
 }
 
 export async function postPushToken(sessionToken: string, pushToken: string) {
-  console.log("posting push token", sessionToken);
+  console.debug("posting push token", sessionToken);
   const res = await fetch(`${API_URL}/users/me/push-token`, {
     headers: {
       authorization: `Bearer ${sessionToken}`,

@@ -1,7 +1,7 @@
 import * as Notifications from "expo-notifications";
 
 export async function registerForPushNotificationsAsync() {
-  console.log("registerForPushNotificationsAsync");
+  console.debug("registerForPushNotificationsAsync");
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   if (existingStatus !== "granted") {
     const { status } = await Notifications.requestPermissionsAsync();
@@ -10,7 +10,7 @@ export async function registerForPushNotificationsAsync() {
       return;
     }
   } else {
-    console.log("already granted");
+    console.debug("already granted");
     return;
   }
 }

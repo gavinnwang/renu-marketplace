@@ -1,10 +1,10 @@
 todo:
-notification for chats   [*]
-num of unread chats    [*]
-ai completetion   
-aws centralized logging
-check home icon to scroll to top [*]
-report button 
+* notification for chats [*]
+* num of unread chats [*]
+* ai completetion  
+* aws centralized logging
+* check home icon to scroll to top [*]
+* report button 
 
 1. chat message efficiency and consistency: https://towardsdatascience.com/ace-the-system-interview-design-a-chat-application-3f34fd5b85d0 
 
