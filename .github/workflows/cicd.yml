@@ -5,12 +5,7 @@ on:
     branches:
       - main
     paths: 
-      - 'src/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - '.github/workflows/**'
-      - 'Dockerfile'
-      - '.sqlx/**'
+      - 'backend'
 
 jobs:
   build-push-and-deploy:
