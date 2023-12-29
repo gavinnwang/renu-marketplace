@@ -22,11 +22,14 @@ impl FromRequest for AuthenticationGuard {
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        // get token from cookie or header or query string
+        // if get token from header or query string, remove "Bearer " from token
         let token = req
             .cookie("token")
             .map(|c| c.value().to_string())
             .or_else(|| {
-                req.headers()
+                let token = req
+                    .headers()
                     .get(http::header::AUTHORIZATION)
                     .map(|h| h.to_str().unwrap_or("").to_string())
                     .or_else(|| {
@@ -34,20 +37,23 @@ impl FromRequest for AuthenticationGuard {
                             .split("&")
                             .find(|s| s.starts_with("authorization="))
                             .map(|s| s.split_at(("authorization=").len()).1.to_string())
-                    })
+                    });
+
+                match token {
+                    Some(token) if token.len() < 7 => None,
+                    Some(token) => Some(token.split_at(7).1.to_string()),
+                    None => None,
+                }
             });
 
         let token = match token {
-            Some(token) if token.len() < 7 => {
-                tracing::error!("Token too short");
-                return Box::pin(async { Err(UserError::AuthError.into()) });
-            }
-            Some(token) => token.split_at(7).1.to_string(),
+            Some(token) => token,
             None => {
                 tracing::warn!("User token not found.");
                 return Box::pin(async { Err(UserError::AuthError.into()) });
             }
         };
+        tracing::info!("token: {}", token);
 
         let jwt_secret = match req.app_data::<web::Data<Config>>() {
             Some(config) => &config.jwt_secret,

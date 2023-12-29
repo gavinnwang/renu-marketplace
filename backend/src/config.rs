@@ -1,3 +1,4 @@
+use core::panic;
 
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -6,7 +7,7 @@ pub struct Config {
     pub google_oauth_client_id: String,
     pub google_oauth_client_secret: String,
     pub google_oauth_redirect_url: String,
-    
+
     pub database_url: String,
     pub server_port: u16,
     pub server_host: String,
@@ -16,7 +17,7 @@ pub struct Config {
     pub s3_key: String,
     pub s3_key_secret: String,
 
-    pub openai_api_key: String
+    pub openai_api_key: String,
 }
 
 impl Config {
@@ -27,8 +28,17 @@ impl Config {
             std::env::var("GOOGLE_OAUTH_CLIENT_ID").expect("GOOGLE_OAUTH_CLIENT_ID must be set");
         let google_oauth_client_secret = std::env::var("GOOGLE_OAUTH_CLIENT_SECRET")
             .expect("GOOGLE_OAUTH_CLIENT_SECRET must be set");
-        let google_oauth_redirect_url = std::env::var("GOOGLE_OAUTH_REDIRECT_URL")
-            .expect("GOOGLE_OAUTH_REDIRECT_URL must be set");
+
+        let env = std::env::var("ENV").unwrap_or("production".to_string());
+        let google_oauth_redirect_url = match env.as_str() {
+            "production" => std::env::var("GOOGLE_OAUTH_REDIRECT_URL")
+                .expect("GOOGLE_OAUTH_REDIRECT_URL must be set"),
+            "development" => std::env::var("GOOGLE_OAUTH_REDIRECT_URL_DEV")
+                .expect("GOOGLE_OAUTH_REDIRECT_URL_DEV must be set"),
+            _ => {
+                panic!("Invalid ENV variable");
+            }
+        };
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
         let server_port = std::env::var("SERVER_PORT").expect("SERVER_PORT must be set");
         let server_host = std::env::var("SERVER_HOST").expect("SERVER_HOST must be set");
@@ -42,18 +52,22 @@ impl Config {
 
         Config {
             jwt_secret,
-            jwt_max_age: jwt_max_age.parse::<i64>().expect("TOKEN_MAXAGE must be an integer"),
+            jwt_max_age: jwt_max_age
+                .parse::<i64>()
+                .expect("TOKEN_MAXAGE must be an integer"),
             google_oauth_client_id,
             google_oauth_client_secret,
             google_oauth_redirect_url,
             database_url,
-            server_port: server_port.parse::<u16>().expect("SERVER_PORT must be an integer"),
+            server_port: server_port
+                .parse::<u16>()
+                .expect("SERVER_PORT must be an integer"),
             server_host,
             s3_bucket_name,
             s3_region,
             s3_key,
             s3_key_secret,
-            openai_api_key
+            openai_api_key,
         }
     }
 }

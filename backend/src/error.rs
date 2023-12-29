@@ -7,7 +7,7 @@ use thiserror::Error;
 pub enum UserError {
     #[error("An internal error occurred. Please try again later.")]
     InternalError,
-    #[error("Invalid credentials.")]
+    #[error("Invalid credentials. Please log in again.")]
     AuthError,
     #[error("An error occurred while creating account.")]
     CreateUserError,
@@ -16,11 +16,11 @@ pub enum UserError {
 
 
 impl error::ResponseError for UserError {
-    // fn error_response(&self) -> actix_web::HttpResponse {
-    //     actix_web::HttpResponse::build(self.status_code())
-    //         .insert_header(actix_web::http::header::ContentType::plaintext())
-    //         .body(self.to_string())
-    // }
+    fn error_response(&self) -> actix_web::HttpResponse {
+        actix_web::HttpResponse::build(self.status_code())
+            .insert_header(actix_web::http::header::ContentType::json())
+            .json(self.to_string())
+    }
 
     fn status_code(&self) -> StatusCode {
         match *self {

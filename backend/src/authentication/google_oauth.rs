@@ -33,7 +33,6 @@ pub async fn request_token(
     authorization_code: &str,
     env: &web::Data<Config>,
 ) -> Result<OAuthResponse, Box<dyn Error>> {
-
     let root_url = "https://oauth2.googleapis.com/token";
     let client = Client::new();
 
@@ -71,7 +70,10 @@ pub async fn get_google_user(
         let user_info = response.json::<GoogleUserResult>().await?;
         Ok(user_info)
     } else {
-        tracing::error!("Error requesting user information: {}", response.text().await?);
+        tracing::error!(
+            "Error requesting user information: {}",
+            response.text().await?
+        );
         Err("An error occurred while trying to retrieve user information.".into())
     }
 }

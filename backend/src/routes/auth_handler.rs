@@ -15,7 +15,6 @@ use crate::{
     },
     config::Config,
     error::DbError,
-    // model::user_model::NewUser,
     repository::user_repository,
 };
 
