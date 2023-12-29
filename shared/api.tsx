@@ -113,13 +113,18 @@ export async function getItem(itemId: string): Promise<Item> {
   return parseOrThrowResponse<Item>(res);
 }
 
-export async function getItemsByCategory(category: string, page: number) {
+export async function getItemsByCategory(
+  category: string,
+  page: number,
+  cache?: RequestCache
+) {
   console.debug("fetching with pageParam and category", page, category);
   const res = await fetch(
-    `${API_URL}/items/?category=${category}&page=${page}`
+    `${API_URL}/items/?category=${category}&page=${page}`,
+    { cache: cache }
   );
   return parseOrThrowResponse<Item[]>(res);
-};
+}
 
 export async function postItemStatus(
   sessionToken: string,

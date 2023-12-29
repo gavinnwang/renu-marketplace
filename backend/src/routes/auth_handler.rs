@@ -5,6 +5,7 @@ use actix_web::{
 };
 use chrono::{Duration, Utc};
 use jsonwebtoken::{encode, EncodingKey, Header};
+use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::{
@@ -17,6 +18,18 @@ use crate::{
     // model::user_model::NewUser,
     repository::user_repository,
 };
+
+#[derive(Deserialize)]
+enum DeviceType {
+    Mobile,
+    Web,
+}
+
+#[derive(Deserialize)]
+struct State {
+    device_type: DeviceType,
+    callback: String,
+}
 
 #[tracing::instrument(skip(config, pool))]
 #[get("/callback")]
@@ -37,6 +50,14 @@ async fn google_oauth_handler(
         tracing::error!("Google OAuth: State not provided!");
         return HttpResponse::Unauthorized().json("State not provided!");
     }
+
+    let state: State = match serde_json::from_str(state) {
+        Err(err) => {
+            tracing::error!("Failed to parse state: {err}");
+            return HttpResponse::Unauthorized().json("Failed to parse state");
+        }
+        Ok(state) => state,
+    };
 
     let token_response = request_token(code.as_str(), &config).await;
 
@@ -129,20 +150,44 @@ async fn google_oauth_handler(
         Ok(token) => token,
     };
 
+    match state.device_type {
+        DeviceType::Mobile => {
+            let redirect_url = format!(
+                "{}?email={}&name={}&token={}&user_id={}",
+                state.callback, google_user.email, google_user.name, token, user_id
+            );
+            tracing::info!("Mobile user logged in with redirect url: {}", redirect_url);
+            HttpResponse::Found()
+                .append_header((LOCATION, redirect_url))
+                .finish()
+        }
+        DeviceType::Web => {
+            let cookie = Cookie::build("token", token.clone())
+                .path("/")
+                .max_age(ActixWebDuration::new(60 * config.jwt_max_age, 0))
+                .http_only(true)
+                .finish();
+            tracing::info!("Web user logged in");
+            HttpResponse::Ok()
+                .cookie(cookie)
+                .json("Successfully logged in")
+        }
+    }
+
     // let cookie = Cookie::build("token", token.clone())
     //     .path("/")
     //     .max_age(ActixWebDuration::new(60 * config.jwt_max_age, 0))
     //     .http_only(true)
     //     .finish();
 
-    let mut response = HttpResponse::Found();
-    let redirect_url = format!(
-        "{state}?email={}&name={}&token={}&user_id={}",
-        google_user.email, google_user.name, token, user_id
-    );
-    tracing::info!("Redirecting to {}\n", redirect_url);
-    response.append_header((LOCATION, redirect_url));
-    response.finish()
+    // let mut response = HttpResponse::Found();
+    // let redirect_url = format!(
+    //     "{state}?email={}&name={}&token={}&user_id={}",
+    //     google_user.email, google_user.name, token, user_id
+    // );
+    // tracing::info!("Redirecting to {}\n", redirect_url);
+    // response.append_header((LOCATION, redirect_url));
+    // response.finish()
 }
 
 #[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]

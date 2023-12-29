@@ -12,6 +12,7 @@ export default function ItemListingCard({ item }: { item: Item }) {
           src={`${IMAGES_URL}${item.images[0]}`}
           alt={item.name}
           width={200}
+          className="min-w-[200px] min-h-[200px]"
           height={200}
         />
         <div>

@@ -433,7 +433,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
 import { customAlphabet } from "nanoid/non-secure";
 import Colors from "../../../../shared/constants/Colors";
-import { registerForPushNotificationsAsync } from "../../../utils/notification";
+import { registerForPushNotificationsAsync } from "../../../notification";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessage }) => {
   return (

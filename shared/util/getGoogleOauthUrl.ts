@@ -1,6 +1,5 @@
-import { GOOGLE_OAUTH_CLIENT_ID, REDIRECT_URL } from "../../shared/api";
-
-export const getGoogleUrl = (from: string) => {
+import { GOOGLE_OAUTH_CLIENT_ID, REDIRECT_URL } from "../api";
+export const getGoogleUrl = (state: State) => {
   const rootUrl = `https://accounts.google.com/o/oauth2/v2/auth`;
 
   const options = {
@@ -13,10 +12,15 @@ export const getGoogleUrl = (from: string) => {
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
     ].join(" "),
-    state: from,
+    state: JSON.stringify(state),
   };
 
   const qs = new URLSearchParams(options);
 
   return `${rootUrl}?${qs.toString()}`;
+};
+
+type State = {
+  device_type: "mobile" | "web";
+  callback: string;
 };

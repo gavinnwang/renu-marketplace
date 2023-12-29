@@ -7,7 +7,7 @@ import { router } from "expo-router";
 
 import { Session } from "../../shared/types";
 import { AuthContext } from "../context/authContext";
-import { getGoogleUrl } from "../utils/getGoogleOauthUrl";
+import { getGoogleUrl } from "../../shared/util/getGoogleOauthUrl";
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
@@ -15,7 +15,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async () => {
     const callbackUrl = Linking.createURL("App");
-    const link = getGoogleUrl(callbackUrl);
+    const link = getGoogleUrl({
+      device_type: "mobile",
+      callback: callbackUrl,
+    });
 
     const result: WebBrowser.WebBrowserAuthSessionResult =
       await WebBrowser.openAuthSessionAsync(link, callbackUrl);

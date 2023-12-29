@@ -24,7 +24,7 @@ export default function UploadListingStepOne() {
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.1,
     });
 
     if (!result.canceled) {
