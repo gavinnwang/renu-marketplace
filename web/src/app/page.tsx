@@ -11,7 +11,7 @@ export default async function Home() {
     <main className="m-10">
       <Link
         href={getGoogleUrl({
-          device_type: "web",
+          device_type: "Web",
           callback: "http://localhost:3000",
         })}
       >

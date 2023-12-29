@@ -162,15 +162,16 @@ async fn google_oauth_handler(
                 .finish()
         }
         DeviceType::Web => {
-            let cookie = Cookie::build("token", token.clone())
+            let cookie = Cookie::build("token", &token)
                 .path("/")
                 .max_age(ActixWebDuration::new(60 * config.jwt_max_age, 0))
                 .http_only(true)
                 .finish();
             tracing::info!("Web user logged in");
-            HttpResponse::Ok()
+            HttpResponse::Found()
+                .append_header((LOCATION, state.callback))
                 .cookie(cookie)
-                .json("Successfully logged in")
+                .finish()
         }
     }
 
