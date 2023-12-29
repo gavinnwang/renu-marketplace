@@ -7,7 +7,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { ChatGroup, Measure, RefAndKey } from "../../../../types";
+import { ChatGroup, Measure, RefAndKey } from "../../../../../shared/types";
 import Colors from "../../../../../shared/constants/Colors";
 import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

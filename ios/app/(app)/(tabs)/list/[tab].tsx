@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import Colors from "../../../../../shared/constants/Colors";
-import { Item, Measure, RefAndKey } from "../../../../types";
+import { Item, Measure, RefAndKey } from "../../../../../shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Image } from "expo-image";
@@ -106,7 +106,7 @@ export default function ListScreen() {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-import { CATEGORIES } from "../home";
+import { CATEGORIES } from "../../../../../shared/constants/Category";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
 import { IMAGES_URL, getUserMeItems, postItemStatus } from "../../../../../shared/api";

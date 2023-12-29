@@ -8,7 +8,7 @@ export default async function Home() {
   return (
     <main className="m-10">
       <p className="text-4xl font">Listings</p>
-      <div className="flex flex-row gap-x-2">
+      <div className="flex flex-row gap-x-2 overflow-x-scroll no-scrollbar">
         {data.map((item, index) => (
           <ItemListingCard item={item} key={index} />
         ))}

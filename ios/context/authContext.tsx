@@ -1,5 +1,5 @@
 import React from "react";
-import { Session } from "../types";
+import { Session } from "../../shared/types";
 
 type AuthContextType = {
   signIn: () => Promise<void>;

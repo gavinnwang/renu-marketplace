@@ -3,26 +3,14 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { ItemListing } from "../../../components/ItemListing";
 import { LogoWithText } from "../../../components/Logo";
-import { Item, Measure } from "../../../types";
+import { Item, Measure } from "../../../../shared/types";
 import React from "react";
 import Colors from "../../../../shared/constants/Colors";
 import PagerView from "react-native-pager-view";
 import { API_URL, parseOrThrowResponse } from "../../../../shared/api";
+import { CATEGORIES } from "../../../../shared/constants/Category";
 import { FlashList } from "@shopify/flash-list";
 import { useScrollToTop } from "@react-navigation/native";
-
-export const CATEGORIES: Record<string, string> = {
-  all: "All",
-  womens: "Women's",
-  mens: "Men's",
-  home: "Home & Tools",
-  furniture: "Furniture",
-  electronics: "Electronics",
-  bikes: "Bikes & Scooters",
-  tickets: "Tickets",
-  general: "General",
-  free: "Free",
-};
 
 type CategoryTabData = {
   key: string;
@@ -164,7 +152,7 @@ const CategoryView = ({
               onRefresh={() => {
                 refetchItems();
               }}
-          />
+            />
           }
           data={items.pages.flatMap((page) => page)}
           numColumns={2}

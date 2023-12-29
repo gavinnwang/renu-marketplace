@@ -14,7 +14,7 @@ import Colors from "../../../../shared/constants/Colors";
 import { Image } from "expo-image";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
-import { CATEGORIES } from "../(tabs)/home";
+import { CATEGORIES } from "../../../../shared/constants/Category";
 
 import { useSession } from "../../../hooks/useSession";
 import {
