@@ -16,7 +16,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ChatGroup, ChatMessage } from "../../../types";
+import { ChatGroup, ChatMessage } from "../../../../shared/types";
 import { Image } from "expo-image";
 import { TextInput } from "react-native-gesture-handler";
 import useWebSocket from "react-use-websocket";
@@ -29,7 +29,7 @@ import {
   getItem,
   parseOrThrowResponse,
   postChatRoomWithFirstMessage,
-} from "../../../api";
+} from "../../../../shared/api";
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -432,7 +432,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
 import { customAlphabet } from "nanoid/non-secure";
-import Colors from "../../../constants/Colors";
+import Colors from "../../../../shared/constants/Colors";
 import { registerForPushNotificationsAsync } from "../../../utils/notification";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessage }) => {

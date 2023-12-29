@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Colors from "../../../constants/Colors";
+import Colors from "../../../../shared/constants/Colors";
 import { Image } from "expo-image";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
@@ -24,8 +24,8 @@ import {
   getSavedItemStatus,
   getUserInfo,
   postChangeSavedItemStatus,
-} from "../../../api";
-import { Item } from "../../../types";
+} from "../../../../shared/api";
+import { Item } from "../../../../shared/types";
 import React from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";

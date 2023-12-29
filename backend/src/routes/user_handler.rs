@@ -3,6 +3,7 @@ use sqlx::PgPool;
 
 use crate::{
     authentication::jwt::AuthenticationGuard,
+    error::UserError,
     model::item_model::ItemStatus,
     repository::{
         item_repository,
@@ -121,14 +122,12 @@ async fn post_push_token_handler(
     auth_guard: AuthenticationGuard,
     data: web::Json<PushTokenRequest>,
     pool: web::Data<PgPool>,
-) -> impl Responder {
+) -> Result<HttpResponse, actix_web::Error> {
     let user_id = auth_guard.user_id;
 
-    match user_repository::post_push_token(user_id, &data.token, pool.as_ref()).await {
-        Ok(_) => HttpResponse::Ok().json("Push token updated"),
-        Err(err) => {
-            tracing::error!("Failed to add push token: {err}");
-            HttpResponse::InternalServerError().json("Something went wrong")
-        }
-    }
+    user_repository::post_push_token(user_id, &data.token, pool.as_ref())
+        .await
+        .map_err(|_| UserError::InternalError)?;
+
+    Ok(HttpResponse::Ok().json("Push token updated"))
 }

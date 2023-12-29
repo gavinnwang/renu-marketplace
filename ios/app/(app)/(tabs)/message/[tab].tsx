@@ -8,13 +8,13 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { ChatGroup, Measure, RefAndKey } from "../../../../types";
-import Colors from "../../../../constants/Colors";
+import Colors from "../../../../../shared/constants/Colors";
 import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useSession } from "../../../../hooks/useSession";
-import { IMAGES_URL, getChatGroupUnreadCount, getChatGroups } from "../../../../api";
+import { IMAGES_URL, getChatGroupUnreadCount, getChatGroups } from "../../../../../shared/api";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../../components/RefreshScreen";
 

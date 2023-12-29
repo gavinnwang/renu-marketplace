@@ -3,10 +3,10 @@ import { Link } from "expo-router";
 
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Image } from "expo-image";
-import { Item } from "../types";
+import { Item } from "../../shared/types";
 import dayjs from "dayjs";
-import Colors from "../constants/Colors";
-import { IMAGES_URL } from "../api";
+import Colors from "../../shared/constants/Colors";
+import { IMAGES_URL } from "../../shared/api";
 dayjs.extend(relativeTime);
 
 const horizontalGapPx = 10;

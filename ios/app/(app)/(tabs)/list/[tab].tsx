@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Colors from "../../../../constants/Colors";
+import Colors from "../../../../../shared/constants/Colors";
 import { Item, Measure, RefAndKey } from "../../../../types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -109,7 +109,7 @@ dayjs.extend(relativeTime);
 import { CATEGORIES } from "../home";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
-import { IMAGES_URL, getUserMeItems, postItemStatus } from "../../../../api";
+import { IMAGES_URL, getUserMeItems, postItemStatus } from "../../../../../shared/api";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
 const ListingPageItem = ({ item }: { item: Item }) => {

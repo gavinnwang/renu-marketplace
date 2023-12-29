@@ -1,12 +1,12 @@
 import React from "react";
 import { Text, View, ScrollView } from "react-native";
-import Colors from "../../../constants/Colors";
+import Colors from "../../../../shared/constants/Colors";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import { ItemListing } from "../../../components/ItemListing";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
-import { getSavedItems, getUserMeInfo } from "../../../api";
+import { getSavedItems, getUserMeInfo } from "../../../../shared/api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import RefreshScreen from "../../../components/RefreshScreen";
 import { FlashList } from "@shopify/flash-list";

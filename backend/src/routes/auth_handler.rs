@@ -13,8 +13,9 @@ use crate::{
         jwt::{AuthenticationGuard, TokenClaims},
     },
     config::Config,
+    error::DbError,
     // model::user_model::NewUser,
-    repository::user_repository, error::DbError,
+    repository::user_repository,
 };
 
 #[tracing::instrument(skip(config, pool))]
@@ -68,8 +69,7 @@ async fn google_oauth_handler(
     //     return HttpResponse::InternalServerError().json("User email is not northwestern.edu email"}));
     // }
 
-    let user_id =
-        user_repository::fetch_user_id_by_email(pool.as_ref(), &google_user.email).await;
+    let user_id = user_repository::fetch_user_id_by_email(pool.as_ref(), &google_user.email).await;
 
     let user_id = match user_id {
         Err(err) => match err {
@@ -79,9 +79,13 @@ async fn google_oauth_handler(
                     "User with email {} not found, creating new user",
                     google_user.email
                 );
-                let user_id =
-                    user_repository::add_user(pool.as_ref(), &google_user.name, &google_user.email, &google_user.picture)
-                        .await;
+                let user_id = user_repository::add_user(
+                    pool.as_ref(),
+                    &google_user.name,
+                    &google_user.email,
+                    &google_user.picture,
+                )
+                .await;
                 match user_id {
                     Err(err) => {
                         tracing::error!("Failed to add user: {err}");

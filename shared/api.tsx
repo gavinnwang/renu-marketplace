@@ -1,7 +1,7 @@
 import { AICompleteResponse, ChatGroup, Item, User } from "./types";
 
-import Constants from "expo-constants";
-const config = Constants.expoConfig as any;
+// import Constants from "expo-constants";
+// const config = Constants.expoConfig as any;
 
 // export const API_URL = "http://" + config.hostUri.split(`:`).shift().concat(`:8080`) as string
 export const API_URL = "https://api.gavinwang.dev";
@@ -12,7 +12,6 @@ export const REDIRECT_URL = "https://api.gavinwang.dev/auth/callback";
 
 export const GOOGLE_OAUTH_CLIENT_ID =
   "479411838275-kpsk3vagvubv429vnhu85hsviahv8ed7.apps.googleusercontent.com";
-
 
 export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -60,7 +59,7 @@ export async function getUserMeItems(sessionToken: string): Promise<Item[]> {
 }
 
 export async function postPushToken(sessionToken: string, pushToken: string) {
-  console.log("posting push token", sessionToken)
+  console.log("posting push token", sessionToken);
   const res = await fetch(`${API_URL}/users/me/push-token`, {
     headers: {
       authorization: `Bearer ${sessionToken}`,
@@ -113,6 +112,14 @@ export async function getItem(itemId: string): Promise<Item> {
   const res = await fetch(`${API_URL}/items/${itemId}`);
   return parseOrThrowResponse<Item>(res);
 }
+
+export async function getItemsByCategory(category: string, page: number) {
+  console.debug("fetching with pageParam and category", page, category);
+  const res = await fetch(
+    `${API_URL}/items/?category=${category}&page=${page}`
+  );
+  return parseOrThrowResponse<Item[]>(res);
+};
 
 export async function postItemStatus(
   sessionToken: string,

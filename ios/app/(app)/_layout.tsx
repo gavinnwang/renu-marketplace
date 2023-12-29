@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useSession } from "../../hooks/useSession";
 import React from "react";
 import * as Notifications from "expo-notifications";
-import { postPushToken } from "../../api";
+import { postPushToken } from "../../../shared/api";
 
 export default function AppLayout() {
   const { session } = useSession();

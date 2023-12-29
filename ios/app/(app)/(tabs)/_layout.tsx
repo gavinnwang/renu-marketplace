@@ -1,9 +1,9 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import Colors from "../../../constants/Colors";
+import Colors from '../../../../shared/constants/Colors';
 import Svg, { Path } from "react-native-svg";
 import { SafeAreaView, Text, View } from "react-native";
-import { getChatGroupUnreadCount } from "../../../api";
+import { getChatGroupUnreadCount } from '../../../../shared/api'
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "../../../hooks/useSession";
 

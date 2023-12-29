@@ -1,5 +1,5 @@
 import Svg, { Path } from "react-native-svg";
-import Colors from "../constants/Colors";
+import Colors from "../../shared/constants/Colors";
 
 export default function LeftChevron() {
   return (

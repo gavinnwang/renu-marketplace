@@ -1,4 +1,4 @@
-import { GOOGLE_OAUTH_CLIENT_ID, REDIRECT_URL } from "../api";
+import { GOOGLE_OAUTH_CLIENT_ID, REDIRECT_URL } from "../../shared/api";
 
 export const getGoogleUrl = (from: string) => {
   const rootUrl = `https://accounts.google.com/o/oauth2/v2/auth`;

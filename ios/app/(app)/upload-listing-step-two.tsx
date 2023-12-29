@@ -17,7 +17,7 @@ import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { useSession } from "../../hooks/useSession";
 import { FlashList } from "@shopify/flash-list";
 import LeftChevron from "../../components/LeftChevron";
-import { postImages, postNewItem } from "../../api";
+import { postImages, postNewItem } from "../../../shared/api";
 
 const ItemCategory: Record<string, string> = {
   picking: "Pick a category",

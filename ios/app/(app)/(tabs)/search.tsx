@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text, TouchableOpacity, View } from "react-native";
-import Colors from "../../../constants/Colors";
+import Colors from "../../../../shared/constants/Colors";
 import React from "react";
 import { useNavigation } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { getSearchItems } from "../../../api";
+import { getSearchItems } from "../../../../shared/api";
 import { FlashList } from "@shopify/flash-list";
 import { ItemListing } from "../../../components/ItemListing";
 
