@@ -4,57 +4,56 @@ on:
   push:
     branches:
       - main
-    paths: 
-      - 'backend'
+    paths:
+      - "backend"
 
 jobs:
   build-push-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3 
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: backend/
-        push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/renu:latest
-        platforms: linux/amd64
-        
-    - name: Deploy to DigitalOcean Droplet
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.DROPLET_HOST }}
-        username: ${{ secrets.DROPLET_USERNAME }}
-        key: ${{ secrets.DROPLET_SSH_KEY }}
-        passphrase: ${{ secrets.DROPLET_PASSPHRASE }}
-        script: |
-          docker stop renu || true
-          docker rm renu || true
-          docker system prune -f -a || true
-          docker pull wry0313/renu:latest
-          docker run -d --name renu \
-            -p 8080:8080 \
-            -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -e TOKEN_MAXAGE=${{ secrets.TOKEN_MAXAGE }} \
-            -e GOOGLE_OAUTH_CLIENT_ID=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }} \
-            -e GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }} \
-            -e GOOGLE_OAUTH_REDIRECT_URL=${{ secrets.GOOGLE_OAUTH_REDIRECT_URL }} \
-            -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
-            -e SERVER_HOST=${{ secrets.SERVER_HOST }} \
-            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-            -e S3_KEY=${{ secrets.S3_KEY }} \
-            -e S3_KEY_SECRET=${{ secrets.S3_KEY_SECRET }} \
-            -e S3_REGION=${{ secrets.S3_REGION }} \
-            -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
-            wry0313/renu:latest 
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: backend/
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/renu:latest
+          platforms: linux/amd64
 
+      - name: Deploy to DigitalOcean Droplet
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          passphrase: ${{ secrets.DROPLET_PASSPHRASE }}
+          script: |
+            docker stop renu || true
+            docker rm renu || true
+            docker system prune -f -a || true
+            docker pull wry0313/renu:latest
+            docker run -d --name renu \
+              -p 8080:8080 \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e TOKEN_MAXAGE=${{ secrets.TOKEN_MAXAGE }} \
+              -e GOOGLE_OAUTH_CLIENT_ID=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }} \
+              -e GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }} \
+              -e GOOGLE_OAUTH_REDIRECT_URL=${{ secrets.GOOGLE_OAUTH_REDIRECT_URL }} \
+              -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
+              -e SERVER_HOST=${{ secrets.SERVER_HOST }} \
+              -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+              -e S3_KEY=${{ secrets.S3_KEY }} \
+              -e S3_KEY_SECRET=${{ secrets.S3_KEY_SECRET }} \
+              -e S3_REGION=${{ secrets.S3_REGION }} \
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+              wry0313/renu:latest

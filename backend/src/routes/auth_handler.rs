@@ -125,7 +125,7 @@ async fn google_oauth_handler(
         Ok(user_id) => user_id,
     };
 
-    tracing::info!("generating jwt token for user with id {user_id}");
+    tracing::info!("Generating jwt token for user with id {user_id}");
 
     let jwt_secret = &config.jwt_secret;
     let now = Utc::now();
