@@ -20,6 +20,7 @@ use crate::{
 };
 
 #[derive(Deserialize)]
+#[serde(rename_all = "snake_case")]
 enum DeviceType {
     Mobile,
     Web,
