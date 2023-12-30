@@ -14,7 +14,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useSession } from "../../../../hooks/useSession";
-import { IMAGES_URL, getChatGroupUnreadCount, getChatGroups } from "../../../../../shared/api";
+import {
+  IMAGES_URL,
+  getChatGroupUnreadCount,
+  getChatGroups,
+} from "../../../../../shared/api";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
@@ -111,9 +115,8 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
         <Image
           transition={{
             effect: "cross-dissolve",
-            duration: 250,
+            duration: 50,
           }}
-          recyclingKey={chat.item_id.toString()}
           source={{ uri: `${IMAGES_URL}${chat.item_images[0]}` }}
           className="object-cover rounded-sm"
           style={{

@@ -89,7 +89,7 @@ export default function ListScreen() {
         <Pressable
           onPress={() => {
             void router.push({
-              pathname: "/upload-listing-step-one",
+              pathname: "/upload-listing",
             });
           }}
           className="w-full h-full bg-purplePrimary rounded-sm flex shadow-lg items-center justify-center"
@@ -109,7 +109,11 @@ dayjs.extend(relativeTime);
 import { CATEGORIES } from "../../../../../shared/constants/Category";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../../hooks/useSession";
-import { IMAGES_URL, getUserMeItems, postItemStatus } from "../../../../../shared/api";
+import {
+  IMAGES_URL,
+  getUserMeItems,
+  postItemStatus,
+} from "../../../../../shared/api";
 import RefreshScreen from "../../../../components/RefreshScreen";
 
 const ListingPageItem = ({ item }: { item: Item }) => {

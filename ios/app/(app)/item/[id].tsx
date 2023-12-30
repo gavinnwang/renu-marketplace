@@ -113,6 +113,10 @@ export default function ItemPage() {
     },
   });
 
+  console.log(itemId);
+
+  const width = Dimensions.get("window").width;
+
   return (
     <>
       <SafeAreaView className="bg-bgLight" />
@@ -128,16 +132,15 @@ export default function ItemPage() {
               data={item.images}
               renderItem={({ item }) => (
                 <Image
+                  style={{
+                    height: width,
+                    width: width,
+                    maxHeight: width,
+                    backgroundColor: Colors.grayLight,
+                  }}
                   transition={{
                     effect: "cross-dissolve",
-                    duration: 200,
-                  }}
-                  recyclingKey={item}
-                  style={{
-                    height: Dimensions.get("window").width,
-                    width: Dimensions.get("window").width,
-                    maxHeight: Dimensions.get("window").width,
-                    backgroundColor: Colors.grayLight,
+                    duration: 100,
                   }}
                   source={{
                     uri: `${IMAGES_URL}${item}`,
@@ -152,9 +155,6 @@ export default function ItemPage() {
               viewabilityConfig={{
                 itemVisiblePercentThreshold: 50,
               }}
-              // contentContainerStyle={{
-              //   height: Dimensions.get("window").width,
-              // }}
             />
             <View className="relative">
               {item.images.length > 1 && (

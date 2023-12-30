@@ -41,6 +41,7 @@ export default function TabsLayout() {
           options={{
             title: "List",
             headerShown: false,
+
             tabBarIcon: ({ color }) => <ListIcon color={color} />,
             href: "list/0",
           }}

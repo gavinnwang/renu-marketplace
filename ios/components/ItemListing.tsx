@@ -29,8 +29,6 @@ export function ItemListing({ item }: { item: Item }) {
             effect: "cross-dissolve",
             duration: 100,
           }}
-          recyclingKey={item.id.toString()}
-          cachePolicy="memory-disk"
           source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
           className="object-cover rounded-t"
           style={{
