@@ -14,7 +14,7 @@ import * as Linking from "expo-linking";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
-  console.debug(session);
+  // console.debug(session);
 
   const { data: user, isError } = useQuery({
     queryKey: ["me"],
@@ -51,8 +51,7 @@ export default function AccountScreen() {
         </Text>
       </View>
       <ScrollView>
-        <View className="flex items-start">
-          <View className="bg-blackPrimary w-full h-[80px]"></View>
+        <View className="flex flex-row items-start">
           <Image
             source={{
               uri: user?.profile_image ?? "",
@@ -60,41 +59,30 @@ export default function AccountScreen() {
             style={{
               borderColor: Colors.whitePrimary,
             }}
-            className="w-[74px] h-[74px] rounded-full -mt-10 border border-white ml-2.5 bg-blackPrimary"
+            className="w-16 h-16 rounded-full border border-white ml-2.5 bg-blackPrimary"
           />
-        </View>
 
-        <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
-          <View className="flex-col w-[200px]">
-            <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px]">
-              {user?.name ?? session?.name}
-            </Text>
+          <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
+            <View className="flex-col w-[200px]">
+              <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px]">
+                {user?.name ?? session?.name}
+              </Text>
 
-            <View className="flex-row">
-              <Text className="font-Manrope_400Regular text-sm mr-3">
-                <Text className="font-Manrope_600SemiBold">
-                  {user?.active_listing_count ?? 0}
-                </Text>{" "}
-                Active Listings
-              </Text>
-              <Text className="font-Manrope_400Regular text-sm">
-                <Text className="font-Manrope_600SemiBold">
-                  {user?.sales_done_count ?? 0}
-                </Text>{" "}
-                Sales Done
-              </Text>
+              <View className="flex-row">
+                <Text className="font-Manrope_400Regular text-sm mr-3">
+                  <Text className="font-Manrope_600SemiBold">
+                    {user?.active_listing_count ?? 0}
+                  </Text>{" "}
+                  Active Listings
+                </Text>
+                <Text className="font-Manrope_400Regular text-sm">
+                  <Text className="font-Manrope_600SemiBold">
+                    {user?.sales_done_count ?? 0}
+                  </Text>{" "}
+                  Sales Done
+                </Text>
+              </View>
             </View>
-          </View>
-
-          <View className="flex flex-col w-[100px] gap-y-0.5">
-            <TouchableOpacity
-              onPress={signOut}
-              className="font-Manrope_400Regular bg-purplePrimary p-2 rounded-sm"
-            >
-              <Text className="text-white text-center font-SecularOne_400Regular">
-                SIGN OUT
-              </Text>
-            </TouchableOpacity>
           </View>
         </View>
         <View className="w-full h-2 bg-grayLight mt-2" />
@@ -103,9 +91,15 @@ export default function AccountScreen() {
           className="ml-2.5 mt-2 mb-1"
           onPress={handleEmailLink}
         >
-          <Text className="font-Poppins_600SemiBold text-base">
+          <Text className="font-Manrope_500Medium text-base">
             Give us feedbacks
           </Text>
+        </TouchableOpacity>
+
+        <View className="w-full h-2 bg-grayLight mt-2" />
+
+        <TouchableOpacity className="ml-2.5 mt-2 mb-1" onPress={signOut}>
+          <Text className="font-Manrope_500Medium text-base">Sign out</Text>
         </TouchableOpacity>
 
         <View className="w-full h-2 bg-grayLight mt-2" />

@@ -24,6 +24,7 @@ export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
 }
 
 export async function getUserMeInfo(sessionToken: string): Promise<User> {
+  console.debug("getting user info", sessionToken);
   const res = await fetch(`${API_URL}/users/me`, {
     headers: {
       authorization: `Bearer ${sessionToken}`,

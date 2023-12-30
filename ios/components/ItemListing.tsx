@@ -27,14 +27,14 @@ export function ItemListing({ item }: { item: Item }) {
         <Image
           transition={{
             effect: "cross-dissolve",
-            duration: 100,
+            duration: 50,
           }}
           source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
           className="object-cover rounded-t"
           style={{
             width: imageWidth,
             maxWidth: imageWidth,
-            height: (imageWidth ) * 1.3,
+            height: imageWidth * 1.3,
             backgroundColor: Colors.grayLight,
           }}
         />

@@ -1,19 +1,51 @@
 import { useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useSession } from "./useSession";
+import { QueryClient, useQuery } from "@tanstack/react-query";
+import {
+  getChatGroupUnreadCount,
+  getChatGroups,
+  getItemsByCategory,
+  getUserMeInfo,
+  getUserMeItems,
+} from "../../shared/api";
+import { Session } from "../../shared/types";
 
-const useRetrieveSession = () => {
+const useRetrieveSession = (queryClient: QueryClient) => {
   const { setSession, setLoadedFromStorage, loadedFromStorage } = useSession();
   useEffect(() => {
     const getToken = async () => {
       const session = await SecureStore.getItemAsync("session");
+      const sessionParsed = session ? (JSON.parse(session) as Session) : null;
       if (session) {
-        setSession(JSON.parse(session));
+        setSession(sessionParsed);
       }
       setTimeout(() => {
-        console.debug("loaded from storage to true");
+        if (sessionParsed) {
+          console.log("PREFETCHING");
+          queryClient.prefetchQuery({
+            queryKey: ["me"],
+            queryFn: () => getUserMeInfo(sessionParsed.token),
+          });
+          queryClient.prefetchQuery({
+            queryKey: ["unreadCount"],
+            queryFn: () => getChatGroupUnreadCount(sessionParsed.token),
+          });
+          queryClient.prefetchQuery({
+            queryFn: () => getChatGroups(sessionParsed.token, "buyer"),
+            queryKey: ["chats", "Buy"],
+          });
+          queryClient.prefetchQuery({
+            queryKey: ["list"],
+            queryFn: () => getUserMeItems(sessionParsed.token),
+          });
+          queryClient.prefetchInfiniteQuery({
+            queryFn: () => getItemsByCategory("all", 0),
+            queryKey: ["item", "all"],
+          });
+        }
         setLoadedFromStorage(true);
-      }, 750);
+      }, 1000);
     };
 
     if (!loadedFromStorage) {

@@ -45,13 +45,12 @@ export default function SellerPage() {
 
         <ScrollView>
           <View className="flex items-start">
-            <View className="bg-blackPrimary w-full h-[80px]"></View>
+            {/* <View className="bg-blackPrimary w-full h-[80px]"></View> */}
             <Image
               source={{
-                uri:
-                  user?.profile_image || ""
+                uri: user?.profile_image || "",
               }}
-              className="w-[74px] h-[74px] rounded-full -mt-10 border border-white ml-2.5 bg-blackPrimary"
+              className="w-16 h-16 rounded-full border border-white ml-2.5 bg-blackPrimary"
             />
           </View>
 

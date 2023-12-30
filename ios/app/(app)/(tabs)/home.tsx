@@ -79,15 +79,17 @@ const CategoryView = ({
   selectedSection: number;
   flashListRef: React.RefObject<any>;
 }) => {
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [fetched, setFetched] = React.useState(false);
   const getItemsByCategory = async ({ pageParam = 0 }) => {
     console.debug("fetching with pageParam and category", pageParam, category);
     const res = await fetch(
       `${API_URL}/items/?category=${category}&page=${pageParam}`
     );
+    setFetched(true);
     return parseOrThrowResponse<Item[]>(res);
   };
 
-  const [refreshing, setRefreshing] = React.useState(false);
   const {
     data: items,
     isLoading: isLoadingItems,
@@ -98,7 +100,7 @@ const CategoryView = ({
   } = useInfiniteQuery({
     queryFn: getItemsByCategory,
     queryKey: ["item", category],
-    // enabled: Math.abs(selectedSection - index) <= 1,
+    enabled: !fetched && Math.abs(selectedSection - index) <= 2,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length > 0 ? allPages.length : undefined;
     },
