@@ -1,7 +1,7 @@
 todo:
 * notification for chats [*]
 * num of unread chats [*]
-* ai completetion  
+* ai completetion [*]
 * aws centralized logging
 * check home icon to scroll to top [*]
 * report button
