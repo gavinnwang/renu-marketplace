@@ -28,6 +28,7 @@ import {
   postImages,
   postNewItem,
 } from "../../../shared/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MAX_IMAGES = 6;
 
@@ -88,6 +89,106 @@ export default function UploadListingStepOne() {
 
   const [uploading, setUploading] = React.useState(false);
   const iosPickerRef = React.useRef<PickerIOS>(null);
+  const [completing, setCompleting] = React.useState(false);
+  const queryClient = useQueryClient();
+  const handleComplete = async () => {
+    if (images.length === 1) {
+      alert("Please add at least one image");
+      return;
+    }
+    if (session === null) {
+      alert("Please login to use this feature");
+      return;
+    }
+    setCompleting(true);
+    try {
+      const uploadedImage = await postImages(images.slice(0, 1));
+      const imageUrl = `${IMAGES_URL}${uploadedImage[0]}`;
+      console.log("imageUrl: ", imageUrl);
+      postAIComplete(session.token, imageUrl).then((res) => {
+        console.log("res: ", res);
+        setTitle(res.title);
+        setPrice(String(res.price));
+        setDescription(res.description);
+        if (Object.keys(ItemCategory).includes(res.category)) {
+          setCategory(res.category);
+          iosPickerRef.current?.setState(res.category);
+        }
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    setCompleting(false);
+  };
+  const handleAddImage = () => {
+    if (images.length > MAX_IMAGES) {
+      alert(`You can only upload ${MAX_IMAGES} images`);
+      return;
+    }
+    requestPermission().then((status) => {
+      if (status.granted) {
+        pickImage();
+      } else {
+        router.back();
+      }
+    });
+  };
+  const handleUpload = async () => {
+    if (uploading) {
+      return;
+    }
+    if (images.length === 1) {
+      alert("Please add at least one image");
+      return;
+    }
+    if (title === "") {
+      alert("Please enter a title");
+      return;
+    }
+    if (price === "") {
+      alert("Please enter a price");
+      return;
+    }
+    if (isNaN(Number(price))) {
+      alert("Please enter a valid price");
+      return;
+    }
+    if (Number(price) > 999) {
+      alert("Please enter a price less than $999");
+      return;
+    }
+    // if category is part of item category but not picking
+    if (
+      !Object.keys(ItemCategory).includes(category) ||
+      category === "picking"
+    ) {
+      alert("Please select a valid category");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      if (images.pop() !== "picker") {
+        throw new Error("Last image is not picker");
+      }
+      const s3UrlsResponse = await postImages(images);
+
+      const itemId = await postNewItem(
+        session?.token || "",
+        title,
+        Number(price),
+        description,
+        category,
+        s3UrlsResponse
+      );
+      console.debug("replace to: ", `/item/${itemId}`);
+      queryClient.invalidateQueries(["list"]);
+      router.replace(`/item/${itemId}`);
+    } catch (e) {
+      console.error(e);
+    }
+    setUploading(false);
+  };
   return (
     <>
       <SafeAreaView className="bg-bgLight">
@@ -120,19 +221,7 @@ export default function UploadListingStepOne() {
                 renderItem={({ item, index }) => {
                   return index === images.length - 1 ? (
                     <TouchableOpacity
-                      onPress={() => {
-                        if (images.length > MAX_IMAGES) {
-                          alert(`You can only upload ${MAX_IMAGES} images`);
-                          return;
-                        }
-                        requestPermission().then((status) => {
-                          if (status.granted) {
-                            pickImage();
-                          } else {
-                            router.back();
-                          }
-                        });
-                      }}
+                      onPress={handleAddImage}
                       style={{
                         width: imageWidth,
                         height: imageHeight,
@@ -162,39 +251,15 @@ export default function UploadListingStepOne() {
                 }}
               />
               <View className="px-3">
-                <TouchableOpacity
-                  onPress={async () => {
-                    if (images.length === 1) {
-                      alert("Please add at least one image");
-                      return;
-                    }
-                    if (session === null) {
-                      alert("Please login to use this feature");
-                      return;
-                    }
-                    try {
-                      const uploadedImage = await postImages(
-                        images.slice(0, 1)
-                      );
-                      const imageUrl = `${IMAGES_URL}${uploadedImage[0]}`;
-                      postAIComplete(session.token, imageUrl).then((res) => {
-                        setTitle(res.title);
-                        setPrice(String(res.price));
-                        setDescription(res.description);
-                        if (Object.keys(ItemCategory).includes(res.category)) {
-                          setCategory(res.category);
-                          iosPickerRef.current?.setState(res.category);
-                        }
-                      });
-                    } catch (e) {
-                      console.error(e);
-                    }
-                  }}
-                >
-                  <View className="px-2 py-1 flex mt-3 rounded-sm bg-purplePrimary">
-                    <Text className="font-Poppins_600SemiBold text-base text-white">
-                      one click to auto fill
-                    </Text>
+                <TouchableOpacity onPress={handleComplete}>
+                  <View className="px-2 py-1 mt-3 rounded-sm bg-purplePrimary">
+                    {completing ? (
+                      <ActivityIndicator size="small" color="white" />
+                    ) : (
+                      <Text className="mx-auto font-Poppins_600SemiBold text-base text-white">
+                        Auto fill with AI
+                      </Text>
+                    )}
                   </View>
                 </TouchableOpacity>
                 <View className="pb-5 border-b border-b-stone-200">
@@ -267,61 +332,7 @@ export default function UploadListingStepOne() {
                 </View>
                 <View className="fixed bottom-0 h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
                   <Pressable
-                    onPress={async () => {
-                      if (uploading) {
-                        return;
-                      }
-                      if (images.length === 1) {
-                        alert("Please add at least one image");
-                        return;
-                      }
-                      if (title === "") {
-                        alert("Please enter a title");
-                        return;
-                      }
-                      if (price === "") {
-                        alert("Please enter a price");
-                        return;
-                      }
-                      if (isNaN(Number(price))) {
-                        alert("Please enter a valid price");
-                        return;
-                      }
-                      if (Number(price) > 999) {
-                        alert("Please enter a price less than $999");
-                        return;
-                      }
-                      // if category is part of item category but not picking
-                      if (
-                        !Object.keys(ItemCategory).includes(category) ||
-                        category === "picking"
-                      ) {
-                        alert("Please select a valid category");
-                        return;
-                      }
-
-                      setUploading(true);
-                      try {
-                        if (images.pop() !== "picker") {
-                          throw new Error("Last image is not picker");
-                        }
-                        const s3UrlsResponse = await postImages(images);
-
-                        const itemId = await postNewItem(
-                          session?.token || "",
-                          title,
-                          Number(price),
-                          description,
-                          category,
-                          s3UrlsResponse
-                        );
-                        console.debug("replace to: ", `/item/${itemId}`);
-                        router.replace(`/item/${itemId}`);
-                      } catch (e) {
-                        console.error(e);
-                      }
-                      setUploading(false);
-                    }}
+                    onPress={handleUpload}
                     className="w-full h-full rounded-sm bg-purplePrimary flex shadow-lg items-center justify-center"
                   >
                     {!uploading ? (
