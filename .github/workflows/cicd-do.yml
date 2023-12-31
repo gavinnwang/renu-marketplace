@@ -1,11 +1,11 @@
-name: Rust CI/CD
+name: Rust CI/CD on DigitalOcean Droplet
 
 on:
   push:
     branches:
       - main
     paths:
-      - ".github/workflows/**"
+      - ".github/workflows/cicd-do.yml"
       - 'backend/**'
 
 jobs:

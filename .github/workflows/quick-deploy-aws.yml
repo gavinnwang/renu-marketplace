@@ -1,4 +1,4 @@
-name: Quick deploy
+name: Quick deploy to AWS EC2
 
 on: [workflow_dispatch]
 

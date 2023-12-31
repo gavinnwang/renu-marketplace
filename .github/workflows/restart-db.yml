@@ -1,4 +1,4 @@
-name: Restart Database
+name: Restart Database On DigitalOcean
 
 on: [workflow_dispatch]
 

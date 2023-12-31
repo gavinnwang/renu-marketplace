@@ -1,4 +1,4 @@
-name: Quick deploy
+name: Quick deploy to DigitalOcean Droplet
 
 on: [workflow_dispatch]
 
