@@ -110,7 +110,10 @@ export default function UploadListingStepOne() {
       setTitle(completionRes.title);
       setPrice(String(completionRes.price));
       setDescription(completionRes.description);
-      if (Object.keys(ItemCategory).includes(completionRes.category)) {
+      if (completionRes.price === 0) {
+        setCategory("free");
+        iosPickerRef.current?.setState("free");
+      } else if (Object.keys(ItemCategory).includes(completionRes.category)) {
         setCategory(completionRes.category);
         iosPickerRef.current?.setState(completionRes.category);
       }

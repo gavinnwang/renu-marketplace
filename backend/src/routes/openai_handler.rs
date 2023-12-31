@@ -50,7 +50,7 @@ async fn chat_complete_handler(
 
 #[derive(serde::Deserialize, Debug, serde::Serialize)]
 pub struct Response {
-    pub price: i64,
+    pub price: f64,
     pub title: String,
     pub description: String,
     pub category: String,
