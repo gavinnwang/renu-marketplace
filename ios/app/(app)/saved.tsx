@@ -60,7 +60,14 @@ export default function SavedItemsPage() {
           ) : (
             <FlashList
               refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={refetch} />
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={async () => {
+                    setRefreshing(true);
+                    await refetch();
+                    setRefreshing(false);
+                  }}
+                />
               }
               showsVerticalScrollIndicator={false}
               data={savedItemData}

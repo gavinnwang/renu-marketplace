@@ -71,10 +71,11 @@ export default function MessagePage() {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => {
-                console.debug("refreshing");
-                refetch();
-                queryClient.invalidateQueries(["unreadCount"]);
+              onRefresh={async () => {
+                setRefreshing(true);
+                await refetch();
+                await queryClient.invalidateQueries(["unreadCount"]);
+                setRefreshing(false);
               }}
             />
           }

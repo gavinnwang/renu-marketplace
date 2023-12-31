@@ -116,8 +116,10 @@ const CategoryView = ({
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => {
-                refetchItems();
+              onRefresh={async () => {
+                setRefreshing(true);
+                await refetchItems();
+                setRefreshing(false);
               }}
             />
           }
@@ -133,7 +135,14 @@ const CategoryView = ({
         <ScrollView
           className="bg-bgLight h-full py-[70%]"
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={refetchItems} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={async () => {
+                setRefreshing(true);
+                await refetchItems();
+                setRefreshing(false);
+              }}
+            />
           }
         >
           <View className="flex flex-col gap-y-2 items-center">
@@ -151,8 +160,10 @@ const CategoryView = ({
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => {
-                refetchItems();
+              onRefresh={async () => {
+                setRefreshing(true);
+                await refetchItems();
+                setRefreshing(false);
               }}
             />
           }

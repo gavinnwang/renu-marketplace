@@ -71,8 +71,10 @@ export default function ListScreen() {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => {
-                refetch();
+              onRefresh={async () => {
+                setRefreshing(true);
+                await refetch();
+                setRefreshing(false);
               }}
             />
           }

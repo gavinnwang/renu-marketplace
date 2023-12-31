@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, ScrollView } from "react-native";
+import { Text, View, ScrollView, RefreshControl } from "react-native";
 import Colors from "../../../../shared/constants/Colors";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
@@ -17,22 +17,17 @@ export default function AccountScreen() {
   const { signOut, session } = useSession();
   // console.debug(session);
 
-  const { data: user, isError } = useQuery({
+  const {
+    data: user,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ["me"],
     queryFn: () => getUserMeInfo(session!.token),
     enabled: !!session && !!session.token,
   });
 
-  const {
-    data: savedItemData,
-    isError: isErrorSavedItem,
-    isLoading: isLoadingSavedItem,
-    refetch,
-  } = useQuery({
-    queryKey: ["savedItems"],
-    queryFn: () => getSavedItems(session!.token),
-    enabled: !!session && !!session.token,
-  });
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const handleEmailLink = () => {
     const email = "gavinwang313@gmail.com";
@@ -51,7 +46,22 @@ export default function AccountScreen() {
           My Profile
         </Text>
       </View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={async () => {
+              setRefreshing(true);
+              await refetch();
+              setRefreshing(false);
+            }}
+          />
+        }
+        className="bg-bgLight h-full"
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
+      >
         <View className="flex flex-row items-start">
           <Image
             source={{
