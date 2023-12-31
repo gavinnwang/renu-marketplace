@@ -91,6 +91,7 @@ export default function UploadListingStepOne() {
   const iosPickerRef = React.useRef<PickerIOS>(null);
   const [completing, setCompleting] = React.useState(false);
   const queryClient = useQueryClient();
+
   const handleComplete = async () => {
     if (images.length === 1) {
       alert("Please add at least one image");
@@ -98,6 +99,9 @@ export default function UploadListingStepOne() {
     }
     if (session === null) {
       alert("Please login to use this feature");
+      return;
+    }
+    if (completing) {
       return;
     }
     setCompleting(true);

@@ -60,7 +60,9 @@ export default function ItemPage() {
     enabled: !!itemId,
     initialData: () => {
       if (itemString) {
-        return JSON.parse(itemString as string) as Item;
+        return JSON.parse(
+          (itemString as string).replace(/~~pct~~/g, "%")
+        ) as Item;
       } else {
         return undefined;
       }

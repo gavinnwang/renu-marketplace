@@ -18,7 +18,7 @@ export function ItemListing({ item }: { item: Item }) {
       href={{
         pathname: `/item/${item.id}`,
         params: {
-          itemString: JSON.stringify(item),
+          itemString: JSON.stringify(item).replace(/%/g, '~~pct~~'),
         },
       }}
       className="flex flex-col shadow-sm px-[5px] pt-3"

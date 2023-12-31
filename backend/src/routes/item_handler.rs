@@ -22,7 +22,7 @@ async fn get_items_handler(
 ) -> impl Responder {
     tracing::info!("called");
 
-    let limit = 12;
+    let limit = 25;
     let offset = query.page * limit;
 
     let items = match &query.category {

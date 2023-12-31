@@ -2,14 +2,18 @@ import React from "react";
 import { Text, View, ScrollView, RefreshControl } from "react-native";
 import Colors from "../../../../shared/constants/Colors";
 import { Image } from "expo-image";
-import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ItemListing } from "../../../components/ItemListing";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
-import { getSavedItems, getUserMeInfo } from "../../../../shared/api";
+import {
+  getUserMeInfo,
+  postPushToken,
+} from "../../../../shared/api";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import RefreshScreen from "../../../components/RefreshScreen";
-import { FlashList } from "@shopify/flash-list";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
 
@@ -37,6 +41,17 @@ export default function AccountScreen() {
   };
 
   const queryClient = useQueryClient();
+
+  const postPushTokenMutation = useMutation({
+    mutationFn: async (pushToken: string) =>
+      postPushToken(session!.token, pushToken),
+    onSuccess: () => {
+      console.debug("successfully posted push token");
+    },
+    onError: (error) => {
+      console.error("error posting push token", error);
+    },
+  });
 
   return (
     <View className="bg-bgLight h-full">
@@ -122,54 +137,12 @@ export default function AccountScreen() {
           className="ml-2.5 mt-2 mb-1"
           onPress={() => {
             queryClient.removeQueries();
+            postPushTokenMutation.mutate("");
             signOut();
           }}
         >
           <Text className="font-Manrope_500Medium text-base">Sign out</Text>
         </TouchableOpacity>
-
-        {/* <View className="w-full h-full bg-grayLight mt-2" /> */}
-
-        {/* <Text className="ml-2.5 mt-4 mb-3 font-Poppins_600SemiBold text-xl">
-          Saved Items
-          <Text className="font-Poppins_500Medium text-sm">
-            {" "}
-            ({savedItemData?.length ?? 0})
-          </Text>
-        </Text>
-
-        <View className="bg-greyLight h-full">
-          {isLoadingSavedItem ? (
-            <></>
-          ) : isErrorSavedItem ? (
-            <RefreshScreen
-              displayText="Something went wrong."
-              refetch={refetch}
-              marginTop="30%"
-            />
-          ) : savedItemData.length === 0 ? (
-            <RefreshScreen
-              displayText="You have no saved items."
-              refetch={refetch}
-              marginTop="30%"
-            />
-          ) : (
-            <FlashList
-              showsVerticalScrollIndicator={false}
-              scrollEnabled={false}
-              data={savedItemData}
-              numColumns={2}
-              contentContainerStyle={{
-                paddingTop: 10,
-                paddingLeft: 10,
-              }}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={ItemListing}
-              estimatedItemSize={320}
-              removeClippedSubviews={true}
-            />
-          )}
-        </View> */}
       </ScrollView>
     </View>
   );

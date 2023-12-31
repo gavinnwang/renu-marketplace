@@ -2,9 +2,10 @@ todo:
 * notification for chats [*]
 * num of unread chats [*]
 * ai completetion [*]
-* aws centralized logging
 * check home icon to scroll to top [*]
 * report button
+* setup cloudwatch for loggin
+* setup cloudwatch alarm to shuwdown service when cost exceeds limit
 * testing for api endpoints
 * loading page prefetching
 * kubernetes
