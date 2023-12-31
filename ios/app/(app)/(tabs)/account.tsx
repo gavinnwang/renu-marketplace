@@ -11,6 +11,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import RefreshScreen from "../../../components/RefreshScreen";
 import { FlashList } from "@shopify/flash-list";
 import * as Linking from "expo-linking";
+import { router } from "expo-router";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -89,6 +90,16 @@ export default function AccountScreen() {
 
         <TouchableOpacity
           className="ml-2.5 mt-2 mb-1"
+          onPress={() => {
+            router.push("/saved");
+          }}
+        >
+          <Text className="font-Manrope_500Medium text-base">Saved items</Text>
+        </TouchableOpacity>
+        <View className="w-full h-2 bg-grayLight mt-2" />
+
+        <TouchableOpacity
+          className="ml-2.5 mt-2 mb-1"
           onPress={handleEmailLink}
         >
           <Text className="font-Manrope_500Medium text-base">
@@ -102,9 +113,9 @@ export default function AccountScreen() {
           <Text className="font-Manrope_500Medium text-base">Sign out</Text>
         </TouchableOpacity>
 
-        <View className="w-full h-2 bg-grayLight mt-2" />
+        {/* <View className="w-full h-full bg-grayLight mt-2" /> */}
 
-        <Text className="ml-2.5 mt-4 mb-3 font-Poppins_600SemiBold text-xl">
+        {/* <Text className="ml-2.5 mt-4 mb-3 font-Poppins_600SemiBold text-xl">
           Saved Items
           <Text className="font-Poppins_500Medium text-sm">
             {" "}
@@ -143,7 +154,7 @@ export default function AccountScreen() {
               removeClippedSubviews={true}
             />
           )}
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
