@@ -32,10 +32,7 @@ export default function AccountScreen() {
   const handleEmailLink = () => {
     const email = "gavinwang313@gmail.com";
     const subject = encodeURIComponent("[Renu Feedback]");
-    const body = encodeURIComponent("Hi, I have some feedbacks for you.");
-
-    const url = `mailto:${email}?subject=${subject}&body=${body}`;
-
+    const url = `mailto:${email}?subject=${subject}`;
     Linking.openURL(url).catch((err) => console.error(err));
   };
 
