@@ -42,7 +42,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       }
     }
   };
-
   const signOut = async () => {
     await SecureStore.deleteItemAsync("session");
     await SecureStore.deleteItemAsync("searchHistory");

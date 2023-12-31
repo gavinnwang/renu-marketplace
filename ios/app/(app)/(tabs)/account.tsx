@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View, ScrollView, RefreshControl } from "react-native";
 import Colors from "../../../../shared/constants/Colors";
 import { Image } from "expo-image";
-import { useQuery } from "@tanstack/react-query";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ItemListing } from "../../../components/ItemListing";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
@@ -35,6 +35,8 @@ export default function AccountScreen() {
     const url = `mailto:${email}?subject=${subject}`;
     Linking.openURL(url).catch((err) => console.error(err));
   };
+
+  const queryClient = useQueryClient();
 
   return (
     <View className="bg-bgLight h-full">
@@ -116,7 +118,13 @@ export default function AccountScreen() {
 
         <View className="w-full h-2 bg-grayLight mt-2" />
 
-        <TouchableOpacity className="ml-2.5 mt-2 mb-1" onPress={signOut}>
+        <TouchableOpacity
+          className="ml-2.5 mt-2 mb-1"
+          onPress={() => {
+            queryClient.removeQueries();
+            signOut();
+          }}
+        >
           <Text className="font-Manrope_500Medium text-base">Sign out</Text>
         </TouchableOpacity>
 
