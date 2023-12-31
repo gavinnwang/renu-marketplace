@@ -78,6 +78,7 @@ export type AICompleteResponse = {
   price: number;
   title: string;
   description: string;
+  category: string;
 };
 
 export type SearchHistory = {

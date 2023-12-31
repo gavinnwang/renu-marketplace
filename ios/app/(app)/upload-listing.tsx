@@ -22,8 +22,12 @@ import {
 } from "react-native-gesture-handler";
 import { useSession } from "../../hooks/useSession";
 import { Picker, PickerIOS } from "@react-native-picker/picker";
-import { postImages, postNewItem } from "../../../shared/api";
-import { LongPressGesture } from "react-native-gesture-handler/lib/typescript/handlers/gestures/longPressGesture";
+import {
+  IMAGES_URL,
+  postAIComplete,
+  postImages,
+  postNewItem,
+} from "../../../shared/api";
 
 const MAX_IMAGES = 6;
 
@@ -83,7 +87,7 @@ export default function UploadListingStepOne() {
   const { session } = useSession();
 
   const [uploading, setUploading] = React.useState(false);
-
+  const iosPickerRef = React.useRef<PickerIOS>(null);
   return (
     <>
       <SafeAreaView className="bg-bgLight">
@@ -158,7 +162,35 @@ export default function UploadListingStepOne() {
                 }}
               />
               <View className="px-3">
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={async () => {
+                    if (images.length === 1) {
+                      alert("Please add at least one image");
+                      return;
+                    }
+                    if (session === null) {
+                      alert("Please login to use this feature");
+                      return;
+                    }
+                    try {
+                      const uploadedImage = await postImages(
+                        images.slice(0, 1)
+                      );
+                      const imageUrl = `${IMAGES_URL}${uploadedImage[0]}`;
+                      postAIComplete(session.token, imageUrl).then((res) => {
+                        setTitle(res.title);
+                        setPrice(String(res.price));
+                        setDescription(res.description);
+                        if (Object.keys(ItemCategory).includes(res.category)) {
+                          setCategory(res.category);
+                          iosPickerRef.current?.setState(res.category);
+                        }
+                      });
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                >
                   <View className="px-2 py-1 flex mt-3 rounded-sm bg-purplePrimary">
                     <Text className="font-Poppins_600SemiBold text-base text-white">
                       one click to auto fill
@@ -208,6 +240,7 @@ export default function UploadListingStepOne() {
                   >
                     {Object.keys(ItemCategory).map((key) => (
                       <PickerIOS.Item
+                        ref={iosPickerRef}
                         key={key}
                         label={ItemCategory[key]}
                         value={key}

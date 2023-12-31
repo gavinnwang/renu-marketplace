@@ -20,14 +20,26 @@ pub async fn request_openai_api(
                 "content": [
                     {
                         "type": "text",
-                        "text": "Dont say anything just output a json that contains a rough predicted resell price and a image description and title,
-                        your response need to be so that without any processing I can Deserialize it into a struct like this:
-                        struct Response {
-                            price: i64,
-                            title: String,
-                            description: String,
+                        "text": "Only output a json that contains a rough predicted resell price, an accurte description of the resell item in the image, an item title, and an item category from the image. 
+                        The category field has to be one of thses: womens, mens, home: (daily essentials), furniture, electronics, bikes, tickets, general, free.
+                        The response needs to be able to deserialize into a struct like this without erorr:
+                        type Response = {
+                            price: number;
+                            title: String;
+                            description: String;
+                            category:
+                            | 'picking'
+                            | 'mens'
+                            | 'womens'
+                            | 'home'
+                            | 'furniture'
+                            | 'electronics'
+                            | 'bikes'
+                            | 'tickets'
+                            | 'general'
+                            | 'free';
                         }
-                       if a field is not applicable, leave the default value.
+                       if a field is not applicable, leave the default value. The default for category is picking
                         "
                     },
                     {
@@ -55,22 +67,10 @@ pub async fn request_openai_api(
             Ok(openai_response)
         }
         Err(err) => {
-            tracing::error!("Error requesting OpenAI API: {:#?}", err);
+            tracing::error!("Error requesting OpenAI API: {}", err);
             Err(err)
         }
     }
-
-    // match response.status().is_success() {
-    //     true => {
-    //         let openai_response = response.json::<OpenAIResponse>().await?;
-    //         Ok(openai_response)
-    //     }
-    //     false => {
-    //         let openai_response = response.text().await?;
-    //         tracing::error!("Error requesting OpenAI API: {:#?}", openai_response);
-    //         Err(Error::status())
-    //     }
-    // }
 }
 
 #[derive(Deserialize, Debug)]

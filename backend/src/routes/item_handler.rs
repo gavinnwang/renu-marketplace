@@ -167,7 +167,7 @@ async fn post_item_handler(
         }
     };
 
-    if item.price <= 0.0 {
+    if item.price < 0.0 {
         tracing::error!("Invalid price");
         return HttpResponse::BadRequest().json("Invalid price");
     }
