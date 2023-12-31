@@ -7,7 +7,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Slot, SplashScreen } from "expo-router";
 import { useEffect } from "react";
-import { useColorScheme } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
 import { SessionProvider } from "../providers/sessionProvider";
 import {
   Poppins_300Light,
@@ -25,6 +25,7 @@ import { SecularOne_400Regular } from "@expo-google-fonts/secular-one";
 import useRetrieveSession from "../hooks/useLoadSession";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useNotificationObserver from "../hooks/useNotificationObserver";
+import Toast from "react-native-toast-message";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -37,7 +38,7 @@ const queryClient = new QueryClient({
       cacheTime: 1000 * 60 * 60 * 24, // 24 hours
     },
   },
-})
+});
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -70,14 +71,25 @@ export default function RootLayout() {
   }
 
   return (
-    <SessionProvider>
-      <RootLayoutNav />
-    </SessionProvider>
+    <>
+      <SessionProvider>
+        <RootLayoutNav />
+      </SessionProvider>
+      <Toast config={toastConfig} />
+    </>
   );
 }
+const toastConfig = {
+  error: ({ text1 }: any) => (
+    <View className="px-2 py-1 mx-3 mt-3 bg-red-500 rounded-md">
+      <Text className="text-white">{text1}</Text>
+    </View>
+  ),
+};
+
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  // const colorScheme = useColorScheme();
 
   useRetrieveSession(queryClient);
 

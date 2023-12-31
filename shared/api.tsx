@@ -18,6 +18,7 @@ export const GOOGLE_OAUTH_CLIENT_ID =
 export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const errMsg = await res.text();
+
     throw new Error(errMsg);
   }
   return res.json();

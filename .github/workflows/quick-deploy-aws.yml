@@ -1,0 +1,34 @@
+name: Quick deploy
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            docker system prune -f -a || true
+            docker pull wry0313/renu:latest
+            docker run -d --name renu \
+              -p 8080:8080 \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e TOKEN_MAXAGE=${{ secrets.TOKEN_MAXAGE }} \
+              -e GOOGLE_OAUTH_CLIENT_ID=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }} \
+              -e GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }} \
+              -e GOOGLE_OAUTH_REDIRECT_URL=${{ secrets.GOOGLE_OAUTH_REDIRECT_URL }} \
+              -e SERVER_PORT=${{ secrets.SERVER_PORT }} \
+              -e SERVER_HOST=${{ secrets.SERVER_HOST }} \
+              -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+              -e S3_KEY=${{ secrets.S3_KEY }} \
+              -e S3_KEY_SECRET=${{ secrets.S3_KEY_SECRET }} \
+              -e S3_REGION=${{ secrets.S3_REGION }} \
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+              wry0313/renu:latest

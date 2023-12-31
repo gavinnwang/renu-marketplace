@@ -105,16 +105,15 @@ export default function UploadListingStepOne() {
       const uploadedImage = await postImages(images.slice(0, 1));
       const imageUrl = `${IMAGES_URL}${uploadedImage[0]}`;
       console.log("imageUrl: ", imageUrl);
-      postAIComplete(session.token, imageUrl).then((res) => {
-        console.log("res: ", res);
-        setTitle(res.title);
-        setPrice(String(res.price));
-        setDescription(res.description);
-        if (Object.keys(ItemCategory).includes(res.category)) {
-          setCategory(res.category);
-          iosPickerRef.current?.setState(res.category);
-        }
-      });
+      const completionRes = await postAIComplete(session.token, imageUrl);
+      console.log("completionRes: ", completionRes);
+      setTitle(completionRes.title);
+      setPrice(String(completionRes.price));
+      setDescription(completionRes.description);
+      if (Object.keys(ItemCategory).includes(completionRes.category)) {
+        setCategory(completionRes.category);
+        iosPickerRef.current?.setState(completionRes.category);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -252,11 +251,11 @@ export default function UploadListingStepOne() {
               />
               <View className="px-3">
                 <TouchableOpacity onPress={handleComplete}>
-                  <View className="px-2 py-1 mt-3 rounded-sm bg-purplePrimary">
+                  <View className="px-2 py-1 mt-3 rounded-sm h-[36px] flex items-center justify-center bg-purplePrimary">
                     {completing ? (
                       <ActivityIndicator size="small" color="white" />
                     ) : (
-                      <Text className="mx-auto font-Poppins_600SemiBold text-base text-white">
+                      <Text className="font-Poppins_600SemiBold text-base text-white">
                         Auto fill with AI
                       </Text>
                     )}
