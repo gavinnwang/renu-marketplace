@@ -30,6 +30,7 @@ import {
   postChatRoomWithFirstMessage,
 } from "../../../../shared/api";
 
+
 export default function ChatScreen() {
   const router = useRouter();
   const {
@@ -341,7 +342,9 @@ export default function ChatScreen() {
                   <Text className="font-Poppins_600SemiBold text-base text-blackPrimary max-w-[230px] max-h-[60px]">
                     {item.name}
                   </Text>
-                  <Text className="font-Manrope_400Regular text-sm max-w-[230px] max-h-[40px] text-blackPrimary">
+                  <Text className="font-Manrope_400Regular text-sm max-w-[230px] text-blackPrimary" style={{
+                    maxHeight: item.status === "inactive" ? 20 : 40
+                  }}>
                     {!(item.description && item.description.trim())
                       ? "No description provided."
                       : item.description.trim()}
