@@ -26,10 +26,11 @@ const data = TABS.map((i) => ({
 }));
 
 export default function MessagePage() {
-  const queryClient = useQueryClient();
-  const chats = queryClient.getQueryData<ChatGroup[]>(["chats", TABS[0]], {
-    exact: true,
-  });
+  // const queryClient = useQueryClient();
+  // const chats = queryClient.getQueryData<ChatGroup[]>(["chats", TABS[0]], {
+  //   exact: true,
+  // });
+  // console.log(chats);
   const pagerViewRef = React.useRef<PagerView>(null);
   const [selectedTabInt, setSelectedTabInt] = React.useState(0);
 
@@ -41,7 +42,7 @@ export default function MessagePage() {
       <Tabs
         data={data}
         selectedTabInt={selectedTabInt}
-        chats={chats}
+        // chats={chats}
         pagerViewRef={pagerViewRef}
       />
       <PagerView
@@ -90,7 +91,9 @@ function TabPage({ index }: { index: number }) {
       ) : (
         <FlashList
           data={chats}
-          renderItem={({ item }) => <ChatRow item={item} />}
+          renderItem={({ item }) => (
+            <ChatRow item={item} sellOrBuy={TABS[index]} />
+          )}
           keyExtractor={(item) => item.chat_id.toString()}
           refreshControl={
             <RefreshControl
@@ -110,10 +113,14 @@ function TabPage({ index }: { index: number }) {
   );
 }
 
-const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
+const ChatRow = ({
+  item: chat,
+  sellOrBuy,
+}: {
+  item: ChatGroup;
+  sellOrBuy: string;
+}) => {
   const width = (Dimensions.get("window").width - 230) / 2;
-  const param = useLocalSearchParams();
-  const selectedTabInt = parseInt(param.tab as string);
 
   return (
     <Pressable
@@ -122,7 +129,7 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
           pathname: `/chat/${chat.item_id}`,
           params: {
             chatIdParam: chat.chat_id,
-            sellOrBuy: TABS[selectedTabInt],
+            sellOrBuy,
             otherUserName: chat.other_user_name,
             unreadCount: chat.unread_count,
           },
@@ -194,16 +201,28 @@ const Tab = React.forwardRef(
     {
       index,
       selectedTabInt,
-      unreadCount,
+      // unreadCount,
       pagerViewRef,
     }: {
       index: number;
       selectedTabInt: number;
-      unreadCount: number;
+      // unreadCount: number;
       pagerViewRef: React.RefObject<PagerView>;
     },
     ref: any
   ) => {
+    // const queryClient = useQueryClient();
+    // const chats = queryClient.getQueryData<ChatGroup[]>(["chats", TABS[index]])
+    // const unreadCount = chats?.filter((c) => c.unread_count > 0).length ?? 0;
+    const { session } = useSession();
+    const { data: chats } = useQuery({
+      queryFn: () => getChatGroups(session!.token, !index ? "buyer" : "seller"),
+      queryKey: ["chats", TABS[index]],
+      enabled: !!session,
+    });
+    const unreadCount = React.useMemo(() => {
+      return chats?.filter((c) => c.unread_count > 0).length ?? 0;
+    }, [chats]);
     return (
       <Pressable
         key={index}
@@ -233,12 +252,12 @@ const Tab = React.forwardRef(
 const Tabs = ({
   data,
   selectedTabInt,
-  chats,
+  // chats,
   pagerViewRef,
 }: {
   data: RefAndKey[];
   selectedTabInt: number;
-  chats: ChatGroup[] | undefined;
+  // chats: ChatGroup[] | undefined;
   pagerViewRef: React.RefObject<PagerView>;
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
@@ -276,12 +295,11 @@ const Tabs = ({
       ]).start();
     }
   }, [selectedTabInt, measures]);
-  const queryClient = useQueryClient();
-  const unreadCount = queryClient.getQueryData<number>(["unreadCount"], {
-    exact: true,
-  });
-  const currentUnreadCount =
-    chats?.filter((c) => c.unread_count > 0).length ?? 0;
+  // const queryClient = useQueryClient();
+  // const unreadCount = queryClient.getQueryData<number>(["unreadCount"]);
+  // const tabZeroUnreadCount =
+  //   chats?.filter((c) => c.unread_count > 0).length ?? 0;
+
   return (
     <View
       ref={containerRef}
@@ -295,11 +313,11 @@ const Tabs = ({
             index={index}
             ref={section.ref}
             selectedTabInt={selectedTabInt}
-            unreadCount={
-              index === selectedTabInt
-                ? currentUnreadCount ?? 0
-                : Math.max(0, (unreadCount ?? 0) - currentUnreadCount)
-            }
+            // unreadCount={
+            //   index === 0
+            //     ? tabZeroUnreadCount ?? 0
+            //     : Math.max(0, (unreadCount ?? 0) - tabZeroUnreadCount)
+            // }
           />
         );
       })}
