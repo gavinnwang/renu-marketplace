@@ -9,6 +9,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 import * as ImagePicker from "expo-image-picker";
@@ -29,6 +30,8 @@ import {
   postNewItem,
 } from "../../../shared/api";
 import { useQueryClient } from "@tanstack/react-query";
+import { registerForPushNotificationsAsync } from "../../notification";
+import * as Notifications from "expo-notifications";
 
 const MAX_IMAGES = 6;
 
@@ -171,29 +174,70 @@ export default function UploadListingStepOne() {
       alert("Please select a valid category");
       return;
     }
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to publish this item and all the information is correct?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {
+            return;
+          },
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            // alert popup says "enable notifications to get notified when someone wants to buy your item"
+            const { status: existingStatus } =
+              await Notifications.getPermissionsAsync();
+            if (existingStatus !== "granted") {
+              Alert.alert(
+                "Enable notifications",
+                "Enable notifications to get notified when someone wants to buy your item",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                    onPress: () => {},
+                  },
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      registerForPushNotificationsAsync();
+                    },
+                  },
+                ],
+                { cancelable: false }
+              );
+            }
+            setUploading(true);
+            try {
+              if (images.pop() !== "picker") {
+                throw new Error("Last image is not picker");
+              }
+              const s3UrlsResponse = await postImages(images);
 
-    setUploading(true);
-    try {
-      if (images.pop() !== "picker") {
-        throw new Error("Last image is not picker");
-      }
-      const s3UrlsResponse = await postImages(images);
-
-      const itemId = await postNewItem(
-        session?.token || "",
-        title,
-        Number(price),
-        description,
-        category,
-        s3UrlsResponse
-      );
-      console.debug("replace to: ", `/item/${itemId}`);
-      queryClient.invalidateQueries(["list"]);
-      router.replace(`/item/${itemId}`);
-    } catch (e) {
-      console.error(e);
-    }
-    setUploading(false);
+              const itemId = await postNewItem(
+                session?.token || "",
+                title,
+                Number(price),
+                description,
+                category,
+                s3UrlsResponse
+              );
+              console.debug("replace to: ", `/item/${itemId}`);
+              queryClient.invalidateQueries(["list"]);
+              router.replace(`/item/${itemId}`);
+            } catch (e) {
+              console.error(e);
+            }
+            setUploading(false);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
   return (
     <>
