@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import React from "react";
 import {
   Animated,
@@ -9,10 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Colors from "../../../../../shared/constants/Colors";
-import { Item, Measure, RefAndKey } from "../../../../../shared/types";
+import Colors from "../../../../shared/constants/Colors";
+import { Item, Measure, RefAndKey } from "../../../../shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import { Image } from "expo-image";
 
 const TABS = ["Active", "Sold"];
@@ -23,11 +22,60 @@ const data = TABS.map((i) => ({
   ref: React.createRef(),
 }));
 
-export default function ListScreen() {
-  const param = useLocalSearchParams();
-  const selectedTab = param.tab;
-  const selectedTabInt = parseInt(selectedTab as string);
-  const tabDisplay = TABS[selectedTabInt];
+export default function ListPage() {
+  const queryClient = useQueryClient();
+  const items = queryClient.getQueryData<Item[]>(["list"], {
+    exact: true,
+  });
+  const pagerViewRef = React.useRef<PagerView>(null);
+  const [selectedTabInt, setSelectedTabInt] = React.useState(0);
+
+  return (
+    <View className="bg-bgLight h-full">
+      <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
+        Listings
+      </Text>
+      <Tabs
+        data={data}
+        selectedTabInt={selectedTabInt}
+        itemData={items ?? []}
+        pagerViewRef={pagerViewRef}
+      />
+      <PagerView
+        onPageSelected={(e) => {
+          const idx = e.nativeEvent.position;
+          setSelectedTabInt(idx);
+        }}
+        className="flex-1"
+        initialPage={0}
+        orientation="horizontal"
+        ref={pagerViewRef}
+      >
+        {data.map((_, index) => (
+          <TabPage index={index} key={index} />
+        ))}
+      </PagerView>
+
+      <View className="h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
+        <Pressable
+          onPress={() => {
+            void router.push({
+              pathname: "/upload-listing",
+            });
+          }}
+          className="w-full h-full bg-purplePrimary rounded-sm flex shadow-lg items-center justify-center"
+        >
+          <Text className="font-SecularOne_400Regular text-xl text-white">
+            ADD NEW LISTING
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+export function TabPage({ index }: { index: number }) {
+  const tabDisplay = TABS[index];
 
   const { session } = useSession();
 
@@ -46,14 +94,6 @@ export default function ListScreen() {
 
   return (
     <View className="bg-bgLight h-full">
-      <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
-        Listings
-      </Text>
-      <Tabs
-        data={data}
-        selectedTabInt={selectedTabInt}
-        itemData={items ?? []}
-      />
       {isErrorItem ? (
         <RefreshScreen
           displayText={"Something went wrong."}
@@ -61,11 +101,10 @@ export default function ListScreen() {
         />
       ) : isLoadingItem ? (
         <View className="flex flex-grow"></View>
-      ) : items.filter((item) => item.status === STATUS[selectedTabInt])
-          .length > 0 ? (
+      ) : items.filter((item) => item.status === STATUS[index]).length > 0 ? (
         <FlashList
           estimatedItemSize={160}
-          data={items.filter((item) => item.status === STATUS[selectedTabInt])}
+          data={items.filter((item) => item.status === STATUS[index])}
           numColumns={1}
           keyExtractor={(item) => item.id.toString()}
           refreshControl={
@@ -86,21 +125,6 @@ export default function ListScreen() {
           refetch={refetch}
         />
       )}
-
-      <View className="h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
-        <Pressable
-          onPress={() => {
-            void router.push({
-              pathname: "/upload-listing",
-            });
-          }}
-          className="w-full h-full bg-purplePrimary rounded-sm flex shadow-lg items-center justify-center"
-        >
-          <Text className="font-SecularOne_400Regular text-xl text-white">
-            ADD NEW LISTING
-          </Text>
-        </Pressable>
-      </View>
     </View>
   );
 }
@@ -108,15 +132,16 @@ export default function ListScreen() {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-import { CATEGORIES } from "../../../../../shared/constants/Category";
+import { CATEGORIES } from "../../../../shared/constants/Category";
 import { FlashList } from "@shopify/flash-list";
-import { useSession } from "../../../../hooks/useSession";
+import { useSession } from "../../../hooks/useSession";
 import {
   IMAGES_URL,
   getUserMeItems,
   postItemStatus,
-} from "../../../../../shared/api";
-import RefreshScreen from "../../../../components/RefreshScreen";
+} from "../../../../shared/api";
+import RefreshScreen from "../../../components/RefreshScreen";
+import PagerView from "react-native-pager-view";
 
 const ListingPageItem = ({ item }: { item: Item }) => {
   const width = (Dimensions.get("window").width - 210) / 2;
@@ -164,15 +189,8 @@ const ListingPageItem = ({ item }: { item: Item }) => {
     mutation.mutateAsync(newStatus);
   };
 
-  const [touching, setTouching] = React.useState(false);
   return (
     <Pressable
-      onPressIn={() => {
-        setTouching(true);
-      }}
-      onPressOut={() => {
-        setTouching(false);
-      }}
       onPress={() => {
         console.debug(item);
         void router.push({
@@ -182,9 +200,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
           },
         });
       }}
-      className={`flex flex-row py-4 px-4 border-b border-b-grayPrimary  ${
-        touching ? "bg-gray-100" : ""
-      }`}
+      className="flex flex-row py-4 px-4 border-b border-b-grayPrimary"
     >
       <Image
         source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
@@ -232,10 +248,12 @@ const Tab = React.forwardRef(
       selectedTabInt,
       sectionIndex,
       dataCount,
+      pagerViewRef,
     }: {
       selectedTabInt: number;
       sectionIndex: number;
       dataCount: number;
+      pagerViewRef: React.RefObject<PagerView>;
     },
     ref: any
   ) => {
@@ -243,10 +261,7 @@ const Tab = React.forwardRef(
       <Pressable
         key={sectionIndex}
         onPress={() => {
-          if (selectedTabInt === sectionIndex) {
-            return;
-          }
-          void router.replace(`/list/${sectionIndex}`);
+          pagerViewRef.current?.setPage(sectionIndex);
         }}
         className="w-[50%] justify-center items-center"
         ref={ref}
@@ -274,10 +289,12 @@ const Tabs = ({
   data,
   selectedTabInt,
   itemData,
+  pagerViewRef,
 }: {
   data: RefAndKey[];
   selectedTabInt: number;
   itemData: Item[];
+  pagerViewRef: React.RefObject<PagerView>;
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();
@@ -323,6 +340,7 @@ const Tabs = ({
       {data.map((section, i) => {
         return (
           <Tab
+            pagerViewRef={pagerViewRef}
             key={section.key}
             selectedTabInt={selectedTabInt}
             sectionIndex={i}
