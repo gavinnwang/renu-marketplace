@@ -1,9 +1,9 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import Colors from '../../../../shared/constants/Colors';
+import Colors from "../../../../shared/constants/Colors";
 import Svg, { Path } from "react-native-svg";
 import { SafeAreaView, Text, View } from "react-native";
-import { getChatGroupUnreadCount } from '../../../../shared/api'
+import { getChatGroupUnreadCount } from "../../../../shared/api";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "../../../hooks/useSession";
 
@@ -47,12 +47,12 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="message/[tab]"
+          name="messages"
           options={{
             title: "Message",
             headerShown: false,
             tabBarIcon: ({ color }) => <MessageIcon color={color} />,
-            href: "message/0",
+            href: "messages",
           }}
         />
         <Tabs.Screen

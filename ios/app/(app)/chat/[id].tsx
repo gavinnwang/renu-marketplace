@@ -327,10 +327,10 @@ export default function ChatScreen() {
                 }}
               />
             )}
-            <View className="mx-4 flex flex-grow flex-col">
+            <View className="mx-4 flex flex-grow flex-col pt-3">
               {item && (
                 <>
-                  <Text className="font-Poppins_600SemiBold text-base text-blackPrimary max-w-[230px]">
+                  <Text className="font-Poppins_600SemiBold text-base text-blackPrimary max-w-[230px] max-h-[60px]">
                     {item.name}
                   </Text>
                   <Text className="font-Manrope_400Regular text-sm max-w-[230px] max-h-[40px] text-blackPrimary">
