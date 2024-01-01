@@ -1,18 +1,10 @@
 import React from "react";
-import { Text, View, ScrollView, RefreshControl } from "react-native";
-import Colors from "../../../../shared/constants/Colors";
+import { Text, View, ScrollView, RefreshControl, Alert } from "react-native";
 import { Image } from "expo-image";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
-import {
-  getUserMeInfo,
-  postPushToken,
-} from "../../../../shared/api";
+import { getUserMeInfo } from "../../../../shared/api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
@@ -40,22 +32,9 @@ export default function AccountScreen() {
     Linking.openURL(url).catch((err) => console.error(err));
   };
 
-  const queryClient = useQueryClient();
-
-  const postPushTokenMutation = useMutation({
-    mutationFn: async (pushToken: string) =>
-      postPushToken(session!.token, pushToken),
-    onSuccess: () => {
-      console.debug("successfully posted push token");
-    },
-    onError: (error) => {
-      console.error("error posting push token", error);
-    },
-  });
-
   return (
     <View className="bg-bgLight h-full">
-      <View className="flex-row items-center  ">
+      <View className="flex-row items-center">
         <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
           My Profile
         </Text>
@@ -71,7 +50,7 @@ export default function AccountScreen() {
             }}
           />
         }
-        className="bg-bgLight h-full"
+        className="bg-bgLight"
         contentContainerStyle={{
           paddingBottom: 100,
         }}
@@ -81,12 +60,8 @@ export default function AccountScreen() {
             source={{
               uri: user?.profile_image ?? "",
             }}
-            style={{
-              borderColor: Colors.whitePrimary,
-            }}
-            className="w-16 h-16 rounded-full border border-white ml-2.5 bg-blackPrimary"
+            className="w-16 h-16 rounded-full border-white ml-2.5 bg-blackPrimary"
           />
-
           <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
             <View className="flex-col w-[200px]">
               <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px]">
@@ -110,49 +85,73 @@ export default function AccountScreen() {
             </View>
           </View>
         </View>
-        <View className="w-full h-2 bg-grayLight mt-2" />
 
+        <View className="w-full h-2 bg-grayLight mt-2" />
         <TouchableOpacity
-          className="ml-2.5 mt-2 mb-1"
-          onPress={() => {
-            router.push("/saved");
-          }}
+          className="ml-4 mt-2 mb-1 flex flex-row items-center"
+          onPress={() => router.push("/saved")}
         >
-          <Text className="font-Manrope_500Medium text-base">Saved items</Text>
+          <HeartIcon />
+          <Text className="ml-2 font-Manrope_500Medium text-base">
+            Saved items
+          </Text>
         </TouchableOpacity>
-        <View className="w-full h-2 bg-grayLight mt-2" />
 
+        <View className="w-full h-2 bg-grayLight mt-2" />
         <TouchableOpacity
-          className="ml-2.5 mt-2 mb-1"
+          className="ml-4 mt-2 mb-1 flex flex-row items-center"
           onPress={handleEmailLink}
         >
-          <Text className="font-Manrope_500Medium text-base">
-            Give us feedbacks
+          <EmailIcon />
+          <Text className="ml-2 font-Manrope_500Medium text-base">
+            Share feedbacks
           </Text>
         </TouchableOpacity>
 
         <View className="w-full h-2 bg-grayLight mt-2" />
 
         <TouchableOpacity
-          className="ml-2.5 mt-2 mb-1"
-          onPress={() => {
-            queryClient.removeQueries();
-            postPushTokenMutation.mutate("");
-            signOut();
-          }}
+          className="ml-4 mt-2 mb-1 flex flex-row items-center"
+          onPress={signOut}
         >
-          <Text className="font-Manrope_500Medium text-base">Sign out</Text>
+          <Text className="font-Manrope_500Medium text-base text-red-500">
+            Sign out
+          </Text>
         </TouchableOpacity>
+        <View className="w-full h-[500%] bg-grayLight mt-2" />
       </ScrollView>
     </View>
   );
 }
 
-const DownArrowIcon = () => (
-  <Svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+const EmailIcon = () => (
+  <Svg
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="black"
+    className="w-5 h-5"
+  >
     <Path
-      d="M4.12774 7.32321L11 14.0222L17.8722 7.32321C17.995 7.20328 18.1598 7.13614 18.3315 7.13614C18.5031 7.13614 18.668 7.20328 18.7907 7.32321C18.8502 7.38146 18.8974 7.45099 18.9297 7.52773C18.9619 7.60446 18.9785 7.68686 18.9785 7.77009C18.9785 7.85332 18.9619 7.93572 18.9297 8.01245C18.8974 8.08918 18.8502 8.15871 18.7907 8.21696L11.4799 15.345C11.3515 15.4701 11.1793 15.5401 11 15.5401C10.8207 15.5401 10.6485 15.4701 10.5201 15.345L3.20924 8.21834C3.14936 8.16004 3.10178 8.09035 3.06928 8.01336C3.03679 7.93637 3.02005 7.85365 3.02005 7.77009C3.02005 7.68652 3.03679 7.60381 3.06928 7.52682C3.10178 7.44983 3.14936 7.38013 3.20924 7.32184C3.33202 7.20191 3.49685 7.13477 3.66849 7.13477C3.84012 7.13477 4.00495 7.20191 4.12774 7.32184V7.32321Z"
-      fill="black"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+    />
+  </Svg>
+);
+
+const HeartIcon = () => (
+  <Svg
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="black"
+    className="w-5 h-5"
+  >
+    <Path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
     />
   </Svg>
 );

@@ -27,8 +27,9 @@ export function ItemListing({ item }: { item: Item }) {
         <Image
           transition={{
             effect: "cross-dissolve",
-            duration: 50,
+            duration: 100,
           }}
+          recyclingKey={item.id.toString()}
           source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
           className="object-cover rounded-t"
           style={{

@@ -157,6 +157,8 @@ const CategoryView = ({
           ref={flashListRef}
           className="bg-bgLight h-full"
           showsVerticalScrollIndicator={false}
+          estimatedItemSize={320}
+          removeClippedSubviews={true}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -175,11 +177,7 @@ const CategoryView = ({
           }}
           keyExtractor={(item) => item.id.toString()}
           renderItem={ItemListing}
-          onEndReached={() => {
-            fetchNextPage();
-          }}
-          estimatedItemSize={320}
-          removeClippedSubviews={true}
+          onEndReached={fetchNextPage}
         />
       )}
     </View>

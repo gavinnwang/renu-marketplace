@@ -23,6 +23,10 @@ const useRetrieveSession = (queryClient: QueryClient) => {
       setTimeout(() => {
         if (sessionParsed) {
           console.log("PREFETCHING");
+          queryClient.prefetchInfiniteQuery({
+            queryFn: () => getItemsByCategory("all", 0),
+            queryKey: ["item", "all"],
+          });
           queryClient.prefetchQuery({
             queryKey: ["me"],
             queryFn: () => getUserMeInfo(sessionParsed.token),
@@ -38,10 +42,6 @@ const useRetrieveSession = (queryClient: QueryClient) => {
           queryClient.prefetchQuery({
             queryKey: ["list"],
             queryFn: () => getUserMeItems(sessionParsed.token),
-          });
-          queryClient.prefetchInfiniteQuery({
-            queryFn: () => getItemsByCategory("all", 0),
-            queryKey: ["item", "all"],
           });
         }
         setLoadedFromStorage(true);

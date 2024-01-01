@@ -8,6 +8,8 @@ import { router } from "expo-router";
 import { Session } from "../../shared/types";
 import { AuthContext } from "../context/authContext";
 import { getGoogleUrl } from "../../shared/util/getGoogleOauthUrl";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { clearPushToken, postPushToken } from "../../shared/api";
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
@@ -42,10 +44,29 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       }
     }
   };
+
+  const queryClient = useQueryClient();
+
+  const clearPushTokenMutation = useMutation({
+    mutationFn: async (sessionToken: string) => clearPushToken(sessionToken),
+    onSuccess: () => {
+      console.debug("successfully cleared push token");
+    },
+    onError: (error) => {
+      console.error("error clearing push token", error);
+    },
+  });
   const signOut = async () => {
+    queryClient.removeQueries();
+    const token = session?.token;
+    if (token) {
+      clearPushTokenMutation.mutate(token);
+    } else {
+      console.error("no token to clear");
+    }
+    setSession(null);
     await SecureStore.deleteItemAsync("session");
     await SecureStore.deleteItemAsync("searchHistory");
-    setSession(null);
     router.replace("/");
   };
 

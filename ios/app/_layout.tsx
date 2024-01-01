@@ -72,10 +72,12 @@ export default function RootLayout() {
 
   return (
     <>
-      <SessionProvider>
-        <RootLayoutNav />
-      </SessionProvider>
-      <Toast config={toastConfig} />
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+          <RootLayoutNav />
+          <Toast config={toastConfig} />
+        </SessionProvider>
+      </QueryClientProvider>
     </>
   );
 }
@@ -87,19 +89,11 @@ const toastConfig = {
   ),
 };
 
-
 function RootLayoutNav() {
   // const colorScheme = useColorScheme();
 
   useRetrieveSession(queryClient);
-
   useNotificationObserver();
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      {/* <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}> */}
-      <Slot />
-      {/* </ThemeProvider> */}
-    </QueryClientProvider>
-  );
+  return <Slot />;
 }

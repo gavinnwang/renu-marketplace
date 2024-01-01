@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use sqlx::PgPool;
 
 use crate::{
@@ -130,4 +130,19 @@ async fn post_push_token_handler(
         .map_err(|_| UserError::InternalError)?;
 
     Ok(HttpResponse::Ok().json("Push token updated"))
+}
+
+#[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
+#[delete("/me/push-token")]
+async fn clear_push_token_handler(
+    auth_guard: AuthenticationGuard,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, actix_web::Error> {
+    let user_id = auth_guard.user_id;
+
+    user_repository::post_push_token(user_id, "", pool.as_ref())
+        .await
+        .map_err(|_| UserError::InternalError)?;
+
+    Ok(HttpResponse::Ok().json("Push token cleared"))
 }

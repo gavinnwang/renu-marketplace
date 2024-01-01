@@ -270,7 +270,7 @@ const Tab = React.forwardRef(
           <Text
             className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
               sectionIndex === selectedTabInt
-                ? "text-blackPrimary border-b border-grayPrimary"
+                ? "text-blackPrimary border-grayPrimary"
                 : "text-grayPrimary"
             }`}
           >
