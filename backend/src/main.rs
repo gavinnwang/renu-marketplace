@@ -2,12 +2,12 @@ pub mod authentication;
 pub mod config;
 pub mod error;
 pub mod model;
+pub mod notification;
+pub mod openai;
 pub mod repository;
 pub mod routes;
 pub mod uploads;
 pub mod websocket;
-pub mod openai;
-pub mod notification;
 
 use actix::Actor;
 use actix_cors::Cors;
@@ -40,31 +40,42 @@ async fn main() -> std::io::Result<()> {
         .await
     {
         Ok(pool) => {
-            tracing::info!("Connection to the database is successful!");
+            tracing::info!("Connected to database");
             pool
         }
+        Err(e) => {
+            tracing::error!("Failed to connect to database: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    tracing::info!("Running migrations");
+    match sqlx::migrate!("./migrations").run(&pool).await {
+        Ok(_) => {
+            tracing::info!("Migrations run successfully!");
+        }
         Err(err) => {
-            tracing::info!("Failed to connect to the database: {:?}", err);
+            tracing::info!("Failed to run migrations: {:?}", err);
             std::process::exit(1);
         }
     };
 
     match sqlx::query("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
-    .fetch_all(&pool)
-    .await
-{
-    Ok(rows) => {
-        for row in rows {
-            match sqlx::Row::try_get:: <String,_>(&row, 0) {
-                Ok(table_name) => tracing::info!("Table: {}", table_name),
-                Err(e) => tracing::error!("Error getting table name: {}", e),
+        .fetch_all(&pool)
+        .await
+    {
+        Ok(rows) => {
+            for row in rows {
+                match sqlx::Row::try_get::<String, _>(&row, 0) {
+                    Ok(table_name) => tracing::info!("Table: {}", table_name),
+                    Err(e) => tracing::error!("Error getting table name: {}", e),
+                }
             }
         }
+        Err(e) => {
+            tracing::error!("Failed to execute query: {}", e);
+        }
     }
-    Err(e) => {
-        tracing::error!("Failed to execute query: {}", e);
-    }
-}
 
     let server_host = config.server_host.clone();
     let server_port = config.server_port;
@@ -90,7 +101,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let cors = Cors::default()
             .allow_any_origin()
-            .allowed_methods(vec!["GET", "POST"])
+            .allowed_methods(vec!["GET", "POST", "DELETE"])
             .allowed_headers(vec![
                 header::CONTENT_TYPE,
                 header::AUTHORIZATION,
@@ -110,7 +121,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(TracingLogger::default())
     })
     .bind((server_host, server_port))?
-    .workers(5)
+    .workers(10)
     .run()
     .await
 }

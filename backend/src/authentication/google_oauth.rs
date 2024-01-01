@@ -1,7 +1,6 @@
 use actix_web::web;
 use reqwest::{Client, Url};
 use serde::Deserialize;
-use std::error::Error;
 
 use crate::config::Config;
 
@@ -32,7 +31,7 @@ pub struct GoogleUserResult {
 pub async fn request_token(
     authorization_code: &str,
     env: &web::Data<Config>,
-) -> Result<OAuthResponse, Box<dyn Error>> {
+) -> Result<OAuthResponse, reqwest::Error> {
     let root_url = "https://oauth2.googleapis.com/token";
     let client = Client::new();
 
@@ -45,19 +44,22 @@ pub async fn request_token(
     ];
     let response = client.post(root_url).form(&params).send().await?;
 
-    if response.status().is_success() {
-        let oauth_response = response.json::<OAuthResponse>().await?;
-        Ok(oauth_response)
-    } else {
-        tracing::error!("Error requesting token: {}", response.text().await?);
-        Err("An error occurred while trying to retrieve access token.".into())
+    match response.error_for_status() {
+        Ok(response) => {
+            let oauth_response = response.json::<OAuthResponse>().await?;
+            Ok(oauth_response)
+        }
+        Err(err) => {
+            tracing::error!("Error requesting token: {}", err);
+            Err(err)
+        }
     }
 }
 
 pub async fn get_google_user(
     access_token: &str,
     id_token: &str,
-) -> Result<GoogleUserResult, Box<dyn Error>> {
+) -> Result<GoogleUserResult, reqwest::Error> {
     let client = Client::new();
     let mut url = Url::parse("https://www.googleapis.com/oauth2/v1/userinfo").expect("Invalid URL");
     url.query_pairs_mut().append_pair("alt", "json");
@@ -66,14 +68,14 @@ pub async fn get_google_user(
 
     let response = client.get(url).bearer_auth(id_token).send().await?;
 
-    if response.status().is_success() {
-        let user_info = response.json::<GoogleUserResult>().await?;
-        Ok(user_info)
-    } else {
-        tracing::error!(
-            "Error requesting user information: {}",
-            response.text().await?
-        );
-        Err("An error occurred while trying to retrieve user information.".into())
+    match response.error_for_status() {
+        Ok(response) => {
+            let user_info = response.json::<GoogleUserResult>().await?;
+            Ok(user_info)
+        }
+        Err(err) => {
+            tracing::error!("Error requesting user information: {}", err);
+            Err(err)
+        }
     }
 }

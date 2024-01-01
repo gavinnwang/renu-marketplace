@@ -1,5 +1,5 @@
+use actix_http::StatusCode;
 use actix_web::error;
-use reqwest::StatusCode;
 use sqlx::postgres::PgDatabaseError;
 use thiserror::Error;
 
@@ -9,11 +9,11 @@ pub enum UserError {
     InternalError,
     #[error("Invalid credentials. Please log in again.")]
     AuthError,
+    #[error("Something went wrong while authenticating: {0}")]
+    OAuthError(&'static str),
     #[error("An error occurred while creating account.")]
     CreateUserError,
 }
-
-
 
 impl error::ResponseError for UserError {
     fn error_response(&self) -> actix_web::HttpResponse {
@@ -26,6 +26,7 @@ impl error::ResponseError for UserError {
         match *self {
             UserError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
             UserError::AuthError => StatusCode::UNAUTHORIZED,
+            UserError::OAuthError(_) => StatusCode::BAD_GATEWAY,
             UserError::CreateUserError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -49,24 +50,6 @@ pub enum DbError {
     /// Other error.
     #[error("{0}")]
     Other(sqlx::Error),
-}
-
-impl error::ResponseError for DbError {
-    // fn error_response(&self) -> actix_web::HttpResponse {
-    //     actix_web::HttpResponse::build(self.status_code())
-    //         .insert_header(actix_web::http::header::ContentType::plaintext())
-    //         .body(self.to_string())
-    // }
-
-    fn status_code(&self) -> actix_http::StatusCode {
-        match self {
-            DbError::NotFound => StatusCode::NOT_FOUND,
-            DbError::Conflict => StatusCode::CONFLICT,
-            DbError::ConnectionError => StatusCode::INTERNAL_SERVER_ERROR,
-            DbError::PgDatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            DbError::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        }
-    }
 }
 
 impl From<sqlx::Error> for DbError {

@@ -41,7 +41,7 @@ pub async fn fetch_user_id_by_email(
     Ok(user_id.id as i32)
 }
 
-pub async fn add_user(
+pub async fn create_user(
     conn: impl Executor<'_, Database = Postgres>,
     name: &str,
     email: &str,

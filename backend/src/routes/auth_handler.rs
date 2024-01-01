@@ -14,7 +14,7 @@ use crate::{
         jwt::{AuthenticationGuard, TokenClaims},
     },
     config::Config,
-    error::DbError,
+    error::{DbError, UserError},
     repository::user_repository,
 };
 
@@ -37,44 +37,34 @@ async fn google_oauth_handler(
     query: web::Query<QueryCode>,
     config: web::Data<Config>,
     pool: web::Data<PgPool>,
-) -> impl Responder {
+) -> Result<HttpResponse, actix_web::Error> {
     let code = &query.code;
     let state = &query.state;
 
     if code.is_empty() {
-        tracing::error!("Google OAuth: Authorization code not provided!");
-        return HttpResponse::Unauthorized().json("Authorization code not provided!");
+        tracing::error!("Google OAuth: Authorization code not provided");
+        return Err(UserError::OAuthError("authorization code not provided"))?;
     }
 
     if state.is_empty() {
-        tracing::error!("Google OAuth: State not provided!");
-        return HttpResponse::Unauthorized().json("State not provided!");
+        tracing::error!("Google OAuth: State not provided");
+        return Err(UserError::OAuthError("state not provided"))?;
     }
 
-    let state: State = match serde_json::from_str(state) {
-        Err(err) => {
-            tracing::error!("Failed to parse state: {err}");
-            return HttpResponse::Unauthorized().json("Failed to parse state");
-        }
-        Ok(state) => state,
-    };
+    let state: State = serde_json::from_str(state).map_err(|err| {
+        tracing::error!("Failed to parse state: {err}");
+        UserError::OAuthError("failed to parse state")
+    })?;
 
-    let token_response = request_token(code.as_str(), &config).await;
-
-    let token_response = match token_response {
-        Err(message) => {
-            tracing::error!("Failed to request token from Google OAuth {}", message);
-            return HttpResponse::BadGateway()
-                .json("Failed to request token from Google OAuth API");
-        }
-        Ok(token_response) => token_response,
-    };
+    let token_response = request_token(code.as_str(), &config).await.map_err(|err| {
+        tracing::error!("Failed to request token from Google OAuth {}", err);
+        UserError::OAuthError("failed to request token")
+    })?;
 
     let google_user =
         match get_google_user(&token_response.access_token, &token_response.id_token).await {
-            Err(message) => {
-                let message = message.to_string();
-                return HttpResponse::BadGateway().json(message);
+            Err(_) => {
+                return Err(UserError::OAuthError("failed to get google user"))?;
             }
             Ok(google_user) => google_user,
         };
@@ -100,26 +90,23 @@ async fn google_oauth_handler(
                     "User with email {} not found, creating new user",
                     google_user.email
                 );
-                let user_id = user_repository::add_user(
+                let user_id = user_repository::create_user(
                     pool.as_ref(),
                     &google_user.name,
                     &google_user.email,
                     &google_user.picture,
                 )
-                .await;
-                match user_id {
-                    Err(err) => {
-                        tracing::error!("Failed to add user: {err}");
-                        return HttpResponse::InternalServerError().json("Failed to add user");
-                    }
-                    Ok(user_id) => user_id,
-                }
-            }
+                .await
+                .map_err(|err| {
+                    tracing::error!("Failed to create user: {err}");
+                    UserError::CreateUserError
+                })?;
 
+                user_id
+            }
             _ => {
                 tracing::error!("Failed to fetch user id by email: {err}");
-                return HttpResponse::InternalServerError()
-                    .json("Failed to fetch user id by email");
+                return Err(UserError::OAuthError("failed to fetch user id by email"))?;
             }
         },
         Ok(user_id) => user_id,
@@ -137,18 +124,15 @@ async fn google_oauth_handler(
         iat,
     };
 
-    let token = match encode(
+    let token = encode(
         &Header::default(),
         &claims,
         &EncodingKey::from_secret(jwt_secret.as_ref()),
-    ) {
-        Err(err) => {
-            tracing::error!("Failed to encode token: {err}");
-            return HttpResponse::BadGateway()
-                .json("Failed to encode token, please try again later");
-        }
-        Ok(token) => token,
-    };
+    )
+    .map_err(|err| {
+        tracing::error!("Failed to encode jwt token: {err}");
+        UserError::OAuthError("failed to encode jwt token")
+    })?;
 
     match state.device_type {
         DeviceType::Mobile => {
@@ -157,9 +141,9 @@ async fn google_oauth_handler(
                 state.callback, google_user.email, google_user.name, token, user_id
             );
             tracing::info!("Mobile user logged in with redirect url: {}", redirect_url);
-            HttpResponse::Found()
+            Ok(HttpResponse::Found()
                 .append_header((LOCATION, redirect_url))
-                .finish()
+                .finish())
         }
         DeviceType::Web => {
             let cookie = Cookie::build("token", &token)
@@ -168,10 +152,10 @@ async fn google_oauth_handler(
                 .http_only(true)
                 .finish();
             tracing::info!("Web user logged in");
-            HttpResponse::Found()
+            Ok(HttpResponse::Found()
                 .append_header((LOCATION, state.callback))
                 .cookie(cookie)
-                .finish()
+                .finish())
         }
     }
 
