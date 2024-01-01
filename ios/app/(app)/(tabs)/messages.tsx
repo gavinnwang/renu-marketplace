@@ -7,56 +7,85 @@ import {
   RefreshControl,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { ChatGroup, Measure, RefAndKey } from "../../../../../shared/types";
-import Colors from "../../../../../shared/constants/Colors";
+import { ChatGroup, Measure, RefAndKey } from "../../../../shared/types";
+import Colors from "../../../../shared/constants/Colors";
 import React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
-import { useSession } from "../../../../hooks/useSession";
-import {
-  IMAGES_URL,
-  getChatGroupUnreadCount,
-  getChatGroups,
-} from "../../../../../shared/api";
+import { useSession } from "../../../hooks/useSession";
+import { IMAGES_URL, getChatGroups } from "../../../../shared/api";
 import { FlashList } from "@shopify/flash-list";
-import RefreshScreen from "../../../../components/RefreshScreen";
+import RefreshScreen from "../../../components/RefreshScreen";
+import PagerView from "react-native-pager-view";
 
 const TABS = ["Buy", "Sell"];
 const data = TABS.map((i) => ({
   key: i,
   ref: React.createRef(),
 }));
-
 export default function MessagePage() {
-  const param = useLocalSearchParams();
-  const selectedTab = param.tab as string;
-  const selectedTabInt = parseInt(selectedTab);
-
-  const { session } = useSession();
-
-  const {
-    data: chats,
-    isError: isErrorChats,
-    isLoading: isLoadingChats,
-    refetch,
-  } = useQuery({
-    queryFn: () =>
-      getChatGroups(session!.token, selectedTabInt ? "seller" : "buyer"),
-    queryKey: ["chats", TABS[selectedTabInt]],
-    enabled: !!session,
-  });
-
-  const [refreshing, setRefreshing] = React.useState(false);
-
   const queryClient = useQueryClient();
+  const chats = queryClient.getQueryData<ChatGroup[]>(["chats", TABS[0]], {
+    exact: true,
+  });
+  const pagerViewRef = React.useRef<PagerView>(null);
+  const [selectedTabInt, setSelectedTabInt] = React.useState(0);
 
   return (
     <View className="bg-bgLight h-full">
       <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
         Messages
       </Text>
-      <Tabs data={data} selectedTabInt={selectedTabInt} chats={chats} />
+      <Tabs
+        data={data}
+        selectedTabInt={selectedTabInt}
+        chats={chats}
+        pagerViewRef={pagerViewRef}
+      />
+      <PagerView
+        // onPageScroll={(e) => {
+        //   const idx = e.nativeEvent.position;
+        //   setSelectedTabInt(idx);
+        // }}
+        onPageSelected={(e) => {
+          const idx = e.nativeEvent.position;
+          setSelectedTabInt(idx);
+        }}
+        className="flex-1"
+        initialPage={0}
+        orientation="horizontal"
+        ref={pagerViewRef}
+      >
+        {data.map((item, index) => (
+          <View key={index}>
+            <MessagesView index={index} />
+          </View>
+        ))}
+      </PagerView>
+    </View>
+  );
+}
+
+function MessagesView({ index }: { index: number }) {
+  const { session } = useSession();
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const queryClient = useQueryClient();
+  const {
+    data: chats,
+    isError: isErrorChats,
+    isLoading: isLoadingChats,
+    refetch,
+  } = useQuery({
+    queryFn: () => getChatGroups(session!.token, !index ? "buyer" : "seller"),
+    queryKey: ["chats", TABS[index]],
+    enabled: !!session,
+  });
+
+  return (
+    <View className="bg-bgLight h-full">
       {isErrorChats ? (
         <RefreshScreen displayText="Something went wrong." refetch={refetch} />
       ) : isLoadingChats ? (
@@ -91,12 +120,8 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
   const param = useLocalSearchParams();
   const selectedTabInt = parseInt(param.tab as string);
 
-  const [touching, setTouching] = React.useState(false);
-
   return (
     <Pressable
-      onTouchStart={() => setTouching(true)}
-      onTouchEnd={() => setTouching(false)}
       onPress={() => {
         router.push({
           pathname: `/chat/${chat.item_id}`,
@@ -110,7 +135,7 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
       }}
       className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary ${
         chat.item_status === "inactive" ? "opacity-70" : ""
-      } ${touching ? "bg-gray-100" : ""}`}
+      }`}
     >
       <View className="relative">
         <Image
@@ -135,18 +160,15 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
           </View>
         )}
       </View>
-      <View className="flex flex-col px-4 pt-2 flex-grow justify-between ">
+      <View className="flex flex-col px-4 flex-grow justify-between ">
         <View>
-          <View className="flex flex-row gap-y-1 justify-between">
-            <Text className="font-Manrope_600SemiBold text-base">
+          <View className="flex flex-row gap-y-1 justify-between max-w-[250px]">
+            <Text className="font-Manrope_600SemiBold text-base max-h-[50px]">
               {chat.item_name}
-            </Text>
-            <Text className="font-Manrope_400Regular text-sm">
-              {dayjs(chat.last_message_sent_at).fromNow()}
             </Text>
           </View>
           {chat.last_message_content && (
-            <Text className="text-base text-gray-600 font-Manrope_400Regular max-w-[250px]">
+            <Text className="text-base text-gray-600 font-Manrope_500Medium max-w-[250px]">
               {chat.last_message_content.length >= 50 ? (
                 <>{chat.last_message_content.slice(0, 50)}...</>
               ) : (
@@ -156,8 +178,10 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
           )}
         </View>
         <View className="flex flex-col">
-          <Text className="font-Poppins_400Regular">
+          <Text className="font-Manrope_500Medium text-xs">
             {chat.other_user_name}
+            {"    "}
+            {dayjs(chat.last_message_sent_at).fromNow()}
           </Text>
           <Text className="font-Manrope_600SemiBold text-sm text-purplePrimary">
             {chat.item_status === "inactive"
@@ -173,36 +197,35 @@ const ChatRow = ({ item: chat }: { item: ChatGroup }) => {
 const Tab = React.forwardRef(
   (
     {
-      selectedTabInt,
-      sectionIndex,
+      index,
+
       unreadCount,
+      pagerViewRef,
     }: {
-      selectedTabInt: number;
-      sectionIndex: number;
+      index: number;
+
       unreadCount: number;
+      pagerViewRef: React.RefObject<PagerView>;
     },
     ref: any
   ) => {
     return (
       <Pressable
-        key={sectionIndex}
+        key={index}
         onPress={() => {
-          if (selectedTabInt === sectionIndex) {
-            return;
-          }
-          void router.replace(`/message/${sectionIndex}`);
+          pagerViewRef.current?.setPage(index);
         }}
         className="w-[50%] justify-center items-center"
         ref={ref}
       >
         <Text
           className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
-            sectionIndex === selectedTabInt
+            index === index
               ? "text-blackPrimary border-b-[1px] border-b-grayLight"
               : "text-grayPrimary"
           }`}
         >
-          {TABS[sectionIndex]}{" "}
+          {TABS[index]}{" "}
           <Text className="font-Poppins_500Medium text-sm">
             ({unreadCount})
           </Text>
@@ -216,10 +239,12 @@ const Tabs = ({
   data,
   selectedTabInt,
   chats,
+  pagerViewRef,
 }: {
   data: RefAndKey[];
   selectedTabInt: number;
   chats: ChatGroup[] | undefined;
+  pagerViewRef: React.RefObject<PagerView>;
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();
@@ -256,10 +281,10 @@ const Tabs = ({
       ]).start();
     }
   }, [selectedTabInt, measures]);
-  const { session } = useSession();
-  const { data: unreadCount } = useQuery(["unreadCount"], () =>
-    getChatGroupUnreadCount(session!.token)
-  );
+  const queryClient = useQueryClient();
+  const unreadCount = queryClient.getQueryData<number>(["unreadCount"], {
+    exact: true,
+  });
   const currentUnreadCount =
     chats?.filter((c) => c.unread_count > 0).length ?? 0;
   return (
@@ -267,17 +292,17 @@ const Tabs = ({
       ref={containerRef}
       className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight"
     >
-      {data.map((section, i) => {
+      {data.map((section, index) => {
         return (
           <Tab
+            pagerViewRef={pagerViewRef}
             key={section.key}
-            selectedTabInt={selectedTabInt}
-            sectionIndex={i}
+            index={index}
             ref={section.ref}
             unreadCount={
-              i === selectedTabInt
+              index === selectedTabInt
                 ? currentUnreadCount ?? 0
-                : (unreadCount ?? 0) - currentUnreadCount
+                : Math.max(0, (unreadCount ?? 0) - currentUnreadCount)
             }
           />
         );

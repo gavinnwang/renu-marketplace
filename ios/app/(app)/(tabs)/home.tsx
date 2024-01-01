@@ -46,7 +46,7 @@ export default function HomeScreen() {
       />
       <PagerView
         ref={pagerViewRef}
-        onPageScroll={(e) => {
+        onPageSelected={(e) => {
           const idx = e.nativeEvent.position;
           setSelectedSection(idx);
         }}
