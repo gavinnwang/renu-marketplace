@@ -41,6 +41,7 @@ export default function ChatScreen() {
     showEncourageMessage,
     unreadCount,
   } = useLocalSearchParams();
+  console.log("chat id param: ", chatIdParam);
   // console.log("sell or buy: ", sellOrBuy);
 
   const { session } = useSession();
@@ -48,10 +49,15 @@ export default function ChatScreen() {
 
   const { data: chatId, isError: isErrorChatId } = useQuery({
     queryFn: async () => getChatIdFromItemId(session!.token, itemId as string),
-    queryKey: ["chat_id", itemId],
+    queryKey: ["chat_id", itemId, chatIdParam], // it is IMPORTANT to include chatIdParam in the query key because in the seller page there can be multiple chats with the same item id. When seller click the chat it will have the chat id param and this query will not run
     enabled: !!itemId && !chatIdParam && !!session && !newChat, // run the query if there is no chat id param and is not a new chat
     initialData: chatIdParam ? parseInt(chatIdParam as string) : null,
+    onSettled: (data) => {
+      console.log("chat id query settled");
+    },
   });
+
+  console.log("chat id: ", chatId);
 
   // console.log("Chat id: ", chatId);
 
@@ -454,8 +460,6 @@ import LeftChevron from "../../../components/LeftChevron";
 import { customAlphabet } from "nanoid/non-secure";
 import Colors from "../../../../shared/constants/Colors";
 import { registerForPushNotificationsAsync } from "../../../notification";
-import Toast from "react-native-toast-message";
-import { isLoading } from "expo-font";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessage }) => {
   return (
