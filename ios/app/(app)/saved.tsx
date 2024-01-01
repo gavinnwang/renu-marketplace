@@ -37,8 +37,12 @@ export default function SavedItemsPage() {
           <Pressable onPress={router.back} className="p-3">
             <LeftChevron />
           </Pressable>
-          <Text className=" font-Poppins_600SemiBold text-xl ">
+          <Text className=" font-Poppins_600SemiBold text-xl">
             Saved items
+            <Text className="font-Poppins_500Medium text-sm">
+              {" "}
+              ({savedItemData?.length ?? 0})
+            </Text>{" "}
           </Text>
         </View>
 
@@ -46,17 +50,19 @@ export default function SavedItemsPage() {
           {isLoadingSavedItem ? (
             <></>
           ) : isErrorSavedItem ? (
-            <RefreshScreen
-              displayText="Something went wrong."
-              refetch={refetch}
-              marginTop="30%"
-            />
+            <View className="-mt-[30%] flex-grow">
+              <RefreshScreen
+                displayText="Something went wrong."
+                refetch={refetch}
+              />
+            </View>
           ) : savedItemData.length === 0 ? (
-            <RefreshScreen
-              displayText="You have no saved items."
-              refetch={refetch}
-              marginTop="30%"
-            />
+            <View className="-mt-[30%] flex-grow">
+              <RefreshScreen
+                displayText="You have no saved items."
+                refetch={refetch}
+              />
+            </View>
           ) : (
             <FlashList
               refreshControl={

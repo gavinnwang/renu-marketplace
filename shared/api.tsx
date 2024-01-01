@@ -1,4 +1,10 @@
-import { AICompleteResponse, ChatGroup, Item, User } from "./types";
+import {
+  AICompleteResponse,
+  ChatGroup,
+  ChatMessage,
+  Item,
+  User,
+} from "./types";
 
 // import Constants from "expo-constants";
 // const config = Constants.expoConfig as any;
@@ -87,6 +93,22 @@ export async function getChatGroups(
     },
   });
   return parseOrThrowResponse<ChatGroup[]>(res);
+}
+
+export async function getChatMessages(
+  page: number,
+  chatId: number,
+  sessionToken: string
+) {
+  const res = await fetch(
+    `${API_URL}/chats/messages/${chatId}?offset=${page}`,
+    {
+      headers: {
+        authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  return parseOrThrowResponse<ChatMessage[]>(res);
 }
 
 export async function getChatGroupUnreadCount(

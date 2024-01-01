@@ -94,13 +94,13 @@ export default function SellerPage() {
               <RefreshScreen
                 displayText="Something went wrong."
                 refetch={refetch}
-                marginTop="30%"
+                // marginTop="30%"
               />
             ) : activeItems.length === 0 ? (
               <RefreshScreen
-                displayText="You have no Active items."
+                displayText="User has no listed items"
                 refetch={refetch}
-                marginTop="30%"
+                // marginTop="30%"
               />
             ) : (
               <FlashList
