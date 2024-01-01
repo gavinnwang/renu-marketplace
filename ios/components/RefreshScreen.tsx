@@ -3,11 +3,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 export default function RefreshScreen({
   displayText,
   refetch,
-  marginTop = "50%",
 }: {
   displayText: string;
   refetch: () => void;
-  marginTop?: string;
 }) {
   return (
     <View className="flex-grow flex flex-col justify-center items-center w-full">

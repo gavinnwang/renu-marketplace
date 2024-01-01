@@ -159,8 +159,8 @@ export default function UploadListingStepOne() {
       alert("Please enter a valid price");
       return;
     }
-    if (Number(price) > 999) {
-      alert("Please enter a price less than $999");
+    if (Number(price) > 99999) {
+      alert("Please enter a price less than $99999");
       return;
     }
     // if category is part of item category but not picking
@@ -208,7 +208,7 @@ export default function UploadListingStepOne() {
                 <LeftChevron />
               </Pressable>
               <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary ">
-                ADD PHOTOS
+                UPLOAD LISTING
               </Text>
               <View className="w-10 p-3" />
             </View>

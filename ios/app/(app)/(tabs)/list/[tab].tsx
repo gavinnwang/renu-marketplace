@@ -203,7 +203,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
       />
       <View className="flex flex-col flex-grow justify-between px-4">
         <View className="flex flex-col flex-grow gap-y-1">
-          <Text className="font-Manrope_600SemiBold text-base">
+          <Text className="font-Manrope_600SemiBold text-base max-h-[25px]">
             {item.name}
           </Text>
           <Text className="font-Manrope_400Regular text-sm">
@@ -215,7 +215,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
         </View>
         <TouchableOpacity
           onPress={onPressHandler}
-          className="border-[1.5px] h-[32px] flex-grow-0 flex items-center justify-center rounded-sm"
+          className="border-[1.5px] h-[32px] w-[250px] flex items-center justify-center rounded-sm"
         >
           <Text className="font-SecularOne_400Regular text-sm text-blackPrimary">
             {item.status === "active" ? "MARK AS SOLD" : "RELIST"}

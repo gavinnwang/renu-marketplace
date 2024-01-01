@@ -317,7 +317,7 @@ export default function ItemPage() {
                           }
                         }
                       }}
-                      className="font-Manrope_400Regular bg-purplePrimary p-2"
+                      className="font-Manrope_400Regular bg-purplePrimary p-2 rounded-sm"
                     >
                       <Text className="text-white text-center font-Manrope_600SemiBold">
                         {item.user_id === session?.user_id ? "Edit" : "Message"}

@@ -1,10 +1,10 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
+  ActivityIndicator,
   Dimensions,
   KeyboardAvoidingView,
   Pressable,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,11 +23,10 @@ import useWebSocket from "react-use-websocket";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../hooks/useSession";
 import {
-  API_URL,
   IMAGES_URL,
   getChatIdFromItemId,
+  getChatMessages,
   getItem,
-  parseOrThrowResponse,
   postChatRoomWithFirstMessage,
 } from "../../../../shared/api";
 
@@ -50,26 +49,16 @@ export default function ChatScreen() {
     queryFn: async () => getChatIdFromItemId(session!.token, itemId as string),
     queryKey: ["chat_id", itemId],
     enabled: !!itemId && !chatIdParam && !!session && !newChat, // run the query if there is no chat id param and is not a new chat
-    initialData: parseInt(chatIdParam as string),
+    initialData: chatIdParam ? parseInt(chatIdParam as string) : null,
   });
+
+  console.log("Chat id: ", chatId);
 
   const { data: item, isError: isErrorData } = useQuery({
     queryFn: () => getItem(itemId as string),
     queryKey: ["item", itemId],
     enabled: !!itemId,
   });
-
-  const getChatMessages = async ({ pageParam = 0 }) => {
-    const res = await fetch(
-      `${API_URL}/chats/messages/${chatId}?offset=${pageParam}`,
-      {
-        headers: {
-          authorization: `Bearer ${session?.token}`,
-        },
-      }
-    );
-    return parseOrThrowResponse<ChatMessage[]>(res);
-  };
 
   const LIMIT = 25;
 
@@ -83,9 +72,12 @@ export default function ChatScreen() {
     hasNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryFn: getChatMessages,
+    queryFn: async ({ pageParam = 0 }) => {
+      console.debug("getting messages", pageParam);
+      return getChatMessages(pageParam, chatId!, session!.token);
+    },
     queryKey: ["messages", chatId],
-    enabled: !!chatId,
+    enabled: !!chatId && !!session,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length > 0
         ? (allPages.length - 1) * LIMIT + lastPage.length + extraOffset
@@ -113,7 +105,7 @@ export default function ChatScreen() {
         // remove receive success from the end of the message
         const messageContent = (e.data as string).slice(0, -15);
         optimisticAddMessage(messageContent, 0);
-        optimisticallyUpdateChatGroupData();
+        optimisticallyUpdateChatGroupData(messageContent);
         setExtraOffset((prev) => prev + 1);
       }
       if ((e.data as string).endsWith("send success")) {
@@ -154,7 +146,9 @@ export default function ChatScreen() {
   };
 
   React.useEffect(() => {
-    console.debug("optimistically updating chat group unread count to zero");
+    if (!chatId) {
+      return;
+    }
     optimisticallyUpdateChatGroupUnreadCount();
   }, []);
 
@@ -164,7 +158,7 @@ export default function ChatScreen() {
       return;
     }
     queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
-      console.debug("optimistically updating chat group unread count");
+      console.debug("optimistically updating chat group unread count to zero");
       if (!oldData) {
         return;
       }
@@ -184,7 +178,7 @@ export default function ChatScreen() {
     );
   };
 
-  const optimisticallyUpdateChatGroupData = () => {
+  const optimisticallyUpdateChatGroupData = (messageContent: string) => {
     queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
       console.debug("optimistically updating chat group data");
       if (!oldData) {
@@ -194,7 +188,7 @@ export default function ChatScreen() {
         if (chatGroup.chat_id === chatId) {
           return {
             ...chatGroup,
-            last_message_content: inputText,
+            last_message_content: messageContent,
             last_message_sent_at: new Date(),
           };
         }
@@ -204,6 +198,8 @@ export default function ChatScreen() {
     });
   };
 
+  const [creatingChatRoom, setCreatingChatRoom] = React.useState(false);
+
   const createChatRoomAndFirstMessageMutation = useMutation({
     mutationFn: (firstMessage: string) =>
       postChatRoomWithFirstMessage(
@@ -211,11 +207,21 @@ export default function ChatScreen() {
         firstMessage,
         itemId as string
       ),
+    onMutate: () => {
+      setCreatingChatRoom(true);
+    },
+    // onSettled: () => {
+    //   setCreatingChatRoom(false);
+    // },
+    onError: (err) => {
+      console.error(err);
+    },
     onSuccess: (data) => {
+      console.log("first message sent successfully, chat id: ", data);
       sendMessage(`/join ${data}`);
+      setLastMessageSentSuccessfully(true);
       queryClient.setQueryData(["chat_id", itemId], data);
       queryClient.invalidateQueries(["chats", sellOrBuy]);
-      queryClient.invalidateQueries(["messages", data]);
     },
   });
 
@@ -271,6 +277,7 @@ export default function ChatScreen() {
   );
   const [lastMessageSentSuccessfully, setLastMessageSentSuccessfully] =
     React.useState(false);
+
   return (
     <SafeAreaView className="bg-bgLight">
       <View className="bg-bgLight h-full">
@@ -323,10 +330,10 @@ export default function ChatScreen() {
             <View className="mx-4 flex flex-grow flex-col">
               {item && (
                 <>
-                  <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
+                  <Text className="font-Poppins_600SemiBold text-base text-blackPrimary max-w-[230px]">
                     {item.name}
                   </Text>
-                  <Text className="font-Manrope_400Regular text-sm max-w-[250px] max-h-[40px] text-blackPrimary">
+                  <Text className="font-Manrope_400Regular text-sm max-w-[230px] max-h-[40px] text-blackPrimary">
                     {!(item.description && item.description.trim())
                       ? "No description provided."
                       : item.description.trim()}
@@ -351,9 +358,16 @@ export default function ChatScreen() {
         >
           {chatMessagesData.length === 0 && showEncourageMessage === "true" ? (
             <View className="flex-grow flex flex-col justify-center items-center w-full">
-              <Text className="font-Manrope_500Medium text-gray-500">
-                start by sending some messages to seller.
-              </Text>
+              <View className="flex flex-row items-center justify-center">
+                <Text className="font-Manrope_500Medium text-gray-500">
+                  {creatingChatRoom
+                    ? "creating chat room"
+                    : "start by sending some messages to seller."}
+                </Text>
+                {creatingChatRoom && (
+                  <ActivityIndicator size="small" className="ml-2" />
+                )}
+              </View>
             </View>
           ) : (
             <>
@@ -372,6 +386,10 @@ export default function ChatScreen() {
                     return;
                   }
                   console.debug("refetching messages");
+                  if (!chatId) {
+                    console.log("chat id is null");
+                    return;
+                  }
                   fetchNextPage();
                 }}
                 showsVerticalScrollIndicator={true}
@@ -401,6 +419,7 @@ export default function ChatScreen() {
                 if (!chatId) {
                   console.debug("no chat id so create one");
                   createChatRoomAndFirstMessageMutation.mutateAsync(inputText);
+                  registerForPushNotificationsAsync();
                   setInputText("");
                 } else {
                   const correlationId = nanoid();
@@ -414,10 +433,9 @@ export default function ChatScreen() {
                   setLastMessageSentSuccessfully(false);
                   console.debug("optimistically updating messages");
                   optimisticAddMessage(inputText, 1);
-                  optimisticallyUpdateChatGroupData();
+                  optimisticallyUpdateChatGroupData(inputText);
+                  registerForPushNotificationsAsync();
                   setInputText("");
-                  registerForPushNotificationsAsync()
-                  
                 }
               }}
             />
@@ -434,6 +452,8 @@ import LeftChevron from "../../../components/LeftChevron";
 import { customAlphabet } from "nanoid/non-secure";
 import Colors from "../../../../shared/constants/Colors";
 import { registerForPushNotificationsAsync } from "../../../notification";
+import Toast from "react-native-toast-message";
+import { isLoading } from "expo-font";
 dayjs.extend(relativeTime);
 const Message = ({ item: message }: { item: ChatMessage }) => {
   return (
