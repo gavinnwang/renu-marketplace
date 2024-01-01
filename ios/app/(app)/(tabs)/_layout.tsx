@@ -37,13 +37,12 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="list/[tab]"
+          name="list"
           options={{
             title: "List",
             headerShown: false,
-
             tabBarIcon: ({ color }) => <ListIcon color={color} />,
-            href: "list/0",
+            href: "list",
           }}
         />
         <Tabs.Screen

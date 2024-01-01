@@ -24,6 +24,7 @@ const data = TABS.map((i) => ({
   key: i,
   ref: React.createRef(),
 }));
+
 export default function MessagePage() {
   const queryClient = useQueryClient();
   const chats = queryClient.getQueryData<ChatGroup[]>(["chats", TABS[0]], {
@@ -44,10 +45,6 @@ export default function MessagePage() {
         pagerViewRef={pagerViewRef}
       />
       <PagerView
-        // onPageScroll={(e) => {
-        //   const idx = e.nativeEvent.position;
-        //   setSelectedTabInt(idx);
-        // }}
         onPageSelected={(e) => {
           const idx = e.nativeEvent.position;
           setSelectedTabInt(idx);
@@ -57,17 +54,15 @@ export default function MessagePage() {
         orientation="horizontal"
         ref={pagerViewRef}
       >
-        {data.map((item, index) => (
-          <View key={index}>
-            <MessagesView index={index} />
-          </View>
+        {data.map((_, index) => (
+          <TabPage index={index} key={index} />
         ))}
       </PagerView>
     </View>
   );
 }
 
-function MessagesView({ index }: { index: number }) {
+function TabPage({ index }: { index: number }) {
   const { session } = useSession();
 
   const [refreshing, setRefreshing] = React.useState(false);
