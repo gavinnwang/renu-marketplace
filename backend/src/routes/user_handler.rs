@@ -134,7 +134,7 @@ async fn post_push_token_handler(
 
 #[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
 #[delete("/me/push-token")]
-async fn clear_push_token_handler(
+async fn delete_push_token_handler(
     auth_guard: AuthenticationGuard,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, actix_web::Error> {
