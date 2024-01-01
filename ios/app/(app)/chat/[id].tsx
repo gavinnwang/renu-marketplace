@@ -41,6 +41,7 @@ export default function ChatScreen() {
     showEncourageMessage,
     unreadCount,
   } = useLocalSearchParams();
+  // console.log("sell or buy: ", sellOrBuy);
 
   const { session } = useSession();
   const queryClient = useQueryClient();
@@ -52,7 +53,7 @@ export default function ChatScreen() {
     initialData: chatIdParam ? parseInt(chatIdParam as string) : null,
   });
 
-  console.log("Chat id: ", chatId);
+  // console.log("Chat id: ", chatId);
 
   const { data: item, isError: isErrorData } = useQuery({
     queryFn: () => getItem(itemId as string),
@@ -149,6 +150,7 @@ export default function ChatScreen() {
     if (!chatId) {
       return;
     }
+    console.log("setting unread to zero");
     optimisticallyUpdateChatGroupUnreadCount();
   }, []);
 
@@ -158,10 +160,10 @@ export default function ChatScreen() {
       return;
     }
     queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
-      console.debug("optimistically updating chat group unread count to zero");
       if (!oldData) {
         return;
       }
+      console.debug("optimistically updating chat group unread count to zero");
       const newData = oldData.map((chatGroup) => {
         if (chatGroup.chat_id === chatId) {
           return {

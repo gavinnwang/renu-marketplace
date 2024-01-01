@@ -23,10 +23,6 @@ const data = TABS.map((i) => ({
 }));
 
 export default function ListPage() {
-  const queryClient = useQueryClient();
-  const items = queryClient.getQueryData<Item[]>(["list"], {
-    exact: true,
-  });
   const pagerViewRef = React.useRef<PagerView>(null);
   const [selectedTabInt, setSelectedTabInt] = React.useState(0);
 
@@ -38,7 +34,6 @@ export default function ListPage() {
       <Tabs
         data={data}
         selectedTabInt={selectedTabInt}
-        itemData={items ?? []}
         pagerViewRef={pagerViewRef}
       />
       <PagerView
@@ -288,12 +283,10 @@ const Tab = React.forwardRef(
 const Tabs = ({
   data,
   selectedTabInt,
-  itemData,
   pagerViewRef,
 }: {
   data: RefAndKey[];
   selectedTabInt: number;
-  itemData: Item[];
   pagerViewRef: React.RefObject<PagerView>;
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
@@ -332,6 +325,13 @@ const Tabs = ({
     }
   }, [selectedTabInt, measures]);
 
+  const { session } = useSession();
+  const { data: itemData } = useQuery({
+    queryKey: ["list"],
+    queryFn: () => getUserMeItems(session!.token),
+    enabled: !!session && !!session.token,
+  });
+
   return (
     <View
       ref={containerRef}
@@ -346,7 +346,7 @@ const Tabs = ({
             sectionIndex={i}
             ref={section.ref}
             dataCount={
-              itemData.filter((item) => item.status === STATUS[i]).length
+              itemData?.filter((item) => item.status === STATUS[i]).length ?? 0
             }
           />
         );

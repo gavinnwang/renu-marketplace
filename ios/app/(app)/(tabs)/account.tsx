@@ -88,7 +88,7 @@ export default function AccountScreen() {
 
         <View className="w-full h-2 bg-grayLight mt-2" />
         <TouchableOpacity
-          className="ml-4 mt-2 mb-1 flex flex-row items-center"
+          className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
           onPress={() => router.push("/saved")}
         >
           <HeartIcon />
@@ -99,7 +99,7 @@ export default function AccountScreen() {
 
         <View className="w-full h-2 bg-grayLight mt-2" />
         <TouchableOpacity
-          className="ml-4 mt-2 mb-1 flex flex-row items-center"
+          className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
           onPress={handleEmailLink}
         >
           <EmailIcon />
@@ -111,7 +111,7 @@ export default function AccountScreen() {
         <View className="w-full h-2 bg-grayLight mt-2" />
 
         <TouchableOpacity
-          className="ml-4 mt-2 mb-1 flex flex-row items-center"
+          className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
           onPress={signOut}
         >
           <Text className="font-Manrope_500Medium text-base text-red-500">
