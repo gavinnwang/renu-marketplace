@@ -298,6 +298,7 @@ pub async fn clear_unread_count_by_user_id(
 }
 
 // fetch the item info by chat id and if there is a chat room between the user and other user regarding this item
+// BUGBUGBUGBUGUGB
 pub async fn fetch_chat_id_by_item_id(
     user_id: i32,
     item_id: i32,
