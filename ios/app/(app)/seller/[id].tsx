@@ -50,7 +50,7 @@ export default function SellerPage() {
               source={{
                 uri: user?.profile_image || "",
               }}
-              className="w-16 h-16 rounded-full border border-white ml-2.5 bg-blackPrimary"
+              className="w-16 h-16 rounded-full ml-2.5 bg-blackPrimary"
             />
           </View>
 

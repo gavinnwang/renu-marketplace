@@ -32,7 +32,7 @@ pub async fn fetch_user_by_id(
 
 pub async fn fetch_user_id_by_email(
     conn: impl Executor<'_, Database = Postgres>,
-    email: &String,
+    email: &str,
 ) -> Result<i32, DbError> {
     let user_id = sqlx::query!(r#"SELECT id FROM "user" WHERE email = $1"#, email)
         .fetch_one(conn)
@@ -43,9 +43,9 @@ pub async fn fetch_user_id_by_email(
 
 pub async fn add_user(
     conn: impl Executor<'_, Database = Postgres>,
-    name: &String,
-    email: &String,
-    profile_image: &String,
+    name: &str,
+    email: &str,
+    profile_image: &str,
 ) -> Result<i32, DbError> {
     let record = sqlx::query!(
         r#"INSERT INTO "user" (name, email, profile_image) VALUES ($1, $2, $3) RETURNING id"#,
@@ -61,7 +61,7 @@ pub async fn add_user(
 
 pub async fn post_push_token(
     user_id: i32,
-    push_token: &String,
+    push_token: &str,
     conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<(), DbError> {
     let result = sqlx::query!(

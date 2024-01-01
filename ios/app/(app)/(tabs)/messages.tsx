@@ -193,12 +193,12 @@ const Tab = React.forwardRef(
   (
     {
       index,
-
+      selectedTabInt,
       unreadCount,
       pagerViewRef,
     }: {
       index: number;
-
+      selectedTabInt: number;
       unreadCount: number;
       pagerViewRef: React.RefObject<PagerView>;
     },
@@ -215,8 +215,8 @@ const Tab = React.forwardRef(
       >
         <Text
           className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
-            index === index
-              ? "text-blackPrimary border-b-[1px] border-b-grayLight"
+            selectedTabInt === index
+              ? "text-blackPrimary border-b-grayLight"
               : "text-grayPrimary"
           }`}
         >
@@ -294,6 +294,7 @@ const Tabs = ({
             key={section.key}
             index={index}
             ref={section.ref}
+            selectedTabInt={selectedTabInt}
             unreadCount={
               index === selectedTabInt
                 ? currentUnreadCount ?? 0

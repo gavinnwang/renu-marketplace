@@ -6,7 +6,7 @@ use serde_json::json;
 use crate::config::Config;
 
 pub async fn request_openai_api(
-    image_url: &String,
+    image_url: &str,
     config: &web::Data<Config>,
 ) -> Result<OpenAIResponse, Error> {
     let root_url = "https://api.openai.com/v1/chat/completions";

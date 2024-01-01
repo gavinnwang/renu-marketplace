@@ -83,6 +83,18 @@ export async function postPushToken(sessionToken: string, pushToken: string) {
   return parseOrThrowResponse(res);
 }
 
+export async function clearPushToken(sessionToken: string) {
+  console.debug("clearing push token", sessionToken);
+  const res = await fetch(`${API_URL}/users/me/push-token`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+      "content-type": "application/json",
+    },
+    method: "DELETE",
+  });
+  return parseOrThrowResponse(res);
+}
+
 export async function getChatGroups(
   sessionToken: string,
   buyerOrSeller: string
