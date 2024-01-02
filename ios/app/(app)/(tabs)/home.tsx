@@ -83,7 +83,7 @@ const CategoryView = ({
   const [fetched, setFetched] = React.useState(false);
   const getItemsByCategory = async ({ pageParam = 0 }) => {
     console.debug("fetching with pageParam and category", pageParam, category);
-    const res = await fetch(`${API_URL}/items/?category=wow&page=${pageParam}`);
+    const res = await fetch(`${API_URL}/items/?category=${category}&page=${pageParam}`);
     setFetched(true);
     return parseOrThrowResponse<Item[]>(res);
   };
