@@ -1,10 +1,11 @@
+import Toast from "react-native-toast-message";
 import {
   AICompleteResponse,
   ChatGroup,
   ChatMessage,
   Item,
   User,
-} from "./types";
+} from "../shared/types";
 
 // import Constants from "expo-constants";
 // const config = Constants.expoConfig as any;
@@ -23,8 +24,12 @@ export const GOOGLE_OAUTH_CLIENT_ID =
 
 export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    const errMsg = await res.text();
-
+    const errMsg = await res.json();
+    console.debug("error response", errMsg);
+    Toast.show({
+      type: "error",
+      text1: `An error occured: ${errMsg}`,
+    });
     throw new Error(errMsg);
   }
   return res.json();

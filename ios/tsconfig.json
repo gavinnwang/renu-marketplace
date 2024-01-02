@@ -8,7 +8,7 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "../shared/api.tsx",
+    "api.tsx",
     "../shared/constants/Colors.ts"
   ]
 }

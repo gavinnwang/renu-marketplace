@@ -134,7 +134,7 @@ import {
   IMAGES_URL,
   getUserMeItems,
   postItemStatus,
-} from "../../../../shared/api";
+} from "../../../api";
 import RefreshScreen from "../../../components/RefreshScreen";
 import PagerView from "react-native-pager-view";
 

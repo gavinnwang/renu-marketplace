@@ -8,7 +8,7 @@ import {
   getItemsByCategory,
   getUserMeInfo,
   getUserMeItems,
-} from "../../shared/api";
+} from "../api";
 import { Session } from "../../shared/types";
 
 const useRetrieveSession = (queryClient: QueryClient) => {
@@ -22,7 +22,7 @@ const useRetrieveSession = (queryClient: QueryClient) => {
       }
       setTimeout(() => {
         if (sessionParsed) {
-          console.log("PREFETCHING");
+          console.debug("PREFETCHING");
           queryClient.prefetchInfiniteQuery({
             queryFn: () => getItemsByCategory("all", 0),
             queryKey: ["item", "all"],

@@ -24,7 +24,7 @@ import {
   getSavedItemStatus,
   getUserInfo,
   postChangeSavedItemStatus,
-} from "../../../../shared/api";
+} from "../../../api";
 import { Item } from "../../../../shared/types";
 import React from "react";
 import dayjs from "dayjs";
@@ -115,7 +115,7 @@ export default function ItemPage() {
     },
   });
 
-  console.log(itemId);
+  console.debug(itemId);
 
   const width = Dimensions.get("window").width;
 

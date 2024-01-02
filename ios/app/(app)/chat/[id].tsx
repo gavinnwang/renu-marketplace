@@ -28,8 +28,7 @@ import {
   getChatMessages,
   getItem,
   postChatRoomWithFirstMessage,
-} from "../../../../shared/api";
-
+} from "../../../api";
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -42,8 +41,8 @@ export default function ChatScreen() {
     showEncourageMessage,
     unreadCount,
   } = useLocalSearchParams();
-  console.log("chat id param: ", chatIdParam);
-  // console.log("sell or buy: ", sellOrBuy);
+  // console.debug("chat id param: ", chatIdParam);
+  // console.debug("sell or buy: ", sellOrBuy);
 
   const { session } = useSession();
   const queryClient = useQueryClient();
@@ -54,13 +53,9 @@ export default function ChatScreen() {
     enabled: !!itemId && !chatIdParam && !!session && !newChat, // run the query if there is no chat id param and is not a new chat
     initialData: chatIdParam ? parseInt(chatIdParam as string) : null,
     onSettled: (data) => {
-      console.log("chat id query settled");
+      console.debug("chat id query settled");
     },
   });
-
-  console.log("chat id: ", chatId);
-
-  // console.log("Chat id: ", chatId);
 
   const { data: item, isError: isErrorData } = useQuery({
     queryFn: () => getItem(itemId as string),
@@ -157,7 +152,7 @@ export default function ChatScreen() {
     if (!chatId) {
       return;
     }
-    console.log("setting unread to zero");
+    console.debug("setting unread to zero");
     optimisticallyUpdateChatGroupUnreadCount();
   }, []);
 
@@ -226,10 +221,10 @@ export default function ChatScreen() {
       console.error(err);
     },
     onSuccess: (data) => {
-      console.log("first message sent successfully, chat id: ", data);
+      console.debug("first message sent successfully, chat id: ", data);
       sendMessage(`/join ${data}`);
       setLastMessageSentSuccessfully(true);
-      queryClient.setQueryData(["chat_id", itemId], data);
+      queryClient.setQueryData(["chat_id", itemId, chatIdParam], data);
       queryClient.invalidateQueries(["chats", sellOrBuy]);
     },
   });
@@ -342,9 +337,12 @@ export default function ChatScreen() {
                   <Text className="font-Poppins_600SemiBold text-base text-blackPrimary max-w-[230px] max-h-[60px]">
                     {item.name}
                   </Text>
-                  <Text className="font-Manrope_400Regular text-sm max-w-[230px] text-blackPrimary" style={{
-                    maxHeight: item.status === "inactive" ? 20 : 40
-                  }}>
+                  <Text
+                    className="font-Manrope_400Regular text-sm max-w-[230px] text-blackPrimary"
+                    style={{
+                      maxHeight: item.status === "inactive" ? 20 : 40,
+                    }}
+                  >
                     {!(item.description && item.description.trim())
                       ? "No description provided."
                       : item.description.trim()}
@@ -398,7 +396,7 @@ export default function ChatScreen() {
                   }
                   console.debug("refetching messages");
                   if (!chatId) {
-                    console.log("chat id is null");
+                    console.debug("chat id is null");
                     return;
                   }
                   fetchNextPage();

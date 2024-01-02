@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
-import { getUserMeInfo } from "../../../../shared/api";
+import { getUserMeInfo } from "../../../api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";

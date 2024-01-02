@@ -7,7 +7,7 @@ import { Item, Measure } from "../../../../shared/types";
 import React from "react";
 import Colors from "../../../../shared/constants/Colors";
 import PagerView from "react-native-pager-view";
-import { API_URL, parseOrThrowResponse } from "../../../../shared/api";
+import { API_URL, parseOrThrowResponse } from "../../../api";
 import { CATEGORIES } from "../../../../shared/constants/Category";
 import { FlashList } from "@shopify/flash-list";
 import { useScrollToTop } from "@react-navigation/native";
@@ -83,9 +83,7 @@ const CategoryView = ({
   const [fetched, setFetched] = React.useState(false);
   const getItemsByCategory = async ({ pageParam = 0 }) => {
     console.debug("fetching with pageParam and category", pageParam, category);
-    const res = await fetch(
-      `${API_URL}/items/?category=${category}&page=${pageParam}`
-    );
+    const res = await fetch(`${API_URL}/items/?category=wow&page=${pageParam}`);
     setFetched(true);
     return parseOrThrowResponse<Item[]>(res);
   };

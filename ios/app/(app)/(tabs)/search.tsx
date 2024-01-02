@@ -4,7 +4,7 @@ import Colors from "../../../../shared/constants/Colors";
 import React from "react";
 import { useNavigation } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { getSearchItems } from "../../../../shared/api";
+import { getSearchItems } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
 import { ItemListing } from "../../../components/ItemListing";
 

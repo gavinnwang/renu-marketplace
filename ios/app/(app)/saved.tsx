@@ -9,7 +9,7 @@ import LeftChevron from "../../components/LeftChevron";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "../../hooks/useSession";
-import { getSavedItems } from "../../../shared/api";
+import { getSavedItems } from "../../api";
 import RefreshScreen from "../../components/RefreshScreen";
 import { FlashList } from "@shopify/flash-list";
 import { ItemListing } from "../../components/ItemListing";

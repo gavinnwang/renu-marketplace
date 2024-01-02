@@ -9,7 +9,7 @@ import { Session } from "../../shared/types";
 import { AuthContext } from "../context/authContext";
 import { getGoogleUrl } from "../../shared/util/getGoogleOauthUrl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { clearPushToken, postPushToken } from "../../shared/api";
+import { clearPushToken, postPushToken } from "../api";
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);

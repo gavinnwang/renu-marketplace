@@ -3,7 +3,7 @@ import LeftChevron from "../../../components/LeftChevron";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
-import { getUserActiveItems, getUserInfo } from "../../../../shared/api";
+import { getUserActiveItems, getUserInfo } from "../../../api";
 import { User } from "../../../../shared/types";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../components/RefreshScreen";

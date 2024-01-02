@@ -14,7 +14,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useSession } from "../../../hooks/useSession";
-import { IMAGES_URL, getChatGroups } from "../../../../shared/api";
+import { IMAGES_URL, getChatGroups } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../components/RefreshScreen";
 import PagerView from "react-native-pager-view";
@@ -30,7 +30,7 @@ export default function MessagePage() {
   // const chats = queryClient.getQueryData<ChatGroup[]>(["chats", TABS[0]], {
   //   exact: true,
   // });
-  // console.log(chats);
+  // console.debug(chats);
   const pagerViewRef = React.useRef<PagerView>(null);
   const [selectedTabInt, setSelectedTabInt] = React.useState(0);
 

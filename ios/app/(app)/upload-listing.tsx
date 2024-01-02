@@ -28,7 +28,7 @@ import {
   postAIComplete,
   postImages,
   postNewItem,
-} from "../../../shared/api";
+} from "../../api";
 import { useQueryClient } from "@tanstack/react-query";
 import { registerForPushNotificationsAsync } from "../../notification";
 import * as Notifications from "expo-notifications";
@@ -111,9 +111,9 @@ export default function UploadListingStepOne() {
     try {
       const uploadedImage = await postImages(images.slice(0, 1));
       const imageUrl = `${IMAGES_URL}${uploadedImage[0]}`;
-      console.log("imageUrl: ", imageUrl);
+      console.debug("imageUrl: ", imageUrl);
       const completionRes = await postAIComplete(session.token, imageUrl);
-      console.log("completionRes: ", completionRes);
+      console.debug("completionRes: ", completionRes);
       setTitle(completionRes.title);
       setPrice(String(completionRes.price));
       setDescription(completionRes.description);
