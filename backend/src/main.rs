@@ -16,6 +16,64 @@ use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use tracing_actix_web::TracingLogger;
 
+use tonic::{transport::Server, Request, Response, Status};
+
+pub mod hello {
+    tonic::include_proto!("hello");
+}
+pub mod item {
+    tonic::include_proto!("item");
+}
+use item::item_service_server::{ItemServiceServer, ItemService};
+use item::{GetItemsByCategoryRequest, GetItemsByCategoryResponse};
+
+#[tonic::async_trait]
+impl ItemService for HelloService {
+    async fn get_items_by_category(
+        &self,
+        request: Request<GetItemsByCategoryRequest>,
+    ) -> Result<Response<GetItemsByCategoryResponse>, Status> {
+        
+        let items =repository::item_repository::fetch_items_by_status(model::item_model::ItemStatus::Active, 10, 0, pool.as_ref())
+            .await
+            .map_err(|e| Status::new(tonic::Code::Internal, e.to_string()))?;
+    }
+}
+
+use hello::hello_server::{Hello, HelloServer};
+use hello::{HelloRequest, HelloResponse};
+
+#[derive(Debug, Default)]
+pub struct HelloService {}
+
+#[tonic::async_trait]
+impl Hello for HelloService {
+    async fn call(
+        &self,
+        request: Request<HelloRequest>,
+    ) -> Result<Response<HelloResponse>, Status> {
+        // println!("Got a request: {:?}", request);
+
+        // let reply = HelloResponse {
+        //     msg: "Ok".to_string(),
+        // };
+
+        // let mut err_details = ErrorDetails::new();
+
+        // Ok(Response::new(reply))
+        // let status = Status::with_error_details(
+        //     Code::InvalidArgument,
+        //     "request contains invalid arguments",
+        //     err_details,
+        // );
+
+        Err(Status::new(
+            tonic::Code::InvalidArgument,
+            "request contains invalid arguments",
+        ))
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -96,9 +154,20 @@ async fn main() -> std::io::Result<()> {
 
     let s3_client = Data::new(s3_client);
 
+    tracing::info!("Starting gRPC server");
+    let gaddr: std::net::SocketAddr = "0.0.0.0:50051".parse().unwrap();
+    let hello_service = HelloService::default();
+    let grpc = async move {
+        tokio::task::spawn(
+            Server::builder()
+                .add_service(HelloServer::new(hello_service))
+                .serve(gaddr),
+        )
+    };
+
     tracing::info!("Starting Actix web server");
 
-    HttpServer::new(move || {
+    let http = HttpServer::new(move || {
         let cors = Cors::default()
             .allow_any_origin()
             .allowed_methods(vec!["GET", "POST", "DELETE"])
@@ -122,6 +191,8 @@ async fn main() -> std::io::Result<()> {
     })
     .bind((server_host, server_port))?
     .workers(10)
-    .run()
-    .await
+    .run();
+
+    let _ret = futures_util::future::join(grpc, http).await;
+    Ok(())
 }

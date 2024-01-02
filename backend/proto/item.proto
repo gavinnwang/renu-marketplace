@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package item;
+
+import "google/protobuf/timestamp.proto";
+
+enum Category {
+    MENS = 0;
+    WOMENS = 1;
+    HOME = 2;
+    FURNITURE = 3;
+    ELECTRONICS = 4;
+    BIKES = 5;
+    TICKETS = 6;
+    GENERAL = 7;
+    FREE = 8;
+}
+
+message Item {
+    int32 id = 1;
+    string name = 2;
+    double price = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+    string images = 6; // JSON string for images
+    string description = 7;
+    string category = 8;
+    string status = 9;
+    int32 user_id = 10;
+}
+
+message GetItemsByCategoryRequest {
+    Category category = 1;
+}
+
+message GetItemsByCategoryResponse {
+    repeated Item items = 1; // List of Items
+}
+
+service ItemService {
+    rpc GetItemsByCategory(GetItemsByCategoryRequest) returns (GetItemsByCategoryResponse);
+}
