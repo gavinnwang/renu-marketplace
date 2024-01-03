@@ -39,7 +39,21 @@ impl Config {
                 panic!("Invalid ENV variable");
             }
         };
-        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let database_name = std::env::var("DATABASE_NAME").expect("DATABASE_NAME must be set");
+        let database_user = std::env::var("DATABASE_USER").expect("DATABASE_USER must be set");
+        let database_password =
+            std::env::var("DATABASE_PASSWORD").expect("DATABASE_PASSWORD must be set");
+        let database_host = std::env::var("DATABASE_HOST").expect("DATABASE_HOST must be set");
+        let database_port = std::env::var("DATABASE_PORT").expect("DATABASE_PORT must be set");
+        let database_url = format!(
+            "postgresql://{}:{}@{}:{}/{}",
+            database_user, database_password, database_host, database_port, database_name
+        );
+        let database_url_from_env =
+            std::env::var("DATABASE_URL").expect("DATABASE_URL must be set"); // we need database url for sqlx to work
+        if database_url_from_env != database_url {
+            panic!("Databse url from env is not equal to the one generated from env variables, {} != {}", database_url_from_env, database_url);
+        }
         let server_port = std::env::var("SERVER_PORT").expect("SERVER_PORT must be set");
         let server_host = std::env::var("SERVER_HOST").expect("SERVER_HOST must be set");
 

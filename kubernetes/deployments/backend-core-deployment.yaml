@@ -16,3 +16,6 @@ spec:
       containers:
         - name: backend-core
           image: wry0313/renu:latest
+          envFrom:
+          - configMapRef:
+              name: backend-core-config

@@ -15,4 +15,4 @@ jobs:
           key: ${{ secrets.DROPLET_SSH_KEY }}
           passphrase: ${{ secrets.DROPLET_PASSPHRASE }}
           script: |
-            docker run -v ${{ secrets.DATABASE_NAME }}:/var/lib/postgresql/data -e POSTGRES_USER=${{ secrets.DATABASE_USERNAME }}  -e POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} -e POSTGRES_DB=${{ secrets.DATABASE_NAME }} -p 5432:5432 -d paradedb/paradedb:latest
+            docker run -v ${{ secrets.DATABASE_NAME }}:/var/lib/postgresql/data -e POSTGRES_USER=${{ secrets.DATABASE_USER }}  -e POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} -e POSTGRES_DB=${{ secrets.DATABASE_NAME }} -p 5432:5432 -d paradedb/paradedb:latest

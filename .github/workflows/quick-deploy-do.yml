@@ -19,6 +19,11 @@ jobs:
             docker pull wry0313/renu:latest
             docker run -d --name renu \
               -p 8080:8080 \
+              -e DATABASE_NAME=${{ secrets.DATABASE_NAME }} \
+              -e DATABASE_USER=${{ secrets.DATABASE_USER }} \
+              -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e DATABASE_HOST=${{ secrets.DATABASE_HOST }} \
+              -e DATABASE_PORT=${{ secrets.DATABASE_PORT }} \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               -e TOKEN_MAXAGE=${{ secrets.TOKEN_MAXAGE }} \

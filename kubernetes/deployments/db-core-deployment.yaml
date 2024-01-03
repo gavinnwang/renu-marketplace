@@ -17,18 +17,21 @@ spec:
         - name: db-core
           image: paradedb/paradedb:latest
           # image: postgres:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
           volumeMounts:
             - name: db-core-persistent-storage
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/postgresql/renu-data
           env:
-          - name: PGDATA
-            value: /var/lib/postgresql/mydata
-          - name: POSTGRES_DB
-            value: "renu-db"
-          - name: POSTGRES_USER
-            value: "postgres"
-          - name: POSTGRES_PASSWORD
-            value: "postgres"
+            - name: PGDATA
+              value: /var/lib/postgresql/renu-data
+            - name: POSTGRES_DB
+              value: "renu-db"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
       volumes:
         - name: db-core-persistent-storage
           persistentVolumeClaim:

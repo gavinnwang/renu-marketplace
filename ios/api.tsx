@@ -9,9 +9,10 @@ import {
 
 // import Constants from "expo-constants";
 // const config = Constants.expoConfig as any;
-// export const API_URL = "http://" + config.hostUri.split(`:`).shift().concat(`:8080`) as string
-// export const API_URL = "http://localhost:8080";
+// export const API_URL = "http://" + config.hostUri.split(`:`).shift().concat(`:52455`) as string
+// console.log("API_URL", API_URL);
 //  export const REDIRECT_URL = "http://localhost:8080/auth/callback";
+
 export const API_URL = "https://api.gavinwang.dev";
 export const REDIRECT_URL = "https://api.gavinwang.dev/auth/callback";
 
