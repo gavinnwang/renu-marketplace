@@ -99,7 +99,7 @@ export default function ChatScreen() {
       if ((e.data as string).endsWith("receive success")) {
         const messageContent = (e.data as string).slice(0, -15);
         optimisticAddMessage(messageContent, 0);
-        optimisticallyUpdateChatGroupData(messageContent);
+        // optimisticallyUpdateChatGroupData(messageContent);
         setExtraOffset((prev) => prev + 1);
       }
       if ((e.data as string).endsWith("send success")) {
@@ -143,6 +143,11 @@ export default function ChatScreen() {
       return;
     }
     optimisticallyUpdateChatGroupUnreadCount();
+
+    return () => {
+      console.debug("unmount and invalidating");
+      queryClient.invalidateQueries(["chats"]);
+    };
   }, []);
 
   const optimisticallyUpdateChatGroupUnreadCount = () => {
@@ -190,24 +195,24 @@ export default function ChatScreen() {
     });
   };
 
-  const optimisticallyUpdateChatGroupData = (messageContent: string) => {
-    queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
-      if (!oldData) {
-        return;
-      }
-      const newData = oldData.map((chatGroup) => {
-        if (chatGroup.chat_id === chatId) {
-          return {
-            ...chatGroup,
-            last_message_content: messageContent,
-            last_message_sent_at: new Date(),
-          };
-        }
-        return chatGroup;
-      });
-      return newData;
-    });
-  };
+  // const optimisticallyUpdateChatGroupData = (messageContent: string) => {
+  //   queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
+  //     if (!oldData) {
+  //       return;
+  //     }
+  //     const newData = oldData.map((chatGroup) => {
+  //       if (chatGroup.chat_id === chatId) {
+  //         return {
+  //           ...chatGroup,
+  //           last_message_content: messageContent,
+  //           last_message_sent_at: new Date(),
+  //         };
+  //       }
+  //       return chatGroup;
+  //     });
+  //     return newData;
+  //   });
+  // };
 
   const [creatingChatRoom, setCreatingChatRoom] = React.useState(false);
 
@@ -435,7 +440,7 @@ export default function ChatScreen() {
                   sendMessage(`/message ${chatId} 1111 ${inputText}`);
                   setLastMessageSentSuccessfully(false);
                   optimisticAddMessage(inputText, 1);
-                  optimisticallyUpdateChatGroupData(inputText);
+                  // optimisticallyUpdateChatGroupData(inputText);
                   registerForPushNotificationsAsync();
                   setInputText("");
                 }
