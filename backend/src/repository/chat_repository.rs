@@ -40,7 +40,7 @@ pub async fn fetch_chat_groups_by_seller_id(
         JOIN 
             "item" i ON ic.item_id = i.id
         JOIN 
-            "user" u ON u.id = i.user_id
+            "user" u ON u.id = ic.buyer_id
         LEFT JOIN
             recent_message rm ON ic.id = rm.chat_id AND rm.rn = 1
         WHERE 

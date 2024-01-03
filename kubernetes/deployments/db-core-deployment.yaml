@@ -1,3 +1,4 @@
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: db-core-deployment
@@ -5,22 +6,25 @@ metadata:
     app: db-core
 spec:
   selector:
-    matchLabels:
+    matchLabels: # the deployment will manage pods whose labels match this selector
       app: db-core
-  template:
+  template: # the deployment will create pods from this template
     metadata:
       labels:
         app: db-core
     spec:
-      containers:
+      containers: # the pkuod will run a container from this image
         - name: db-core
-          image: postgres
+          image: paradedb/paradedb:latest
+          # image: postgres:latest
           volumeMounts:
             - name: db-core-persistent-storage
               mountPath: /var/lib/postgresql/data
           env:
+          - name: PGDATA
+            value: /var/lib/postgresql/mydata
           - name: POSTGRES_DB
-            value: "boards"
+            value: "renu-db"
           - name: POSTGRES_USER
             value: "postgres"
           - name: POSTGRES_PASSWORD
