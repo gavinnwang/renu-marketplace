@@ -6,6 +6,7 @@ use crate::{
     authentication::jwt::AuthenticationGuard, error::UserError, repository::chat_repository,
 };
 
+// fetch chat groups where user is seller
 #[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
 #[get("/seller")]
 async fn get_chat_groups_by_seller_id(
@@ -25,6 +26,7 @@ async fn get_chat_groups_by_seller_id(
     }
 }
 
+// fetch chat groups where user is buyer
 #[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
 #[get("/buyer")]
 async fn get_chat_groups_by_buyer_id(
@@ -42,6 +44,34 @@ async fn get_chat_groups_by_buyer_id(
             HttpResponse::InternalServerError().json("Failed to fetch chat groups for buyer")
         }
     }
+}
+
+#[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
+#[get("/")]
+async fn get_all_chat_groups(
+    auth_guard: AuthenticationGuard,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, Error> {
+    let user_id = auth_guard.user_id;
+    let buy_chat_groups = chat_repository::fetch_chat_groups_by_buyer_id(user_id, pool.as_ref())
+        .await
+        .map_err(|err| {
+            tracing::error!("failed to fetch chat groups where user is buyer: {err}");
+            UserError::InternalError
+        })?;
+    let sell_chat_groups = chat_repository::fetch_chat_groups_by_seller_id(user_id, pool.as_ref())
+        .await
+        .map_err(|err| {
+            tracing::error!("failed to fetch chat groups where user is seller: {err}");
+            UserError::InternalError
+        })?;
+
+    let response = serde_json::json!({
+        "buyer_chat": buy_chat_groups,
+        "seller_chat": sell_chat_groups,
+    });
+
+    Ok(HttpResponse::Ok().json(response))
 }
 
 #[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]

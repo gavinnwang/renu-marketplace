@@ -112,6 +112,21 @@ export async function getChatGroups(
   return parseOrThrowResponse<ChatGroup[]>(res);
 }
 
+export async function getAllChatGroups(sessionToken: string): Promise<{
+  buyer_chat: ChatGroup[];
+  seller_chat: ChatGroup[];
+}> {
+  const res = await fetch(`${API_URL}/chats/`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  return parseOrThrowResponse<{
+    buyer_chat: ChatGroup[];
+    seller_chat: ChatGroup[];
+  }>(res);
+}
+
 export async function getChatMessages(
   page: number,
   chatId: number,

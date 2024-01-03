@@ -43,7 +43,8 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::chat_handler::get_chat_messages_by_chat_id)
             .service(super::chat_handler::get_chat_id_by_item_id)
             .service(super::chat_handler::post_chat_room_and_send_first_message)
-            .service(super::chat_handler::get_unread_chat_group_count_by_user_id),
+            .service(super::chat_handler::get_unread_chat_group_count_by_user_id)
+            .service(super::chat_handler::get_all_chat_groups),
     );
 
     conf.service(web::scope("/search").service(super::item_search_handler::search_items_handler));
