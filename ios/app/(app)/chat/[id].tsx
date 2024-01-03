@@ -41,8 +41,6 @@ export default function ChatScreen() {
     showEncourageMessage,
     unreadCount,
   } = useLocalSearchParams();
-  // console.debug("chat id param: ", chatIdParam);
-  // console.debug("sell or buy: ", sellOrBuy);
 
   const { session } = useSession();
   const queryClient = useQueryClient();
@@ -52,9 +50,6 @@ export default function ChatScreen() {
     queryKey: ["chat_id", itemId, chatIdParam], // it is IMPORTANT to include chatIdParam in the query key because in the seller page there can be multiple chats with the same item id. When seller click the chat it will have the chat id param and this query will not run
     enabled: !!itemId && !chatIdParam && !!session && !newChat, // run the query if there is no chat id param and is not a new chat
     initialData: chatIdParam ? parseInt(chatIdParam as string) : null,
-    onSettled: (data) => {
-      console.debug("chat id query settled");
-    },
   });
 
   const { data: item, isError: isErrorData } = useQuery({
@@ -76,7 +71,6 @@ export default function ChatScreen() {
     refetch,
   } = useInfiniteQuery({
     queryFn: async ({ pageParam = 0 }) => {
-      console.debug("getting messages", pageParam);
       return getChatMessages(pageParam, chatId!, session!.token);
     },
     queryKey: ["messages", chatId],
@@ -87,7 +81,7 @@ export default function ChatScreen() {
         : undefined,
   });
 
-  const width = Dimensions.get("window").width / 7;
+  const width = React.useMemo(() => Dimensions.get("window").width / 7, []);
   const [inputText, setInputText] = React.useState("");
 
   const { sendMessage } = useWebSocket("wss://api.gavinwang.dev/ws", {
@@ -102,10 +96,7 @@ export default function ChatScreen() {
     },
     reconnectInterval: 5,
     onMessage: (e) => {
-      console.debug(e.data);
       if ((e.data as string).endsWith("receive success")) {
-        console.debug("message sent successfully and invalidating");
-        // remove receive success from the end of the message
         const messageContent = (e.data as string).slice(0, -15);
         optimisticAddMessage(messageContent, 0);
         optimisticallyUpdateChatGroupData(messageContent);
@@ -127,7 +118,6 @@ export default function ChatScreen() {
     queryClient.setQueryData<InfiniteData<ChatMessage[]>>(
       ["messages", chatId],
       (oldData) => {
-        console.debug("optimistically updating messages");
         if (!oldData) {
           return;
         }
@@ -152,39 +142,56 @@ export default function ChatScreen() {
     if (!chatId) {
       return;
     }
-    console.debug("setting unread to zero");
     optimisticallyUpdateChatGroupUnreadCount();
   }, []);
 
   const optimisticallyUpdateChatGroupUnreadCount = () => {
     if (unreadCount && Number(unreadCount) === 0) {
-      console.debug("unread count is zero so no need to update");
       return;
     }
-    queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
+    queryClient.setQueryData<{
+      buyer_chat: ChatGroup[];
+      seller_chat: ChatGroup[];
+    }>(["chats"], (oldData) => {
       if (!oldData) {
         return;
       }
-      console.debug("optimistically updating chat group unread count to zero");
-      const newData = oldData.map((chatGroup) => {
-        if (chatGroup.chat_id === chatId) {
-          return {
-            ...chatGroup,
-            unread_count: 0,
-          };
-        }
-        return chatGroup;
-      });
-      return newData;
+      if (sellOrBuy === "Buy") {
+        console.debug("optimistically updating unread count buy");
+        const newBuyerData = oldData.buyer_chat.map((chatGroup) => {
+          if (chatGroup.chat_id === chatId) {
+            return {
+              ...chatGroup,
+              unread_count: 0,
+            };
+          }
+          return chatGroup;
+        });
+        return {
+          ...oldData,
+          buyer_chat: newBuyerData,
+        };
+      } else if (sellOrBuy === "Sell") {
+        console.debug("optimistically updating unread count sell");
+        const newSellerData = oldData.seller_chat.map((chatGroup) => {
+          if (chatGroup.chat_id === chatId) {
+            return {
+              ...chatGroup,
+              unread_count: 0,
+            };
+          }
+          return chatGroup;
+        });
+        return {
+          ...oldData,
+          seller_chat: newSellerData,
+        };
+      }
     });
-    queryClient.setQueryData<number>(["unreadCount"], (old) =>
-      old ? old - 1 : 0
-    );
   };
 
   const optimisticallyUpdateChatGroupData = (messageContent: string) => {
     queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
-      console.debug("optimistically updating chat group data");
       if (!oldData) {
         return;
       }
@@ -221,7 +228,6 @@ export default function ChatScreen() {
       console.error(err);
     },
     onSuccess: (data) => {
-      console.debug("first message sent successfully, chat id: ", data);
       sendMessage(`/join ${data}`);
       setLastMessageSentSuccessfully(true);
       queryClient.setQueryData(["chat_id", itemId, chatIdParam], data);
@@ -231,10 +237,8 @@ export default function ChatScreen() {
 
   const chatMessagesData = React.useMemo(() => {
     if (!chatMessages?.pages) {
-      console.debug("no messages");
       return [];
     }
-    console.debug("PROCESSING mESSAGES DATE");
     let lastDisplayString = "";
     const curTime = new Date();
     const messages = chatMessages.pages.flatMap((page) =>
@@ -391,12 +395,9 @@ export default function ChatScreen() {
                 estimatedItemSize={50}
                 onEndReached={() => {
                   if (!hasNextPage) {
-                    console.debug("no next page");
                     return;
                   }
-                  console.debug("refetching messages");
                   if (!chatId) {
-                    console.debug("chat id is null");
                     return;
                   }
                   fetchNextPage();
@@ -426,21 +427,13 @@ export default function ChatScreen() {
               onSubmitEditing={async () => {
                 if (!inputText.trim()) return;
                 if (!chatId) {
-                  console.debug("no chat id so create one");
                   createChatRoomAndFirstMessageMutation.mutateAsync(inputText);
                   registerForPushNotificationsAsync();
                   setInputText("");
                 } else {
-                  const correlationId = nanoid();
-                  console.debug(
-                    "sending message with correlation id",
-                    correlationId
-                  );
-                  sendMessage(
-                    `/message ${chatId} ${correlationId} ${inputText}`
-                  );
+                  // const correlationId = nanoid();
+                  sendMessage(`/message ${chatId} 1111 ${inputText}`);
                   setLastMessageSentSuccessfully(false);
-                  console.debug("optimistically updating messages");
                   optimisticAddMessage(inputText, 1);
                   optimisticallyUpdateChatGroupData(inputText);
                   registerForPushNotificationsAsync();
@@ -488,7 +481,6 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
               message.from_me ? "text-white" : "text-black"
             }`}
           >
-            {/* {message.id} */}
             {message.content}
           </Text>
         </View>

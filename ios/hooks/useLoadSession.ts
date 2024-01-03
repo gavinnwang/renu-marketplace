@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useSession } from "./useSession";
-import { QueryClient, useQuery } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import {
-  getChatGroupUnreadCount,
-  getChatGroups,
+  getAllChatGroups,
   getItemsByCategory,
   getUserMeInfo,
   getUserMeItems,
@@ -22,7 +21,7 @@ const useRetrieveSession = (queryClient: QueryClient) => {
       }
       setTimeout(() => {
         if (sessionParsed) {
-          console.debug("PREFETCHING");
+          console.debug("prefetching");
           queryClient.prefetchInfiniteQuery({
             queryFn: () => getItemsByCategory("all", 0),
             queryKey: ["item", "all"],
@@ -32,12 +31,8 @@ const useRetrieveSession = (queryClient: QueryClient) => {
             queryFn: () => getUserMeInfo(sessionParsed.token),
           });
           queryClient.prefetchQuery({
-            queryKey: ["unreadCount"],
-            queryFn: () => getChatGroupUnreadCount(sessionParsed.token),
-          });
-          queryClient.prefetchQuery({
-            queryFn: () => getChatGroups(sessionParsed.token, "buyer"),
-            queryKey: ["chats", "Buy"],
+            queryFn: () => getAllChatGroups(sessionParsed.token),
+            queryKey: ["chats"],
           });
           queryClient.prefetchQuery({
             queryKey: ["list"],
@@ -45,7 +40,7 @@ const useRetrieveSession = (queryClient: QueryClient) => {
           });
         }
         setLoadedFromStorage(true);
-      }, 1000);
+      }, 750);
     };
 
     if (!loadedFromStorage) {

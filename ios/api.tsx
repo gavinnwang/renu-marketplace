@@ -9,15 +9,13 @@ import {
 
 // import Constants from "expo-constants";
 // const config = Constants.expoConfig as any;
-
 // export const API_URL = "http://" + config.hostUri.split(`:`).shift().concat(`:8080`) as string
-export const API_URL = "https://api.gavinwang.dev";
 // export const API_URL = "http://localhost:8080";
+//  export const REDIRECT_URL = "http://localhost:8080/auth/callback";
+export const API_URL = "https://api.gavinwang.dev";
+export const REDIRECT_URL = "https://api.gavinwang.dev/auth/callback";
 
 export const IMAGES_URL = "https://images.gavinwang.dev/";
-
-export const REDIRECT_URL = "https://api.gavinwang.dev/auth/callback";
-//  export const REDIRECT_URL = "http://localhost:8080/auth/callback";
 
 export const GOOGLE_OAUTH_CLIENT_ID =
   "479411838275-kpsk3vagvubv429vnhu85hsviahv8ed7.apps.googleusercontent.com";

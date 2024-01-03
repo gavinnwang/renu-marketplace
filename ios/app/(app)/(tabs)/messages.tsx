@@ -14,7 +14,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useSession } from "../../../hooks/useSession";
-import { IMAGES_URL, getChatGroups } from "../../../api";
+import { IMAGES_URL, getAllChatGroups, getChatGroups } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../components/RefreshScreen";
 import PagerView from "react-native-pager-view";
@@ -26,11 +26,6 @@ const data = TABS.map((i) => ({
 }));
 
 export default function MessagePage() {
-  // const queryClient = useQueryClient();
-  // const chats = queryClient.getQueryData<ChatGroup[]>(["chats", TABS[0]], {
-  //   exact: true,
-  // });
-  // console.debug(chats);
   const pagerViewRef = React.useRef<PagerView>(null);
   const [selectedTabInt, setSelectedTabInt] = React.useState(0);
 
@@ -70,15 +65,17 @@ function TabPage({ index }: { index: number }) {
 
   const queryClient = useQueryClient();
   const {
-    data: chats,
+    data: allChats,
     isError: isErrorChats,
     isLoading: isLoadingChats,
     refetch,
   } = useQuery({
-    queryFn: () => getChatGroups(session!.token, !index ? "buyer" : "seller"),
-    queryKey: ["chats", TABS[index]],
+    queryFn: () => getAllChatGroups(session!.token),
+    queryKey: ["chats"],
     enabled: !!session,
   });
+
+  const chats = index === 0 ? allChats?.buyer_chat : allChats?.seller_chat;
 
   return (
     <View className="bg-bgLight h-full">
@@ -86,7 +83,7 @@ function TabPage({ index }: { index: number }) {
         <RefreshScreen displayText="Something went wrong." refetch={refetch} />
       ) : isLoadingChats ? (
         <></>
-      ) : chats.length === 0 ? (
+      ) : chats && chats.length === 0 ? (
         <RefreshScreen displayText="No messages yet." refetch={refetch} />
       ) : (
         <FlashList
@@ -101,7 +98,7 @@ function TabPage({ index }: { index: number }) {
               onRefresh={async () => {
                 setRefreshing(true);
                 await refetch();
-                await queryClient.invalidateQueries(["unreadCount"]);
+                // await queryClient.invalidateQueries(["unreadCount"]);
                 setRefreshing(false);
               }}
             />
@@ -201,25 +198,21 @@ const Tab = React.forwardRef(
     {
       index,
       selectedTabInt,
-      // unreadCount,
       pagerViewRef,
     }: {
       index: number;
       selectedTabInt: number;
-      // unreadCount: number;
       pagerViewRef: React.RefObject<PagerView>;
     },
     ref: any
   ) => {
-    // const queryClient = useQueryClient();
-    // const chats = queryClient.getQueryData<ChatGroup[]>(["chats", TABS[index]])
-    // const unreadCount = chats?.filter((c) => c.unread_count > 0).length ?? 0;
     const { session } = useSession();
-    const { data: chats } = useQuery({
-      queryFn: () => getChatGroups(session!.token, !index ? "buyer" : "seller"),
-      queryKey: ["chats", TABS[index]],
+    const { data: allChats } = useQuery({
+      queryFn: () => getAllChatGroups(session!.token),
+      queryKey: ["chats"],
       enabled: !!session,
     });
+    const chats = index === 0 ? allChats?.buyer_chat : allChats?.seller_chat;
     const unreadCount = React.useMemo(() => {
       return chats?.filter((c) => c.unread_count > 0).length ?? 0;
     }, [chats]);
@@ -295,10 +288,6 @@ const Tabs = ({
       ]).start();
     }
   }, [selectedTabInt, measures]);
-  // const queryClient = useQueryClient();
-  // const unreadCount = queryClient.getQueryData<number>(["unreadCount"]);
-  // const tabZeroUnreadCount =
-  //   chats?.filter((c) => c.unread_count > 0).length ?? 0;
 
   return (
     <View
@@ -313,11 +302,6 @@ const Tabs = ({
             index={index}
             ref={section.ref}
             selectedTabInt={selectedTabInt}
-            // unreadCount={
-            //   index === 0
-            //     ? tabZeroUnreadCount ?? 0
-            //     : Math.max(0, (unreadCount ?? 0) - tabZeroUnreadCount)
-            // }
           />
         );
       })}

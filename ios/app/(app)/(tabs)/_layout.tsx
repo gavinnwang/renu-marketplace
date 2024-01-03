@@ -3,7 +3,7 @@ import React from "react";
 import Colors from "../../../../shared/constants/Colors";
 import Svg, { Path } from "react-native-svg";
 import { SafeAreaView, Text, View } from "react-native";
-import { getChatGroupUnreadCount } from "../../../api";
+import { getAllChatGroups, getChatGroupUnreadCount } from "../../../api";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "../../../hooks/useSession";
 
@@ -84,9 +84,19 @@ const HomeIcon = ({ color }: { color: string }) => (
 
 const MessageIcon = ({ color }: { color: string }) => {
   const { session } = useSession();
-  const { data: unreadCount } = useQuery(["unreadCount"], () =>
-    getChatGroupUnreadCount(session!.token)
-  );
+  const { data: allChats } = useQuery({
+    queryFn: () => getAllChatGroups(session!.token),
+    queryKey: ["chats"],
+    enabled: !!session,
+  });
+
+  const unreadCount = React.useMemo(() => {
+    return (
+      (allChats?.buyer_chat.filter((c) => c.unread_count > 0).length ?? 0) +
+      (allChats?.seller_chat.filter((c) => c.unread_count > 0).length ?? 0)
+    );
+  }, [allChats]);
+
   return (
     <View className="relative">
       {unreadCount && unreadCount > 0 ? (
