@@ -23,12 +23,7 @@ import {
 } from "react-native-gesture-handler";
 import { useSession } from "../../hooks/useSession";
 import { Picker, PickerIOS } from "@react-native-picker/picker";
-import {
-  IMAGES_URL,
-  postAIComplete,
-  postImages,
-  postNewItem,
-} from "../../api";
+import { IMAGES_URL, postAIComplete, postImages, postNewItem } from "../../api";
 import { useQueryClient } from "@tanstack/react-query";
 import { registerForPushNotificationsAsync } from "../../notification";
 import * as Notifications from "expo-notifications";
@@ -109,7 +104,7 @@ export default function UploadListingStepOne() {
     }
     setCompleting(true);
     try {
-      const uploadedImage = await postImages(images.slice(0, 1));
+      const uploadedImage = await postImages(images.slice(0, 1), true);
       const imageUrl = `${IMAGES_URL}${uploadedImage[0]}`;
       console.debug("imageUrl: ", imageUrl);
       const completionRes = await postAIComplete(session.token, imageUrl);
@@ -216,7 +211,7 @@ export default function UploadListingStepOne() {
               if (images.pop() !== "picker") {
                 throw new Error("Last image is not picker");
               }
-              const s3UrlsResponse = await postImages(images);
+              const s3UrlsResponse = await postImages(images, false);
 
               const itemId = await postNewItem(
                 session?.token || "",

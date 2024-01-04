@@ -1,20 +1,22 @@
 use crate::uploads::client::Client;
-use actix_multipart::form::{tempfile::TempFile, MultipartForm};
+use actix_multipart::form::{tempfile::TempFile, text, MultipartForm};
 use actix_web::{post, web, HttpResponse, Responder};
 
 #[derive(MultipartForm)]
 pub struct ImageForm {
-    // #[multipart(limit = "100 MiB")]
     images: Vec<TempFile>,
+    temp: text::Text<String>,
 }
 
-#[tracing::instrument(skip(form, s3_client))] // todo! add multithreading
+#[tracing::instrument(skip(form, s3_client))] // todo: add multithreading but lowki its fine without it
 #[post("/")]
 async fn post_images(
     form: MultipartForm<ImageForm>,
     s3_client: web::Data<Client>,
 ) -> impl Responder {
-    let images = form.into_inner().images;
+    let form = form.into_inner();
+    let images = form.images;
+    let temp = form.temp.0 == "true";
 
     if images.is_empty() {
         tracing::error!("No images provided: {:#?}", images);
@@ -23,8 +25,10 @@ async fn post_images(
 
     let mut uploaded_file_keys: Vec<String> = Vec::with_capacity(images.len());
 
+    let key_prefix = if temp { "temp/" } else { "images/" };
+    tracing::info!("Uploading files: to {}", key_prefix);
     for image in &images {
-        let uploaded_file = match s3_client.upload(&image, "images/").await {
+        let uploaded_file = match s3_client.upload(&image, key_prefix).await {
             Ok(file) => file,
             Err(_) => {
                 tracing::error!("Error uploading file");

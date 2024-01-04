@@ -68,7 +68,6 @@ export default function ChatScreen() {
     isError: isErrorChatMessages,
     fetchNextPage,
     hasNextPage,
-    refetch,
   } = useInfiniteQuery({
     queryFn: async ({ pageParam = 0 }) => {
       return getChatMessages(pageParam, chatId!, session!.token);
@@ -195,25 +194,6 @@ export default function ChatScreen() {
     });
   };
 
-  // const optimisticallyUpdateChatGroupData = (messageContent: string) => {
-  //   queryClient.setQueryData<ChatGroup[]>(["chats", sellOrBuy], (oldData) => {
-  //     if (!oldData) {
-  //       return;
-  //     }
-  //     const newData = oldData.map((chatGroup) => {
-  //       if (chatGroup.chat_id === chatId) {
-  //         return {
-  //           ...chatGroup,
-  //           last_message_content: messageContent,
-  //           last_message_sent_at: new Date(),
-  //         };
-  //       }
-  //       return chatGroup;
-  //     });
-  //     return newData;
-  //   });
-  // };
-
   const [creatingChatRoom, setCreatingChatRoom] = React.useState(false);
 
   const createChatRoomAndFirstMessageMutation = useMutation({
@@ -284,10 +264,6 @@ export default function ChatScreen() {
     return messages;
   }, [chatMessages?.pages]);
 
-  const nanoid = React.useMemo(
-    () => customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 10),
-    []
-  );
   const [lastMessageSentSuccessfully, setLastMessageSentSuccessfully] =
     React.useState(false);
 

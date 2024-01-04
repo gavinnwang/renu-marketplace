@@ -31,6 +31,7 @@ export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
     });
     throw new Error(errMsg);
   }
+  console.log("err is okay")
   return res.json();
 }
 
@@ -269,7 +270,7 @@ export async function getSearchItems(query: string): Promise<Item[]> {
   return parseOrThrowResponse<Item[]>(res);
 }
 
-export async function postImages(images: string[]): Promise<string[]> {
+export async function postImages(images: string[], temp: Boolean): Promise<string[]> {
   const formData = new FormData();
   for (let i = 0; i < images.length; i++) {
     const uri = images[i];
@@ -282,6 +283,7 @@ export async function postImages(images: string[]): Promise<string[]> {
       name: fileName,
       type: fileType,
     } as any);
+    formData.append("temp", temp ? "true" : "false");
   }
 
   console.debug("form data: ", formData);
@@ -292,13 +294,7 @@ export async function postImages(images: string[]): Promise<string[]> {
     method: "POST",
     body: formData,
   });
-  if (!postImageResponse.ok) {
-    const errMsg = await postImageResponse.text();
-    console.error(errMsg);
-    throw new Error("Failed to post images");
-  }
-
-  return postImageResponse.json();
+  return parseOrThrowResponse<string[]>(postImageResponse);
 }
 
 export async function postNewItem(
