@@ -98,13 +98,12 @@ impl Handler<ChatMessageToServer> for ChatServer {
                                     )
                                     .await
                                     {
-                                        Ok(_) => {
-                                            tracing::info!("Push notification sent successfully");
+                                        Ok(resp_msg) => {
+                                            tracing::info!("Push notification sent successfully {resp_msg}");
                                         }
                                         Err(err) => {
                                             tracing::error!(
-                                                "Failed to send push notification. Error message: {}\n",
-                                                err
+                                                "Failed to send push notification. Error message: {err}"
                                             );
                                         }
                                     }

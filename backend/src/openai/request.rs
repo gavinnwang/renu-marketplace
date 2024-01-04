@@ -1,5 +1,5 @@
 use actix_web::web;
-use reqwest::{Client, Error};
+use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
 
@@ -72,7 +72,7 @@ pub async fn request_openai_api(
             Ok(openai_response)
         }
         false => {
-            let err_msg = response.text().await.map_err(|err| err.to_string())?;
+            let err_msg = response.json().await.map_err(|err| err.to_string())?;
             Err(err_msg)
         }
     }
