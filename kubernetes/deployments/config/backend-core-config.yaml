@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-core-config
+data:
+  ENV: development
+  DATABASE_NAME: renu-db
+  GOOGLE_OAUTH_REDIRECT_URL: https://api.gavinwang.dev/auth/callback
+  GOOGLE_OAUTH_REDIRECT_URL_DEV: http://localhost:8080/auth/callback

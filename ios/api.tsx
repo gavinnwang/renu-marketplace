@@ -31,7 +31,6 @@ export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
     });
     throw new Error(errMsg);
   }
-  console.log("err is okay")
   return res.json();
 }
 
