@@ -5,6 +5,7 @@ metadata:
   labels:
     app: backend-core
 spec:
+revisionHistoryLimit: 0 # keep one replica set
   selector:
     matchLabels:
       app: backend-core
@@ -17,5 +18,5 @@ spec:
         - name: backend-core
           image: wry0313/renu:latest
           envFrom:
-          - configMapRef:
-              name: backend-core-config
+          - secretRef:
+              name: backend-core-secret

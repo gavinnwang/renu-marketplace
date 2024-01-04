@@ -5,6 +5,7 @@ metadata:
   labels:
     app: db-core
 spec:
+  revisionHistoryLimit: 0 # keep one replica set
   selector:
     matchLabels: # the deployment will manage pods whose labels match this selector
       app: db-core
@@ -13,25 +14,23 @@ spec:
       labels:
         app: db-core
     spec:
-      containers: # the pkuod will run a container from this image
+      containers: # the pod will run a container from this image
         - name: db-core
           image: paradedb/paradedb:latest
-          # image: postgres:latest
           securityContext:
             allowPrivilegeEscalation: false
             runAsUser: 0
           volumeMounts:
             - name: db-core-persistent-storage
-              mountPath: /var/lib/postgresql/renu-data
-          env:
-            - name: PGDATA
-              value: /var/lib/postgresql/renu-data
-            - name: POSTGRES_DB
-              value: "renu-db"
-            - name: POSTGRES_USER
-              value: "postgres"
-            - name: POSTGRES_PASSWORD
-              value: "postgres"
+              mountPath: /var/lib/postgresql/data/renu-data
+          # env:
+          #   - name: PGDATA
+          #     value: /var/lib/postgresql/renu-data
+          envFrom:
+          - configMapRef:
+              name: db-core-config
+          - secretRef:
+              name: db-core-secret
       volumes:
         - name: db-core-persistent-storage
           persistentVolumeClaim:

@@ -3,25 +3,23 @@ kind: PersistentVolumeClaim
 metadata:
   name: db-core-pvc
 spec:
-  storageClassName: standard
+  storageClassName: ebs-sc
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: standard
+  name: ebs-sc
 provisioner: kubernetes.io/aws-ebs
 parameters:
-  type: gp2
+  type: gp3
 reclaimPolicy: Retain
 allowVolumeExpansion: false
-mountOptions:
-  - debug
-volumeBindingMode: Immediate
+volumeBindingMode: WaitForFirstConsumer
 # ---
 # apiVersion: v1
 # kind: PersistentVolume
