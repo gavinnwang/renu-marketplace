@@ -8,7 +8,7 @@ use crate::config::Config;
 pub async fn request_openai_api(
     image_url: &str,
     config: &web::Data<Config>,
-) -> Result<OpenAIResponse, Error> {
+) -> Result<OpenAIResponse, String> {
     let root_url = "https://api.openai.com/v1/chat/completions";
     let client = Client::new();
 
@@ -20,7 +20,7 @@ pub async fn request_openai_api(
                 "content": [
                     {
                         "type": "text",
-                        "text": "Only output a json that contains a rough predicted resell price, an accurte description of the resell item in the image, an item title, and an item category from the image. 
+                        "text": "Only output a json that contains a rough predicted resell price, an accurte description of the resell item in the image, an item title, and an item category from the image.
                         The category field has to be one of thses: womens, mens, home: (daily essentials), furniture, electronics, bikes, tickets, general, free.
                         The response needs to be able to deserialize into a struct like this without erorr:
                         type Response = {
@@ -60,15 +60,20 @@ pub async fn request_openai_api(
         .bearer_auth(config.openai_api_key.as_str())
         .json(&payload)
         .send()
-        .await?;
-    match response.error_for_status() {
-        Ok(response) => {
-            let openai_response = response.json::<OpenAIResponse>().await?;
+        .await
+        .map_err(|err| err.to_string())?;
+
+    match response.status().is_success() {
+        true => {
+            let openai_response = response
+                .json::<OpenAIResponse>()
+                .await
+                .map_err(|err| err.to_string())?;
             Ok(openai_response)
         }
-        Err(err) => {
-            tracing::error!("Error requesting OpenAI API: {}", err);
-            Err(err)
+        false => {
+            let err_msg = response.text().await.map_err(|err| err.to_string())?;
+            Err(err_msg)
         }
     }
 }
