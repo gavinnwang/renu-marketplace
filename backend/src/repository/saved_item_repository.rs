@@ -15,6 +15,7 @@ pub async fn fetch_saved_items_by_user_id(
             item.price, 
             item.user_id,
             item.description, 
+            item.location,
             item.category::TEXT AS "category!",
             item.status::TEXT AS "status!",
             item.created_at,

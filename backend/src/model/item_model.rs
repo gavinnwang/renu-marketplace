@@ -10,6 +10,7 @@ pub struct Item {
     pub updated_at: DateTime<Utc>,
     pub images: serde_json::Value,
     pub description: Option<String>,
+    pub location: Option<String>,
     pub category: String,
     pub status: String,
     pub user_id: i32,

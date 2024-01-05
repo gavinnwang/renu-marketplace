@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            item.id, \n            item.name, \n            item.price, \n            item.user_id, \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at, \n            item.description,\n            item.updated_at,\n            item.images as images\n        FROM item\n        WHERE item.status = $1\n        ORDER BY item.created_at DESC\n        LIMIT $2\n        OFFSET $3;\n        ",
+  "query": "\n        SELECT\n            Item.id,\n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category::TEXT AS \"category!\",\n            Item.status::TEXT AS \"status!\",\n            Item.description,\n            Item.location,\n            Item.created_at, \n            Item.updated_at,\n            Item.images as images\n        FROM Item \n        WHERE Item.category = $1 AND Item.status = 'active'\n        ORDER BY Item.created_at DESC\n        LIMIT $2\n        OFFSET $3;\n        ",
   "describe": {
     "columns": [
       {
@@ -35,21 +35,26 @@
       },
       {
         "ordinal": 6,
-        "name": "created_at",
-        "type_info": "Timestamptz"
-      },
-      {
-        "ordinal": 7,
         "name": "description",
         "type_info": "Text"
       },
       {
+        "ordinal": 7,
+        "name": "location",
+        "type_info": "Varchar"
+      },
+      {
         "ordinal": 8,
-        "name": "updated_at",
+        "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
         "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
         "name": "images",
         "type_info": "Json"
       }
@@ -58,11 +63,18 @@
       "Left": [
         {
           "Custom": {
-            "name": "item_status",
+            "name": "category",
             "kind": {
               "Enum": [
-                "active",
-                "inactive"
+                "mens",
+                "womens",
+                "home",
+                "furniture",
+                "electronics",
+                "bikes",
+                "tickets",
+                "general",
+                "free"
               ]
             }
           }
@@ -78,11 +90,12 @@
       false,
       null,
       null,
-      false,
       true,
+      true,
+      false,
       false,
       false
     ]
   },
-  "hash": "59252b3ac13215765dc9cde0706bb0ed46d0e646959569018f862f79c6fc6e2b"
+  "hash": "6f6014dca34c16653b8c1165f9d62eda91e13e2ead93ad3b8b14facf53569df1"
 }

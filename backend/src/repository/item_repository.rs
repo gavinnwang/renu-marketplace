@@ -24,6 +24,7 @@ pub async fn fetch_items_by_status(
             item.status::TEXT AS "status!",
             item.created_at, 
             item.description,
+            item.location,
             item.updated_at,
             item.images as images
         FROM item
@@ -59,6 +60,7 @@ pub async fn fetch_active_items_by_category(
             Item.category::TEXT AS "category!",
             Item.status::TEXT AS "status!",
             Item.description,
+            Item.location,
             Item.created_at, 
             Item.updated_at,
             Item.images as images
@@ -93,6 +95,7 @@ pub async fn fetch_item_by_id(
                 Item.category::TEXT as "category!",
                 Item.status::TEXT as "status!",
                 Item.description,
+                Item.location,
                 Item.created_at, 
                 Item.updated_at,
                 Item.images as images
@@ -122,6 +125,7 @@ pub async fn fetch_items_by_user_id(
             Item.category::TEXT AS "category!",
             Item.status::TEXT AS "status!",
             Item.description,
+            Item.location,
             Item.created_at, 
             Item.updated_at,
             Item.images as images
@@ -153,6 +157,7 @@ pub async fn fetch_items_by_user_id_and_status(
             Item.category::TEXT AS "category!",
             Item.status::TEXT AS "status!",
             Item.description,
+            Item.location,
             Item.created_at, 
             Item.updated_at,
             Item.images as images
@@ -233,6 +238,7 @@ pub async fn search_items(
             item.status::TEXT AS "status!",
             item.created_at as "created_at!", 
             item.description as "description!",
+            item.location as "location!",
             item.updated_at as "updated_at!",
             item.images as "images!"
         FROM search_item_idx.search(
