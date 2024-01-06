@@ -269,7 +269,10 @@ export async function getSearchItems(query: string): Promise<Item[]> {
   return parseOrThrowResponse<Item[]>(res);
 }
 
-export async function postImages(images: string[], temp: Boolean): Promise<string[]> {
+export async function postImages(
+  images: string[],
+  temp: Boolean
+): Promise<string[]> {
   const formData = new FormData();
   for (let i = 0; i < images.length; i++) {
     const uri = images[i];
@@ -319,4 +322,9 @@ export async function postNewItem(
     }),
   });
   return parseOrThrowResponse<number>(postItemResponse);
+}
+
+export async function getPopularSearchQueries(): Promise<string[]> {
+  const res = await fetch(`${API_URL}/search/popular-queries`);
+  return parseOrThrowResponse<string[]>(res);
 }

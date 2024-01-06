@@ -27,8 +27,8 @@ export default function ListPage() {
   const [selectedTabInt, setSelectedTabInt] = React.useState(0);
 
   return (
-    <View className="bg-bgLight h-full">
-      <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
+    <View className="bg-bgLight h-full dark:bg-blackPrimary">
+      <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl text-blackPrimary dark:text-bgLight">
         Listings
       </Text>
       <Tabs
@@ -51,7 +51,7 @@ export default function ListPage() {
         ))}
       </PagerView>
 
-      <View className="h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
+      <View className="h-[72px] w-full bg-bgLight dark:bg-blackPrimary border-t border-t-stone-200 dark:border-t-stone-800 py-3 px-6 flex items-center justify-center">
         <Pressable
           onPress={() => {
             void router.push({
@@ -88,7 +88,7 @@ export function TabPage({ index }: { index: number }) {
   const [refreshing, setRefreshing] = React.useState(false);
 
   return (
-    <View className="bg-bgLight h-full">
+    <View className="bg-bgLight dark:bg-blackPrimary h-full">
       {isErrorItem ? (
         <RefreshScreen
           displayText={"Something went wrong."}
@@ -130,11 +130,7 @@ dayjs.extend(relativeTime);
 import { CATEGORIES } from "../../../../shared/constants/Category";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../hooks/useSession";
-import {
-  IMAGES_URL,
-  getUserMeItems,
-  postItemStatus,
-} from "../../../api";
+import { IMAGES_URL, getUserMeItems, postItemStatus } from "../../../api";
 import RefreshScreen from "../../../components/RefreshScreen";
 import PagerView from "react-native-pager-view";
 
@@ -214,21 +210,21 @@ const ListingPageItem = ({ item }: { item: Item }) => {
       />
       <View className="flex flex-col flex-grow justify-between px-4">
         <View className="flex flex-col flex-grow gap-y-1">
-          <Text className="font-Manrope_600SemiBold text-base max-h-[25px]">
+          <Text className="font-Manrope_600SemiBold text-base max-h-[25px] text-blackPrimary dark:text-bgLight">
             {item.name}
           </Text>
-          <Text className="font-Manrope_400Regular text-sm">
+          <Text className="font-Manrope_400Regular text-sm text-blackPrimary dark:text-bgLight">
             {dayjs(item.created_at).fromNow()}
           </Text>
-          <Text className="font-Manrope_400Regular text-sm">
+          <Text className="font-Manrope_400Regular text-sm text-blackPrimary dark:text-bgLight">
             {CATEGORIES[item.category]}{" "}
           </Text>
         </View>
         <TouchableOpacity
           onPress={onPressHandler}
-          className="border-[1.5px] h-[32px] w-[250px] flex items-center justify-center rounded-sm"
+          className="border-[1.5px] h-[32px] w-[250px] flex items-center justify-center rounded-sm border-blackPrimary dark:border-bgLight"
         >
-          <Text className="font-SecularOne_400Regular text-sm text-blackPrimary">
+          <Text className="font-SecularOne_400Regular text-sm text-blackPrimary dark:text-bgLight">
             {item.status === "active" ? "MARK AS SOLD" : "RELIST"}
           </Text>
         </TouchableOpacity>
@@ -265,7 +261,7 @@ const Tab = React.forwardRef(
           <Text
             className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
               sectionIndex === selectedTabInt
-                ? "text-blackPrimary border-grayPrimary"
+                ? "text-blackPrimary dark:text-bgLight border-grayPrimary"
                 : "text-grayPrimary"
             }`}
           >
@@ -335,7 +331,7 @@ const Tabs = ({
   return (
     <View
       ref={containerRef}
-      className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight"
+      className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight dark:border-b-blackSecondary"
     >
       {data.map((section, i) => {
         return (
@@ -375,11 +371,11 @@ const Indicator = ({
 
   return (
     <Animated.View
+      className="bg-blackPrimary dark:bg-bgLight"
       style={{
         position: "absolute",
         height: 2,
         width: Dimensions.get("window").width / 2,
-        backgroundColor: Colors.blackPrimary,
         transform: [{ translateX }],
         bottom: -1,
       }}

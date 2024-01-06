@@ -31,15 +31,14 @@ export function ItemListing({ item }: { item: Item }) {
           }}
           recyclingKey={item.id.toString()}
           source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
-          className="object-cover rounded-t"
+          className="object-cover rounded-t bg-bgLight dark:bg-blackSecondary"
           style={{
             width: imageWidth,
             maxWidth: imageWidth,
             height: imageWidth * 1.3,
-            backgroundColor: Colors.grayLight,
           }}
         />
-        <View className="h-fit py-2 px-2.5 bg-white rounded-b flex flex-col dark:bg-stone-900">
+        <View className="h-fit py-2 px-2.5 bg-white rounded-b flex flex-col dark:bg-[#1f1c18]">
           <Text className="font-Manrope_600SemiBold text-base max-h-[25px] text-blackPrimary dark:text-white">
             {item.name}
           </Text>

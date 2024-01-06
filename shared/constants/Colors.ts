@@ -1,5 +1,6 @@
 const backgroundLight = "#F9F9F9";
 const blackPrimary = "#181818";
+const blackSecondary = "#1f1c18";
 const whitePrimary = "#FFFFFF";
 const grayLight = "#EEEEEE";
 const grayPrimary = "#B5B5B5";
@@ -10,6 +11,7 @@ export default {
   grayPrimary,
   whitePrimary,
   northwesternPurple,
+  blackSecondary,
   light: {
     text: blackPrimary,
     background: backgroundLight,

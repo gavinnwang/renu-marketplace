@@ -6,7 +6,7 @@ import {
   Pressable,
   RefreshControl,
 } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { ChatGroup, Measure, RefAndKey } from "../../../../shared/types";
 import Colors from "../../../../shared/constants/Colors";
 import React from "react";

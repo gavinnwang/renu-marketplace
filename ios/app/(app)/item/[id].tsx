@@ -7,6 +7,7 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
+  useColorScheme,
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -115,14 +116,12 @@ export default function ItemPage() {
     },
   });
 
-  console.debug(itemId);
-
   const width = Dimensions.get("window").width;
 
   return (
     <>
-      <SafeAreaView className="bg-bgLight" />
-      <View className="bg-bgLight h-full">
+      <SafeAreaView className="bg-bgLight dark:bg-blackPrimary" />
+      <View className="bg-bgLight h-full dark:bg-blackPrimary">
         <Pressable onPress={router.back} className="p-3">
           <LeftChevron />
         </Pressable>
@@ -165,7 +164,7 @@ export default function ItemPage() {
             </View>
             {item.user_id === session?.user_id ? (
               <View className="px-3 py-1.5 w-full bg-purplePrimary flex justify-center">
-                <Text className="font-Manrope_500Medium text-white">
+                <Text className="font-Manrope_500Medium text-bgLight">
                   {item.status === "inactive"
                     ? `You sold this item ${dayjs(item.updated_at).fromNow()}`
                     : `You listed this item ${dayjs(
@@ -177,7 +176,7 @@ export default function ItemPage() {
             ) : (
               item.status === "inactive" && (
                 <View className="px-3 py-1.5 w-full bg-purplePrimary flex justify-center">
-                  <Text className="font-Manrope_500Medium text-white">
+                  <Text className="font-Manrope_500Medium text-blackPrimary dark:text-bgLight">
                     This item is mark as sold.
                   </Text>
                 </View>
@@ -185,7 +184,7 @@ export default function ItemPage() {
             )}
             <View className="w-full flex flex-col p-3 py-3">
               <View className="w-full flex justify-between flex-row items-center">
-                <Text className="text-lg font-Poppins_600SemiBold">
+                <Text className="text-lg font-Poppins_600SemiBold text-blackPrimary dark:text-bgLight">
                   {item.name}
                 </Text>
                 <TouchableOpacity
@@ -198,10 +197,10 @@ export default function ItemPage() {
               </View>
               <View className="flex flex-row items-center">
                 <CategoryIcon />
-                <Text className="mx-1.5 font-Manrope_400Regular text-sm">
+                <Text className="mx-1.5 font-Manrope_400Regular text-sm text-blackPrimary dark:text-bgLight">
                   Category
                 </Text>
-                <Text className="font-Manrope_600SemiBold text-sm">
+                <Text className="font-Manrope_600SemiBold text-sm text-blackPrimary dark:text-bgLight">
                   {CATEGORIES[item.category]}
                 </Text>
               </View>
@@ -209,43 +208,35 @@ export default function ItemPage() {
                 ${item.price}
               </Text>
             </View>
-            <View className="h-2 bg-grayLight" />
+            <View className="h-2 bg-grayLight dark:bg-zinc-950" />
             <View className="p-3 flex flex-col gap-y-2">
               <View className="flex flex-row gap-x-0.5">
-                <Text className="text-base font-Poppins_600SemiBold">
+                <Text className="text-base font-Poppins_600SemiBold text-blackPrimary dark:text-bgLight">
                   Description
                 </Text>
               </View>
 
               <View>
-                <Text
-                  className={`font-Manrope_500Medium text-sm mb-1 ${
-                    item.location ? "" : "opacity-70"
-                  }`}
-                >
+                <Text className="font-Manrope_500Medium text-sm mb-1 opacity-70 text-blackPrimary dark:text-bgLight">
                   {!(item.description && item.description.trim())
                     ? "No description provided."
                     : item.description.trim()}
                 </Text>
               </View>
               <View className="flex flex-row gap-x-0.5 pt-2">
-                <Text className="text-base font-Poppins_600SemiBold">
+                <Text className="text-base font-Poppins_600SemiBold text-blackPrimary dark:text-bgLight">
                   Meet up Location
                 </Text>
               </View>
 
               <View>
-                <Text
-                  className={`font-Manrope_500Medium text-sm mb-1 ${
-                    item.location ? "" : "opacity-70"
-                  }`}
-                >
+                <Text className="font-Manrope_500Medium text-sm mb-1 opacity-70 text-blackPrimary dark:text-bgLight">
                   {!(item.location && item.location.trim())
                     ? "No meet up location listed."
                     : item.location.trim()}
                 </Text>
               </View>
-              <Text className="font-Manrope_400Regular text-xs">
+              <Text className="font-Manrope_500Medium text-xs text-blackPrimary opacity-70 dark:text-bgLight">
                 {item.updated_at !== item.created_at && item.status === "active"
                   ? `Re-listed ${dayjs(
                       item.updated_at
@@ -256,15 +247,16 @@ export default function ItemPage() {
               </Text>
             </View>
 
-            <View className="h-2 bg-grayLight" />
+            <View className="h-2 bg-grayLight dark:bg-zinc-950" />
 
             <View className="p-3 flex flex-col gap-y-2">
-              <Text className="font-Poppins_600SemiBold text-base">Seller</Text>
+              <Text className="font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
+                Seller
+              </Text>
               <Pressable
                 onPress={() => {
                   if (!seller) return;
                   if (!session) return;
-                  console.debug("seller", item.user_id);
                   if (seller.id === session.user_id) {
                     router.push("/account");
                   } else {
@@ -298,7 +290,6 @@ export default function ItemPage() {
                     onPress={() => {
                       if (!seller) return;
                       if (!session) return;
-                      console.debug("seller", item.user_id);
                       if (seller.id === session.user_id) {
                         router.push("/account");
                       } else {
@@ -312,15 +303,15 @@ export default function ItemPage() {
                       }
                     }}
                   >
-                    <Text className="font-Poppins_500Medium text-base text-blackPrimary">
+                    <Text className="font-Poppins_500Medium text-base text-blackPrimary dark:text-bgLight">
                       {seller?.name ?? "Loading user"}
                     </Text>
                   </TouchableOpacity>
                   <View className="flex flex-row gap-x-1">
-                    <Text className="font-Manrope_400Regular text-sm">
+                    <Text className="font-Manrope_400Regular text-sm text-blackPrimary dark:text-bgLight">
                       {seller?.active_listing_count ?? 0} listings
                     </Text>
-                    <Text className="font-Manrope_400Regular text-sm">
+                    <Text className="font-Manrope_400Regular text-sm text-blackPrimary dark:text-bgLight">
                       {seller?.sales_done_count ?? 0} sold
                     </Text>
                   </View>
@@ -377,11 +368,22 @@ export default function ItemPage() {
   );
 }
 
-const CategoryIcon = () => (
-  <Svg width={14} height={14} viewBox="0 0 12 12" fill="none">
-    <Path
-      d="M4.875 10.125H2.625C2.42609 10.125 2.23532 10.046 2.09467 9.90533C1.95402 9.76468 1.875 9.57391 1.875 9.375V7.125C1.875 6.92609 1.95402 6.73532 2.09467 6.59467C2.23532 6.45402 2.42609 6.375 2.625 6.375H4.875C5.07391 6.375 5.26468 6.45402 5.40533 6.59467C5.54598 6.73532 5.625 6.92609 5.625 7.125V9.375C5.625 9.57391 5.54598 9.76468 5.40533 9.90533C5.26468 10.046 5.07391 10.125 4.875 10.125ZM4.875 7.125H2.625V9.375H4.875V7.125ZM9.375 10.125H7.125C6.92609 10.125 6.73532 10.046 6.59467 9.90533C6.45402 9.76468 6.375 9.57391 6.375 9.375V7.125C6.375 6.92609 6.45402 6.73532 6.59467 6.59467C6.73532 6.45402 6.92609 6.375 7.125 6.375H9.375C9.57391 6.375 9.76468 6.45402 9.90533 6.59467C10.046 6.73532 10.125 6.92609 10.125 7.125V9.375C10.125 9.57391 10.046 9.76468 9.90533 9.90533C9.76468 10.046 9.57391 10.125 9.375 10.125ZM9.375 7.125H7.125V9.375H9.375V7.125ZM4.875 5.625H2.625C2.42609 5.625 2.23532 5.54598 2.09467 5.40533C1.95402 5.26468 1.875 5.07391 1.875 4.875V2.625C1.875 2.42609 1.95402 2.23532 2.09467 2.09467C2.23532 1.95402 2.42609 1.875 2.625 1.875H4.875C5.07391 1.875 5.26468 1.95402 5.40533 2.09467C5.54598 2.23532 5.625 2.42609 5.625 2.625V4.875C5.625 5.07391 5.54598 5.26468 5.40533 5.40533C5.26468 5.54598 5.07391 5.625 4.875 5.625ZM4.875 2.625H2.625V4.875H4.875V2.625ZM9.375 5.625H7.125C6.92609 5.625 6.73532 5.54598 6.59467 5.40533C6.45402 5.26468 6.375 5.07391 6.375 4.875V2.625C6.375 2.42609 6.45402 2.23532 6.59467 2.09467C6.73532 1.95402 6.92609 1.875 7.125 1.875H9.375C9.57391 1.875 9.76468 1.95402 9.90533 2.09467C10.046 2.23532 10.125 2.42609 10.125 2.625V4.875C10.125 5.07391 10.046 5.26468 9.90533 5.40533C9.76468 5.54598 9.57391 5.625 9.375 5.625ZM9.375 2.625H7.125V4.875H9.375V2.625Z"
-      fill="black"
-    />
-  </Svg>
-);
+const CategoryIcon = () => {
+  const colorScheme = useColorScheme();
+  return (
+    <Svg
+      width={14}
+      height={14}
+      viewBox="0 0 12 12"
+      fill="none"
+      className="w-4 h-4"
+    >
+      <Path
+        d="M4.875 10.125H2.625C2.42609 10.125 2.23532 10.046 2.09467 9.90533C1.95402 9.76468 1.875 9.57391 1.875 9.375V7.125C1.875 6.92609 1.95402 6.73532 2.09467 6.59467C2.23532 6.45402 2.42609 6.375 2.625 6.375H4.875C5.07391 6.375 5.26468 6.45402 5.40533 6.59467C5.54598 6.73532 5.625 6.92609 5.625 7.125V9.375C5.625 9.57391 5.54598 9.76468 5.40533 9.90533C5.26468 10.046 5.07391 10.125 4.875 10.125ZM4.875 7.125H2.625V9.375H4.875V7.125ZM9.375 10.125H7.125C6.92609 10.125 6.73532 10.046 6.59467 9.90533C6.45402 9.76468 6.375 9.57391 6.375 9.375V7.125C6.375 6.92609 6.45402 6.73532 6.59467 6.59467C6.73532 6.45402 6.92609 6.375 7.125 6.375H9.375C9.57391 6.375 9.76468 6.45402 9.90533 6.59467C10.046 6.73532 10.125 6.92609 10.125 7.125V9.375C10.125 9.57391 10.046 9.76468 9.90533 9.90533C9.76468 10.046 9.57391 10.125 9.375 10.125ZM9.375 7.125H7.125V9.375H9.375V7.125ZM4.875 5.625H2.625C2.42609 5.625 2.23532 5.54598 2.09467 5.40533C1.95402 5.26468 1.875 5.07391 1.875 4.875V2.625C1.875 2.42609 1.95402 2.23532 2.09467 2.09467C2.23532 1.95402 2.42609 1.875 2.625 1.875H4.875C5.07391 1.875 5.26468 1.95402 5.40533 2.09467C5.54598 2.23532 5.625 2.42609 5.625 2.625V4.875C5.625 5.07391 5.54598 5.26468 5.40533 5.40533C5.26468 5.54598 5.07391 5.625 4.875 5.625ZM4.875 2.625H2.625V4.875H4.875V2.625ZM9.375 5.625H7.125C6.92609 5.625 6.73532 5.54598 6.59467 5.40533C6.45402 5.26468 6.375 5.07391 6.375 4.875V2.625C6.375 2.42609 6.45402 2.23532 6.59467 2.09467C6.73532 1.95402 6.92609 1.875 7.125 1.875H9.375C9.57391 1.875 9.76468 1.95402 9.90533 2.09467C10.046 2.23532 10.125 2.42609 10.125 2.625V4.875C10.125 5.07391 10.046 5.26468 9.90533 5.40533C9.76468 5.54598 9.57391 5.625 9.375 5.625ZM9.375 2.625H7.125V4.875H9.375V2.625Z"
+        fill={
+          colorScheme === "dark" ? Colors.whitePrimary : Colors.blackPrimary
+        }
+      />
+    </Svg>
+  );
+};

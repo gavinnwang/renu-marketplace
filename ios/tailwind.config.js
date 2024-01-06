@@ -16,6 +16,7 @@ module.exports = {
       },
       colors: () => ({
         blackPrimary: "#181818",
+        blackSecondary: "#1f1c18",
         grayLight: "#EEEEEE",
         purplePrimary: "#4E2A84",
         purpleSecondary: "#2A0D41",
