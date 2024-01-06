@@ -9,6 +9,22 @@ pub struct SearchItemsQuery {
     query: String,
 }
 
+#[get("/popular-queries")]
+async fn get_popular_queries_handler() -> impl Responder {
+    tracing::info!("get_popular_queries_handler called");
+
+    return HttpResponse::Ok().json(vec!["Bike", "Shoes", "Chair"]);
+    // let popular_queries = item_repository::get_popular_queries(pool.as_ref()).await;
+
+    // match popular_queries {
+    //     Ok(popular_queries) => HttpResponse::Ok().json(popular_queries),
+    //     Err(err) => {
+    //         tracing::error!("Failed to fetch popular queries");
+    //         HttpResponse::InternalServerError().json(err.to_string())
+    //     }
+    // }
+}
+
 #[tracing::instrument(skip(pool))]
 #[get("/items")]
 async fn search_items_handler(
@@ -21,7 +37,7 @@ async fn search_items_handler(
     match items {
         Ok(items) => HttpResponse::Ok().json(items),
         Err(err) => {
-            tracing::error!("Failed to fetch items: {err}");
+            tracing::error!("Failed to fetch items");
             HttpResponse::InternalServerError().json(err.to_string())
         }
     }

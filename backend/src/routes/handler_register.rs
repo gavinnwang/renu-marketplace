@@ -47,7 +47,11 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::chat_handler::get_all_chat_groups),
     );
 
-    conf.service(web::scope("/search").service(super::item_search_handler::search_items_handler));
+    conf.service(
+        web::scope("/search")
+            .service(super::item_search_handler::search_items_handler)
+            .service(super::item_search_handler::get_popular_queries_handler),
+    );
 
     conf.service(web::scope("/images").service(super::image_upload_handler::post_images));
 
