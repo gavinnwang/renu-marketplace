@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            item.id as \"id!\", \n            item.name as \"name!\", \n            item.price as \"price!\", \n            item.user_id as \"user_id!\", \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at as \"created_at!\", \n            item.description as \"description!\",\n            item.location as \"location!\",\n            item.updated_at as \"updated_at!\",\n            item.images as \"images!\"\n        FROM search_item_idx.search(\n        $1,\n        fuzzy_fields => 'description,name',\n        distance => 1\n        ) AS item\n        WHERE item.status = 'active'\n        LIMIT 10;\n        ",
+  "query": "\n        SELECT\n            item.id as \"id!\", \n            item.name as \"name!\", \n            item.price as \"price!\", \n            item.user_id as \"user_id!\", \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at as \"created_at!\", \n            item.description as \"description\",\n            item.location as \"location\",\n            item.updated_at as \"updated_at!\",\n            item.images as \"images!\"\n        FROM search_item_idx.search(\n        $1,\n        fuzzy_fields => 'description,name',\n        distance => 1\n        ) AS item\n        WHERE item.status = 'active'\n        LIMIT 10;\n        ",
   "describe": {
     "columns": [
       {
@@ -40,12 +40,12 @@
       },
       {
         "ordinal": 7,
-        "name": "description!",
+        "name": "description",
         "type_info": "Text"
       },
       {
         "ordinal": 8,
-        "name": "location!",
+        "name": "location",
         "type_info": "Varchar"
       },
       {
@@ -78,5 +78,5 @@
       null
     ]
   },
-  "hash": "ca317ee9cf6f431f1e7ae5b8b8b379f651ca9681c477f89222dd68615146a927"
+  "hash": "5a22602543b3eab99b7969b71baea1646947ea36c98ea4857e5c9aa69293379f"
 }

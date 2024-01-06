@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View, useColorScheme } from "react-native";
 import Colors from "../../../../shared/constants/Colors";
 import React from "react";
 import { useNavigation } from "expo-router";
@@ -10,6 +10,7 @@ import { ItemListing } from "../../../components/ItemListing";
 
 const Stack = createNativeStackNavigator();
 export default function MyStack() {
+  const colorScheme = useColorScheme();
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -17,13 +18,17 @@ export default function MyStack() {
         component={SearchPage}
         options={{
           headerTitleStyle: {
-            color: Colors.blackPrimary,
+            color:
+              colorScheme === "light" ? Colors.light.text : Colors.dark.text,
             fontFamily: "Poppins_600SemiBold",
             fontSize: 20,
           },
           headerTitleAlign: "left",
           headerStyle: {
-            backgroundColor: Colors.light.background,
+            backgroundColor:
+              colorScheme === "light"
+                ? Colors.light.background
+                : Colors.dark.background,
           },
         }}
       />
@@ -95,18 +100,18 @@ export function SearchPage() {
     saveSearchHistory();
   }, [searchHistory]);
   return (
-    <View className="bg-bgLight h-full">
+    <View className="bg-bgLight h-full dark:bg-blackPrimary">
       <View className="h-[54px]"></View>
       {searchQuery.length === 0 ? (
         searchHistory.length === 0 ? (
           <View className="flex-grow flex flex-col justify-center items-center w-full">
-            <Text className="font-Poppins_600SemiBold text-lg">
+            <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
               Search for items!
             </Text>
           </View>
         ) : (
           <View className="flex-grow flex flex-col mt-[16%] items-center w-full">
-            <Text className="font-Poppins_600SemiBold text-lg">
+            <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
               Recent searches
             </Text>
             <View className="flex flex-row flex-wrap justify-center items-center w-full">
@@ -115,7 +120,6 @@ export function SearchPage() {
                   onPress={() => {
                     // focus search bar
                     setSearchQuery(searchQuery);
-                    
                   }}
                   className="px-2 py-1 m-1 rounded-md bg-bgLighter"
                   key={index}

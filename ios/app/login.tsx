@@ -41,21 +41,21 @@ export default function LoginPage() {
   }, [session]);
 
   return (
-    <SafeAreaView className="flex h-full w-full pt-4 items-center bg-bgLight flex-col justify-between">
+    <SafeAreaView className="flex h-full w-full pt-4 items-center bg-bgLight flex-col justify-between dark:bg-blackPrimary">
       <View className="flex flex-row items-center mt-[30%]">
         <BigLogo />
-        <Text className="pl-1 text-black font-Poppins_600SemiBold text-[45px] tracking-tighter">
+        <Text className="pl-1 text-blackPrimary font-Poppins_600SemiBold text-[45px] tracking-tighter dark:text-white">
           Renu
         </Text>
       </View>
-      <Text className="mt-1 font-Poppins_600SemiBold text-black text-base w-[300px] mx-auto text-center leading-6">
+      <Text className="mt-1 font-Poppins_600SemiBold dark:text-white  text-base w-[300px] mx-auto text-center leading-6">
         Shop and sell with people within your college area with ease!
       </Text>
 
       <TouchableOpacity onPress={signIn} className="mb-12">
-        <View className="items-center flex-row h-[45px] rounded-sm border-[1.5px] w-[80vw] flex justify-center">
+        <View className="items-center flex-row h-[45px] rounded-sm border-[1.5px] w-[80vw] flex justify-center dark:border-white">
           <GoogleLogo />
-          <Text className="ml-2 font-Poppins_600SemiBold text-base">
+          <Text className="ml-2 font-Poppins_600SemiBold text-base dark:text-white">
             Continue with Google
           </Text>
         </View>

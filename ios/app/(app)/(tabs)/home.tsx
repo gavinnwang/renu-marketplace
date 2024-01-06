@@ -35,7 +35,7 @@ export default function HomeScreen() {
   useScrollToTop(data[selectedSection].flashListRef);
 
   return (
-    <View className="bg-bgLight h-full">
+    <View className="bg-bgLight h-full dark:bg-blackPrimary">
       <View className="flex flex-row items-center justify-start pl-4 pr-6 pb-2.5 min-h-[43px]">
         <LogoWithText />
       </View>
@@ -83,7 +83,9 @@ const CategoryView = ({
   const [fetched, setFetched] = React.useState(false);
   const getItemsByCategory = async ({ pageParam = 0 }) => {
     console.debug("fetching with pageParam and category", pageParam, category);
-    const res = await fetch(`${API_URL}/items/?category=${category}&page=${pageParam}`);
+    const res = await fetch(
+      `${API_URL}/items/?category=${category}&page=${pageParam}`
+    );
     setFetched(true);
     return parseOrThrowResponse<Item[]>(res);
   };
@@ -208,7 +210,9 @@ const Tab = React.forwardRef(
       >
         <Text
           className={`font-Poppins_500Medium ${
-            index === selectedSection ? "text-purplePrimary" : "text-gray-400"
+            index === selectedSection
+              ? "text-purplePrimary"
+              : "text-stone-400 dark:text-stone-500"
           }`}
         >
           {section.display}
@@ -275,7 +279,7 @@ const Tabs = ({
       ref={containerRef}
       horizontal
       showsHorizontalScrollIndicator={false}
-      className="border-y border-grayLight flex flex-row  min-h-[45px] max-h-[42px]"
+      className="border-y border-grayLight dark:border-stone-800 flex flex-row  min-h-[45px] max-h-[42px]"
     >
       {data.map((section, index) => {
         return (

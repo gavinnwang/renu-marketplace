@@ -13,6 +13,7 @@ export type Item = {
     | "general"
     | "free";
   description?: string;
+  location?: string;
   status: "active" | "inactive";
   user_id: number;
   created_at: Date;

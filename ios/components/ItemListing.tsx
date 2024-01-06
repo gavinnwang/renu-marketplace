@@ -39,11 +39,11 @@ export function ItemListing({ item }: { item: Item }) {
             backgroundColor: Colors.grayLight,
           }}
         />
-        <View className="h-fit py-2 px-2.5 bg-white rounded-b flex flex-col">
-          <Text className="font-Manrope_600SemiBold text-base max-h-[25px]">
+        <View className="h-fit py-2 px-2.5 bg-white rounded-b flex flex-col dark:bg-stone-900">
+          <Text className="font-Manrope_600SemiBold text-base max-h-[25px] text-blackPrimary dark:text-white">
             {item.name}
           </Text>
-          <Text className="font-Manrope_500Medium text-xs">
+          <Text className="font-Manrope_500Medium text-xs text-blackPrimary dark:text-white">
             {dayjs(item.created_at).fromNow()}
           </Text>
           <Text className="text-purplePrimary font-Manrope_600SemiBold text-xl">

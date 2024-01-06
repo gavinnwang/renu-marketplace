@@ -5,7 +5,7 @@ use crate::{
     error::DbError,
     model::item_model::{Category, Item, ItemStatus},
 };
- 
+
 pub async fn fetch_items_by_status(
     status: ItemStatus,
     limit: i32,
@@ -237,8 +237,8 @@ pub async fn search_items(
             item.category::TEXT AS "category!",
             item.status::TEXT AS "status!",
             item.created_at as "created_at!", 
-            item.description as "description!",
-            item.location as "location!",
+            item.description as "description",
+            item.location as "location",
             item.updated_at as "updated_at!",
             item.images as "images!"
         FROM search_item_idx.search(

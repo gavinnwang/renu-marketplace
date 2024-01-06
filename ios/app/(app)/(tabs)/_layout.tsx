@@ -2,19 +2,23 @@ import { Tabs } from "expo-router";
 import React from "react";
 import Colors from "../../../../shared/constants/Colors";
 import Svg, { Path } from "react-native-svg";
-import { SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, Text, View, useColorScheme } from "react-native";
 import { getAllChatGroups, getChatGroupUnreadCount } from "../../../api";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "../../../hooks/useSession";
 
 export default function TabsLayout() {
+  const colorScheme = useColorScheme();
   return (
     <>
-      <SafeAreaView className="bg-bgLight" />
+      <SafeAreaView className="bg-bgLight dark:bg-blackPrimary" />
       <Tabs
         screenOptions={{
           tabBarStyle: {
-            backgroundColor: Colors.light.background,
+            backgroundColor:
+              colorScheme === "dark"
+                ? Colors.dark.background
+                : Colors.light.background,
           },
           tabBarActiveTintColor: Colors.northwesternPurple,
         }}

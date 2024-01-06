@@ -218,10 +218,31 @@ export default function ItemPage() {
               </View>
 
               <View>
-                <Text className="font-Manrope_400Regular text-sm mb-1">
+                <Text
+                  className={`font-Manrope_500Medium text-sm mb-1 ${
+                    item.location ? "" : "opacity-70"
+                  }`}
+                >
                   {!(item.description && item.description.trim())
                     ? "No description provided."
                     : item.description.trim()}
+                </Text>
+              </View>
+              <View className="flex flex-row gap-x-0.5 pt-2">
+                <Text className="text-base font-Poppins_600SemiBold">
+                  Meet up Location
+                </Text>
+              </View>
+
+              <View>
+                <Text
+                  className={`font-Manrope_500Medium text-sm mb-1 ${
+                    item.location ? "" : "opacity-70"
+                  }`}
+                >
+                  {!(item.location && item.location.trim())
+                    ? "No meet up location listed."
+                    : item.location.trim()}
                 </Text>
               </View>
               <Text className="font-Manrope_400Regular text-xs">
@@ -273,9 +294,28 @@ export default function ItemPage() {
                   className="w-[53px] h-[53px] rounded-full bg-blackPrimary"
                 />
                 <View className="flex flex-col gap-y-1 ml-2">
-                  <Text className="font-Poppins_500Medium text-base text-blackPrimary">
-                    {seller?.name ?? "Loading user"}
-                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (!seller) return;
+                      if (!session) return;
+                      console.debug("seller", item.user_id);
+                      if (seller.id === session.user_id) {
+                        router.push("/account");
+                      } else {
+                        router.push({
+                          pathname: `/seller/${seller.id}`,
+                          params: {
+                            sellerString: JSON.stringify(seller),
+                            sellerId: seller.id.toString(),
+                          },
+                        });
+                      }
+                    }}
+                  >
+                    <Text className="font-Poppins_500Medium text-base text-blackPrimary">
+                      {seller?.name ?? "Loading user"}
+                    </Text>
+                  </TouchableOpacity>
                   <View className="flex flex-row gap-x-1">
                     <Text className="font-Manrope_400Regular text-sm">
                       {seller?.active_listing_count ?? 0} listings
@@ -330,11 +370,7 @@ export default function ItemPage() {
             <View className="h-16" />
           </ScrollView>
         ) : (
-          <>
-            {/* <Text className="font-Poppins_500Medium text-base mx-auto">
-              Loading
-            </Text> */}
-          </>
+          <></>
         )}
       </View>
     </>
