@@ -126,14 +126,14 @@ const CategoryView = ({
         >
           <View className="flex flex-col gap-y-2 items-center">
             <LogoWithText />
-            <Text className="font-Poppins_600SemiBold text-lg">
+            <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
               Something went wrong.
             </Text>
           </View>
         </ScrollView>
       ) : items.pages.length <= 1 && items.pages[0].length === 0 ? (
         <ScrollView
-          className="bg-bgLight h-full py-[70%]"
+          className="bg-bgLight h-full py-[70%] dark:bg-blackPrimary"
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -147,7 +147,7 @@ const CategoryView = ({
         >
           <View className="flex flex-col gap-y-2 items-center">
             <LogoWithText />
-            <Text className="font-Poppins_600SemiBold text-lg">
+            <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
               No item right now... List one!
             </Text>
           </View>
@@ -155,7 +155,7 @@ const CategoryView = ({
       ) : (
         <FlashList
           ref={flashListRef}
-          className="bg-bgLight h-full"
+          className="bg-bgLight h-full dark:bg-blackPrimary"
           showsVerticalScrollIndicator={false}
           estimatedItemSize={320}
           removeClippedSubviews={true}

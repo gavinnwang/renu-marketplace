@@ -30,8 +30,8 @@ export default function MessagePage() {
   const [selectedTabInt, setSelectedTabInt] = React.useState(0);
 
   return (
-    <View className="bg-bgLight h-full">
-      <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl ">
+    <View className="bg-bgLight h-full dark:bg-blackPrimary">
+      <Text className="m-2.5 mt-2 font-Poppins_600SemiBold text-xl text-blackPrimary dark:text-bgLight">
         Messages
       </Text>
       <Tabs
@@ -78,7 +78,7 @@ function TabPage({ index }: { index: number }) {
   const chats = index === 0 ? allChats?.buyer_chat : allChats?.seller_chat;
 
   return (
-    <View className="bg-bgLight h-full">
+    <View className="bg-bgLight h-full dark:bg-blackPrimary">
       {isErrorChats ? (
         <RefreshScreen displayText="Something went wrong." refetch={refetch} />
       ) : isLoadingChats ? (
@@ -132,7 +132,7 @@ const ChatRow = ({
           },
         });
       }}
-      className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary ${
+      className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary dark:bg-blackPrimary ${
         chat.item_status === "inactive" ? "opacity-70" : ""
       }`}
     >
@@ -159,15 +159,15 @@ const ChatRow = ({
           </View>
         )}
       </View>
-      <View className="flex flex-col px-4 flex-grow justify-between ">
+      <View className="flex flex-col px-4 flex-grow justify-between">
         <View>
           <View className="flex flex-row gap-y-1 justify-between max-w-[250px]">
-            <Text className="font-Manrope_600SemiBold text-base max-h-[50px]">
+            <Text className="font-Manrope_600SemiBold text-base max-h-[50px] text-blackPrimary dark:text-bgLight">
               {chat.item_name}
             </Text>
           </View>
           {chat.last_message_content && (
-            <Text className="text-base text-gray-600 font-Manrope_500Medium max-w-[250px]">
+            <Text className="text-base text-gray-600 font-Manrope_500Medium max-w-[250px] dark:text-gray-400">
               {chat.last_message_content.length >= 50 ? (
                 <>{chat.last_message_content.slice(0, 50)}...</>
               ) : (
@@ -177,7 +177,7 @@ const ChatRow = ({
           )}
         </View>
         <View className="flex flex-col">
-          <Text className="font-Manrope_500Medium text-xs">
+          <Text className="font-Manrope_500Medium text-xs text-blackPrimary dark:text-bgLight">
             {chat.other_user_name}
             {"    "}
             {dayjs(chat.last_message_sent_at).fromNow()}
