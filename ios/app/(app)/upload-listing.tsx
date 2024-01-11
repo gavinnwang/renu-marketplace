@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
   Alert,
+  useColorScheme,
 } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 import * as ImagePicker from "expo-image-picker";
@@ -234,24 +235,25 @@ export default function UploadListingStepOne() {
       { cancelable: false }
     );
   };
+  const colorScheme = useColorScheme();
   return (
     <>
-      <SafeAreaView className="bg-bgLight">
-        <View className="bg-bgLight h-full">
+      <SafeAreaView className="bg-bgLight dark:bg-blackPrimary">
+        <View className="bg-bgLight h-full dark:bg-blackPrimary">
           <KeyboardAvoidingView
             behavior="position"
             style={{ flex: 1, zIndex: -100 }}
           >
-            <View className="flex flex-row items-center justify-between border-b border-b-stone-300">
+            <View className="flex flex-row items-center justify-between border-b border-b-stone-300 dark:border-b-stone-800">
               <Pressable onPress={router.back} className="w-10 p-3">
                 <LeftChevron />
               </Pressable>
-              <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary ">
+              <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
                 UPLOAD LISTING
               </Text>
               <View className="w-10 p-3" />
             </View>
-            <Text className="w-full pt-2 px-3 font-Poppins_600SemiBold text-base text-blackPrimary ">
+            <Text className="w-full pt-2 px-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
               Add Photos ({images.length - 1}){" "}
             </Text>
             <ScrollView>
@@ -301,14 +303,14 @@ export default function UploadListingStepOne() {
                     {completing ? (
                       <ActivityIndicator size="small" color="white" />
                     ) : (
-                      <Text className="font-Poppins_600SemiBold text-base text-white">
+                      <Text className="font-Poppins_600SemiBold text-base text-bgLight">
                         Auto fill with AI
                       </Text>
                     )}
                   </View>
                 </TouchableOpacity>
-                <View className="pb-5 border-b border-b-stone-200">
-                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary ">
+                <View className="pb-5 border-b border-b-stone-200 dark:border-b-stone-800">
+                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
                     Title
                   </Text>
 
@@ -321,8 +323,8 @@ export default function UploadListingStepOne() {
                     />
                   </View>
                 </View>
-                <View className="pb-5 border-b border-b-stone-200">
-                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary ">
+                <View className="pb-5 border-b border-b-stone-200 dark:border-b-stone-800">
+                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
                     Price
                   </Text>
                   <View className="bg-grayLight dark:bg-zinc-950 rounded-md">
@@ -335,8 +337,8 @@ export default function UploadListingStepOne() {
                     />
                   </View>
                 </View>
-                <View className=" border-b border-b-stone-200">
-                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary ">
+                <View className="border-b border-b-stone-200 dark:border-b-stone-800">
+                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
                     Category:{" "}
                     {ItemCategory[category] === "Pick a category"
                       ? ""
@@ -350,6 +352,7 @@ export default function UploadListingStepOne() {
                   >
                     {Object.keys(ItemCategory).map((key) => (
                       <PickerIOS.Item
+                        color={colorScheme === "dark" ? "white" : "black"}
                         ref={iosPickerRef}
                         key={key}
                         label={ItemCategory[key]}
@@ -371,11 +374,11 @@ export default function UploadListingStepOne() {
                       onChangeText={(text) => setDescription(text)}
                       value={description}
                       placeholder="Enter a description"
-                      className="p-3 h-fit"
+                      className="p-3 h-fit text-blackPrimary dark:text-bgLight dark:placeholder:text-bgLight"
                     />
                   </View>
                 </View>
-                <View className="fixed bottom-0 h-[72px] w-full bg-bgLight border-t border-t-stone-200 py-3 px-6 flex items-center justify-center">
+                <View className="fixed bottom-0 h-[72px] w-full bg-bgLight dark:bg-blackPrimary border-t border-t-stone-200 dark:border-t-stone-800 py-3 px-6 flex items-center justify-center">
                   <Pressable
                     onPress={handleUpload}
                     className="w-full h-full rounded-sm bg-purplePrimary flex shadow-lg items-center justify-center"
