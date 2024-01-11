@@ -109,10 +109,10 @@ const CategoryView = ({
   return (
     <View key={index} className="h-full flex flex-grow">
       {isLoadingItems ? (
-        <View className="bg-bgLight h-full w-full"></View>
+        <View className="bg-bgLight dark:bg-blackPrimary h-full w-full"></View>
       ) : isErrorItems ? (
         <ScrollView
-          className="bg-bgLight h-full py-[70%]"
+          className="bg-bgLight dark:bg-blackPrimary h-full py-[70%]"
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

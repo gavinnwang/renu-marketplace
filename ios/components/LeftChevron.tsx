@@ -1,13 +1,15 @@
 import Svg, { Path } from "react-native-svg";
 import Colors from "../../shared/constants/Colors";
+import { useColorScheme } from "react-native";
 
 export default function LeftChevron() {
+  const colorScheme = useColorScheme();
   return (
     <Svg
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.75}
-      stroke={Colors.blackPrimary}
+      stroke={colorScheme === "dark" ? Colors.light.background: Colors.blackPrimary}
       className="w-6 h-6"
     >
       <Path

@@ -31,15 +31,15 @@ export default function SavedItemsPage() {
   const [refreshing, setRefreshing] = React.useState(false);
   return (
     <>
-      <SafeAreaView className="bg-bgLight" />
-      <View className="bg-bgLight h-full">
+      <SafeAreaView className="bg-bgLight dark:bg-blackPrimary" />
+      <View className="bg-bgLight dark:bg-blackPrimary h-full">
         <View className="flex flex-row items-center">
           <Pressable onPress={router.back} className="p-3">
             <LeftChevron />
           </Pressable>
-          <Text className=" font-Poppins_600SemiBold text-xl">
+          <Text className=" font-Poppins_600SemiBold text-xl text-blackPrimary dark:text-bgLight">
             Saved items
-            <Text className="font-Poppins_500Medium text-sm">
+            <Text className="font-Poppins_500Medium text-sm text-blackPrimary dark:text-bgLight">
               {" "}
               ({savedItemData?.length ?? 0})
             </Text>{" "}

@@ -268,21 +268,21 @@ export default function ChatScreen() {
     React.useState(false);
 
   return (
-    <SafeAreaView className="bg-bgLight">
-      <View className="bg-bgLight h-full">
-        <View className="flex flex-row items-center justify-between ">
+    <SafeAreaView className="bg-bgLight dark:bg-blackPrimary">
+      <View className="bg-bgLight dark:bg-blackPrimary h-full">
+        <View className="flex flex-row items-center justify-between bg-bgLight dark:bg-blackPrimary">
           <Pressable onPress={router.back} className="w-10 p-3">
             <LeftChevron />
           </Pressable>
           {otherUserName && (
-            <Text className="font-Poppins_600SemiBold text-base text-blackPrimary ">
+            <Text className="font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
               {otherUserName}
             </Text>
           )}
           <View className="w-10 p-3" />
         </View>
 
-        <View className="border-y border-y-stone-200">
+        <View className="border-y border-y-stone-200 dark:border-y-stone-700 bg-stone-50 dark:bg-blackSecondary">
           <Pressable
             onPress={() => {
               if (!item) return;
@@ -293,7 +293,7 @@ export default function ChatScreen() {
                 },
               });
             }}
-            className="p-3.5 flex-row justify-between items-center bg-stone-50"
+            className="p-3.5 flex-row justify-between items-center"
             style={{
               height: (width * 4) / 3 + 28,
               opacity: item?.status === "inactive" ? 0.75 : 1,
@@ -306,24 +306,23 @@ export default function ChatScreen() {
                   duration: 250,
                 }}
                 source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
-                className="object-cover rounded-sm"
+                className="object-cover rounded-sm bg-grayLight dark:bg-zinc-800"
                 style={{
                   minWidth: width,
                   minHeight: (width * 4) / 3,
                   width: width,
                   height: (width * 4) / 3,
-                  backgroundColor: Colors.grayLight,
                 }}
               />
             )}
             <View className="mx-4 flex flex-grow flex-col pt-3">
               {item && (
                 <>
-                  <Text className="font-Poppins_600SemiBold text-base text-blackPrimary max-w-[230px] max-h-[60px]">
+                  <Text className="font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight max-w-[230px] max-h-[60px]">
                     {item.name}
                   </Text>
                   <Text
-                    className="font-Manrope_400Regular text-sm max-w-[230px] text-blackPrimary"
+                    className="font-Manrope_400Regular text-sm max-w-[230px] text-blackPrimary dark:text-bgLight"
                     style={{
                       maxHeight: item.status === "inactive" ? 20 : 40,
                     }}
@@ -340,7 +339,7 @@ export default function ChatScreen() {
                 </>
               )}
             </View>
-            <Text className="font-Poppins_600SemiBold text-base text-blackPrimary">
+            <Text className="font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
               {item && `$${item.price}`}
             </Text>
           </Pressable>
@@ -353,7 +352,7 @@ export default function ChatScreen() {
           {chatMessagesData.length === 0 && showEncourageMessage === "true" ? (
             <View className="flex-grow flex flex-col justify-center items-center w-full">
               <View className="flex flex-row items-center justify-center">
-                <Text className="font-Manrope_500Medium text-gray-500">
+                <Text className="font-Manrope_500Medium text-gray-500 dark:text-gray-300">
                   {creatingChatRoom
                     ? "creating chat room"
                     : "start by sending some messages to seller."}
@@ -390,7 +389,7 @@ export default function ChatScreen() {
               />
               {lastMessageSentSuccessfully ? (
                 <View className="flex w-full -mt-5 flex-row items-center justify-end pr-2 py-1">
-                  <Text className="font-Manrope_500Medium text-gray-500 text-xs">
+                  <Text className="font-Manrope_500Medium text-gray-500 dark:text-gray-300 text-xs">
                     delivered
                   </Text>
                 </View>
@@ -401,7 +400,7 @@ export default function ChatScreen() {
           <View className="flex flex-row w-full px-2">
             <TextInput
               placeholder="Message"
-              className="px-4 py-2 border rounded-full border-gray-400 flex-grow"
+              className="px-4 py-2 border rounded-full border-stone-400 dark:border-stone-600 flex-grow text-blackPrimary dark:text-bgLight"
               value={inputText}
               onChangeText={setInputText}
               blurOnSubmit={false}
@@ -453,13 +452,15 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
         <View
           className={`flex flex-row rounded-xl p-2 w-fit my-1.5 ${
             message.from_me
-              ? " bg-purplePrimary"
-              : " bg-grayLight border border-stone-300"
+              ? " bg-purplePrimary border border-stone-300 dark:border-stone-800"
+              : " bg-grayLight border border-stone-300 dark:bg-stone-700 dark:border-stone-600"
           }`}
         >
           <Text
             className={`font-Manrope_500Medium text-[15.5px] ${
-              message.from_me ? "text-white" : "text-black"
+              message.from_me
+                ? "text-white"
+                : "text-blackPrimary dark:text-bgLight"
             }`}
           >
             {message.content}

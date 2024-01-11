@@ -9,12 +9,16 @@ export default function RefreshScreen({
 }) {
   return (
     <View className="flex-grow flex flex-col justify-center items-center w-full">
-      <Text className="font-Poppins_600SemiBold text-lg">{displayText}</Text>
+      <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
+        {displayText}
+      </Text>
       <TouchableOpacity
         onPress={refetch}
         className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center rounded-sm"
       >
-        <Text className="font-Poppins_500Medium">Refresh</Text>
+        <Text className="font-Poppins_500Medium text-blackPrimary dark:text-bgLight">
+          Refresh
+        </Text>
       </TouchableOpacity>
     </View>
   );
