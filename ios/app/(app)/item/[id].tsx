@@ -133,11 +133,11 @@ export default function ItemPage() {
               data={item.images}
               renderItem={({ item }) => (
                 <Image
+                  className="bg-grayLight dark:bg-zinc-800"
                   style={{
                     height: width,
                     width: width,
                     maxHeight: width,
-                    backgroundColor: Colors.grayLight,
                   }}
                   transition={{
                     effect: "cross-dissolve",

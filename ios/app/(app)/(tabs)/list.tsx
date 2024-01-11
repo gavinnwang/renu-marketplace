@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from "react-native";
 import Colors from "../../../../shared/constants/Colors";
 import { Item, Measure, RefAndKey } from "../../../../shared/types";
@@ -180,6 +181,8 @@ const ListingPageItem = ({ item }: { item: Item }) => {
     mutation.mutateAsync(newStatus);
   };
 
+  const colorScheme = useColorScheme();
+
   return (
     <Pressable
       onPress={() => {
@@ -187,11 +190,11 @@ const ListingPageItem = ({ item }: { item: Item }) => {
         void router.push({
           pathname: `/item/${item.id}`,
           params: {
-            itemString: JSON.stringify(item),
+            itemString: JSON.stringify(item).replace(/%/g, "~~pct~~"),
           },
         });
       }}
-      className="flex flex-row py-4 px-4 border-b border-b-grayPrimary"
+      className="flex flex-row py-4 px-4 border-b border-b-zinc-300 dark:border-b-zinc-600"
     >
       <Image
         source={{ uri: `${IMAGES_URL}${item.images[0]}` }}
@@ -205,7 +208,8 @@ const ListingPageItem = ({ item }: { item: Item }) => {
           width: width,
           maxWidth: width,
           height: (width * 4) / 3,
-          backgroundColor: Colors.grayLight,
+          backgroundColor:
+            colorScheme === "dark" ? Colors.blackPrimary : Colors.grayLight,
         }}
       />
       <View className="flex flex-col flex-grow justify-between px-4">

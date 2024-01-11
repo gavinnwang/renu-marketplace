@@ -19,6 +19,7 @@ export default function TabsLayout() {
               colorScheme === "dark"
                 ? Colors.dark.background
                 : Colors.light.background,
+            borderTopColor: "transparent",
           },
           tabBarActiveTintColor: Colors.northwesternPurple,
         }}

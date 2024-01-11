@@ -86,7 +86,7 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <View className="w-full h-2 bg-grayLight mt-2" />
+        <View className="w-full h-2 bg-grayLight dark:bg-zinc-950 mt-2" />
         <TouchableOpacity
           className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
           onPress={() => router.push("/saved")}
@@ -97,7 +97,7 @@ export default function AccountScreen() {
           </Text>
         </TouchableOpacity>
 
-        <View className="w-full h-2 bg-grayLight mt-2" />
+        <View className="w-full h-2 bg-grayLight dark:bg-zinc-950 mt-2" />
         <TouchableOpacity
           className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
           onPress={handleEmailLink}
@@ -108,7 +108,7 @@ export default function AccountScreen() {
           </Text>
         </TouchableOpacity>
 
-        <View className="w-full h-2 bg-grayLight mt-2" />
+        <View className="w-full h-2 bg-grayLight dark:bg-zinc-950 mt-2" />
 
         <TouchableOpacity
           className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
@@ -118,7 +118,7 @@ export default function AccountScreen() {
             Sign out
           </Text>
         </TouchableOpacity>
-        <View className="w-full h-[500%] bg-grayLight mt-2" />
+        <View className="w-full h-[500%] bg-grayLight dark:bg-zinc-950 mt-2" />
       </ScrollView>
     </View>
   );

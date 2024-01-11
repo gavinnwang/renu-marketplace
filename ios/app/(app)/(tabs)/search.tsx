@@ -79,12 +79,14 @@ export function SearchPage() {
     enabled: !!searchQuery.length,
   });
 
+  const [pressedHistory, setPressedHistory] = React.useState(false);
   const navigation = useNavigation();
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerSearchBarOptions: {
         placeholder: "Search",
         onSearchButtonPress: (event: any) => {
+          setPressedHistory(false);
           const searchQuery = event.nativeEvent.text.trim() as string;
           setSearchQuery(searchQuery);
           if (!searchQuery) {
@@ -117,7 +119,6 @@ export function SearchPage() {
     saveSearchHistory();
   }, [searchHistory]);
 
-  const [pressedHistory, setPressedHistory] = React.useState(false);
   return (
     <View className="bg-bgLight h-full dark:bg-blackPrimary">
       <View className="h-[54px]"></View>

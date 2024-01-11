@@ -312,7 +312,7 @@ export default function UploadListingStepOne() {
                     Title
                   </Text>
 
-                  <View className="bg-grayLight rounded-md">
+                  <View className="bg-grayLight dark:bg-zinc-950 rounded-md">
                     <TextInput
                       onChangeText={(text) => setTitle(text)}
                       value={title}
@@ -325,7 +325,7 @@ export default function UploadListingStepOne() {
                   <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary ">
                     Price
                   </Text>
-                  <View className="bg-grayLight rounded-md">
+                  <View className="bg-grayLight dark:bg-zinc-950 rounded-md">
                     <TextInput
                       onChangeText={(text) => setPrice(text)}
                       value={price}
@@ -364,7 +364,7 @@ export default function UploadListingStepOne() {
                     Description
                   </Text>
 
-                  <View className="bg-grayLight rounded-md h-[120px]">
+                  <View className="bg-grayLight dark:bg-zinc-950 rounded-md h-[120px]">
                     <TextInput
                       collapsable
                       multiline

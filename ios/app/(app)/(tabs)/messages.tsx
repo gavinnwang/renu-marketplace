@@ -5,6 +5,7 @@ import {
   Animated,
   Pressable,
   RefreshControl,
+  useColorScheme,
 } from "react-native";
 import { router } from "expo-router";
 import { ChatGroup, Measure, RefAndKey } from "../../../../shared/types";
@@ -14,7 +15,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useSession } from "../../../hooks/useSession";
-import { IMAGES_URL, getAllChatGroups, getChatGroups } from "../../../api";
+import { IMAGES_URL, getAllChatGroups } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../components/RefreshScreen";
 import PagerView from "react-native-pager-view";
@@ -118,6 +119,7 @@ const ChatRow = ({
   sellOrBuy: string;
 }) => {
   const width = (Dimensions.get("window").width - 230) / 2;
+  const colorScheme = useColorScheme();
 
   return (
     <Pressable
@@ -132,7 +134,7 @@ const ChatRow = ({
           },
         });
       }}
-      className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-grayPrimary dark:bg-blackPrimary ${
+      className={`flex flex-row py-4 px-4  bg-bgLight border-b border-b-zinc-300 dark:border-b-zinc-600 dark:bg-blackPrimary ${
         chat.item_status === "inactive" ? "opacity-70" : ""
       }`}
     >
@@ -148,7 +150,8 @@ const ChatRow = ({
             width: width,
             maxWidth: width,
             height: (width * 4) / 3,
-            backgroundColor: Colors.grayLight,
+            backgroundColor:
+              colorScheme === "dark" ? Colors.blackPrimary : Colors.grayLight,
           }}
         />
         {chat.unread_count > 0 && (
@@ -228,7 +231,7 @@ const Tab = React.forwardRef(
         <Text
           className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
             selectedTabInt === index
-              ? "text-blackPrimary border-b-grayLight"
+              ? "text-blackPrimary border-b-grayLight dark:text-bgLight" 
               : "text-grayPrimary"
           }`}
         >
@@ -292,7 +295,7 @@ const Tabs = ({
   return (
     <View
       ref={containerRef}
-      className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight"
+      className="flex flex-row  w-screen justify-center items-center border-b border-b-grayLight dark:border-b-blackSecondary"
     >
       {data.map((section, index) => {
         return (
@@ -329,11 +332,12 @@ const Indicator = ({
 
   return (
     <Animated.View
+      className="bg-blackPrimary dark:bg-bgLight"
       style={{
         position: "absolute",
         height: 2,
         width: Dimensions.get("window").width / 2,
-        backgroundColor: Colors.blackPrimary,
+
         transform: [{ translateX }],
         bottom: -1,
       }}
