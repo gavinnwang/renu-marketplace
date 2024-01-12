@@ -48,6 +48,7 @@ function removeDuplicates(arr: string[]): string[] {
     return false;
   });
 }
+const defaultSearches = ["Bike,", "Shoes", "T-shirt", "Chair"];
 
 function SearchPage() {
   const [searchHistory, setSearchHistory] = React.useState<string[]>([]);
@@ -119,7 +120,11 @@ function SearchPage() {
     saveSearchHistory();
   }, [searchHistory]);
 
-  const { data: popularSearches } = useQuery({
+  const {
+    data: popularSearches,
+    isError: isErrorPopularSearches,
+    isLoading: isLoadingPopularSearches,
+  } = useQuery({
     queryKey: ["popular_searches"],
     queryFn: () => getPopularSearchQueries(),
   });
@@ -165,15 +170,13 @@ function SearchPage() {
           </Text>
           <SearchTermsDisplay
             searches={
-              popularSearches?.slice(0, 10) || [
-                "Bike,",
-                "Shoes",
-                "T-shirt",
-                "Chair",
-              ]
+              isLoadingPopularSearches
+                ? [""]
+                : isErrorPopularSearches
+                ? defaultSearches
+                : popularSearches
             }
           />
-
           {searchHistory.length === 0 ? (
             <></>
           ) : (
