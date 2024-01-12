@@ -49,7 +49,7 @@ function removeDuplicates(arr: string[]): string[] {
   });
 }
 
-export function SearchPage() {
+function SearchPage() {
   const [searchHistory, setSearchHistory] = React.useState<string[]>([]);
   React.useEffect(() => {
     const loadSearchHistory = async () => {
@@ -123,6 +123,7 @@ export function SearchPage() {
     queryKey: ["popular_searches"],
     queryFn: () => getPopularSearchQueries(),
   });
+
   const SearchTermsDisplay = ({ searches }: { searches: string[] }) => {
     return (
       <View className="flex flex-row flex-wrap justify-center items-center w-full">
@@ -158,16 +159,25 @@ export function SearchPage() {
     <View className="bg-bgLight h-full dark:bg-blackPrimary">
       <View className="h-[54px]"></View>
       {searchQuery.length === 0 ? (
-        <View className="flex-grow flex flex-col justify-center items-center w-full">
-          <View className="flex-grow flex flex-col mt-[16%] items-center w-full">
-            <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
-              Popular searches
-            </Text>
-          </View>
+        <View className=" flex flex-col mt-[16%] items-center w-full">
+          <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
+            Popular searches
+          </Text>
+          <SearchTermsDisplay
+            searches={
+              popularSearches?.slice(0, 10) || [
+                "Bike,",
+                "Shoes",
+                "T-shirt",
+                "Chair",
+              ]
+            }
+          />
+
           {searchHistory.length === 0 ? (
             <></>
           ) : (
-            <View className="flex-grow flex flex-col mt-[16%] items-center w-full">
+            <View className="flex-grow flex flex-col mt-6 items-center w-full">
               <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
                 Recent searches
               </Text>
