@@ -55,7 +55,7 @@ export default function UploadListingStepOne() {
     }
 
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchCameraAsync({
+    let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [1, 1],
@@ -274,7 +274,7 @@ export default function UploadListingStepOne() {
                         height: imageHeight,
                         borderRadius: 3,
                       }}
-                      className="border border-dashed flex items-center justify-center ml-3"
+                      className="border border-dashed flex items-center justify-center ml-3 border-blackPrimary dark:border-bgLight"
                     >
                       <Plus />
                     </TouchableOpacity>
@@ -319,7 +319,7 @@ export default function UploadListingStepOne() {
                       onChangeText={(text) => setTitle(text)}
                       value={title}
                       placeholder="Enter a title"
-                      className="p-3 h-fit"
+                      className="p-3 h-fit text-blackPrimary dark:text-bgLight"
                     />
                   </View>
                 </View>
@@ -333,7 +333,7 @@ export default function UploadListingStepOne() {
                       value={price}
                       keyboardType="numeric"
                       placeholder="Enter a price"
-                      className="p-3 h-fit"
+                      className="p-3 h-fit text-blackPrimary dark:text-bgLight"
                     />
                   </View>
                 </View>
@@ -363,7 +363,7 @@ export default function UploadListingStepOne() {
                 </View>
 
                 <View className="pb-5">
-                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary">
+                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
                     Description
                   </Text>
 

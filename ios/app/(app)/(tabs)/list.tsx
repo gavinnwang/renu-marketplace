@@ -226,9 +226,9 @@ const ListingPageItem = ({ item }: { item: Item }) => {
         </View>
         <TouchableOpacity
           onPress={onPressHandler}
-          className="border-[1.5px] h-[32px] w-[250px] flex items-center justify-center rounded-sm border-blackPrimary dark:border-bgLight"
+          className="border-[1.5px] h-[32px] w-[250px] flex items-center justify-center rounded-sm border-blackPrimary dark:border-stone-300"
         >
-          <Text className="font-SecularOne_400Regular text-sm text-blackPrimary dark:text-bgLight">
+          <Text className="font-SecularOne_400Regular text-sm text-blackPrimary dark:text-stone-300">
             {item.status === "active" ? "MARK AS SOLD" : "RELIST"}
           </Text>
         </TouchableOpacity>

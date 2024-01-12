@@ -50,6 +50,7 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
     conf.service(
         web::scope("/search")
             .service(super::item_search_handler::search_items_handler)
+            .service(super::item_search_handler::get_popular_queries_handler)
             .service(super::item_search_handler::get_popular_queries_handler),
     );
 

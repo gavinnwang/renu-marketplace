@@ -4,7 +4,7 @@ import Colors from "../../../../shared/constants/Colors";
 import React from "react";
 import { useNavigation } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { getSearchItems } from "../../../api";
+import { getPopularSearchQueries, getSearchItems } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
 import { ItemListing } from "../../../components/ItemListing";
 
@@ -119,68 +119,81 @@ export function SearchPage() {
     saveSearchHistory();
   }, [searchHistory]);
 
+  const { data: popularSearches } = useQuery({
+    queryKey: ["popular_searches"],
+    queryFn: () => getPopularSearchQueries(),
+  });
+  const SearchTermsDisplay = ({ searches }: { searches: string[] }) => {
+    return (
+      <View className="flex flex-row flex-wrap justify-center items-center w-full">
+        {searches.map((searchQuery, index) => (
+          <TouchableOpacity
+            onPress={() => {
+              // focus search bar
+              setSearchQuery(searchQuery);
+              setSearchHistory((searchHistory) => {
+                const newSearchHistory = [
+                  searchQuery,
+                  ...searchHistory.filter((item) => item !== searchQuery),
+                ];
+                return newSearchHistory;
+              });
+              setPressedHistory(true);
+            }}
+            className="px-2 py-1 m-1 rounded-md"
+            key={index}
+          >
+            <View className="bg-[#e9e9e9] dark:bg-[#44403c] p-1.5 rounded-lg">
+              <Text className="text-blackPrimary dark:text-bgLight">
+                {searchQuery}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
+
   return (
     <View className="bg-bgLight h-full dark:bg-blackPrimary">
       <View className="h-[54px]"></View>
       {searchQuery.length === 0 ? (
-        searchHistory.length === 0 ? (
-          <View className="flex-grow flex flex-col justify-center items-center w-full">
-            <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
-              Search for items!
-            </Text>
-          </View>
-        ) : (
+        <View className="flex-grow flex flex-col justify-center items-center w-full">
           <View className="flex-grow flex flex-col mt-[16%] items-center w-full">
             <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
-              Recent searches
+              Popular searches
             </Text>
-            <View className="flex flex-row flex-wrap justify-center items-center w-full">
-              {searchHistory.map((searchQuery, index) => (
+          </View>
+          {searchHistory.length === 0 ? (
+            <></>
+          ) : (
+            <View className="flex-grow flex flex-col mt-[16%] items-center w-full">
+              <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
+                Recent searches
+              </Text>
+              <SearchTermsDisplay searches={searchHistory} />
+              {searchHistory.length > 0 && (
                 <TouchableOpacity
                   onPress={() => {
-                    // focus search bar
-                    setSearchQuery(searchQuery);
-                    setSearchHistory((searchHistory) => {
-                      const newSearchHistory = [
-                        searchQuery,
-                        ...searchHistory.filter((item) => item !== searchQuery),
-                      ];
-                      return newSearchHistory;
-                    });
-                    setPressedHistory(true);
+                    setSearchHistory([]);
+                    SecureStore.deleteItemAsync("searchHistory");
                   }}
                   className="px-2 py-1 m-1 rounded-md"
-                  key={index}
                 >
-                  <View className="bg-[#e9e9e9] dark:bg-[#44403c] p-1.5 rounded-lg">
-                    <Text className="text-blackPrimary dark:text-bgLight">
-                      {searchQuery}
+                  <View className="flex flex-row">
+                    <TrashIcon />
+                    <Text className="ml-1 text-[#a8a29e] dark:text-stone-600">
+                      Clear history
                     </Text>
                   </View>
                 </TouchableOpacity>
-              ))}
+              )}
             </View>
-            {searchHistory.length > 0 && (
-              <TouchableOpacity
-                onPress={() => {
-                  setSearchHistory([]);
-                  SecureStore.deleteItemAsync("searchHistory");
-                }}
-                className="px-2 py-1 m-1 rounded-md"
-              >
-                <View className="flex flex-row">
-                  <TrashIcon />
-                  <Text className="ml-1 text-[#a8a29e] dark:text-stone-600">
-                    Clear history
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          </View>
-        )
+          )}
+        </View>
       ) : searchItems && searchItems.length > 0 ? (
         <FlashList
-          className="bg-bgLight h-full"
+          className="bg-bgLight h-full dark:bg-blackPrimary"
           showsVerticalScrollIndicator={false}
           data={searchItems}
           numColumns={2}
@@ -200,7 +213,7 @@ export function SearchPage() {
         searchItems &&
         searchItems.length === 0 && (
           <View className="flex-grow flex flex-col justify-center items-center w-full">
-            <Text className="font-Poppins_600SemiBold text-lg">
+            <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
               No items found!
             </Text>
           </View>

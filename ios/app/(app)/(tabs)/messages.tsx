@@ -185,7 +185,7 @@ const ChatRow = ({
             {"    "}
             {dayjs(chat.last_message_sent_at).fromNow()}
           </Text>
-          <Text className="font-Manrope_600SemiBold text-sm text-purplePrimary">
+          <Text className="font-Manrope_600SemiBold text-sm text-purplePrimary dark:text-purple-300">
             {chat.item_status === "inactive"
               ? "Item is no longer available."
               : ""}

@@ -37,8 +37,8 @@ export default function SellerPage() {
 
   return (
     <>
-      <SafeAreaView className="bg-bgLight" />
-      <View className="bg-bgLight h-full">
+      <SafeAreaView className="bg-bgLight dark:bg-blackPrimary" />
+      <View className="bg-bgLight h-full dark:bg-blackPrimary">
         <Pressable onPress={router.back} className="p-3">
           <LeftChevron />
         </Pressable>
@@ -50,24 +50,24 @@ export default function SellerPage() {
               source={{
                 uri: user?.profile_image || "",
               }}
-              className="w-16 h-16 rounded-full ml-2.5 bg-blackPrimary"
+              className="w-16 h-16 rounded-full ml-2.5 bg-blackPrimary dark:bg-blackPrimary"
             />
           </View>
 
           <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
             <View className="flex-col w-[200px]">
-              <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px]">
+              <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px] text-blackPrimary dark:text-bgLight">
                 {user?.name}
               </Text>
 
               <View className="flex-row">
-                <Text className="font-Manrope_400Regular text-sm mr-3">
-                  <Text className="font-Manrope_600SemiBold">
+                <Text className="font-Manrope_400Regular text-sm mr-3 text-blackPrimary dark:text-bgLight">
+                  <Text className="font-Manrope_600SemiBold text-blackPrimary dark:text-bgLight">
                     {user?.active_listing_count ?? 0}
                   </Text>{" "}
                   Active Listings
                 </Text>
-                <Text className="font-Manrope_400Regular text-sm">
+                <Text className="font-Manrope_400Regular text-sm text-blackPrimary dark:text-bgLight">
                   <Text className="font-Manrope_600SemiBold">
                     {user?.sales_done_count ?? 0}
                   </Text>{" "}
@@ -77,17 +77,17 @@ export default function SellerPage() {
             </View>
           </View>
 
-          <View className="w-full h-2 bg-grayLight mt-2" />
+          <View className="w-full h-2 bg-grayLight mt-2 dark:bg-zinc-950" />
 
-          <Text className="ml-2.5 mt-4 mb-3 font-Poppins_600SemiBold text-xl">
+          <Text className="ml-2.5 mt-4 mb-3 font-Poppins_600SemiBold text-xl text-blackPrimary dark:text-bgLight">
             Listed Items
-            <Text className="font-Poppins_500Medium text-sm">
+            <Text className="font-Poppins_500Medium text-sm text-blackPrimary dark:text-bgLight">
               {" "}
               ({activeItems?.length ?? 0})
             </Text>
           </Text>
 
-          <View className="bg-greyLight h-full">
+          <View className="bg-greyLight h-full dark:bg-blackPrimary">
             {isLoadingActiveItem ? (
               <></>
             ) : isErrorActiveItem ? (
