@@ -30,6 +30,7 @@ export type User = {
   updated_at: Date;
   active_listing_count: number;
   sales_done_count: number;
+  verified: boolean;
 };
 
 export type Measure = {
@@ -51,10 +52,10 @@ export type Session = {
 };
 
 export type AppleAuthResponse = {
-    token: string;
-    email: string;
-    user_id: number;
-}
+  token: string;
+  email: string;
+  user_id: number;
+};
 
 export type ChatGroup = {
   chat_id: number;
@@ -79,7 +80,6 @@ export type ChatMessage = {
   from_me: number;
 };
 
-
 export type AICompleteResponse = {
   price: number;
   title: string;
@@ -90,4 +90,4 @@ export type AICompleteResponse = {
 export type SearchHistory = {
   created_at: Date;
   query: string;
-}[]
+}[];

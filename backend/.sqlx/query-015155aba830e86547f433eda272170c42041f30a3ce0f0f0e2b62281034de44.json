@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT \n            u.id, \n            u.name, \n            u.email, \n            u.profile_image,\n            u.role::TEXT AS \"role!\",\n            u.created_at, \n            u.updated_at,\n            COUNT(*) FILTER (WHERE i.status = 'active') AS \"active_listing_count!\",\n            COUNT(*) FILTER (WHERE i.status = 'inactive') AS \"sales_done_count!\"\n        FROM \"user\" u\n        LEFT JOIN \"item\" i ON u.id = i.user_id\n        WHERE u.id = $1\n        GROUP BY u.id;",
+  "query": "SELECT \n            u.id, \n            u.name, \n            u.email, \n            u.profile_image,\n            u.role::TEXT AS \"role!\",\n            u.created_at, \n            u.updated_at,\n            u.verified,\n            COUNT(*) FILTER (WHERE i.status = 'active') AS \"active_listing_count!\",\n            COUNT(*) FILTER (WHERE i.status = 'inactive') AS \"sales_done_count!\"\n        FROM \"user\" u\n        LEFT JOIN \"item\" i ON u.id = i.user_id\n        WHERE u.id = $1\n        GROUP BY u.id;",
   "describe": {
     "columns": [
       {
@@ -40,11 +40,16 @@
       },
       {
         "ordinal": 7,
+        "name": "verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
         "name": "active_listing_count!",
         "type_info": "Int8"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "sales_done_count!",
         "type_info": "Int8"
       }
@@ -62,9 +67,10 @@
       null,
       false,
       false,
+      false,
       null,
       null
     ]
   },
-  "hash": "15b54427612e377407b215de640377e48b92fee51986bf9731df611f9381d1a1"
+  "hash": "015155aba830e86547f433eda272170c42041f30a3ce0f0f0e2b62281034de44"
 }

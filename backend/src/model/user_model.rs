@@ -14,6 +14,7 @@ pub struct User {
     pub updated_at: DateTime<Utc>,
     pub active_listing_count: i64,
     pub sales_done_count: i64,
+    pub verified: bool,
 }
 
 // #[derive(Debug, Deserialize, Serialize)]

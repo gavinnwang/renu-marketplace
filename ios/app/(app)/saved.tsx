@@ -6,7 +6,6 @@ import {
   View,
 } from "react-native";
 import LeftChevron from "../../components/LeftChevron";
-import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "../../hooks/useSession";
 import { getSavedItems } from "../../api";
@@ -14,9 +13,9 @@ import RefreshScreen from "../../components/RefreshScreen";
 import { FlashList } from "@shopify/flash-list";
 import { ItemListing } from "../../components/ItemListing";
 import React from "react";
+import { router } from "expo-router";
 
 export default function SavedItemsPage() {
-  const router = useRouter();
   const { session } = useSession();
   const {
     data: savedItemData,
@@ -46,18 +45,18 @@ export default function SavedItemsPage() {
           </Text>
         </View>
 
-        <View className="bg-greyLight h-full">
+        <View className="bg-greyLight">
           {isLoadingSavedItem ? (
             <></>
           ) : isErrorSavedItem ? (
-            <View className="-mt-[30%] flex-grow">
+            <View className=" h-[80%] flex-grow">
               <RefreshScreen
                 displayText="Something went wrong."
                 refetch={refetch}
               />
             </View>
           ) : savedItemData.length === 0 ? (
-            <View className="-mt-[30%] flex-grow">
+            <View className=" h-[80%] flex-grow">
               <RefreshScreen
                 displayText="You have no saved items."
                 refetch={refetch}

@@ -16,6 +16,7 @@ pub async fn fetch_user_by_id(
             u.role::TEXT AS "role!",
             u.created_at, 
             u.updated_at,
+            u.verified,
             COUNT(*) FILTER (WHERE i.status = 'active') AS "active_listing_count!",
             COUNT(*) FILTER (WHERE i.status = 'inactive') AS "sales_done_count!"
         FROM "user" u

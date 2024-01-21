@@ -14,8 +14,6 @@ import { getUserMeInfo } from "../../../api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import { Colors } from "react-native/Libraries/NewAppScreen";
-import { Session } from "../../../../shared/types";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
