@@ -67,7 +67,8 @@ impl Config {
         let openai_api_key = std::env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
 
         let apple_bundle_id = match env.as_str() {
-            "production" => std::env::var("APPLE_BUNDLE_ID").expect("APPLE_BUNDLE_ID must be set"),
+            // "production" => std::env::var("APPLE_BUNDLE_ID").expect("APPLE_BUNDLE_ID must be set"),
+            "production" => "host.exp.Exponent".to_string(),
             "development" => "host.exp.Exponent".to_string(),
             _ => {
                 panic!("Invalid ENV variable");
