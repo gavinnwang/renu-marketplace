@@ -10,6 +10,8 @@ import Toast from "react-native-toast-message";
 import { useMutation } from "@tanstack/react-query";
 import { postAppleLogin } from "../api";
 import * as Linking from "expo-linking";
+import { AppleAuthResponse } from "../../shared/types";
+import * as SecureStore from "expo-secure-store";
 
 const GoogleLogo = ({ className }: { className?: string }) => (
   <Svg viewBox="0 0 48 48" width="16" height="16" className={className}>
@@ -36,7 +38,7 @@ const GoogleLogo = ({ className }: { className?: string }) => (
 );
 
 export default function LoginPage() {
-  const { signInWithGoogle, session } = useSession();
+  const { signInWithGoogle, session, setSession } = useSession();
 
   useEffect(() => {
     if (session) {
@@ -48,14 +50,24 @@ export default function LoginPage() {
     identityToken: string;
     username?: string;
   };
-
   const postAppleLoginMutation = useMutation(
     ({ identityToken, username }: useMutationRequest) => {
       const callbackUrl = Linking.createURL("App");
       return postAppleLogin(identityToken, callbackUrl, username);
     },
     {
-      onSuccess: () => {
+      onSuccess: (res: AppleAuthResponse) => {
+        if (res.token && res.email && res.user_id) {
+          const s = {
+            token: res.token,
+            email: res.email,
+            user_id: res.user_id,
+          };
+          setSession(s);
+          SecureStore.setItemAsync("session", JSON.stringify(s));
+        } else {
+          router.replace("/");
+        }
         console.debug("successfully posted apple login");
       },
       onError: (error: any) => {

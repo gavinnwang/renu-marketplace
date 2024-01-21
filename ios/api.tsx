@@ -1,6 +1,7 @@
 import Toast from "react-native-toast-message";
 import {
   AICompleteResponse,
+  AppleAuthResponse,
   ChatGroup,
   ChatMessage,
   Item,
@@ -47,7 +48,7 @@ export async function postAppleLogin(identityToken: string, callback: string, us
       user_name: username,
     }),
   });
-  return parseOrThrowResponse(res);
+  return parseOrThrowResponse<AppleAuthResponse>(res);
 }
 
 export async function getUserMeInfo(sessionToken: string): Promise<User> {

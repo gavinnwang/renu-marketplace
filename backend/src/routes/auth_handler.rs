@@ -5,7 +5,7 @@ use actix_web::{
 };
 use chrono::{Duration, Utc};
 use jsonwebtoken::{encode, EncodingKey, Header};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::{
@@ -198,7 +198,10 @@ async fn apple_auth_handler(
                     user_email
                 );
                 let is_verified = user_email.ends_with("northwestern.edu");
-                let user_name = request.user_name.clone().unwrap_or(generate_random_username());
+                let user_name = request
+                    .user_name
+                    .clone()
+                    .unwrap_or(generate_random_username());
                 let user_id = user_repository::create_user(
                     pool.as_ref(),
                     &user_name,
@@ -243,14 +246,19 @@ async fn apple_auth_handler(
         tracing::error!("Failed to encode jwt token: {err}");
         UserError::OAuthError("failed to encode jwt token")
     })?;
-    let redirect_url = format!(
-        "{}?email={}&token={}&user_id={}",
-        callback, user_email, token, user_id
-    );
-    tracing::info!("Mobile user logged in with redirect url: {}", redirect_url);
-    Ok(HttpResponse::Found()
-        .append_header((LOCATION, redirect_url))
-        .finish())
+    let response = AppleAuthResponse {
+        email: user_email,
+        token,
+        user_id,
+    };
+    Ok(HttpResponse::Ok().json(response))
+}
+
+#[derive(Serialize, Debug)]
+struct AppleAuthResponse {
+    pub email: String,
+    pub token: String,
+    pub user_id: i32,
 }
 
 #[tracing::instrument(skip_all, fields(user_id = %auth_guard.user_id))]
@@ -275,9 +283,8 @@ async fn logout_handler(auth_guard: AuthenticationGuard) -> impl Responder {
 // }
 
 fn generate_random_username() -> String {
-                let uuid = uuid::Uuid::new_v4().to_string();
-                let first_five_chars = &uuid[..5];
+    let uuid = uuid::Uuid::new_v4().to_string();
+    let first_five_chars = &uuid[..5];
 
-    return  format!("user_{}", first_five_chars);
-
+    return format!("user_{}", first_five_chars);
 }

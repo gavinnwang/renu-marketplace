@@ -50,6 +50,12 @@ export type Session = {
   user_id: number;
 };
 
+export type AppleAuthResponse = {
+    token: string;
+    email: string;
+    user_id: number;
+}
+
 export type ChatGroup = {
   chat_id: number;
   item_id: number;
