@@ -28,21 +28,9 @@ import { IMAGES_URL, postAIComplete, postImages, postNewItem } from "../../api";
 import { useQueryClient } from "@tanstack/react-query";
 import { registerForPushNotificationsAsync } from "../../notification";
 import * as Notifications from "expo-notifications";
+import { ItemCategory } from "../../../shared/types";
 
 const MAX_IMAGES = 6;
-
-const ItemCategory: Record<string, string> = {
-  picking: "Pick a category",
-  womens: "Women's",
-  mens: "Men's",
-  home: "Home & Tools",
-  furniture: "Furniture",
-  electronics: "Electronics",
-  bikes: "Bikes & Scooters",
-  tickets: "Tickets",
-  general: "General",
-  free: "Free",
-};
 
 export default function UploadListingStepOne() {
   const [images, setImages] = React.useState<string[]>(["picker"]);

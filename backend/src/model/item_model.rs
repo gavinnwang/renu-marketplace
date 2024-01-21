@@ -36,28 +36,24 @@ impl ItemStatus {
 #[derive(sqlx::Type, Debug, Deserialize, Serialize)]
 #[sqlx(type_name = "category", rename_all = "snake_case")]
 pub enum Category {
-    Mens,
-    Womens,
-    Home,
+    Apparel,
     Furniture,
+    Vehicles,
     Electronics,
-    Bikes,
-    Tickets,
-    General,
+    Home,
+    Other,
     Free,
 }
 
 impl Category {
     pub fn from_str(s: &str) -> Result<Self, ()> {
         match s.to_lowercase().as_str() {
-            "mens" => Ok(Category::Mens),
-            "womens" => Ok(Category::Womens),
+            "apparel" => Ok(Category::Apparel),
             "home" => Ok(Category::Home),
             "furniture" => Ok(Category::Furniture),
             "electronics" => Ok(Category::Electronics),
-            "bikes" => Ok(Category::Bikes),
-            "tickets" => Ok(Category::Tickets),
-            "general" => Ok(Category::General),
+            "vehicles" => Ok(Category::Vehicles),
+            "other" => Ok(Category::Other),
             "free" => Ok(Category::Free),
             _ => Err(()),
         }

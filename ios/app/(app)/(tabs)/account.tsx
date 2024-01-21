@@ -14,6 +14,8 @@ import { getUserMeInfo } from "../../../api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
+import Colors from "../../../../shared/constants/Colors";
+import { VerifiedIcon } from "../../../components/VerifiedIcon";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -70,9 +72,12 @@ export default function AccountScreen() {
           />
           <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
             <View className="flex-col w-[200px]">
-              <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px] text-blackPrimary dark:text-bgLight">
-                {user?.name}
-              </Text>
+              <View className="flex flex-row mb-1 items-center max-w-[160px] h-[32px]">
+                <Text className="mr-1 text-xl font-Poppins_500Medium text-left text-blackPrimary dark:text-bgLight">
+                  {user?.name}
+                </Text>
+                {user?.verified && <VerifiedIcon />}
+              </View>
 
               <View className="flex-row">
                 <Text className="font-Manrope_400Regular text-sm mr-3 text-blackPrimary dark:text-bgLight">

@@ -3,14 +3,12 @@ export type Item = {
   name: string;
   price: number;
   category:
-    | "mens"
-    | "womens"
+    | "apparel"
     | "home"
     | "furniture"
     | "electronics"
-    | "bikes"
-    | "tickets"
-    | "general"
+    | "vehicles"
+    | "other"
     | "free";
   description?: string;
   location?: string;
@@ -19,6 +17,17 @@ export type Item = {
   created_at: Date;
   images: string[];
   updated_at: Date;
+};
+
+export const ItemCategory: Record<string, string> = {
+  picking: "Pick a category",
+  apparel: "Apparel",
+  home: "Home & Tools",
+  furniture: "Furniture",
+  electronics: "Electronics",
+  vehicles: "Vehicles",
+  other: "Other",
+  free: "Free",
 };
 
 export type User = {

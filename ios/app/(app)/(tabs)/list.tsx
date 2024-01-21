@@ -11,7 +11,7 @@ import {
   useColorScheme,
 } from "react-native";
 import Colors from "../../../../shared/constants/Colors";
-import { Item, Measure, RefAndKey } from "../../../../shared/types";
+import { Item, ItemCategory, Measure, RefAndKey } from "../../../../shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 
@@ -128,7 +128,6 @@ export function TabPage({ index }: { index: number }) {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-import { CATEGORIES } from "../../../../shared/constants/Category";
 import { FlashList } from "@shopify/flash-list";
 import { useSession } from "../../../hooks/useSession";
 import { IMAGES_URL, getUserMeItems, postItemStatus } from "../../../api";
@@ -221,7 +220,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
             {dayjs(item.created_at).fromNow()}
           </Text>
           <Text className="font-Manrope_400Regular text-sm text-blackPrimary dark:text-bgLight">
-            {CATEGORIES[item.category]}{" "}
+            {ItemCategory[item.category]}{" "}
           </Text>
         </View>
         <TouchableOpacity

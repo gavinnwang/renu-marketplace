@@ -21,7 +21,7 @@ pub async fn request_openai_api(
                     {
                         "type": "text",
                         "text": "Only output a json that contains a rough predicted resell price, an accurte description of the resell item in the image, an item title, and an item category from the image.
-                        The category field has to be one of thses: womens, mens, home: (daily essentials), furniture, electronics, bikes, tickets, general, free.
+                        The category field has to be one of these: apparel, furniture, home: (daily essentials), furniture, electronics, vehicles, other, free.
                         The response needs to be able to deserialize into a struct like this without erorr:
                         type Response = {
                             price: number;
@@ -29,14 +29,12 @@ pub async fn request_openai_api(
                             description: String;
                             category:
                             | 'picking'
-                            | 'mens'
-                            | 'womens'
+                            | 'apparel'
                             | 'home'
                             | 'furniture'
                             | 'electronics'
-                            | 'bikes'
-                            | 'tickets'
-                            | 'general'
+                            | 'vehicles'
+                            | 'other'
                             | 'free';
                         }
                        if a field is not applicable, leave the default value. The default for category is picking

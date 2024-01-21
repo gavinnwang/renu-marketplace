@@ -15,7 +15,6 @@ import Colors from "../../../../shared/constants/Colors";
 import { Image } from "expo-image";
 import PaginationDots from "../../../components/PaginationDots";
 import { useRef, useState } from "react";
-import { CATEGORIES } from "../../../../shared/constants/Category";
 
 import { useSession } from "../../../hooks/useSession";
 import {
@@ -26,12 +25,13 @@ import {
   getUserInfo,
   postChangeSavedItemStatus,
 } from "../../../api";
-import { Item } from "../../../../shared/types";
+import { Item, ItemCategory } from "../../../../shared/types";
 import React from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
 import { FlashList } from "@shopify/flash-list";
+import { VerifiedIcon } from "../../../components/VerifiedIcon";
 dayjs.extend(relativeTime);
 
 const HeartIcon = ({ filled }: { filled: boolean }) => (
@@ -201,7 +201,7 @@ export default function ItemPage() {
                   Category
                 </Text>
                 <Text className="font-Manrope_600SemiBold text-sm text-blackPrimary dark:text-bgLight">
-                  {CATEGORIES[item.category]}
+                  {ItemCategory[item.category]}
                 </Text>
               </View>
               <Text className="text-[26px] text-purplePrimary font-Manrope_600SemiBold">
@@ -303,9 +303,12 @@ export default function ItemPage() {
                       }
                     }}
                   >
-                    <Text className="font-Poppins_500Medium text-base text-blackPrimary dark:text-bgLight">
-                      {seller?.name ?? "Loading user"}
-                    </Text>
+                    <View className="flex flex-row items-center">
+                      <Text className="mr-1 font-Poppins_500Medium text-base text-blackPrimary dark:text-bgLight">
+                        {seller?.name ?? " "}
+                      </Text>
+                      {seller?.verified && <VerifiedIcon />}
+                    </View>
                   </TouchableOpacity>
                   <View className="flex flex-row gap-x-1">
                     <Text className="font-Manrope_400Regular text-sm text-blackPrimary dark:text-bgLight">

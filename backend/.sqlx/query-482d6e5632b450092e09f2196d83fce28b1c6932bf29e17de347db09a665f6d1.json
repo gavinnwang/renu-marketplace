@@ -19,14 +19,12 @@
             "name": "category",
             "kind": {
               "Enum": [
-                "mens",
-                "womens",
-                "home",
+                "apparel",
                 "furniture",
+                "vehicles",
                 "electronics",
-                "bikes",
-                "tickets",
-                "general",
+                "home",
+                "other",
                 "free"
               ]
             }

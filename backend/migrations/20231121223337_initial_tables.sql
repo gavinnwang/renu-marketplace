@@ -1,14 +1,12 @@
 CREATE TYPE role AS ENUM ('user', 'student_user', 'admin');
 
 CREATE TYPE category AS ENUM (
-    'mens',
-    'womens',
-    'home',
+    'apparel',
     'furniture',
+    'vehicles',
     'electronics',
-    'bikes',
-    'tickets',
-    'general',
+    'home',
+    'other',
     'free'
 );
 
@@ -29,7 +27,7 @@ CREATE TABLE "item" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     price FLOAT NOT NULL,
-    category category NOT NULL DEFAULT 'general',
+    category category NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     description TEXT,

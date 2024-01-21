@@ -3,12 +3,11 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { ItemListing } from "../../../components/ItemListing";
 import { LogoWithText } from "../../../components/Logo";
-import { Item, Measure } from "../../../../shared/types";
+import { Item, ItemCategory, Measure } from "../../../../shared/types";
 import React from "react";
 import Colors from "../../../../shared/constants/Colors";
 import PagerView from "react-native-pager-view";
 import { API_URL, parseOrThrowResponse } from "../../../api";
-import { CATEGORIES } from "../../../../shared/constants/Category";
 import { FlashList } from "@shopify/flash-list";
 import { useScrollToTop } from "@react-navigation/native";
 
@@ -20,10 +19,10 @@ type CategoryTabData = {
   flashListRef: React.RefObject<any>;
 };
 
-const data: CategoryTabData[] = Object.keys(CATEGORIES).map((i) => ({
+const data: CategoryTabData[] = Object.keys(ItemCategory).map((i) => ({
   key: i,
   value: i,
-  display: CATEGORIES[i],
+  display: ItemCategory[i],
   ref: React.createRef(),
   flashListRef: React.createRef(),
 }));
