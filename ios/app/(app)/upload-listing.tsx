@@ -83,6 +83,7 @@ export default function UploadListingStepOne() {
   const [title, setTitle] = React.useState("");
   const [price, setPrice] = React.useState("");
   const [description, setDescription] = React.useState("");
+  const [location, setLocation] = React.useState("");
 
   const { session } = useSession();
 
@@ -138,38 +139,7 @@ export default function UploadListingStepOne() {
       }
     });
   };
-  const handleUpload = async () => {
-    if (uploading) {
-      return;
-    }
-    if (images.length === 1) {
-      alert("Please add at least one image");
-      return;
-    }
-    if (title === "") {
-      alert("Please enter a title");
-      return;
-    }
-    if (price === "") {
-      alert("Please enter a price");
-      return;
-    }
-    if (isNaN(Number(price))) {
-      alert("Please enter a valid price");
-      return;
-    }
-    if (Number(price) > 99999) {
-      alert("Please enter a price less than $99999");
-      return;
-    }
-    // if category is part of item category but not picking
-    if (
-      !Object.keys(ItemCategory).includes(category) ||
-      category === "picking"
-    ) {
-      alert("Please select a valid category");
-      return;
-    }
+  const handleConfirmAndUpload = async () => {
     Alert.alert(
       "Confirm",
       "Are you sure you want to publish this item and all the information is correct?",
@@ -220,7 +190,8 @@ export default function UploadListingStepOne() {
                 Number(price),
                 description,
                 category,
-                s3UrlsResponse
+                s3UrlsResponse,
+                location
               );
               console.debug("replace to: ", `/item/${itemId}`);
               queryClient.invalidateQueries(["list"]);
@@ -234,6 +205,72 @@ export default function UploadListingStepOne() {
       ],
       { cancelable: false }
     );
+  };
+  const handleUpload = async () => {
+    if (uploading) {
+      return;
+    }
+    if (images.length === 1) {
+      alert("Please add at least one image");
+      return;
+    }
+    if (title === "") {
+      alert("Please enter a title");
+      return;
+    }
+    if (price === "") {
+      alert("Please enter a price");
+      return;
+    }
+    if (isNaN(Number(price))) {
+      alert("Please enter a valid price");
+      return;
+    }
+    if (Number(price) > 99999) {
+      alert("Please enter a price less than $99999");
+      return;
+    }
+    // if category is part of item category but not picking
+    if (
+      !Object.keys(ItemCategory).includes(category) ||
+      category === "picking"
+    ) {
+      alert("Please select a valid category");
+      return;
+    }
+    if (description === "" || location === "") {
+      let messgae = "";
+      if (description === "") {
+        messgae += "description";
+      } else if (location === "") {
+        messgae += "location";
+      } else {
+        messgae += "description and location";
+      }
+      Alert.alert(
+        "Confirm",
+        "Are you sure you don't need " +
+          messgae +
+          " information for your item?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {
+              return;
+            },
+          },
+          {
+            text: "Continue",
+            onPress: async () => {
+              handleConfirmAndUpload();
+            },
+          },
+        ]
+      );
+    } else {
+      handleConfirmAndUpload();
+    }
   };
   const colorScheme = useColorScheme();
   return (
@@ -378,6 +415,22 @@ export default function UploadListingStepOne() {
                     />
                   </View>
                 </View>
+
+                <View className="pb-5">
+                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
+                    Meetup Location
+                  </Text>
+
+                  <View className="bg-grayLight dark:bg-zinc-950 rounded-md">
+                    <TextInput
+                      onChangeText={(text) => setLocation(text)}
+                      value={location}
+                      placeholder="Enter a location"
+                      className="p-3 h-fit text-blackPrimary dark:text-bgLight"
+                    />
+                  </View>
+                </View>
+
                 <View className="fixed bottom-0 h-[72px] w-full bg-bgLight dark:bg-blackPrimary border-t border-t-stone-200 dark:border-t-stone-800 py-3 px-6 flex items-center justify-center">
                   <Pressable
                     onPress={handleUpload}

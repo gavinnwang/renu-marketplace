@@ -8,15 +8,15 @@ import {
   User,
 } from "../shared/types";
 
-import Constants from "expo-constants";
-const config = Constants.expoConfig as any;
-export const API_URL = ("http://" +
-  config.hostUri.split(`:`).shift().concat(`:8080`)) as string;
-console.log("API_URL", API_URL);
-export const REDIRECT_URL = "http://localhost:8080/auth/google/callback";
+// import Constants from "expo-constants";
+// const config = Constants.expoConfig as any;
+// export const API_URL = ("http://" +
+//   config.hostUri.split(`:`).shift().concat(`:8080`)) as string;
+// console.log("API_URL", API_URL);
+// export const REDIRECT_URL = "http://localhost:8080/auth/google/callback";
 
-// export const API_URL = "https://api.gavinwang.dev";
-// export const REDIRECT_URL = "https://api.gavinwang.dev/auth/google/callback";
+export const API_URL = "https://api.gavinwang.dev";
+export const REDIRECT_URL = "https://api.gavinwang.dev/auth/google/callback";
 
 export const IMAGES_URL = "https://images.gavinwang.dev/";
 
@@ -45,7 +45,7 @@ export async function postAppleLogin(identityToken: string, username?: string) {
     body: JSON.stringify({
       identity_token: identityToken,
       user_name: username,
-      dev: true,
+      // dev: true,
     }),
   });
   return parseOrThrowResponse<AppleAuthResponse>(res);
@@ -322,7 +322,8 @@ export async function postNewItem(
   price: number,
   description: string,
   category: string,
-  images: string[]
+  images: string[],
+  location: string
 ): Promise<number> {
   const postItemResponse = await fetch(`${API_URL}/items/`, {
     method: "POST",
@@ -336,6 +337,7 @@ export async function postNewItem(
       description,
       category,
       images,
+      location,
     }),
   });
   return parseOrThrowResponse<number>(postItemResponse);

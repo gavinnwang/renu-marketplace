@@ -201,12 +201,13 @@ pub async fn insert_item(
     category: Category,
     description: Option<String>,
     images: Vec<String>,
+    location: Option<String>,
     conn: impl Executor<'_, Database = Postgres>,
 ) -> Result<i32, DbError> {
     let result = sqlx::query!(
         r#"
-        INSERT INTO Item (name, price, user_id, category, description, images)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO Item (name, price, user_id, category, description, images, location)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id
         "#,
         name,
@@ -214,7 +215,8 @@ pub async fn insert_item(
         user_id,
         category as Category,
         description,
-        Value::from(images)
+        Value::from(images),
+        location
     )
     .fetch_one(conn)
     .await?;

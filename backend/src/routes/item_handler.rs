@@ -142,6 +142,7 @@ struct ItemCreateBody {
     category: String,
     description: Option<String>,
     images: Vec<String>,
+    location: Option<String>,
 }
 
 #[tracing::instrument(skip(pool, auth_guar))]
@@ -186,6 +187,7 @@ async fn post_item_handler(
         category,
         item.description,
         item.images,
+        item.location,
         pool.as_ref(),
     )
     .await;
