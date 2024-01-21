@@ -361,6 +361,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "apple-signin"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b7ed6ffd36981ef8780dcc6ff93f409d44f1337e0b9d34292665014657ac2258"
+dependencies = [
+ "jsonwebtoken 9.2.0",
+ "reqwest",
+ "serde",
+ "serde_repr",
+]
+
+[[package]]
 name = "atoi"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1400,8 +1412,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be4136b2a15dd319360be1c07d9933517ccf0be8f16bf62a3bee4f0d618df427"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "wasi",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -1713,6 +1727,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "jsonwebtoken"
+version = "9.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c7ea04a7c5c055c175f189b6dc6ba036fd62306b58c66c9f6389036c503a3f4"
+dependencies = [
+ "base64 0.21.4",
+ "js-sys",
+ "ring 0.17.5",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "language-tags"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1799,11 +1826,12 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "actix-web-actors",
+ "apple-signin",
  "aws-config",
  "aws-sdk-s3",
  "chrono",
  "dotenv",
- "jsonwebtoken",
+ "jsonwebtoken 8.3.0",
  "reqwest",
  "serde",
  "serde_json",
@@ -2557,6 +2585,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ce1fc6db65a611022b23a0dec6975d63fb80a302cb3388835ff02c097258d50"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "serde_repr"
+version = "0.1.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3081f5ffbb02284dda55132aa26daecedd7372a42417bbbab6f14ab7d6bb9145"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.37",
 ]
 
 [[package]]

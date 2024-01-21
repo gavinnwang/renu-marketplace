@@ -1,15 +1,13 @@
 use actix_web::web;
 
-use super::auth_handler::google_oauth_handler;
-use super::auth_handler::logout_handler;
-
 pub fn handlers(conf: &mut web::ServiceConfig) {
     conf.service(super::health_handler::index_handler);
 
     conf.service(
         web::scope("/auth")
-            .service(google_oauth_handler)
-            .service(logout_handler),
+            .service(super::auth_handler::google_oauth_handler)
+            .service(super::auth_handler::logout_handler)
+            .service(super::auth_handler::apple_auth_handler),
     );
 
     conf.service(

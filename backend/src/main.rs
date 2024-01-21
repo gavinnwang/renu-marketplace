@@ -14,7 +14,12 @@ use actix_cors::Cors;
 use actix_web::{http::header, web::Data, App, HttpServer};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
+use std::sync::Mutex;
 use tracing_actix_web::TracingLogger;
+
+pub struct AppleSignInClient {
+    client: Mutex<apple_signin::AppleJwtClient>, // <- Mutex is necessary to mutate safely across threads
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -94,8 +99,11 @@ async fn main() -> std::io::Result<()> {
     )
     .await;
 
-    let s3_client = Data::new(s3_client);
-
+    let apple_signin_client = actix_web::web::Data::new(AppleSignInClient {
+        client: Mutex::new(apple_signin::AppleJwtClient::new(&[config
+            .apple_bundle_id
+            .clone()])),
+    });
     tracing::info!("Starting Actix web server");
 
     HttpServer::new(move || {
@@ -114,7 +122,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(config.clone()))
             .app_data(Data::new(pool.clone()))
             .app_data(Data::new(server.clone()))
-            .app_data(s3_client.clone())
+            .app_data(Data::new(s3_client.clone()))
+            .app_data(apple_signin_client.clone())
             .wrap(cors)
             .configure(routes::handler_register::handlers)
             .service(websocket::ws_handler::ws_route)
