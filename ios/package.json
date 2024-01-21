@@ -48,7 +48,8 @@
     "react-native-svg": "13.9.0",
     "react-native-toast-message": "^2.2.0",
     "react-native-web": "~0.19.6",
-    "react-use-websocket": "^3.0.0"
+    "react-use-websocket": "^3.0.0",
+    "expo-apple-authentication": "~6.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

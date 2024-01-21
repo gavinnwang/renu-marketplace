@@ -5,9 +5,14 @@ import { useEffect } from "react";
 import { G, Path, Svg } from "react-native-svg";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { BigLogo } from "../components/Logo";
+import * as AppleAuthentication from "expo-apple-authentication";
+import Toast from "react-native-toast-message";
+import { useMutation } from "@tanstack/react-query";
+import { postAppleLogin } from "../api";
+import * as Linking from "expo-linking";
 
 const GoogleLogo = ({ className }: { className?: string }) => (
-  <Svg viewBox="0 0 48 48" width="28" height="28" className={className}>
+  <Svg viewBox="0 0 48 48" width="16" height="16" className={className}>
     <G>
       <Path
         fill="#EA4335"
@@ -31,7 +36,7 @@ const GoogleLogo = ({ className }: { className?: string }) => (
 );
 
 export default function LoginPage() {
-  const { signIn, session } = useSession();
+  const { signInWithGoogle, session } = useSession();
 
   useEffect(() => {
     if (session) {
@@ -39,6 +44,25 @@ export default function LoginPage() {
       router.replace(`/`);
     }
   }, [session]);
+  type useMutationRequest = {
+    identityToken: string;
+    username?: string;
+  };
+
+  const postAppleLoginMutation = useMutation(
+    ({ identityToken, username }: useMutationRequest) => {
+      const callbackUrl = Linking.createURL("App");
+      return postAppleLogin(identityToken, callbackUrl, username);
+    },
+    {
+      onSuccess: () => {
+        console.debug("successfully posted apple login");
+      },
+      onError: (error: any) => {
+        console.error("error posting apple login", error);
+      },
+    }
+  );
 
   return (
     <SafeAreaView className="flex h-full w-full pt-4 items-center bg-bgLight flex-col justify-between dark:bg-blackPrimary">
@@ -52,14 +76,57 @@ export default function LoginPage() {
         Shop and sell with people within your college area with ease!
       </Text>
 
-      <TouchableOpacity onPress={signIn} className="mb-12">
-        <View className="items-center flex-row h-[45px] rounded-sm border-[1.5px] w-[80vw] flex justify-center dark:border-white">
-          <GoogleLogo />
-          <Text className="ml-2 font-Poppins_600SemiBold text-base dark:text-white">
-            Continue with Google
-          </Text>
-        </View>
-      </TouchableOpacity>
+      <View>
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={
+            AppleAuthentication.AppleAuthenticationButtonType.CONTINUE
+          }
+          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+          cornerRadius={5}
+          style={{
+            height: 45,
+          }}
+          onPress={async () => {
+            try {
+              const credential: AppleAuthentication.AppleAuthenticationCredential =
+                await AppleAuthentication.signInAsync({
+                  requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                  ],
+                });
+              if (credential.identityToken) {
+                console.log(credential);
+                postAppleLoginMutation.mutate({
+                  identityToken: credential.identityToken,
+                  username: credential.fullName?.givenName ?? undefined,
+                });
+              }
+            } catch (error: any) {
+              if (error.code === "ERR_CANCELED") {
+                Toast.show({
+                  type: "error",
+                  text1: "Apple login cancelled",
+                });
+              } else {
+                Toast.show({
+                  type: "error",
+                  text1:
+                    error.message ?? "An error occured while authenticating",
+                });
+              }
+            }
+          }}
+        />
+        <TouchableOpacity onPress={signInWithGoogle} className="mb-12 mt-4">
+          <View className="items-center flex-row h-[45px] border-[1.5px] rounded-md w-[80vw] flex justify-center dark:border-white">
+            <GoogleLogo />
+            <Text className="ml-2 font-Poppins_600SemiBold text-base dark:text-white">
+              Continue with Google
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }

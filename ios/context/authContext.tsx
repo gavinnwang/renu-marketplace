@@ -2,7 +2,7 @@ import React from "react";
 import { Session } from "../../shared/types";
 
 type AuthContextType = {
-  signIn: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => void;
   session: Session | null;
   setSession: React.Dispatch<React.SetStateAction<Session | null>>;

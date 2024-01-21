@@ -83,7 +83,7 @@ export default function RootLayout() {
 }
 const toastConfig = {
   error: ({ text1 }: any) => (
-    <View className="px-2 py-1 mx-3 mt-3 bg-red-500 rounded-md">
+    <View className="px-2 py-1 mx-3 mt-5 bg-red-500 rounded-md">
       <Text className="text-white">{text1}</Text>
     </View>
   ),

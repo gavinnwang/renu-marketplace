@@ -47,7 +47,6 @@ export type RefAndKey = {
 export type Session = {
   token: string;
   email: string;
-  name: string;
   user_id: number;
 };
 

@@ -15,6 +15,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { Colors } from "react-native/Libraries/NewAppScreen";
+import { Session } from "../../../../shared/types";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -72,7 +73,7 @@ export default function AccountScreen() {
           <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
             <View className="flex-col w-[200px]">
               <Text className="text-xl mb-1 font-Poppins_500Medium text-left max-w-[160px] h-[30px] text-blackPrimary dark:text-bgLight">
-                {user?.name ?? session?.name}
+                {user?.name}
               </Text>
 
               <View className="flex-row">

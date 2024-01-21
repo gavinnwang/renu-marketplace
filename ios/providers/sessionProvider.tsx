@@ -9,13 +9,13 @@ import { Session } from "../../shared/types";
 import { AuthContext } from "../context/authContext";
 import { getGoogleUrl } from "../../shared/util/getGoogleOauthUrl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { clearPushToken, postPushToken } from "../api";
+import { clearPushToken } from "../api";
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
   const [loadedFromStorage, setLoadedFromStorage] = React.useState(false);
 
-  const signIn = async () => {
+  const signInWithGoogle = async () => {
     const callbackUrl = Linking.createURL("App");
     const link = getGoogleUrl({
       device_type: "mobile",
@@ -28,13 +28,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const params = new URL(result.url).searchParams;
       const token = params.get("token");
       const email = params.get("email");
-      const name = params.get("name");
       const user_id = params.get("user_id");
-      if (token && email && name && user_id) {
+      if (token && email && user_id) {
         const s = {
           token,
           email,
-          name,
           user_id: parseInt(user_id),
         };
         setSession(s);
@@ -73,7 +71,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        signIn,
+        signInWithGoogle,
         signOut,
         session,
         setSession,

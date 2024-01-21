@@ -14,7 +14,7 @@ export default function RefreshScreen({
       </Text>
       <TouchableOpacity
         onPress={refetch}
-        className="border-[1.5px] mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center rounded-sm"
+        className="border-[1.5px] border-blackPrimary dark:border-bgLight mt-4 h-[45px] w-[180px] mx-auto flex items-center justify-center rounded-sm"
       >
         <Text className="font-Poppins_500Medium text-blackPrimary dark:text-bgLight">
           Refresh

@@ -7,14 +7,15 @@ import {
   User,
 } from "../shared/types";
 
-// import Constants from "expo-constants";
-// const config = Constants.expoConfig as any;
-// export const API_URL = "http://" + config.hostUri.split(`:`).shift().concat(`:52455`) as string
-// console.log("API_URL", API_URL);
-//  export const REDIRECT_URL = "http://localhost:8080/auth/callback";
+import Constants from "expo-constants";
+const config = Constants.expoConfig as any;
+export const API_URL = ("http://" +
+  config.hostUri.split(`:`).shift().concat(`:8080`)) as string;
+console.log("API_URL", API_URL);
+export const REDIRECT_URL = "http://localhost:8080/auth/google/callback";
 
-export const API_URL = "https://api.gavinwang.dev";
-export const REDIRECT_URL = "https://api.gavinwang.dev/auth/callback";
+// export const API_URL = "https://api.gavinwang.dev";
+// export const REDIRECT_URL = "https://api.gavinwang.dev/auth/google/callback";
 
 export const IMAGES_URL = "https://images.gavinwang.dev/";
 
@@ -32,6 +33,21 @@ export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
     throw new Error(errMsg);
   }
   return res.json();
+}
+
+export async function postAppleLogin(identityToken: string, callback: string, username?: string) {
+  const res = await fetch(`${API_URL}/auth/apple`, {
+    headers: {
+      "content-type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({
+      identity_token: identityToken,
+      callback: callback,
+      user_name: username,
+    }),
+  });
+  return parseOrThrowResponse(res);
 }
 
 export async function getUserMeInfo(sessionToken: string): Promise<User> {
