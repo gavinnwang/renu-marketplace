@@ -452,7 +452,7 @@ const Message = ({ item: message }: { item: ChatMessage }) => {
         <View
           className={`flex flex-row rounded-xl p-2 w-fit my-1.5 ${
             message.from_me
-              ? " bg-purplePrimary border border-stone-300 dark:border-stone-800"
+              ? " bg-purplePrimary border"
               : " bg-grayLight border border-stone-300 dark:bg-stone-700 dark:border-stone-600"
           }`}
         >

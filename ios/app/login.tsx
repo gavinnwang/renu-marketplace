@@ -106,7 +106,7 @@ export default function LoginPage() {
                   ],
                 });
               if (credential.identityToken) {
-                console.log(credential);
+                console.debug(credential);
                 postAppleLoginMutation.mutate({
                   identityToken: credential.identityToken,
                   username: credential.fullName?.givenName ?? undefined,
