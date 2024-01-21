@@ -18,11 +18,20 @@ export type Item = {
   images: string[];
   updated_at: Date;
 };
-
-export const ItemCategory: Record<string, string> = {
+export const ItemCategoryWithAll: Record<string, string> = {
+  all: "All",
+  apparel: "Apparel",
+  furniture: "Furniture",
+  electronics: "Electronics",
+  vehicles: "Vehicles",
+  home: "Home",
+  other: "Other",
+  free: "Free",
+};
+export const ItemCategoryWithPicking: Record<string, string> = {
   picking: "Pick a category",
   apparel: "Apparel",
-  home: "Home & Tools",
+  home: "Home",
   furniture: "Furniture",
   electronics: "Electronics",
   vehicles: "Vehicles",

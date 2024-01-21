@@ -5,7 +5,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { Image } from "expo-image";
 import { Item } from "../../shared/types";
 import dayjs from "dayjs";
-import Colors from "../../shared/constants/Colors";
 import { IMAGES_URL } from "../api";
 dayjs.extend(relativeTime);
 

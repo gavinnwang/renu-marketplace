@@ -11,7 +11,7 @@ import {
   useColorScheme,
 } from "react-native";
 import Colors from "../../../../shared/constants/Colors";
-import { Item, ItemCategory, Measure, RefAndKey } from "../../../../shared/types";
+import { Item, ItemCategoryWithAll as ItemCategory, Measure, RefAndKey } from "../../../../shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 

@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { ItemListing } from "../../../components/ItemListing";
 import { LogoWithText } from "../../../components/Logo";
-import { Item, ItemCategory, Measure } from "../../../../shared/types";
+import { Item, ItemCategoryWithAll, Measure } from "../../../../shared/types";
 import React from "react";
 import Colors from "../../../../shared/constants/Colors";
 import PagerView from "react-native-pager-view";
@@ -19,10 +19,10 @@ type CategoryTabData = {
   flashListRef: React.RefObject<any>;
 };
 
-const data: CategoryTabData[] = Object.keys(ItemCategory).map((i) => ({
+const data: CategoryTabData[] = Object.keys(ItemCategoryWithAll).map((i) => ({
   key: i,
   value: i,
-  display: ItemCategory[i],
+  display: ItemCategoryWithAll[i],
   ref: React.createRef(),
   flashListRef: React.createRef(),
 }));
@@ -147,7 +147,7 @@ const CategoryView = ({
           <View className="flex flex-col gap-y-2 items-center">
             <LogoWithText />
             <Text className="font-Poppins_600SemiBold text-lg text-blackPrimary dark:text-bgLight">
-              No item right now... List one!
+              No listings yet. List something!
             </Text>
           </View>
         </ScrollView>
@@ -314,7 +314,7 @@ const Indicator = ({
   measures: Measure[];
 }) => {
   const scaleX = animatedWidth.interpolate({
-    inputRange: [0, Math.max(...measures.map((item) => item.width)) / 3],
+    inputRange: [0, Math.max(...measures.map((item) => item.width)) / 2],
     outputRange: [0, 1],
   });
   const translateX = animatedValueX.interpolate({

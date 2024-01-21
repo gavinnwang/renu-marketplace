@@ -25,7 +25,7 @@ import {
   getUserInfo,
   postChangeSavedItemStatus,
 } from "../../../api";
-import { Item, ItemCategory } from "../../../../shared/types";
+import { Item, ItemCategoryWithAll as ItemCategory } from "../../../../shared/types";
 import React from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";

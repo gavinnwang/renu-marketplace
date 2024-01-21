@@ -28,7 +28,7 @@ import { IMAGES_URL, postAIComplete, postImages, postNewItem } from "../../api";
 import { useQueryClient } from "@tanstack/react-query";
 import { registerForPushNotificationsAsync } from "../../notification";
 import * as Notifications from "expo-notifications";
-import { ItemCategory } from "../../../shared/types";
+import { ItemCategoryWithPicking } from "../../../shared/types";
 
 const MAX_IMAGES = 6;
 
@@ -105,7 +105,9 @@ export default function UploadListingStepOne() {
       if (completionRes.price === 0) {
         setCategory("free");
         iosPickerRef.current?.setState("free");
-      } else if (Object.keys(ItemCategory).includes(completionRes.category)) {
+      } else if (
+        Object.keys(ItemCategoryWithPicking).includes(completionRes.category)
+      ) {
         setCategory(completionRes.category);
         iosPickerRef.current?.setState(completionRes.category);
       }
@@ -220,7 +222,7 @@ export default function UploadListingStepOne() {
     }
     // if category is part of item category but not picking
     if (
-      !Object.keys(ItemCategory).includes(category) ||
+      !Object.keys(ItemCategoryWithPicking).includes(category) ||
       category === "picking"
     ) {
       alert("Please select a valid category");
@@ -365,9 +367,9 @@ export default function UploadListingStepOne() {
                 <View className="border-b border-b-stone-200 dark:border-b-stone-800">
                   <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
                     Category:{" "}
-                    {ItemCategory[category] === "Pick a category"
+                    {ItemCategoryWithPicking[category] === "Pick a category"
                       ? ""
-                      : ItemCategory[category]}
+                      : ItemCategoryWithPicking[category]}
                   </Text>
                   <Picker
                     selectedValue={category}
@@ -375,12 +377,12 @@ export default function UploadListingStepOne() {
                       setCategory(itemValue as string)
                     }
                   >
-                    {Object.keys(ItemCategory).map((key) => (
+                    {Object.keys(ItemCategoryWithPicking).map((key) => (
                       <PickerIOS.Item
                         color={colorScheme === "dark" ? "white" : "black"}
                         ref={iosPickerRef}
                         key={key}
-                        label={ItemCategory[key]}
+                        label={ItemCategoryWithPicking[key]}
                         value={key}
                       />
                     ))}
