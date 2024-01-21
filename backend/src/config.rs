@@ -20,6 +20,7 @@ pub struct Config {
     pub openai_api_key: String,
 
     pub apple_bundle_id: String,
+    pub apple_bundle_id_dev: String,
 }
 
 impl Config {
@@ -66,14 +67,9 @@ impl Config {
 
         let openai_api_key = std::env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
 
-        let apple_bundle_id = match env.as_str() {
-            // "production" => std::env::var("APPLE_BUNDLE_ID").expect("APPLE_BUNDLE_ID must be set"),
-            "production" => "host.exp.Exponent".to_string(),
-            "development" => "host.exp.Exponent".to_string(),
-            _ => {
-                panic!("Invalid ENV variable");
-            }
-        };
+        let apple_bundle_id =
+            std::env::var("APPLE_BUNDLE_ID").expect("APPLE_BUNDLE_ID must be set");
+        let apple_bundle_id_dev = "host.exp.Exponent".to_string();
 
         Config {
             jwt_secret,
@@ -94,6 +90,7 @@ impl Config {
             s3_key_secret,
             openai_api_key,
             apple_bundle_id,
+            apple_bundle_id_dev,
         }
     }
 }

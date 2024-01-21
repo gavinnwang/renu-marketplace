@@ -154,8 +154,8 @@ async fn google_oauth_handler(
 #[derive(Deserialize, Debug)]
 pub struct AppleAuthRequest {
     pub identity_token: String,
-    pub callback: String,
     pub user_name: Option<String>,
+    pub dev: Option<bool>,
 }
 
 #[tracing::instrument(skip(pool, apple_signin_client, config))]
@@ -167,17 +167,33 @@ async fn apple_auth_handler(
     config: web::Data<Config>,
 ) -> Result<HttpResponse, actix_web::Error> {
     let identity_token = &request.identity_token;
-    let callback = &request.callback;
     let mut apple_signin_client = apple_signin_client.client.lock().unwrap();
-    let payload = match (*apple_signin_client).decode(identity_token.as_str()).await {
-        Ok(payload) => payload,
-        Err(err) => {
-            tracing::error!("Failed to decode apple identity token: {err}");
-            return Err(UserError::OAuthError(
-                "failed to decode apple identity token",
-            ))?;
+
+    let payload = match request.dev {
+        Some(_) => {
+            let mut apple_signin_client =
+                apple_signin::AppleJwtClient::new(&[config.apple_bundle_id_dev.clone()]);
+            match apple_signin_client.decode(identity_token.as_str()).await {
+                Ok(payload) => payload,
+                Err(err) => {
+                    tracing::error!("Failed to decode apple identity token: {err}");
+                    return Err(UserError::OAuthError(
+                        "failed to decode apple identity token",
+                    ))?;
+                }
+            }
         }
+        None => match apple_signin_client.decode(identity_token.as_str()).await {
+            Ok(payload) => payload,
+            Err(err) => {
+                tracing::error!("Failed to decode apple identity token: {err}");
+                return Err(UserError::OAuthError(
+                    "failed to decode apple identity token",
+                ))?;
+            }
+        },
     };
+
     let user_email = match payload.email {
         Some(email) => email,
         None => {

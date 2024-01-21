@@ -9,7 +9,6 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import Toast from "react-native-toast-message";
 import { useMutation } from "@tanstack/react-query";
 import { postAppleLogin } from "../api";
-import * as Linking from "expo-linking";
 import { AppleAuthResponse } from "../../shared/types";
 import * as SecureStore from "expo-secure-store";
 
@@ -52,8 +51,7 @@ export default function LoginPage() {
   };
   const postAppleLoginMutation = useMutation(
     ({ identityToken, username }: useMutationRequest) => {
-      const callbackUrl = Linking.createURL("App");
-      return postAppleLogin(identityToken, callbackUrl, username);
+      return postAppleLogin(identityToken, username);
     },
     {
       onSuccess: (res: AppleAuthResponse) => {
