@@ -364,6 +364,39 @@ export default function UploadListingStepOne() {
                     />
                   </View>
                 </View>
+
+
+                <View className="pb-5 border-b border-b-stone-200 dark:border-b-stone-800">
+                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
+                    Description
+                  </Text>
+
+                  <View className="bg-grayLight dark:bg-zinc-950 rounded-md h-[120px]">
+                    <TextInput
+                      collapsable
+                      multiline
+                      onChangeText={(text) => setDescription(text)}
+                      value={description}
+                      placeholder="Enter a description"
+                      className="p-3 h-fit text-blackPrimary dark:text-bgLight dark:placeholder:text-bgLight"
+                    />
+                  </View>
+                </View>
+
+                <View className="pb-5 border-b border-b-stone-200 dark:border-b-stone-800">
+                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
+                    Meetup Location
+                  </Text>
+
+                  <View className="bg-grayLight dark:bg-zinc-950 rounded-md">
+                    <TextInput
+                      onChangeText={(text) => setLocation(text)}
+                      value={location}
+                      placeholder="Enter a location"
+                      className="p-3 h-fit text-blackPrimary dark:text-bgLight"
+                    />
+                  </View>
+                </View>
                 <View className="border-b border-b-stone-200 dark:border-b-stone-800">
                   <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
                     Category:{" "}
@@ -387,38 +420,6 @@ export default function UploadListingStepOne() {
                       />
                     ))}
                   </Picker>
-                </View>
-
-                <View className="pb-5">
-                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
-                    Description
-                  </Text>
-
-                  <View className="bg-grayLight dark:bg-zinc-950 rounded-md h-[120px]">
-                    <TextInput
-                      collapsable
-                      multiline
-                      onChangeText={(text) => setDescription(text)}
-                      value={description}
-                      placeholder="Enter a description"
-                      className="p-3 h-fit text-blackPrimary dark:text-bgLight dark:placeholder:text-bgLight"
-                    />
-                  </View>
-                </View>
-
-                <View className="pb-5">
-                  <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
-                    Meetup Location
-                  </Text>
-
-                  <View className="bg-grayLight dark:bg-zinc-950 rounded-md">
-                    <TextInput
-                      onChangeText={(text) => setLocation(text)}
-                      value={location}
-                      placeholder="Enter a location"
-                      className="p-3 h-fit text-blackPrimary dark:text-bgLight"
-                    />
-                  </View>
                 </View>
 
                 <View className="fixed bottom-0 h-[72px] w-full bg-bgLight dark:bg-blackPrimary border-t border-t-stone-200 dark:border-t-stone-800 py-3 px-6 flex items-center justify-center">
