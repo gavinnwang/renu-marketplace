@@ -19,6 +19,7 @@ import { useRef, useState } from "react";
 import { useSession } from "../../../hooks/useSession";
 import {
   IMAGES_URL,
+  deleteItem,
   getChatIdFromItemId,
   getItem,
   getSavedItemStatus,
@@ -120,6 +121,16 @@ export default function ItemPage() {
     },
   });
 
+  const deleteItemMutation = useMutation({
+    mutationFn:() => deleteItem(session!.token, itemId as string),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", item?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ["savedItems"] });
+      queryClient.invalidateQueries({ queryKey: ["item", itemId] });
+      router.back();
+    }
+  });
+
   const width = Dimensions.get("window").width;
   const isUserItem = item?.user_id === session?.user_id;
   const { showActionSheetWithOptions } = useActionSheet();
@@ -145,6 +156,7 @@ export default function ItemPage() {
             break;
 
           case destructiveButtonIndex:
+            deleteItemMutation.mutateAsync();
             // Delete
             break;
 
