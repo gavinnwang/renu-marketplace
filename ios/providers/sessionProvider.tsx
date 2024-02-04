@@ -16,10 +16,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [loadedFromStorage, setLoadedFromStorage] = React.useState(false);
 
   const signInWithGoogle = async () => {
-    const callbackUrl = Linking.createURL("App");
+    const callbackUrl = Linking.createURL("/index");
     const link = getGoogleUrl({
       device_type: "mobile",
-      callback: callbackUrl,
+      callback: callbackUrl ?? "",
     });
 
     const result: WebBrowser.WebBrowserAuthSessionResult =

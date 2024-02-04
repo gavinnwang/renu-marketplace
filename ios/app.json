@@ -2,17 +2,20 @@
   "expo": {
     "name": "Renu Marketplace",
     "slug": "marketplace-frontend",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "renu",
     "userInterfaceStyle": "automatic",
     "owner": "renu_marketplace",
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "renu",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to take picture of resell items for uploading."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,7 +28,11 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": ["expo-router", "expo-apple-authentication"],
+    "plugins": [
+      "expo-router",
+      "expo-apple-authentication",
+      "expo-image-picker"
+    ],
     "experiments": {
       "typedRoutes": true
     },

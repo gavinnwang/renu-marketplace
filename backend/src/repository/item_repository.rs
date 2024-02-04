@@ -258,3 +258,20 @@ pub async fn search_items(
 
     Ok(items)
 }
+
+pub async fn delete_item_by_id(
+    id: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<(), DbError> {
+    sqlx::query!(
+        r#"
+        DELETE FROM Item
+        WHERE id = $1
+        "#,
+        id
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(())
+}

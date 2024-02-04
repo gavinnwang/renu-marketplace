@@ -45,24 +45,28 @@ export default function SavedItemsPage() {
           </Text>
         </View>
 
-        <View className="bg-greyLight">
-          {isLoadingSavedItem ? (
-            <></>
-          ) : isErrorSavedItem ? (
-            <View className=" h-[80%] flex-grow">
-              <RefreshScreen
-                displayText="Something went wrong."
-                refetch={refetch}
-              />
-            </View>
-          ) : savedItemData.length === 0 ? (
-            <View className=" h-[80%] flex-grow">
-              <RefreshScreen
-                displayText="You have no saved items."
-                refetch={refetch}
-              />
-            </View>
-          ) : (
+        {isLoadingSavedItem ? (
+          <></>
+        ) : isErrorSavedItem ? (
+          <View className="bg-greyLight">
+          <View className="h-[80%] flex-grow">
+            <RefreshScreen
+              displayText="Something went wrong."
+              refetch={refetch}
+            />
+          </View>
+          </View>
+        ) : savedItemData.length === 0 ? (
+          <View className="bg-greyLight">
+          <View className="h-[80%] flex-grow">
+            <RefreshScreen
+              displayText="You have no saved items."
+              refetch={refetch}
+            />
+          </View>
+          </View>
+        ) : (
+          <View className="bg-greyLight h-full">
             <FlashList
               refreshControl={
                 <RefreshControl
@@ -86,8 +90,8 @@ export default function SavedItemsPage() {
               estimatedItemSize={320}
               removeClippedSubviews={true}
             />
-          )}
-        </View>
+          </View>
+        )}
       </View>
     </>
   );

@@ -145,14 +145,14 @@ struct ItemCreateBody {
     location: Option<String>,
 }
 
-#[tracing::instrument(skip(pool, auth_guar))]
+#[tracing::instrument(skip(pool, auth_guard))]
 #[post("/")]
 async fn post_item_handler(
-    auth_guar: AuthenticationGuard,
+    auth_guard: AuthenticationGuard,
     data: web::Json<ItemCreateBody>,
     pool: web::Data<PgPool>,
 ) -> impl Responder {
-    let user_id = auth_guar.user_id;
+    let user_id = auth_guard.user_id;
 
     let item = data.into_inner();
 
@@ -200,6 +200,57 @@ async fn post_item_handler(
         Err(err) => {
             tracing::error!("Failed to create item: {err}");
             HttpResponse::InternalServerError().json("Something went wrong")
+        }
+    }
+}
+
+
+#[derive(serde::Deserialize, Debug)]
+struct ItemDeleteBody {
+    item_id: i32,
+}
+
+#[tracing::instrument(skip(pool, auth_guard))]
+#[post("/delete")]
+async fn post_delete_item_handler(
+    auth_guard: AuthenticationGuard,
+    data: web::Json<ItemDeleteBody>,
+    pool: web::Data<PgPool>,
+) -> impl Responder {
+    let user_id = auth_guard.user_id;
+    let item_id = data.item_id;
+
+    let item = item_repository::fetch_item_by_id(item_id, pool.as_ref()).await;
+
+    match item {
+        Ok(item) => {
+            if item.user_id != user_id {
+                tracing::warn!("unauthorized");
+                return HttpResponse::Unauthorized()
+                    .json("You are not authorized to delete this item");
+            }
+        }
+        Err(err) => {
+            tracing::error!("Failed to fetch item by id when checking if user is authorized to delete the item: {err}");
+            match err {
+                crate::error::DbError::NotFound => {
+                    return HttpResponse::NotFound().json("Item not found")
+                }
+                _ => return HttpResponse::InternalServerError().json("Something went wrong"),
+            };
+        }
+    };
+
+    let response = item_repository::delete_item_by_id(item_id, pool.as_ref()).await;
+
+    match response {
+        Ok(_) => HttpResponse::Ok().json("Item deleted"),
+        Err(err) => {
+            tracing::error!("Failed to delete item: {err}");
+            match err {
+                crate::error::DbError::NotFound => HttpResponse::NotFound().json("Item not found"),
+                _ => HttpResponse::InternalServerError().json("Something went wrong"),
+            }
         }
     }
 }

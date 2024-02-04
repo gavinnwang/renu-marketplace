@@ -21,6 +21,7 @@ import useRetrieveSession from "../hooks/useLoadSession";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useNotificationObserver from "../hooks/useNotificationObserver";
 import Toast from "react-native-toast-message";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -67,12 +68,14 @@ export default function RootLayout() {
 
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        <SessionProvider>
-          <RootLayoutNav />
-          <Toast config={toastConfig} />
-        </SessionProvider>
-      </QueryClientProvider>
+      <ActionSheetProvider>
+        <QueryClientProvider client={queryClient}>
+          <SessionProvider>
+            <RootLayoutNav />
+            <Toast config={toastConfig} />
+          </SessionProvider>
+        </QueryClientProvider>
+      </ActionSheetProvider>
     </>
   );
 }

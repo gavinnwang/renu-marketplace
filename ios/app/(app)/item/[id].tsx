@@ -25,13 +25,17 @@ import {
   getUserInfo,
   postChangeSavedItemStatus,
 } from "../../../api";
-import { Item, ItemCategoryWithAll as ItemCategory } from "../../../../shared/types";
+import {
+  Item,
+  ItemCategoryWithAll as ItemCategory,
+} from "../../../../shared/types";
 import React from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import LeftChevron from "../../../components/LeftChevron";
 import { FlashList } from "@shopify/flash-list";
 import { VerifiedIcon } from "../../../components/VerifiedIcon";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 dayjs.extend(relativeTime);
 
 const HeartIcon = ({ filled }: { filled: boolean }) => (
@@ -117,14 +121,52 @@ export default function ItemPage() {
   });
 
   const width = Dimensions.get("window").width;
+  const isUserItem = item?.user_id === session?.user_id;
+  const { showActionSheetWithOptions } = useActionSheet();
+  const onPress = () => {
+    const saved = isSaved ? "Unsave" : "Save";
+    const options = isUserItem
+      ? ["Delete", saved, "Cancel"]
+      : ["Report", saved, "Cancel"];
+    const destructiveButtonIndex = 0;
+    const cancelButtonIndex = 2;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      (selectedIndex: any) => {
+        switch (selectedIndex) {
+          case 1:
+            // save or unsave
+            saveItemMutation.mutateAsync(!isSaved);
+            break;
+
+          case destructiveButtonIndex:
+            // Delete
+            break;
+
+          case cancelButtonIndex:
+          // Canceled
+        }
+      }
+    );
+  };
 
   return (
     <>
       <SafeAreaView className="bg-bgLight dark:bg-blackPrimary" />
       <View className="bg-bgLight h-full dark:bg-blackPrimary">
-        <Pressable onPress={router.back} className="p-3">
-          <LeftChevron />
-        </Pressable>
+        <View className="flex flex-row justify-between items-center">
+          <Pressable onPress={router.back} className="p-3">
+            <LeftChevron />
+          </Pressable>
+          <Pressable onPress={onPress} className="p-3">
+            <OptionIcon />
+          </Pressable>
+        </View>
 
         {item ? (
           <ScrollView>
@@ -162,7 +204,7 @@ export default function ItemPage() {
                 <PaginationDots data={item.images} currentIndex={index} />
               )}
             </View>
-            {item.user_id === session?.user_id ? (
+            {isUserItem ? (
               <View className="px-3 py-1.5 w-full bg-purplePrimary flex justify-center">
                 <Text className="font-Manrope_500Medium text-bgLight">
                   {item.status === "inactive"
@@ -257,7 +299,7 @@ export default function ItemPage() {
                 onPress={() => {
                   if (!seller) return;
                   if (!session) return;
-                  if (seller.id === session.user_id) {
+                  if (isUserItem) {
                     router.push("/account");
                   } else {
                     router.push({
@@ -290,7 +332,7 @@ export default function ItemPage() {
                     onPress={() => {
                       if (!seller) return;
                       if (!session) return;
-                      if (seller.id === session.user_id) {
+                      if (isUserItem) {
                         router.push("/account");
                       } else {
                         router.push({
@@ -319,11 +361,11 @@ export default function ItemPage() {
                     </Text>
                   </View>
                 </View>
-                {item.user_id !== session?.user_id && (
+                {!isUserItem && (
                   <View className="ml-auto flex flex-col w-[100px] gap-y-0.5">
                     <Pressable
                       onPress={() => {
-                        if (item.user_id === session?.user_id) {
+                        if (isUserItem) {
                           router.push("/account");
                         } else if (seller) {
                           if (chatId) {
@@ -354,7 +396,7 @@ export default function ItemPage() {
                       className="font-Manrope_400Regular bg-purplePrimary p-2 rounded-sm"
                     >
                       <Text className="text-white text-center font-Manrope_600SemiBold">
-                        {item.user_id === session?.user_id ? "Edit" : "Message"}
+                        Message
                       </Text>
                     </Pressable>
                   </View>
@@ -386,6 +428,25 @@ const CategoryIcon = () => {
         fill={
           colorScheme === "dark" ? Colors.whitePrimary : Colors.blackPrimary
         }
+      />
+    </Svg>
+  );
+};
+
+const OptionIcon = () => {
+  const colorScheme = useColorScheme();
+  return (
+    <Svg
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke={colorScheme === "dark" ? Colors.whitePrimary : Colors.blackPrimary}
+      className="w-6 h-6"
+    >
+      <Path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
       />
     </Svg>
   );
