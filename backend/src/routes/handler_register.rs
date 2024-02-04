@@ -25,7 +25,7 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::item_handler::get_item_by_id_handler)
             .service(super::item_handler::update_item_status_handler)
             .service(super::item_handler::post_item_handler)
-            .service(super::item_handler::post_delete_item_handler),
+            .service(super::item_handler::delete_item_handler),
     );
 
     conf.service(

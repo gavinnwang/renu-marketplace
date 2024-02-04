@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use serde::Deserialize;
 use sqlx::PgPool;
 
@@ -204,21 +204,15 @@ async fn post_item_handler(
     }
 }
 
-
-#[derive(serde::Deserialize, Debug)]
-struct ItemDeleteBody {
-    item_id: i32,
-}
-
 #[tracing::instrument(skip(pool, auth_guard))]
-#[post("/delete")]
-async fn post_delete_item_handler(
+#[delete("/{id}")]
+async fn delete_item_handler(
     auth_guard: AuthenticationGuard,
-    data: web::Json<ItemDeleteBody>,
+    path: web::Path<i32>,
     pool: web::Data<PgPool>,
 ) -> impl Responder {
     let user_id = auth_guard.user_id;
-    let item_id = data.item_id;
+    let item_id = path.into_inner();
 
     let item = item_repository::fetch_item_by_id(item_id, pool.as_ref()).await;
 

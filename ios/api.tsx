@@ -347,3 +347,16 @@ export async function getPopularSearchQueries(): Promise<string[]> {
   const res = await fetch(`${API_URL}/search/popular-queries`);
   return parseOrThrowResponse<string[]>(res);
 }
+
+export async function postDeleteItem(
+  sessionToken: string,
+  itemId: string
+): Promise<string> {
+  const res = await fetch(`${API_URL}/items/${}`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+    },
+    method: "POST",
+  });
+  return parseOrThrowResponse(res);
+}
