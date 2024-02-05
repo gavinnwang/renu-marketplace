@@ -370,3 +370,10 @@ export async function deleteUser(sessionToken: string): Promise<string> {
   });
   return parseOrThrowResponse(res);
 }
+
+export async function blockUser(userId: string): Promise<string> {
+  const res = await fetch(`${API_URL}/users/me/block/${userId}`, {
+    method: "POST",
+  });
+  return parseOrThrowResponse(res);
+}

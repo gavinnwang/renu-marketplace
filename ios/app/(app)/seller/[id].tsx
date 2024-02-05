@@ -9,8 +9,8 @@ import {
 import LeftChevron from "../../../components/LeftChevron";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
-import { useQuery } from "@tanstack/react-query";
-import { getUserActiveItems, getUserInfo } from "../../../api";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { blockUser, getUserActiveItems, getUserInfo } from "../../../api";
 import { User } from "../../../../shared/types";
 import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../components/RefreshScreen";
@@ -45,6 +45,10 @@ export default function SellerPage() {
     enabled: !!sellerId,
   });
 
+  const blockUserMutation = useMutation({
+    mutationFn: (userId: string) => blockUser(userId),
+  });
+
   const { showActionSheetWithOptions } = useActionSheet();
   const onPress = () => {
     const options = ["Block", "Cancel"];
@@ -69,7 +73,8 @@ export default function SellerPage() {
               {
                 text: "Block",
                 onPress: () => {
-                  // Block user
+                  blockUserMutation.mutate(sellerId as string);
+                  router.replace("/home");
                 },
                 style: "destructive",
               },
