@@ -3,7 +3,7 @@ use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::{
-    authentication::jwt::AuthenticationGuard,
+    authentication::jwt::{AuthenticationGuard, GetUserIdMiddleware},
     model::item_model::{Category, ItemStatus},
     repository::item_repository,
 };
@@ -19,17 +19,37 @@ pub struct GetItemQuery {
 async fn get_items_handler(
     pool: web::Data<PgPool>,
     query: web::Query<GetItemQuery>,
+    user_id_middleware: GetUserIdMiddleware,
 ) -> impl Responder {
     tracing::info!("called");
 
     let limit = 24;
     let offset = query.page * limit;
 
+    let user_id = user_id_middleware.user_id;
+
     let items = match &query.category {
-        Some(category) if category == "all" => {
-            item_repository::fetch_items_by_status(ItemStatus::Active, limit, offset, pool.as_ref())
+        Some(category) if category == "all" => match user_id {
+            Some(user_id) => {
+                item_repository::fetch_not_blocked_items_by_status(
+                    user_id,
+                    ItemStatus::Active,
+                    limit,
+                    offset,
+                    pool.as_ref(),
+                )
                 .await
-        }
+            }
+            None => {
+                item_repository::fetch_items_by_status(
+                    ItemStatus::Active,
+                    limit,
+                    offset,
+                    pool.as_ref(),
+                )
+                .await
+            }
+        },
         Some(category) => {
             let category = match Category::from_str(category.as_str()) {
                 Ok(category) => category,
@@ -38,13 +58,49 @@ async fn get_items_handler(
                     return HttpResponse::BadRequest().json("Invalid category");
                 }
             };
-            item_repository::fetch_active_items_by_category(category, limit, offset, pool.as_ref())
-                .await
+            match user_id {
+                Some(user_id) => {
+                    item_repository::fetch_not_blocked_active_items_by_category(
+                        user_id,
+                        category,
+                        limit,
+                        offset,
+                        pool.as_ref(),
+                    )
+                    .await
+                }
+                None => {
+                    item_repository::fetch_active_items_by_category(
+                        category,
+                        limit,
+                        offset,
+                        pool.as_ref(),
+                    )
+                    .await
+                }
+            }
         }
-        None => {
-            item_repository::fetch_items_by_status(ItemStatus::Active, limit, offset, pool.as_ref())
+        None => match user_id {
+            Some(user_id) => {
+                item_repository::fetch_not_blocked_items_by_status(
+                    user_id,
+                    ItemStatus::Active,
+                    limit,
+                    offset,
+                    pool.as_ref(),
+                )
                 .await
-        }
+            }
+            None => {
+                item_repository::fetch_items_by_status(
+                    ItemStatus::Active,
+                    limit,
+                    offset,
+                    pool.as_ref(),
+                )
+                .await
+            }
+        },
     };
 
     match items {

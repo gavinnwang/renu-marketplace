@@ -13,6 +13,66 @@ pub struct TokenClaims {
     pub exp: usize,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GetUserIdMiddleware {
+    pub user_id: Option<i32>,
+}
+
+impl FromRequest for GetUserIdMiddleware {
+    type Error = actix_web::Error;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        let token = req
+            .cookie("token")
+            .map(|c| c.value().to_string())
+            .or_else(|| {
+                let token = req
+                    .headers()
+                    .get(http::header::AUTHORIZATION)
+                    .map(|h| h.to_str().unwrap_or("").to_string())
+                    .or_else(|| {
+                        req.query_string()
+                            .split("&")
+                            .find(|s| s.starts_with("authorization="))
+                            .map(|s| s.split_at(("authorization=").len()).1.to_string())
+                    });
+
+                match token {
+                    Some(token) if token.len() < 7 => None,
+                    Some(token) => Some(token.split_at(7).1.to_string()),
+                    None => None,
+                }
+            });
+
+        let token = match token {
+            Some(token) => token,
+            None => return Box::pin(async { Ok(GetUserIdMiddleware { user_id: None }) }),
+        };
+
+        let jwt_secret = match req.app_data::<web::Data<Config>>() {
+            Some(config) => &config.jwt_secret,
+            None => return Box::pin(async { Ok(GetUserIdMiddleware { user_id: None }) }),
+        };
+
+        let decode = decode::<TokenClaims>(
+            token.as_str(),
+            &DecodingKey::from_secret(jwt_secret.as_ref()),
+            &Validation::new(Algorithm::HS256),
+        );
+
+        match decode {
+            Ok(decoded_token) => Box::pin(async move {
+                let user_id = decoded_token.claims.sub;
+                Ok(GetUserIdMiddleware {
+                    user_id: Some(user_id),
+                })
+            }),
+            Err(_) => Box::pin(async { Ok(GetUserIdMiddleware { user_id: None }) }),
+        }
+    }
+}
+
 pub struct AuthenticationGuard {
     pub user_id: i32,
 }

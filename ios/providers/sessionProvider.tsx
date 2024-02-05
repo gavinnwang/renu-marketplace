@@ -30,10 +30,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const email = params.get("email");
       const user_id = params.get("user_id");
       if (token && email && user_id) {
-        const s = {
+        const s: Session = {
           token,
           email,
           user_id: parseInt(user_id),
+          is_guest: false,
         };
         setSession(s);
         await SecureStore.setItemAsync("session", JSON.stringify(s));

@@ -1,0 +1,95 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            item.id, \n            item.name, \n            item.price, \n            item.user_id, \n            item.category::TEXT AS \"category!\",\n            item.status::TEXT AS \"status!\",\n            item.created_at, \n            item.description,\n            item.location,\n            item.updated_at,\n            item.images as images\n        FROM item\n        LEFT JOIN blocked_user ON item.user_id = blocked_user.blocked_user_id AND blocked_user.blocker_user_id = $1\n        WHERE item.status = $2 AND blocked_user.blocker_user_id IS NULL\n        ORDER BY item.created_at DESC\n        LIMIT $3\n        OFFSET $4;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "price",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 3,
+        "name": "user_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "category!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "location",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "images",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        {
+          "Custom": {
+            "name": "item_status",
+            "kind": {
+              "Enum": [
+                "active",
+                "inactive"
+              ]
+            }
+          }
+        },
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      null,
+      null,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "d63e6c82fd7fe9df5170049f7651931b87c51507f8f7f9a9e3a9acb6e0866485"
+}

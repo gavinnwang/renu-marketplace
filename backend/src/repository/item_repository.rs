@@ -43,6 +43,46 @@ pub async fn fetch_items_by_status(
     Ok(items)
 }
 
+pub async fn fetch_not_blocked_items_by_status(
+    user_id: i32,
+    status: ItemStatus,
+    limit: i32,
+    offset: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<Vec<Item>, DbError> {
+    let items = sqlx::query_as!(
+        Item,
+        r#"
+        SELECT
+            item.id, 
+            item.name, 
+            item.price, 
+            item.user_id, 
+            item.category::TEXT AS "category!",
+            item.status::TEXT AS "status!",
+            item.created_at, 
+            item.description,
+            item.location,
+            item.updated_at,
+            item.images as images
+        FROM item
+        LEFT JOIN blocked_user ON item.user_id = blocked_user.blocked_user_id AND blocked_user.blocker_user_id = $1
+        WHERE item.status = $2 AND blocked_user.blocker_user_id IS NULL
+        ORDER BY item.created_at DESC
+        LIMIT $3
+        OFFSET $4;
+        "#,
+        user_id,
+        status as ItemStatus,
+        limit as i64,
+        offset as i64,
+    )
+    .fetch_all(conn)
+    .await?;
+
+    Ok(items)
+}
+
 pub async fn fetch_active_items_by_category(
     category: Category,
     limit: i32,
@@ -70,6 +110,46 @@ pub async fn fetch_active_items_by_category(
         LIMIT $2
         OFFSET $3;
         "#,
+        category as Category,
+        limit as i64,
+        offset as i64
+    )
+    .fetch_all(conn)
+    .await?;
+
+    Ok(items)
+}
+
+pub async fn fetch_not_blocked_active_items_by_category(
+    user_id: i32,
+    category: Category,
+    limit: i32,
+    offset: i32,
+    conn: impl Executor<'_, Database = Postgres>,
+) -> Result<Vec<Item>, DbError> {
+    let items = sqlx::query_as!(
+        Item,
+        r#"
+        SELECT
+            Item.id,
+            Item.name, 
+            Item.price, 
+            Item.user_id, 
+            Item.category::TEXT AS "category!",
+            Item.status::TEXT AS "status!",
+            Item.description,
+            Item.location,
+            Item.created_at, 
+            Item.updated_at,
+            Item.images as images
+        FROM Item 
+        LEFT JOIN blocked_user ON Item.user_id = blocked_user.blocked_user_id AND blocked_user.blocker_user_id = $1
+        WHERE Item.category = $2 AND Item.status = 'active' AND blocked_user.blocker_user_id IS NULL
+        ORDER BY Item.created_at DESC
+        LIMIT $3
+        OFFSET $4;
+        "#,
+        user_id,
         category as Category,
         limit as i64,
         offset as i64

@@ -78,8 +78,7 @@ export default function ListPage() {
 export function TabPage({ index }: { index: number }) {
   const tabDisplay = TABS[index];
 
-  const { session } = useSession();
-
+  const { session , setSession} = useSession();
   const {
     data: items,
     isError: isErrorItem,
@@ -92,7 +91,7 @@ export function TabPage({ index }: { index: number }) {
   });
 
   const [refreshing, setRefreshing] = React.useState(false);
-  const { setSession } = useSession();
+
   return (
     <View className="bg-bgLight dark:bg-blackPrimary h-full">
       {session?.is_guest ? (

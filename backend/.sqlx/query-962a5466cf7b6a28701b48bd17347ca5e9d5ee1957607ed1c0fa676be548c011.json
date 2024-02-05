@@ -1,0 +1,100 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            Item.id,\n            Item.name, \n            Item.price, \n            Item.user_id, \n            Item.category::TEXT AS \"category!\",\n            Item.status::TEXT AS \"status!\",\n            Item.description,\n            Item.location,\n            Item.created_at, \n            Item.updated_at,\n            Item.images as images\n        FROM Item \n        LEFT JOIN blocked_user ON Item.user_id = blocked_user.blocked_user_id AND blocked_user.blocker_user_id = $1\n        WHERE Item.category = $2 AND Item.status = 'active' AND blocked_user.blocker_user_id IS NULL\n        ORDER BY Item.created_at DESC\n        LIMIT $3\n        OFFSET $4;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "price",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 3,
+        "name": "user_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "category!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "location",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "images",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        {
+          "Custom": {
+            "name": "category",
+            "kind": {
+              "Enum": [
+                "apparel",
+                "furniture",
+                "vehicles",
+                "electronics",
+                "home",
+                "other",
+                "free"
+              ]
+            }
+          }
+        },
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      null,
+      null,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "962a5466cf7b6a28701b48bd17347ca5e9d5ee1957607ed1c0fa676be548c011"
+}

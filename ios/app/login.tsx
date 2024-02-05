@@ -77,7 +77,7 @@ export default function LoginPage() {
   );
 
   const handleGotoTermsWebpage = () => {
-    const url = "https://renu.app/terms";
+    const url = "https://renu.gavinwang.dev/terms";
     Linking.openURL(url).catch((errMsg) =>
       Toast.show({
         type: "error",

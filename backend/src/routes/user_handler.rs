@@ -161,3 +161,20 @@ async fn delete_user_handler(
 
     Ok(HttpResponse::Ok().json("User deleted"))
 }
+
+#[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
+#[post("/me/block/{id}")]
+async fn block_user_handler(
+    auth_guard: AuthenticationGuard,
+    path: web::Path<i32>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, actix_web::Error> {
+    let blocker_user_id = auth_guard.user_id;
+    let blocked_user_id = path.into_inner();
+
+    user_repository::block_user(pool.as_ref(), blocker_user_id, blocked_user_id)
+        .await
+        .map_err(|_| UserError::InternalError)?;
+
+    Ok(HttpResponse::Ok().json("User blocked"))
+}
