@@ -174,7 +174,10 @@ async fn block_user_handler(
 
     user_repository::block_user(pool.as_ref(), blocker_user_id, blocked_user_id)
         .await
-        .map_err(|_| UserError::InternalError)?;
+        .map_err(|err| {
+            tracing::error!("Failed to block user: {err}");
+            UserError::InternalError
+        })?;
 
     Ok(HttpResponse::Ok().json("User blocked"))
 }

@@ -100,16 +100,14 @@ pub async fn block_user(
     blocker_user_id: i32,
     blocked_user_id: i32,
 ) -> Result<(), DbError> {
-    let result = sqlx::query!(
-        r#"INSERT INTO "blocked_user" (blocker_user_id, blocked_user_id) VALUES ($1, $2)"#,
+    sqlx::query!(
+        r#"INSERT INTO "blocked_user" (blocker_user_id, blocked_user_id) VALUES ($1, $2)
+           ON CONFLICT (blocker_user_id, blocked_user_id) DO NOTHING"#,
         blocker_user_id,
         blocked_user_id
     )
     .execute(conn)
     .await?;
 
-    match result.rows_affected() {
-        0 => Err(DbError::NotFound),
-        _ => Ok(()),
-    }
+    Ok(())
 }

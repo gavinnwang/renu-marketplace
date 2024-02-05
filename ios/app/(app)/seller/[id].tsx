@@ -9,7 +9,7 @@ import {
 import LeftChevron from "../../../components/LeftChevron";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { blockUser, getUserActiveItems, getUserInfo } from "../../../api";
 import { User } from "../../../../shared/types";
 import { FlashList } from "@shopify/flash-list";
@@ -18,6 +18,8 @@ import { ItemListing } from "../../../components/ItemListing";
 import { VerifiedIcon } from "../../../components/VerifiedIcon";
 import { OptionIcon } from "../../../components/OptionIcon";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { useSession } from "../../../hooks/useSession";
+import Toast from "react-native-toast-message";
 
 export default function SellerPage() {
   const { sellerString, sellerId } = useLocalSearchParams();
@@ -44,9 +46,14 @@ export default function SellerPage() {
     queryFn: () => getUserActiveItems(sellerId as string),
     enabled: !!sellerId,
   });
-
+  const { session } = useSession();
+  const queryClient = useQueryClient();
   const blockUserMutation = useMutation({
-    mutationFn: (userId: string) => blockUser(userId),
+    mutationFn: (userId: string) => blockUser(session?.token!, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["item", "all"] });
+      router.replace("/home");
+    },
   });
 
   const { showActionSheetWithOptions } = useActionSheet();
@@ -73,8 +80,14 @@ export default function SellerPage() {
               {
                 text: "Block",
                 onPress: () => {
+                  if (!session || session.is_guest) {
+                    Toast.show({
+                      type: "error",
+                      text1: "You must be logged in to block",
+                    });
+                    return;
+                  }
                   blockUserMutation.mutate(sellerId as string);
-                  router.replace("/home");
                 },
                 style: "destructive",
               },

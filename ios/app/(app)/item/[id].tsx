@@ -19,6 +19,7 @@ import { useRef, useState } from "react";
 import { useSession } from "../../../hooks/useSession";
 import {
   IMAGES_URL,
+  blockUser,
   deleteItem,
   getChatIdFromItemId,
   getItem,
@@ -134,6 +135,13 @@ export default function ItemPage() {
   const width = Dimensions.get("window").width;
   const isUserItem = item?.user_id === session?.user_id;
   const { showActionSheetWithOptions } = useActionSheet();
+  const blockUserMutation = useMutation({
+    mutationFn: (userId: string) => blockUser(session?.token!, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["item", "all"] });
+      router.back();
+    },
+  });
   const onPress = () => {
     const saved = isSaved ? "Unsave" : "Save";
     const options = isUserItem
@@ -175,7 +183,7 @@ export default function ItemPage() {
                 });
                 return;
               }
-              console.log("report");
+              blockUserMutation.mutate(item?.user_id.toString() as string);
             }
             break;
 

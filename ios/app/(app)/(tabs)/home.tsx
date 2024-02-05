@@ -10,6 +10,7 @@ import PagerView from "react-native-pager-view";
 import { API_URL, parseOrThrowResponse } from "../../../api";
 import { FlashList } from "@shopify/flash-list";
 import { useScrollToTop } from "@react-navigation/native";
+import { useSession } from "../../../hooks/useSession";
 
 type CategoryTabData = {
   key: string;
@@ -80,10 +81,16 @@ const CategoryView = ({
 }) => {
   const [refreshing, setRefreshing] = React.useState(false);
   const [fetched, setFetched] = React.useState(false);
+  const { session } = useSession();
   const getItemsByCategory = async ({ pageParam = 0 }) => {
     console.debug("fetching with pageParam and category", pageParam, category);
     const res = await fetch(
-      `${API_URL}/items/?category=${category}&page=${pageParam}`
+      `${API_URL}/items/?category=${category}&page=${pageParam}`,
+      {
+        headers: {
+          Authorization: `Bearer ${session?.token}`,
+        },
+      }
     );
     setFetched(true);
     return parseOrThrowResponse<Item[]>(res);
