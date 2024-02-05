@@ -37,6 +37,7 @@ import LeftChevron from "../../../components/LeftChevron";
 import { FlashList } from "@shopify/flash-list";
 import { VerifiedIcon } from "../../../components/VerifiedIcon";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import Toast from "react-native-toast-message";
 dayjs.extend(relativeTime);
 
 const HeartIcon = ({ filled }: { filled: boolean }) => (
@@ -76,9 +77,9 @@ export default function ItemPage() {
   });
 
   const { data: chatId, isError: isErrorChatId } = useQuery({
-    queryFn: () => getChatIdFromItemId(session!.token, itemId as string),
+    queryFn: () => getChatIdFromItemId(session!.token!, itemId as string),
     queryKey: ["chat_item", itemId],
-    enabled: !!session && !!itemId,
+    enabled: !!session && !!itemId && !session.is_guest && !!session.token,
   });
 
   const { data: seller } = useQuery({
@@ -97,14 +98,14 @@ export default function ItemPage() {
   const queryClient = useQueryClient();
 
   const { data: isSaved } = useQuery({
-    queryFn: () => getSavedItemStatus(session!.token, itemId as string),
+    queryFn: () => getSavedItemStatus(session!.token!, itemId as string),
     queryKey: ["saved", itemId],
-    enabled: !!session,
+    enabled: !!session && !!itemId && !session.is_guest && !!session.token,
   });
 
   const saveItemMutation = useMutation({
     mutationFn: (newStatus: boolean) =>
-      postChangeSavedItemStatus(session!.token, itemId as string, newStatus),
+      postChangeSavedItemStatus(session!.token!, itemId as string, newStatus),
     onMutate: async (newStatus: boolean) => {
       await queryClient.cancelQueries(["saved", itemId]);
       const previousStatus = queryClient.getQueryData(["saved", itemId]);
@@ -122,13 +123,11 @@ export default function ItemPage() {
   });
 
   const deleteItemMutation = useMutation({
-    mutationFn:() => deleteItem(session!.token, itemId as string),
+    mutationFn: () => deleteItem(session!.token!, itemId as string),
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["user", item?.user_id] });
-      queryClient.invalidateQueries({ queryKey: ["savedItems"] });
-      queryClient.invalidateQueries({ queryKey: ["item", itemId] });
+      queryClient.invalidateQueries({ queryKey: ["item", "all"] });
       router.back();
-    }
+    },
   });
 
   const width = Dimensions.get("window").width;
@@ -152,12 +151,31 @@ export default function ItemPage() {
         switch (selectedIndex) {
           case 1:
             // save or unsave
+            if (!session || session.is_guest) {
+              Toast.show({
+                type: "error",
+                text1: "You must be logged in to save items",
+              });
+              return;
+            }
             saveItemMutation.mutateAsync(!isSaved);
             break;
 
           case destructiveButtonIndex:
-            deleteItemMutation.mutateAsync();
-            // Delete
+            if (isUserItem) {
+              // delete
+              deleteItemMutation.mutateAsync();
+            } else {
+              // report
+              if (!session || session.is_guest) {
+                Toast.show({
+                  type: "error",
+                  text1: "You must be logged in to report",
+                });
+                return;
+              }
+              console.log("report");
+            }
             break;
 
           case cancelButtonIndex:
@@ -243,6 +261,13 @@ export default function ItemPage() {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
+                    if (!session || session.is_guest) {
+                      Toast.show({
+                        type: "error",
+                        text1: "You must be logged in to save items",
+                      });
+                      return;
+                    }
                     saveItemMutation.mutateAsync(!isSaved);
                   }}
                 >
@@ -452,7 +477,9 @@ const OptionIcon = () => {
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}
-      stroke={colorScheme === "dark" ? Colors.whitePrimary : Colors.blackPrimary}
+      stroke={
+        colorScheme === "dark" ? Colors.whitePrimary : Colors.blackPrimary
+      }
       className="w-6 h-6"
     >
       <Path

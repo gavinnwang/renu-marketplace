@@ -146,3 +146,18 @@ async fn delete_push_token_handler(
 
     Ok(HttpResponse::Ok().json("Push token cleared"))
 }
+
+#[tracing::instrument(skip(auth_guard, pool), fields(user_id = %auth_guard.user_id))]
+#[delete("/me")]
+async fn delete_user_handler(
+    auth_guard: AuthenticationGuard,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, actix_web::Error> {
+    let user_id = auth_guard.user_id;
+
+    user_repository::delete_user(pool.as_ref(), user_id)
+        .await
+        .map_err(|_| UserError::InternalError)?;
+
+    Ok(HttpResponse::Ok().json("User deleted"))
+}

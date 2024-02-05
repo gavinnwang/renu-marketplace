@@ -9,7 +9,7 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import Toast from "react-native-toast-message";
 import { useMutation } from "@tanstack/react-query";
 import { postAppleLogin } from "../api";
-import { AppleAuthResponse } from "../../shared/types";
+import { AppleAuthResponse, Session } from "../../shared/types";
 import * as SecureStore from "expo-secure-store";
 
 const GoogleLogo = ({ className }: { className?: string }) => (
@@ -56,7 +56,8 @@ export default function LoginPage() {
     {
       onSuccess: (res: AppleAuthResponse) => {
         if (res.token && res.email && res.user_id) {
-          const s = {
+          const s: Session = {
+            is_guest: false,
             token: res.token,
             email: res.email,
             user_id: res.user_id,
@@ -128,13 +129,28 @@ export default function LoginPage() {
             }
           }}
         />
-        <TouchableOpacity onPress={signInWithGoogle} className="mb-12 mt-4">
+        <TouchableOpacity onPress={signInWithGoogle} className="mt-4">
           <View className="items-center flex-row h-[45px] border-[1.5px] rounded-md w-[80vw] flex justify-center dark:border-white">
             <GoogleLogo />
             <Text className="ml-2 font-Poppins_600SemiBold text-base dark:text-white">
               Continue with Google
             </Text>
           </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setSession({
+              is_guest: true,
+              email: null,
+              token: null,
+              user_id: null,
+            });
+            router.replace("/home");
+          }}
+        >
+          <Text className="mb-8 mt-3 mx-auto font-Manrope_500Medium text-sm dark:text-white">
+            Continue as guest
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

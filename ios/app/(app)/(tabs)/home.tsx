@@ -95,7 +95,6 @@ const CategoryView = ({
     isError: isErrorItems,
     refetch: refetchItems,
     fetchNextPage,
-    hasNextPage,
   } = useInfiniteQuery({
     queryFn: getItemsByCategory,
     queryKey: ["item", category],

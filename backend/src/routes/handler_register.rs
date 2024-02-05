@@ -17,7 +17,8 @@ pub fn handlers(conf: &mut web::ServiceConfig) {
             .service(super::user_handler::get_items_by_me_by_status_handler)
             .service(super::user_handler::get_active_items_by_user_id)
             .service(super::user_handler::post_push_token_handler)
-            .service(super::user_handler::delete_push_token_handler),
+            .service(super::user_handler::delete_push_token_handler)
+            .service(super::user_handler::delete_user_handler),
     );
     conf.service(
         web::scope("/items")

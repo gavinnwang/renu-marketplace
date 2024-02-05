@@ -11,7 +11,12 @@ import {
   useColorScheme,
 } from "react-native";
 import Colors from "../../../../shared/constants/Colors";
-import { Item, ItemCategoryWithAll as ItemCategory, Measure, RefAndKey } from "../../../../shared/types";
+import {
+  Item,
+  ItemCategoryWithAll as ItemCategory,
+  Measure,
+  RefAndKey,
+} from "../../../../shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 
@@ -82,15 +87,32 @@ export function TabPage({ index }: { index: number }) {
     refetch,
   } = useQuery({
     queryKey: ["list"],
-    queryFn: () => getUserMeItems(session!.token),
-    enabled: !!session && !!session.token,
+    queryFn: () => getUserMeItems(session!.token!),
+    enabled: !!session && !!session.token && session.is_guest === false,
   });
 
   const [refreshing, setRefreshing] = React.useState(false);
-
+  const { setSession } = useSession();
   return (
     <View className="bg-bgLight dark:bg-blackPrimary h-full">
-      {isErrorItem ? (
+      {session?.is_guest ? (
+        <View className="flex-grow flex flex-col justify-center items-center w-full">
+          <Text className="font-Poppins_600SemiBold text-base text-center text-blackPrimary dark:text-bgLight">
+            You must be logged in to view your listings.
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setSession(null);
+              router.replace("/login");
+            }}
+            className="border-[1.5px] border-blackPrimary dark:border-bgLight mt-4 h-[40px] w-[160px] mx-auto flex items-center justify-center rounded-sm"
+          >
+            <Text className="font-Poppins_600SemiBold text-blackPrimary dark:text-bgLight">
+              Login
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : isErrorItem ? (
         <RefreshScreen
           displayText={"Something went wrong."}
           refetch={refetch}
@@ -140,7 +162,7 @@ const ListingPageItem = ({ item }: { item: Item }) => {
 
   const queryClient = useQueryClient();
   const mutation = useMutation(
-    (newStatus: string) => postItemStatus(session!.token, item.id, newStatus),
+    (newStatus: string) => postItemStatus(session!.token!, item.id, newStatus),
     {
       onMutate: async () => {
         await queryClient.cancelQueries({ queryKey: ["list"] });
@@ -327,8 +349,8 @@ const Tabs = ({
   const { session } = useSession();
   const { data: itemData } = useQuery({
     queryKey: ["list"],
-    queryFn: () => getUserMeItems(session!.token),
-    enabled: !!session && !!session.token,
+    queryFn: () => getUserMeItems(session!.token!),
+    enabled: !!session && !!session.token && session.is_guest === false,
   });
 
   return (

@@ -3,6 +3,7 @@ import {
   RefreshControl,
   SafeAreaView,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import LeftChevron from "../../components/LeftChevron";
@@ -16,7 +17,7 @@ import React from "react";
 import { router } from "expo-router";
 
 export default function SavedItemsPage() {
-  const { session } = useSession();
+  const { session, setSession } = useSession();
   const {
     data: savedItemData,
     isError: isErrorSavedItem,
@@ -24,8 +25,8 @@ export default function SavedItemsPage() {
     refetch,
   } = useQuery({
     queryKey: ["savedItems"],
-    queryFn: () => getSavedItems(session!.token),
-    enabled: !!session && !!session.token,
+    queryFn: () => getSavedItems(session!.token!),
+    enabled: !!session && !!session.token && !session.is_guest,
   });
   const [refreshing, setRefreshing] = React.useState(false);
   return (
@@ -45,25 +46,46 @@ export default function SavedItemsPage() {
           </Text>
         </View>
 
-        {isLoadingSavedItem ? (
+        {session?.is_guest ? (
+          <View className="bg-greyLight">
+            <View className="h-[80%] flex-grow mx-5">
+              <View className="flex-grow flex flex-col justify-center items-center w-full">
+                <Text className="font-Poppins_600SemiBold text-base text-center text-blackPrimary dark:text-bgLight">
+                  You must be logged in to view your saved items.
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSession(null);
+                    router.replace("/login");
+                  }}
+                  className="border-[1.5px] border-blackPrimary dark:border-bgLight mt-4 h-[40px] w-[160px] mx-auto flex items-center justify-center rounded-sm"
+                >
+                  <Text className="font-Poppins_600SemiBold text-blackPrimary dark:text-bgLight">
+                    Login
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        ) : isLoadingSavedItem ? (
           <></>
         ) : isErrorSavedItem ? (
           <View className="bg-greyLight">
-          <View className="h-[80%] flex-grow">
-            <RefreshScreen
-              displayText="Something went wrong."
-              refetch={refetch}
-            />
-          </View>
+            <View className="h-[80%] flex-grow">
+              <RefreshScreen
+                displayText="Something went wrong."
+                refetch={refetch}
+              />
+            </View>
           </View>
         ) : savedItemData.length === 0 ? (
           <View className="bg-greyLight">
-          <View className="h-[80%] flex-grow">
-            <RefreshScreen
-              displayText="You have no saved items."
-              refetch={refetch}
-            />
-          </View>
+            <View className="h-[80%] flex-grow">
+              <RefreshScreen
+                displayText="You have no saved items."
+                refetch={refetch}
+              />
+            </View>
           </View>
         ) : (
           <View className="bg-greyLight h-full">

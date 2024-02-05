@@ -14,8 +14,8 @@ import { getUserMeInfo } from "../../../api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
-import Colors from "../../../../shared/constants/Colors";
 import { VerifiedIcon } from "../../../components/VerifiedIcon";
+import Toast from "react-native-toast-message";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -27,8 +27,8 @@ export default function AccountScreen() {
     refetch,
   } = useQuery({
     queryKey: ["me"],
-    queryFn: () => getUserMeInfo(session!.token),
-    enabled: !!session && !!session.token,
+    queryFn: () => getUserMeInfo(session!.token!),
+    enabled: !!session && !!session.token && !session.is_guest,
   });
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -37,8 +37,15 @@ export default function AccountScreen() {
     const email = "gavinwang313@gmail.com";
     const subject = encodeURIComponent("[Renu Feedback]");
     const url = `mailto:${email}?subject=${subject}`;
-    Linking.openURL(url).catch((err) => console.error(err));
+    Linking.openURL(url).catch((errMsg) =>
+      Toast.show({
+        type: "error",
+        text1: `An error occured: ${errMsg}`,
+      })
+    );
   };
+
+  const { setSession } = useSession();
 
   return (
     <View className="bg-bgLight h-full dark:bg-blackPrimary">
@@ -71,11 +78,24 @@ export default function AccountScreen() {
             className="w-16 h-16 rounded-full border-white ml-2.5 bg-blackPrimary"
           />
           <View className="flex-row mt-2 items-end justify-bottom justify-between px-2.5 pb-2">
-            <View className="flex-col w-[200px]">
-              <View className="flex flex-row mb-1 items-center max-w-[160px] h-[32px]">
-                <Text className="mr-1 text-xl font-Poppins_500Medium text-left text-blackPrimary dark:text-bgLight">
-                  {user?.name}
-                </Text>
+            <View className="flex-col w-[300px]">
+              <View className="flex flex-row mb-1 items-center max-w-[350px] h-[32px]">
+                {!user || session?.is_guest ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSession(null);
+                      router.replace("/login");
+                    }}
+                  >
+                    <Text className="mr-1 text-base font-Poppins_500Medium text-left text-blackPrimary dark:text-bgLight">
+                      Log in to view profile
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text className="mr-1 text-xl font-Poppins_500Medium text-left text-blackPrimary dark:text-bgLight">
+                    {user.name}
+                  </Text>
+                )}
                 {user?.verified && <VerifiedIcon />}
               </View>
 

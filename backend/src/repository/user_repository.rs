@@ -80,3 +80,17 @@ pub async fn post_push_token(
         _ => Ok(()),
     }
 }
+
+pub async fn delete_user(
+    conn: impl Executor<'_, Database = Postgres>,
+    id: i32,
+) -> Result<(), DbError> {
+    let result = sqlx::query!(r#"DELETE FROM "user" WHERE id = $1"#, id)
+        .execute(conn)
+        .await?;
+
+    match result.rows_affected() {
+        0 => Err(DbError::NotFound),
+        _ => Ok(()),
+    }
+}

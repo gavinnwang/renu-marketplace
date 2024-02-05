@@ -25,7 +25,7 @@ export const GOOGLE_OAUTH_CLIENT_ID =
 
 export async function parseOrThrowResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    const errMsg = await res.json();
+    const errMsg = await res.text();
     console.debug("error response", errMsg);
     Toast.show({
       type: "error",
@@ -356,7 +356,7 @@ export async function deleteItem(
     headers: {
       authorization: `Bearer ${sessionToken}`,
     },
-    method: "POST",
+    method: "DELETE",
   });
   return parseOrThrowResponse(res);
 }

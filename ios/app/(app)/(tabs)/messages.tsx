@@ -6,6 +6,7 @@ import {
   Pressable,
   RefreshControl,
   useColorScheme,
+  TouchableOpacity,
 } from "react-native";
 import { router } from "expo-router";
 import { ChatGroup, Measure, RefAndKey } from "../../../../shared/types";
@@ -71,16 +72,34 @@ function TabPage({ index }: { index: number }) {
     isLoading: isLoadingChats,
     refetch,
   } = useQuery({
-    queryFn: () => getAllChatGroups(session!.token),
+    queryFn: () => getAllChatGroups(session!.token!),
     queryKey: ["chats"],
-    enabled: !!session,
+    enabled: !!session && session.is_guest === false && !!session.token,
   });
 
   const chats = index === 0 ? allChats?.buyer_chat : allChats?.seller_chat;
 
+  const { setSession } = useSession();
   return (
     <View className="bg-bgLight h-full dark:bg-blackPrimary">
-      {isErrorChats ? (
+      {session?.is_guest ? (
+        <View className="flex-grow flex flex-col justify-center items-center w-full">
+          <Text className="font-Poppins_600SemiBold text-base text-center text-blackPrimary dark:text-bgLight mx-5">
+            You must be logged in to view your messages.
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setSession(null);
+              router.replace("/login");
+            }}
+            className="border-[1.5px] border-blackPrimary dark:border-bgLight mt-4 h-[40px] w-[160px] mx-auto flex items-center justify-center rounded-sm"
+          >
+            <Text className="font-Poppins_600SemiBold text-blackPrimary dark:text-bgLight">
+              Login
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : isErrorChats ? (
         <RefreshScreen displayText="Something went wrong." refetch={refetch} />
       ) : isLoadingChats ? (
         <></>
@@ -211,9 +230,9 @@ const Tab = React.forwardRef(
   ) => {
     const { session } = useSession();
     const { data: allChats } = useQuery({
-      queryFn: () => getAllChatGroups(session!.token),
+      queryFn: () => getAllChatGroups(session!.token!),
       queryKey: ["chats"],
-      enabled: !!session,
+      enabled: !!session && session.is_guest === false && !!session.token,
     });
     const chats = index === 0 ? allChats?.buyer_chat : allChats?.seller_chat;
     const unreadCount = React.useMemo(() => {
@@ -231,7 +250,7 @@ const Tab = React.forwardRef(
         <Text
           className={`ml-2.5 mt-2 font-Poppins_600SemiBold text-base font-semibold leading-7 ${
             selectedTabInt === index
-              ? "text-blackPrimary border-b-grayLight dark:text-bgLight" 
+              ? "text-blackPrimary border-b-grayLight dark:text-bgLight"
               : "text-grayPrimary"
           }`}
         >

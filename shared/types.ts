@@ -63,11 +63,19 @@ export type RefAndKey = {
   ref: React.RefObject<any>;
 };
 
-export type Session = {
-  token: string;
-  email: string;
-  user_id: number;
-};
+export type Session =
+  | {
+      is_guest: false;
+      token: string;
+      email: string;
+      user_id: number;
+    }
+  | {
+      is_guest: true;
+      token: null;
+      email: null;
+      user_id: null;
+    };
 
 export type AppleAuthResponse = {
   token: string;

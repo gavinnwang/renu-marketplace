@@ -20,7 +20,7 @@ const useRetrieveSession = (queryClient: QueryClient) => {
         setSession(sessionParsed);
       }
       setTimeout(() => {
-        if (sessionParsed) {
+        if (sessionParsed && !sessionParsed.is_guest) {
           console.debug("prefetching");
           queryClient.prefetchInfiniteQuery({
             queryFn: () => getItemsByCategory("all", 0),

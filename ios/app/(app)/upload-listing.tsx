@@ -29,6 +29,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { registerForPushNotificationsAsync } from "../../notification";
 import * as Notifications from "expo-notifications";
 import { ItemCategoryWithPicking } from "../../../shared/types";
+import Toast from "react-native-toast-message";
 
 const MAX_IMAGES = 6;
 
@@ -41,26 +42,32 @@ export default function UploadListingStepOne() {
       alert(`You can only upload ${MAX_IMAGES} images`);
       return;
     }
+    try {
+      // No permissions request is necessary for launching the image library
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0,
+      });
 
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0,
-    });
-
-    if (!result.canceled) {
-      const image = result.assets[0].uri;
-      if (image) {
-        setImages((prev) => [
-          ...prev.slice(0, prev.length - 1),
-          image,
-          "picker",
-        ]);
+      if (!result.canceled) {
+        const image = result.assets[0].uri;
+        if (image) {
+          setImages((prev) => [
+            ...prev.slice(0, prev.length - 1),
+            image,
+            "picker",
+          ]);
+        }
+      } else {
+        console.debug("cancelled");
       }
-    } else {
-      console.debug("cancelled");
+    } catch (e) {
+      Toast.show({
+        type: "error",
+        text1: "Failed to upload image: " + e,
+      });
     }
   };
 
@@ -82,11 +89,19 @@ export default function UploadListingStepOne() {
 
   const handleComplete = async () => {
     if (images.length === 1) {
-      alert("Please add at least one image");
+      Toast.show({
+        type: "error",
+        text1: "Please add at least one image",
+      });
+      // alert("Please add at least one image");
       return;
     }
-    if (session === null) {
-      alert("Please login to use this feature");
+    if (session === null || session.is_guest) {
+      // alert("Please login to use this feature");
+      Toast.show({
+        type: "error",
+        text1: "Please login to use this feature",
+      });
       return;
     }
     if (completing) {
@@ -112,6 +127,10 @@ export default function UploadListingStepOne() {
         iosPickerRef.current?.setState(completionRes.category);
       }
     } catch (e) {
+      Toast.show({
+        type: "error",
+        text1: "Failed to complete AI: " + e,
+      });
       console.error(e);
     }
     setCompleting(false);
@@ -197,27 +216,55 @@ export default function UploadListingStepOne() {
     );
   };
   const handleUpload = async () => {
+    if (session === null || session.is_guest) {
+      // alert("Please login to publish item");
+      Toast.show({
+        type: "error",
+        text1: "Please login to publish item",
+      });
+      return;
+    }
     if (uploading) {
       return;
     }
     if (images.length === 1) {
-      alert("Please add at least one image");
+      // alert("Please add at least one image");
+      Toast.show({
+        type: "error",
+        text1: "Please add at least one image",
+      });
       return;
     }
     if (title === "") {
-      alert("Please enter a title");
+      Toast.show({
+        type: "error",
+        text1: "Please enter a title",
+      });
+      // alert("Please enter a title");
       return;
     }
     if (price === "") {
-      alert("Please enter a price");
+      // alert("Please enter a price");
+      Toast.show({
+        type: "error",
+        text1: "Please enter a price",
+      });
       return;
     }
     if (isNaN(Number(price))) {
-      alert("Please enter a valid price");
+      Toast.show({
+        type: "error",
+        text1: "Please enter a valid price",
+      });
+      // alert("Please enter a valid price");
       return;
     }
     if (Number(price) > 99999) {
-      alert("Please enter a price less than $99999");
+      Toast.show({
+        type: "error",
+        text1: "Please enter a price less than $99999",
+      });
+      // alert("Please enter a price less than $99999");
       return;
     }
     // if category is part of item category but not picking
@@ -364,7 +411,6 @@ export default function UploadListingStepOne() {
                     />
                   </View>
                 </View>
-
 
                 <View className="pb-5 border-b border-b-stone-200 dark:border-b-stone-800">
                   <Text className="pb-2 w-full pt-3 font-Poppins_600SemiBold text-base text-blackPrimary dark:text-bgLight">
