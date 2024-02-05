@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { postAppleLogin } from "../api";
 import { AppleAuthResponse, Session } from "../../shared/types";
 import * as SecureStore from "expo-secure-store";
+import * as Linking from "expo-linking";
 
 const GoogleLogo = ({ className }: { className?: string }) => (
   <Svg viewBox="0 0 48 48" width="16" height="16" className={className}>
@@ -74,6 +75,16 @@ export default function LoginPage() {
       },
     }
   );
+
+  const handleGotoTermsWebpage = () => {
+    const url = "https://renu.app/terms";
+    Linking.openURL(url).catch((errMsg) =>
+      Toast.show({
+        type: "error",
+        text1: `An error occured: ${errMsg}`,
+      })
+    );
+  };
 
   return (
     <SafeAreaView className="flex h-full w-full pt-4 items-center bg-bgLight flex-col justify-between dark:bg-blackPrimary">
@@ -148,8 +159,16 @@ export default function LoginPage() {
             router.replace("/home");
           }}
         >
-          <Text className="mb-8 mt-3 mx-auto font-Manrope_500Medium text-sm dark:text-white">
+          <Text className="my-5 mx-auto font-Manrope_500Medium text-sm dark:text-white">
             Continue as guest
+          </Text>
+        </TouchableOpacity>
+        <Text className="mt-1 mx-auto font-Manrope_600SemiBold text-xs dark:text-white">
+          By continuing, you agree to accept our:
+        </Text>
+        <TouchableOpacity onPress={handleGotoTermsWebpage}>
+          <Text className="mb-4 mx-auto font-Manrope_600SemiBold text-xs text-purplePrimary">
+            Terms & Conditions
           </Text>
         </TouchableOpacity>
       </View>

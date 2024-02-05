@@ -5,12 +5,13 @@ import {
   ScrollView,
   RefreshControl,
   useColorScheme,
+  Alert,
 } from "react-native";
 import { Image } from "expo-image";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
-import { getUserMeInfo } from "../../../api";
+import { deleteUser, getUserMeInfo } from "../../../api";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Linking from "expo-linking";
 import { router } from "expo-router";
@@ -44,6 +45,19 @@ export default function AccountScreen() {
       })
     );
   };
+
+  const deleteUserMutation = useMutation({
+    mutationFn: deleteUser,
+    onError: (error) => {
+      Toast.show({
+        type: "error",
+        text1: `An error occured: ${error}`,
+      });
+    },
+    onSettled: () => {
+      signOut();
+    },
+  });
 
   const { setSession } = useSession();
 
@@ -138,12 +152,56 @@ export default function AccountScreen() {
             Share feedbacks
           </Text>
         </TouchableOpacity>
+        <View className="w-full h-2 bg-grayLight dark:bg-zinc-950 mt-2" />
+
+        <TouchableOpacity
+          className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
+          onPress={() => {
+            if (!session || session?.is_guest) {
+              Toast.show({
+                type: "error",
+                text1: "You must be logged in to delete your account",
+              });
+              return;
+            }
+            Alert.alert(
+              "Confirm",
+              "Are you sure you want to delete your account? This action is irreversible.",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                  onPress: () => {
+                    return;
+                  },
+                },
+                {
+                  text: "Continue",
+                  onPress: async () => {
+                    await deleteUserMutation.mutateAsync(session!.token);
+                  },
+                },
+              ]
+            );
+          }}
+        >
+          <Text className="font-Manrope_500Medium text-base text-red-500">
+            Delete account
+          </Text>
+        </TouchableOpacity>
 
         <View className="w-full h-2 bg-grayLight dark:bg-zinc-950 mt-2" />
 
         <TouchableOpacity
           className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
-          onPress={signOut}
+          onPress={() => {
+            if (!session || session?.is_guest) {
+              setSession(null);
+              router.replace("/login");
+              return;
+            }
+            signOut();
+          }}
         >
           <Text className="font-Manrope_500Medium text-base text-red-500">
             Sign out

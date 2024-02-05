@@ -1,4 +1,11 @@
-import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import LeftChevron from "../../../components/LeftChevron";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
@@ -9,6 +16,8 @@ import { FlashList } from "@shopify/flash-list";
 import RefreshScreen from "../../../components/RefreshScreen";
 import { ItemListing } from "../../../components/ItemListing";
 import { VerifiedIcon } from "../../../components/VerifiedIcon";
+import { OptionIcon } from "../../../components/OptionIcon";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 
 export default function SellerPage() {
   const { sellerString, sellerId } = useLocalSearchParams();
@@ -36,13 +45,56 @@ export default function SellerPage() {
     enabled: !!sellerId,
   });
 
+  const { showActionSheetWithOptions } = useActionSheet();
+  const onPress = () => {
+    const options = ["Block", "Cancel"];
+    const destructiveButtonIndex = 0;
+    const cancelButtonIndex = 1;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      (selectedIndex: any) => {
+        switch (selectedIndex) {
+          case destructiveButtonIndex:
+            // Block
+            Alert.alert("Block", "Are you sure you want to block this user?", [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "Block",
+                onPress: () => {
+                  // Block user
+                },
+                style: "destructive",
+              },
+            ]);
+            break;
+
+          case cancelButtonIndex:
+          // Canceled
+        }
+      }
+    );
+  };
+
   return (
     <>
       <SafeAreaView className="bg-bgLight dark:bg-blackPrimary" />
       <View className="bg-bgLight h-full dark:bg-blackPrimary">
-        <Pressable onPress={router.back} className="p-3">
-          <LeftChevron />
-        </Pressable>
+        <View className="flex flex-row justify-between items-center">
+          <Pressable onPress={router.back} className="p-3">
+            <LeftChevron />
+          </Pressable>
+          <Pressable onPress={onPress} className="p-3">
+            <OptionIcon />
+          </Pressable>
+        </View>
 
         <ScrollView>
           <View className="flex items-start">

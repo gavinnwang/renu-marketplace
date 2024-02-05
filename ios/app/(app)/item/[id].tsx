@@ -38,6 +38,7 @@ import { FlashList } from "@shopify/flash-list";
 import { VerifiedIcon } from "../../../components/VerifiedIcon";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import Toast from "react-native-toast-message";
+import { OptionIcon } from "../../../components/OptionIcon";
 dayjs.extend(relativeTime);
 
 const HeartIcon = ({ filled }: { filled: boolean }) => (
@@ -402,6 +403,13 @@ export default function ItemPage() {
                   <View className="ml-auto flex flex-col w-[100px] gap-y-0.5">
                     <Pressable
                       onPress={() => {
+                        if (!session || session.is_guest) {
+                          Toast.show({
+                            type: "error",
+                            text1: "You must be logged in to message",
+                          });
+                          return;
+                        }
                         if (isUserItem) {
                           router.push("/account");
                         } else if (seller) {
@@ -465,27 +473,6 @@ const CategoryIcon = () => {
         fill={
           colorScheme === "dark" ? Colors.whitePrimary : Colors.blackPrimary
         }
-      />
-    </Svg>
-  );
-};
-
-const OptionIcon = () => {
-  const colorScheme = useColorScheme();
-  return (
-    <Svg
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke={
-        colorScheme === "dark" ? Colors.whitePrimary : Colors.blackPrimary
-      }
-      className="w-6 h-6"
-    >
-      <Path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
       />
     </Svg>
   );

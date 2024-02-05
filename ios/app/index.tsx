@@ -11,11 +11,10 @@ export default function Index() {
       console.debug("Not loaded from storage, waiting for session to load");
       return;
     }
-    if (session && !session.is_guest) {
+    if (session) {
       console.debug("Session found, redirecting to home");
       router.replace(`/home`);
-    } 
-    else {
+    } else {
       console.debug("No session found, redirecting to login");
       router.replace("/login");
     }

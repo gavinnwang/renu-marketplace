@@ -350,9 +350,19 @@ export async function getPopularSearchQueries(): Promise<string[]> {
 
 export async function deleteItem(
   sessionToken: string,
-  itemId: string, 
+  itemId: string
 ): Promise<string> {
   const res = await fetch(`${API_URL}/items/${itemId}`, {
+    headers: {
+      authorization: `Bearer ${sessionToken}`,
+    },
+    method: "DELETE",
+  });
+  return parseOrThrowResponse(res);
+}
+
+export async function deleteUser(sessionToken: string): Promise<string> {
+  const res = await fetch(`${API_URL}/users/me`, {
     headers: {
       authorization: `Bearer ${sessionToken}`,
     },
