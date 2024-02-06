@@ -157,7 +157,10 @@ async fn delete_user_handler(
 
     user_repository::delete_user(pool.as_ref(), user_id)
         .await
-        .map_err(|_| UserError::InternalError)?;
+        .map_err(|e| {
+            tracing::error!("Failed to delete user: {e}");
+            UserError::InternalError
+        })?;
 
     Ok(HttpResponse::Ok().json("User deleted"))
 }

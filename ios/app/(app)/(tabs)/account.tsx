@@ -8,7 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { Image } from "expo-image";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Svg, { Path } from "react-native-svg";
 import { useSession } from "../../../hooks/useSession";
 import { deleteUser, getUserMeInfo } from "../../../api";
@@ -17,6 +17,7 @@ import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { VerifiedIcon } from "../../../components/VerifiedIcon";
 import Toast from "react-native-toast-message";
+import * as SecureStore from "expo-secure-store";
 
 export default function AccountScreen() {
   const { signOut, session } = useSession();
@@ -60,6 +61,7 @@ export default function AccountScreen() {
   });
 
   const { setSession } = useSession();
+  const queryClient = useQueryClient();
 
   return (
     <View className="bg-bgLight h-full dark:bg-blackPrimary">
@@ -176,9 +178,17 @@ export default function AccountScreen() {
                   },
                 },
                 {
-                  text: "Continue",
+                  text: "Delete",
+                  style: "destructive",
                   onPress: async () => {
-                    await deleteUserMutation.mutateAsync(session!.token);
+                    const token = session.token;
+                    console.debug("deleting user", token);
+                    setSession(null);
+                    queryClient.removeQueries();
+                    await SecureStore.deleteItemAsync("session");
+                    await SecureStore.deleteItemAsync("searchHistory");
+                    await deleteUserMutation.mutateAsync(token);
+                    router.replace("/");
                   },
                 },
               ]

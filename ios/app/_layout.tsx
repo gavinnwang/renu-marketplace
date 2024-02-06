@@ -22,6 +22,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useNotificationObserver from "../hooks/useNotificationObserver";
 import Toast from "react-native-toast-message";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import { DarkTheme, ThemeProvider, useTheme } from "@react-navigation/native";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -71,7 +72,9 @@ export default function RootLayout() {
       <ActionSheetProvider>
         <QueryClientProvider client={queryClient}>
           <SessionProvider>
-            <RootLayoutNav />
+            <ThemeProvider value={DarkTheme}>
+              <RootLayoutNav />
+            </ThemeProvider>
             <Toast config={toastConfig} />
           </SessionProvider>
         </QueryClientProvider>
@@ -89,7 +92,6 @@ const toastConfig = {
 
 function RootLayoutNav() {
   // const colorScheme = useColorScheme();
-
   useRetrieveSession(queryClient);
   useNotificationObserver();
 
