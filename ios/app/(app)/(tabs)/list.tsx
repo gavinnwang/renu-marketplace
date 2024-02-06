@@ -95,7 +95,7 @@ export function TabPage({ index }: { index: number }) {
   return (
     <View className="bg-bgLight dark:bg-blackPrimary h-full">
       {session?.is_guest ? (
-        <View className="flex-grow flex flex-col justify-center items-center w-full">
+        <View className="px-10 flex-grow flex flex-col mt-[220px] items-center w-full">
           <Text className="font-Poppins_600SemiBold text-base text-center text-blackPrimary dark:text-bgLight">
             You must be logged in to view your listings.
           </Text>

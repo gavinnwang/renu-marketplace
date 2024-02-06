@@ -2,16 +2,26 @@ import { Tabs } from "expo-router";
 import React from "react";
 import Colors from "../../../../shared/constants/Colors";
 import Svg, { Path } from "react-native-svg";
-import { SafeAreaView, Text, View, useColorScheme } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
 import { getAllChatGroups } from "../../../api";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "../../../hooks/useSession";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
   const colorScheme = useColorScheme();
+  const inset = useSafeAreaInsets();
   return (
     <>
-      <SafeAreaView className="bg-bgLight dark:bg-blackPrimary" />
+      <View
+        style={{
+          height: inset.top,
+          backgroundColor:
+            colorScheme === "dark"
+              ? Colors.dark.background
+              : Colors.light.background,
+        }}
+      />
       <Tabs
         screenOptions={{
           tabBarStyle: {

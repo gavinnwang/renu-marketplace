@@ -80,6 +80,12 @@ export default function AccountScreen() {
             refreshing={refreshing}
             onRefresh={async () => {
               setRefreshing(true);
+              if (!session?.token) {
+                setTimeout(() => {
+                  setRefreshing(false);
+                }, 50);
+                return;
+              }
               await refetch();
               setRefreshing(false);
             }}
@@ -139,10 +145,10 @@ export default function AccountScreen() {
 
         <View className="w-full h-2 bg-grayLight dark:bg-zinc-950 mt-2" />
         <TouchableOpacity
-          className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
+          className="ml-2 mt-2.5 mb-1 flex flex-row items-center"
           onPress={() => router.push("/saved")}
         >
-          <HeartIcon />
+          {/* <HeartIcon /> */}
           <Text className="ml-2 font-Manrope_500Medium text-base text-blackPrimary dark:text-bgLight">
             Saved items
           </Text>
@@ -153,8 +159,8 @@ export default function AccountScreen() {
           className="ml-4 mt-2.5 mb-1 flex flex-row items-center"
           onPress={handleEmailLink}
         >
-          <EmailIcon />
-          <Text className="ml-2 font-Manrope_500Medium text-base text-blackPrimary dark:text-bgLight">
+          {/* <EmailIcon /> */}
+          <Text className=" font-Manrope_500Medium text-base text-blackPrimary dark:text-bgLight">
             Share feedbacks
           </Text>
         </TouchableOpacity>
@@ -205,11 +211,30 @@ export default function AccountScreen() {
               router.replace("/login");
               return;
             }
-            signOut();
+            Alert.alert("Confirm", "Are you sure you want to sign out?", [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "Sign out",
+                style: "destructive",
+                onPress: () => {
+                  setSession(null);
+                  queryClient.removeQueries();
+                  SecureStore.deleteItemAsync("session");
+                  router.replace("/");
+                },
+              },
+            ]);
           }}
         >
-          <Text className="font-Manrope_500Medium text-base text-red-500">
-            Sign out
+          <Text
+            className={`font-Manrope_500Medium text-base ${
+              session?.is_guest ? "text-blackPrimary dark:text-bgLight" : "text-red-500"
+            }`}
+          >
+            {session?.is_guest ? "Log in" : "Sign out"}
           </Text>
         </TouchableOpacity>
         <View className="w-full h-[500%] bg-grayLight dark:bg-zinc-950 mt-2" />

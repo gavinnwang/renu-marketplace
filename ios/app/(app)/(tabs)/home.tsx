@@ -31,7 +31,8 @@ const data: CategoryTabData[] = Object.keys(ItemCategoryWithAll).map((i) => ({
 export default function HomeScreen() {
   const [selectedSection, setSelectedSection] = React.useState(0);
   const pagerViewRef = React.useRef<PagerView>(null);
-
+  const [scrollState, setScrollState] = React.useState(0);
+  // const throttledScrollState = useThrottle(scrollState, 50);
   useScrollToTop(data[selectedSection].flashListRef);
 
   return (
@@ -43,12 +44,18 @@ export default function HomeScreen() {
         data={data}
         selectedSection={selectedSection}
         pagerViewRef={pagerViewRef}
+        scrollState={scrollState}
       />
       <PagerView
         ref={pagerViewRef}
-        onPageSelected={(e) => {
-          const idx = e.nativeEvent.position;
-          setSelectedSection(idx);
+        // onPageSelected={(e) => {
+        //   const idx = e.nativeEvent.position;
+        //   setSelectedSection(idx);
+        // }}
+        onPageScroll={(e) => {
+          const { offset, position } = e.nativeEvent;
+          setSelectedSection(position);
+          setScrollState(offset);
         }}
         className="flex-1"
         initialPage={0}
@@ -112,7 +119,7 @@ const CategoryView = ({
   });
 
   return (
-    <View key={index} className="h-full flex flex-grow">
+    <View key={index} className="h-full flex flex-grow w-full">
       {isLoadingItems ? (
         <View className="bg-bgLight dark:bg-blackPrimary h-full w-full"></View>
       ) : isErrorItems ? (
@@ -231,10 +238,12 @@ const Tabs = ({
   data,
   selectedSection,
   pagerViewRef,
+  scrollState,
 }: {
   data: CategoryTabData[];
   selectedSection: number;
   pagerViewRef: React.RefObject<PagerView>;
+  scrollState: number;
 }) => {
   const [measures, setMeasures] = React.useState<Measure[]>([]);
   const containerRef = React.useRef<any>();
@@ -259,25 +268,27 @@ const Tabs = ({
   }, [containerRef.current]);
 
   const animatedValueX = React.useRef(new Animated.Value(0)).current;
-  const animatedWidth = React.useRef(new Animated.Value(0)).current;
+  // const animatedWidth = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    // const idx = data.findIndex((item) => item.value === selectedSection);
     if (measures[selectedSection]) {
       Animated.parallel([
         Animated.timing(animatedValueX, {
-          toValue: measures[selectedSection].x,
-          duration: 150,
+          toValue:
+            measures[selectedSection].x +
+            measures[selectedSection].width * scrollState,
+          // duration: 100,
+          duration: 0,
           useNativeDriver: true,
         }),
-        Animated.timing(animatedWidth, {
-          toValue: measures[selectedSection].width,
-          duration: 150,
-          useNativeDriver: true,
-        }),
+        // Animated.timing(animatedWidth, {
+        //   toValue: measures[Math.ceil(selectedSection + scrollState)].width,
+        //   duration: 50,
+        //   useNativeDriver: true,
+        // }),
       ]).start();
     }
-  }, [selectedSection, measures]);
+  }, [selectedSection, measures, scrollState]);
 
   return (
     <ScrollView
@@ -291,7 +302,7 @@ const Tabs = ({
           <Tab
             key={section.key}
             section={section}
-            selectedSection={selectedSection}
+            selectedSection={selectedSection + (scrollState > 0.2 ? 1 : 0)}
             ref={section.ref}
             pagerViewRef={pagerViewRef}
             index={index}
@@ -302,7 +313,7 @@ const Tabs = ({
       {measures.length > 0 && (
         <Indicator
           animatedValueX={animatedValueX}
-          animatedWidth={animatedWidth}
+          // animatedWidth={animatedWidth}
           measures={measures}
         />
       )}
@@ -312,22 +323,33 @@ const Tabs = ({
 
 const Indicator = ({
   animatedValueX,
-  animatedWidth,
+  // animatedWidth,
   measures,
 }: {
   animatedValueX: Animated.Value;
-  animatedWidth: Animated.Value;
+  // animatedWidth: Animated.Value;
   measures: Measure[];
 }) => {
-  const scaleX = animatedWidth.interpolate({
-    inputRange: [0, Math.max(...measures.map((item) => item.width)) / 2],
-    outputRange: [0, 1],
-  });
+  // const max = React.useMemo(
+  //   () => Math.max(...measures.map((item) => item.width)) / 2,
+  //   [measures]
+  // );
+  // const scaleX = animatedWidth.interpolate({
+  //   inputRange: [0, max],
+  //   outputRange: [0, 1],
+  // });
+  const inputRange = React.useMemo(
+    () => measures.map((item) => item.x),
+    [measures]
+  );
+  const outputRangeMemo = React.useMemo(
+    () =>
+      measures.map((item) => item.x + item.width / 2 - measures[0].width / 2),
+    [measures]
+  );
   const translateX = animatedValueX.interpolate({
-    inputRange: measures.map((item) => item.x),
-    outputRange: measures.map(
-      (item) => item.x + item.width / 2 - measures[0].width / 2
-    ),
+    inputRange: inputRange,
+    outputRange: outputRangeMemo,
   });
 
   return (
@@ -336,9 +358,8 @@ const Indicator = ({
         position: "absolute",
         height: 2,
         width: measures[0].width,
-
         backgroundColor: Colors.northwesternPurple,
-        transform: [{ translateX }, { scaleX }],
+        transform: [{ translateX }, { scale: 1.25 }],
         bottom: -4,
       }}
     />

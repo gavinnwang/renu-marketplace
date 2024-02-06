@@ -83,7 +83,7 @@ function TabPage({ index }: { index: number }) {
   return (
     <View className="bg-bgLight h-full dark:bg-blackPrimary">
       {session?.is_guest ? (
-        <View className="flex-grow flex flex-col justify-center items-center w-full">
+        <View className="flex-grow flex flex-col mt-[220px] items-center w-full">
           <Text className="font-Poppins_600SemiBold text-base text-center text-blackPrimary dark:text-bgLight mx-5">
             You must be logged in to view your messages.
           </Text>

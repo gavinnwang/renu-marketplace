@@ -7,16 +7,18 @@ type SafeAreaViewProps = {
   disableTopSafeArea?: boolean;
   disableSidesSafeArea?: boolean;
   children: React.ReactNode;
+  className?: string;
 };
 
 export const SafeAreaViewBetter: FunctionComponent<SafeAreaViewProps> = (
-  props: SafeAreaViewProps
+  props: SafeAreaViewProps,
 ) => {
   const {
     disableBottomSafeArea = false,
     disableTopSafeArea = false,
     disableSidesSafeArea = false,
     children,
+    className,
   } = props;
 
   const insets = useSafeAreaInsets();
@@ -36,5 +38,5 @@ export const SafeAreaViewBetter: FunctionComponent<SafeAreaViewProps> = (
     style.marginLeft = insets.left;
   }
 
-  return <View style={[{ flex: 1 }, style]}>{children}</View>;
+  return <View style={[{ flex: 1 }, style]} className={className}>{children}</View>;
 };
