@@ -48,7 +48,6 @@ export default function Logo() {
 
 export function BigLogo() {
   const colorScheme = useColorScheme();
-  console.debug("Color scheme is", colorScheme);
   return (
     <Svg width="56" height="55" viewBox="0 0 56 55" fill="none">
       <Circle

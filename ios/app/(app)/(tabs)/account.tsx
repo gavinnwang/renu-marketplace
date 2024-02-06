@@ -55,8 +55,12 @@ export default function AccountScreen() {
         text1: `An error occured: ${error}`,
       });
     },
-    onSettled: () => {
-      signOut();
+    onSettled: async () => {
+      setSession(null);
+      queryClient.removeQueries();
+      await SecureStore.deleteItemAsync("session");
+      await SecureStore.deleteItemAsync("searchHistory");
+      router.replace("/");
     },
   });
 
@@ -173,22 +177,13 @@ export default function AccountScreen() {
                 {
                   text: "Cancel",
                   style: "cancel",
-                  onPress: () => {
-                    return;
-                  },
                 },
                 {
                   text: "Delete",
                   style: "destructive",
                   onPress: async () => {
                     const token = session.token;
-                    console.debug("deleting user", token);
-                    setSession(null);
-                    queryClient.removeQueries();
-                    await SecureStore.deleteItemAsync("session");
-                    await SecureStore.deleteItemAsync("searchHistory");
                     await deleteUserMutation.mutateAsync(token);
-                    router.replace("/");
                   },
                 },
               ]
