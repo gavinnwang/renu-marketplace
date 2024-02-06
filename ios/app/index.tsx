@@ -3,6 +3,7 @@ import { useSession } from "../hooks/useSession";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { BigLogo } from "../components/Logo";
+import { SafeAreaViewBetter } from "../components/SafeAreaViewBetter";
 
 export default function Index() {
   const { session, loadedFromStorage } = useSession();
@@ -21,13 +22,15 @@ export default function Index() {
   }, [session, loadedFromStorage]);
 
   return (
-    <SafeAreaView className="flex h-full w-full flex-grow items-center justify-center bg-bgLight dark:bg-blackPrimary">
-      <View className="flex flex-row items-center">
-        <BigLogo />
-        <Text className="pl-1 text-blackPrimary font-Poppins_600SemiBold text-[45px] tracking-tighter dark:text-white">
-          Renu
-        </Text>
+    <SafeAreaViewBetter>
+      <View className="flex h-full w-full flex-grow items-center justify-center bg-bgLight dark:bg-blackPrimary">
+        <View className="flex flex-row items-center">
+          <BigLogo />
+          <Text className="pl-1 text-blackPrimary font-Poppins_600SemiBold text-[45px] tracking-tighter dark:text-white">
+            Renu
+          </Text>
+        </View>
       </View>
-    </SafeAreaView>
+    </SafeAreaViewBetter>
   );
 }
