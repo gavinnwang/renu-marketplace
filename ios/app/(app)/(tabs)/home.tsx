@@ -1,4 +1,4 @@
-import { Animated, Pressable, ScrollView, Text, View } from "react-native";
+import { Animated, Easing, Pressable, ScrollView, Text, View } from "react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { RefreshControl } from "react-native-gesture-handler";
 import { ItemListing } from "../../../components/ItemListing";
@@ -221,11 +221,10 @@ const Tab = React.forwardRef(
         className="px-3 h-full justify-center"
       >
         <Text
-          className={`font-Poppins_500Medium ${
-            index === selectedSection
-              ? "text-purplePrimary"
-              : "text-stone-400 dark:text-stone-500"
-          }`}
+          className={`font-Poppins_500Medium ${index === selectedSection
+            ? "text-purplePrimary"
+            : "text-stone-400 dark:text-stone-500"
+            }`}
         >
           {section.display}
         </Text>
@@ -268,25 +267,14 @@ const Tabs = ({
   }, [containerRef.current]);
 
   const animatedValueX = React.useRef(new Animated.Value(0)).current;
-  // const animatedWidth = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
     if (measures[selectedSection]) {
-      Animated.parallel([
-        Animated.timing(animatedValueX, {
-          toValue:
-            measures[selectedSection].x +
-            measures[selectedSection].width * scrollState,
-          // duration: 100,
-          duration: 0,
-          useNativeDriver: true,
-        }),
-        // Animated.timing(animatedWidth, {
-        //   toValue: measures[Math.ceil(selectedSection + scrollState)].width,
-        //   duration: 50,
-        //   useNativeDriver: true,
-        // }),
-      ]).start();
+      Animated.timing(animatedValueX, {
+        toValue: measures[selectedSection].x + measures[selectedSection].width * scrollState,
+        duration: 0, // Consider adjusting this for smoother animations if necessary
+        useNativeDriver: true,
+      }).start();
     }
   }, [selectedSection, measures, scrollState]);
 
@@ -357,6 +345,7 @@ const Indicator = ({
       style={{
         position: "absolute",
         height: 2,
+        borderRadius: 1,
         width: measures[0].width,
         backgroundColor: Colors.northwesternPurple,
         transform: [{ translateX }, { scale: 1.25 }],

@@ -12,7 +12,7 @@ import {
 // const config = Constants.expoConfig as any;
 // export const API_URL = ("http://" +
 //   config.hostUri.split(`:`).shift().concat(`:8080`)) as string;
-// console.log("API_URL", API_URL);
+// console.debug("API_URL", API_URL);
 // export const REDIRECT_URL = "http://localhost:8080/auth/google/callback";
 
 export const API_URL = "https://api.gavinwang.dev";

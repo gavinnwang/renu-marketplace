@@ -356,7 +356,7 @@ const Indicator = ({
         position: "absolute",
         height: 2,
         width: Dimensions.get("window").width / 2,
-
+        borderRadius: 1,
         transform: [{ translateX }],
         bottom: -1,
       }}
