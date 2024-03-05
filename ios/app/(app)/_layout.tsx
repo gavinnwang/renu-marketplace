@@ -5,6 +5,7 @@ import React from "react";
 import * as Notifications from "expo-notifications";
 import { postPushToken } from "../../api";
 import Toast from "react-native-toast-message";
+import Constants from "expo-constants";
 
 export default function AppLayout() {
   const { session } = useSession();
@@ -33,7 +34,11 @@ export default function AppLayout() {
         console.debug("not posting because session is guest or not found");
         return;
       }
-      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      const token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId: Constants.expoConfig!.extra!.eas.projectId,
+        })
+      ).data;
       console.debug("UPLOADING TOKEN", token);
       postPushTokenMutation.mutateAsync(token);
     };

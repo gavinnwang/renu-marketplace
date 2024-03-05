@@ -63,14 +63,17 @@ pub async fn request_openai_api(
 
     match response.status().is_success() {
         true => {
-            let openai_response = response
-                .json::<OpenAIResponse>()
-                .await
-                .map_err(|err| err.to_string())?;
+            let openai_response = response.json::<OpenAIResponse>().await.map_err(|err| {
+                tracing::error!("Error parsing OpenAI response: {}", err.to_string());
+                err.to_string()
+            })?;
             Ok(openai_response)
         }
         false => {
-            let err_msg = response.json().await.map_err(|err| err.to_string())?;
+            let err_msg = response.text().await.map_err(|err| {
+                tracing::error!("Error parsing OpenAI error response: {}", err.to_string());
+                err.to_string()
+            })?;
             Err(err_msg)
         }
     }
